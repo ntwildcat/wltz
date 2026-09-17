@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>修仙放置 · 灵潮再临</title>
         <style>
+        /* ===== MOBILE-FIRST 强制规则 ===== */
+        @media (max-width: 768px) {
+            .container { display: flex !important; flex-direction: column !important; width: 100vw !important; height: auto !important; }
+            .sidebar { order: 1 !important; width: 100vw !important; height: 80px !important; flex-direction: row !important; align-items: center !important; border-bottom: 2px solid #c9a961 !important; overflow-x: auto !important; }
+            .skill-tree { display: none !important; }
+            .logo { margin: 0 !important; }
+            .main-content { order: 2 !important; width: 100vw !important; padding: 15px !important; }
+            .panel-container { grid-template-columns: 1fr !important; }
+            .action-list { grid-template-columns: 1fr !important; }
+            .skill-list { grid-template-columns: 1fr !important; }
+        }
+
         /* ========== 瀛椾綋瀹氫箟 ========== */
         /* @font-face {
             font-family: 'Ma Shan Zheng';
