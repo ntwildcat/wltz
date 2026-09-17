@@ -1387,7 +1387,7 @@
             <!-- 游戏进行中的界面 -->
             <div id="gameScreen" class="hidden">
                 <!-- 顶部信息栏 -->
-                <div class="header">
+                <div class="header collapsed" onclick="toggleMobileHeader()" style="cursor: pointer;">
                     <div class="player-info">
                         <div class="info-item">
                             <div class="info-label">修仙者</div>
@@ -5629,12 +5629,49 @@
     </div>
 
     <script>
-        // 手机 Tab 栏切换（仅提示，实际功能需后续实现）
+        // 折叠式 header 切换
+        function toggleMobileHeader() {
+            const header = document.getElementById('header');
+            if (header) {
+                header.classList.toggle('collapsed');
+            }
+        }
+
+        // 手机 Tab 栏切换和内容切换
         function switchMobileTab(tabName) {
+            // 更新Tab样式
             const tabs = document.querySelectorAll('.mobile-tab-item');
             tabs.forEach(tab => tab.classList.remove('active'));
             document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-            console.log(`切换到: ${tabName}`);
+
+            // 显示/隐藏对应内容
+            const mainPanel = document.querySelector('.main-panel');
+            const sidePanel = document.querySelector('.side-panel');
+
+            if (mainPanel && sidePanel) {
+                switch(tabName) {
+                    case 'cultivation':
+                        mainPanel.style.display = 'block';
+                        sidePanel.style.display = 'block';
+                        break;
+                    case 'battle':
+                        mainPanel.style.display = 'block';
+                        sidePanel.style.display = 'none';
+                        break;
+                    case 'shop':
+                        mainPanel.style.display = 'block';
+                        sidePanel.style.display = 'none';
+                        break;
+                    case 'settings':
+                        mainPanel.style.display = 'none';
+                        sidePanel.style.display = 'none';
+                        break;
+                    case 'inventory':
+                        mainPanel.style.display = 'none';
+                        sidePanel.style.display = 'block';
+                        break;
+                }
+            }
         }
     </script>
 </body>
