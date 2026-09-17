@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pandoc -t markdown \"C:\\\\Users\\\\86185\\\\Desktop\\\\网页\\\\【现代修仙·灵潮再临】.docx\")",
+      "PowerShell(python -c \"from docx import Document; doc = Document\\('C:\\\\Users\\\\86185\\\\Desktop\\\\��ҳ\\\\���ִ����ɡ��鳱���١�.docx'\\); [print\\(para.text\\) for para in doc.paragraphs if para.text.strip\\(\\)]\")",
+      "PowerShell(python -c \"from docx import Document; doc = Document\\(r'C:\\\\Users\\\\86185\\\\Desktop\\\\��ҳ\\\\���ִ����ɡ��鳱���١�.docx'\\); [print\\(para.text\\) for para in doc.paragraphs if para.text.strip\\(\\)]\")",
+      "Bash(node -c \"C:\\\\Users\\\\86185\\\\Desktop\\\\网页\\\\修仙放置游戏.html\")",
+      "Bash(cp \"C:\\\\Users\\\\86185\\\\Desktop\\\\网页\\\\修仙放置游戏.html\" \"C:\\\\Users\\\\86185\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\2ab80162-8d1e-4120-959e-13bfb889a3e9\\\\scratchpad\\\\xiuxian_idle.html\")",
+      "Bash(Select-Object -Property Name, Length)",
+      "Bash(grep -B 20 \"克制倍数: \\\\${counterMulti\" \"C:\\\\Users\\\\86185\\\\Desktop\\\\网页\\\\修仙放置游戏.html\")",
+      "Bash(awk '{print \"文件大小: \" $5}')",
+      "Bash(find /c/Users/86185/Desktop -maxdepth 2 -name \".git\" -type d 2>/dev/null || echo \"No git repos found\")"
+    ]
+  }
+}
