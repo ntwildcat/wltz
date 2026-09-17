@@ -1169,7 +1169,142 @@
             border-color: var(--color-danger);
             box-shadow: 0 0 8px rgba(231,76,60,0.3);
         }
-    </style>
+    
+
+/* ===== 鎵嬫満绔?UI 瀹屽叏閲嶈锛堝簳閮?Tab 鏂规锛?===== */
+@media (max-width: 768px) {
+    /* 鍏ㄥ眬 */
+    html, body {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+    }
+    * {
+        box-sizing: border-box !important;
+        max-width: 100% !important;
+    }
+
+    /* 涓诲鍣細鏀逛负绾靛悜 */
+    .container {
+        flex-direction: column !important;
+        height: 100vh !important;
+        width: 100vw !important;
+    }
+
+    /* 闅愯棌宸︿晶 sidebar */
+    .sidebar {
+        display: none !important;
+    }
+
+    /* 涓诲唴瀹瑰尯锛氬叏瀹斤紝搴曢儴鐣欑┖闂寸粰 Tab */
+    .main-content {
+        flex: 1 !important;
+        width: 100vw !important;
+        padding: 10px !important;
+        padding-bottom: 80px !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    /* 澶撮儴淇℃伅绾靛悜鎺掑垪 */
+    .header {
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 10px 0 !important;
+        margin-bottom: 10px !important;
+    }
+
+    .player-info {
+        flex-direction: column !important;
+        gap: 8px !important;
+        align-items: flex-start !important;
+    }
+
+    /* 闈㈡澘鍗曞垪 */
+    .panel-container {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    /* 闈㈡澘鑷€傚簲 */
+    .main-panel, .side-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* 鎶€鑳?琛屽姩鍒楄〃鍗曞垪 */
+    .skill-list, .action-list {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* 澧炲ぇ瑙︽懜鐩爣 */
+    .action-item {
+        min-height: 50px !important;
+        padding: 12px !important;
+    }
+    .btn {
+        min-height: 44px !important;
+        font-size: 16px !important;
+    }
+
+    /* 闃叉瀛愬厓绱犳孩鍑?*/
+    .action-list, .skill-list {
+        min-width: 0 !important;
+    }
+    .action-list > *, .skill-list > * {
+        min-width: 0 !important;
+    }
+}
+
+/* 搴曢儴 Tab 鏍忥紙鍙湪鎵嬫満鏄剧ず锛?*/
+@media (max-width: 768px) {
+    .mobile-bottom-tabs {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        height: 70px !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        background: var(--bg-l1) !important;
+        border-top: 2px solid var(--border-l1) !important;
+        z-index: 100 !important;
+        padding: 0 !important;
+    }
+    
+    .mobile-tab-item {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 20% !important;
+        height: 100% !important;
+        cursor: pointer !important;
+        color: var(--text-l4) !important;
+        font-size: 12px !important;
+        gap: 4px !important;
+        transition: all 0.2s !important;
+    }
+    
+    .mobile-tab-item:hover, .mobile-tab-item.active {
+        color: var(--text-l1) !important;
+        background: rgba(201,169,97,0.1) !important;
+    }
+    
+    .mobile-tab-item .icon {
+        font-size: 24px !important;
+    }
+}
+
+/* 妗岄潰绔殣钘忓簳閮?Tab */
+@media (min-width: 769px) {
+    .mobile-bottom-tabs {
+        display: none !important;
+    }
+}
+
+</style>
 
 </head>
 <body>
@@ -5467,6 +5602,40 @@
         window.addEventListener('beforeunload', () => {
             if (gameRunning) saveGame();
         });
+    </script>
+
+    <!-- 手机底部Tab栏 -->
+    <div class="mobile-bottom-tabs" id="mobileTabBar">
+        <div class="mobile-tab-item active" data-tab="cultivation" onclick="switchMobileTab('cultivation')">
+            <div class="icon">🧘</div>
+            <div>修炼</div>
+        </div>
+        <div class="mobile-tab-item" data-tab="battle" onclick="switchMobileTab('battle')">
+            <div class="icon">⚔️</div>
+            <div>战斗</div>
+        </div>
+        <div class="mobile-tab-item" data-tab="shop" onclick="switchMobileTab('shop')">
+            <div class="icon">🏪</div>
+            <div>商城</div>
+        </div>
+        <div class="mobile-tab-item" data-tab="settings" onclick="switchMobileTab('settings')">
+            <div class="icon">⚙️</div>
+            <div>设置</div>
+        </div>
+        <div class="mobile-tab-item" data-tab="inventory" onclick="switchMobileTab('inventory')">
+            <div class="icon">🎒</div>
+            <div>背包</div>
+        </div>
+    </div>
+
+    <script>
+        // 手机 Tab 栏切换（仅提示，实际功能需后续实现）
+        function switchMobileTab(tabName) {
+            const tabs = document.querySelectorAll('.mobile-tab-item');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            console.log(`切换到: ${tabName}`);
+        }
     </script>
 </body>
 </html>
