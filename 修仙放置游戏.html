@@ -4,7 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>修仙放置 · 灵潮再临</title>
-    <style>
+        <style>
+        /* ========== 瀛椾綋瀹氫箟 ========== */
+        /* @font-face {
+            font-family: 'Ma Shan Zheng';
+            src: url('fonts/MaShanZheng-Regular.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Noto Serif SC';
+            src: url('fonts/NotoSerifSC-Regular.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        } */
+        /* @font-face {
+            font-family: 'Noto Serif SC';
+            src: url('fonts/NotoSerifSC-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        } */
+
+        /* ========== CSS 鍙橀噺绯荤粺 ========== */
+        :root {
+            /* 瀛椾綋鏍?*/
+            --font-title: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', serif;
+            --font-body: 'STSong', 'Songti SC', 'SimSun', serif;
+            --font-mono: 'Courier New', 'Consolas', monospace;
+
+            /* ========== 鑹插僵绯荤粺锛氭按澧ㄤ慨浠?========== */
+            /* L1锛氭繁搴曪紙5灞傝儗鏅級 */
+            --bg-l1: rgba(10, 12, 25, 0.95);      /* 鏈€娣卞簳 */
+            --bg-l2: rgba(25, 30, 50, 0.85);      /* 娣卞簳 */
+            --bg-l3: rgba(40, 45, 70, 0.75);      /* 涓簳 */
+            --bg-l4: rgba(50, 55, 80, 0.6);       /* 娴呭簳 */
+            --bg-l5: rgba(60, 65, 90, 0.5);       /* 鏈€娴呭簳 */
+
+            /* L1锛氳竟妗嗭紙4灞傦級 */
+            --border-l1: #c9a961;                 /* 鍙ら摐閲?*/
+            --border-l2: #6fa980;                 /* 闈掔帀 */
+            --border-l3: #8b7355;                 /* 鏆楁 */
+            --border-l4: #4a4a4a;                 /* 鐏?*/
+
+            /* L2锛氭枃瀛楋紙4灞傦級 */
+            --text-l1: #e8d4b0;                   /* 閲戣壊锛圚1鏍囬锛?*/
+            --text-l2: #c9a961;                   /* 鍙ら摐锛圚2鏍囬锛?*/
+            --text-l3: #9ca69f;                   /* 鐏扮豢锛堟鏂囷級 */
+            --text-l4: #7a8274;                   /* 娣辩豢锛堣緟鍔╋級 */
+
+            /* 鐘舵€佽壊 */
+            --color-hp: #2ecc71;                  /* HP缁?*/
+            --color-warning: #f39c12;             /* 璀﹀憡姗?*/
+            --color-danger: #e74c3c;              /* 鍗遍櫓绾?*/
+            --color-success: #27ae60;             /* 鎴愬姛娣辩豢 */
+
+            /* HP娓愬彉锛堜粠婊″埌绌猴級*/
+            --hp-full: #2ecc71;
+            --hp-high: #3498db;
+            --hp-mid: #f39c12;
+            --hp-low: #e74c3c;
+
+            /* 闃村奖鍜屽彂鍏?*/
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
+            --glow-gold: 0 0 12px rgba(201,169,97,0.4);
+            --glow-jade: 0 0 12px rgba(111,169,128,0.3);
+            --glow-danger: 0 0 12px rgba(231,76,60,0.3);
+
+            /* 闂磋窛 */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 20px;
+            --spacing-2xl: 24px;
+            --spacing-3xl: 32px;
+
+            /* 鍦嗚 */
+            --radius-xs: 2px;
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,11 +99,12 @@
         }
 
         body {
-            font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-            color: #e0e0e0;
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, #0a0c19 0%, #1a1e32 100%);
+            color: var(--text-l3);
             min-height: 100vh;
             overflow-x: hidden;
+            line-height: 1.6;
         }
 
         .container {
@@ -24,35 +112,48 @@
             height: 100vh;
         }
 
-        /* ========== 侧边导航栏 ========== */
+        /* ========== 渚ц竟瀵艰埅鏍?========== */
         .sidebar {
             width: 80px;
-            background: rgba(0, 0, 0, 0.4);
-            border-right: 1px solid #16a34a;
-            padding: 20px 0;
+            background: var(--bg-l1);
+            border-right: 2px solid var(--border-l1);
+            padding: var(--spacing-lg) 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: var(--spacing-lg);
+            box-shadow: inset -2px 0 8px rgba(0,0,0,0.3);
         }
 
         .logo {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, #16a34a, #22c55e);
-            border-radius: 8px;
+            background: linear-gradient(135deg, var(--border-l1), var(--border-l2));
+            border: 2px solid var(--border-l1);
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            margin-bottom: 10px;
+            margin-bottom: var(--spacing-md);
             cursor: pointer;
+            box-shadow: var(--glow-gold);
+            position: relative;
         }
+
+        .logo::before, .logo::after {
+            content: '鈼?;
+            position: absolute;
+            color: var(--border-l1);
+            font-size: 10px;
+        }
+        .logo::before { top: 2px; left: 2px; }
+        .logo::after { bottom: 2px; right: 2px; }
 
         .nav-item {
             width: 50px;
             height: 50px;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -64,19 +165,22 @@
         }
 
         .nav-item:hover {
-            background: rgba(22, 163, 74, 0.2);
+            background: rgba(201,169,97,0.1);
+            border-color: var(--border-l1);
+            box-shadow: var(--glow-gold);
         }
 
         .nav-item.active {
-            background: rgba(22, 163, 74, 0.4);
-            border-color: #16a34a;
+            background: rgba(111,169,128,0.15);
+            border-color: var(--border-l2);
+            box-shadow: var(--glow-jade);
         }
 
         .nav-item .pulse {
             position: absolute;
             width: 8px;
             height: 8px;
-            background: #ff6b6b;
+            background: var(--color-danger);
             border-radius: 50%;
             top: 2px;
             right: 2px;
@@ -91,17 +195,17 @@
         .skill-tree {
             flex: 1;
             overflow-y: auto;
-            padding: 10px 0;
+            padding: var(--spacing-md) 0;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: var(--spacing-sm);
         }
 
         .skill-item {
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #555;
-            border-radius: 6px;
+            padding: var(--spacing-md);
+            background: var(--bg-l2);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
@@ -114,65 +218,68 @@
         }
 
         .skill-item:hover {
-            border-color: #16a34a;
-            background: rgba(22, 163, 74, 0.2);
+            border-color: var(--border-l1);
+            background: rgba(201,169,97,0.1);
+            box-shadow: var(--glow-gold);
         }
 
         .skill-item.active {
-            background: rgba(22, 163, 74, 0.4);
-            border-color: #16a34a;
-            box-shadow: 0 0 10px rgba(22, 163, 74, 0.5);
+            background: rgba(111,169,128,0.15);
+            border-color: var(--border-l2);
+            box-shadow: var(--glow-jade);
         }
 
         .skill-item .skill-name {
             font-weight: bold;
-            color: #16a34a;
-            margin-bottom: 3px;
+            color: var(--text-l2);
+            margin-bottom: var(--spacing-xs);
             font-size: 0.9em;
+            font-family: var(--font-title);
         }
 
         .skill-item .skill-level {
-            color: #fbbf24;
+            color: var(--text-l2);
             font-size: 0.7em;
-            margin-bottom: 3px;
+            margin-bottom: var(--spacing-xs);
         }
 
         .skill-item .exp-bar {
             width: 100%;
             height: 4px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 2px;
+            background: var(--bg-l1);
+            border-radius: var(--radius-xs);
             overflow: hidden;
-            margin-top: 2px;
+            margin-top: var(--spacing-xs);
         }
 
         .skill-item .exp-fill {
             height: 100%;
-            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            background: linear-gradient(90deg, var(--text-l2), var(--border-l1));
             transition: width 0.3s;
         }
 
         .coin-display {
             margin-top: auto;
-            padding: 10px;
+            padding: var(--spacing-md);
             text-align: center;
-            background: rgba(22, 163, 74, 0.1);
-            border-radius: 8px;
+            background: rgba(111,169,128,0.1);
+            border: 1px solid var(--border-l2);
+            border-radius: var(--radius-md);
             width: 60px;
         }
 
         .coin-display div {
             font-size: 12px;
-            color: #fbbf24;
+            color: var(--text-l2);
             font-weight: bold;
         }
 
-        /* ========== 主内容区 ========== */
+        /* ========== 涓诲唴瀹瑰尯 ========== */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: var(--spacing-xl);
             overflow-y: auto;
         }
 
@@ -180,47 +287,59 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #16a34a;
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--border-l1);
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 80px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-l1), transparent);
         }
 
         .player-info {
             display: flex;
-            gap: 30px;
+            gap: var(--spacing-3xl);
             align-items: center;
         }
 
         .info-item {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: var(--spacing-xs);
         }
 
         .info-label {
-            color: #888;
+            color: var(--text-l4);
             font-size: 0.85em;
         }
 
         .info-value {
-            color: #16a34a;
+            color: var(--text-l1);
             font-weight: bold;
             font-size: 1.1em;
+            font-family: var(--font-title);
         }
 
         .progress-bar {
             width: 200px;
             height: 24px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #16a34a;
-            border-radius: 4px;
+            background: var(--bg-l2);
+            border: 2px solid var(--border-l1);
+            border-radius: var(--radius-md);
             overflow: hidden;
             position: relative;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #16a34a, #22c55e);
+            background: linear-gradient(90deg, var(--border-l1), var(--text-l2));
             transition: width 0.3s;
             display: flex;
             align-items: center;
@@ -230,45 +349,59 @@
             font-weight: bold;
         }
 
-        /* ========== 面板区域 ========== */
+        /* ========== 闈㈡澘鍖哄煙 ========== */
         .panel-container {
             display: grid;
             grid-template-columns: 1fr 350px;
-            gap: 20px;
+            gap: var(--spacing-xl);
             flex: 1;
         }
 
         .main-panel {
-            background: rgba(15, 52, 96, 0.5);
-            border: 1px solid #16a34a;
-            border-radius: 8px;
-            padding: 20px;
+            background: var(--bg-l2);
+            border: 2px solid var(--border-l1);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
             overflow-y: auto;
+            box-shadow: var(--shadow-lg), var(--glow-gold);
+            position: relative;
         }
 
+        .main-panel::before, .main-panel::after {
+            content: '鈼?;
+            position: absolute;
+            color: var(--border-l1);
+            font-size: 12px;
+            opacity: 0.6;
+        }
+        .main-panel::before { top: 12px; left: 12px; }
+        .main-panel::after { bottom: 12px; right: 12px; }
+
         .panel-title {
-            font-size: 1.3em;
-            color: #16a34a;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #16a34a;
+            font-size: 1.4em;
+            color: var(--text-l1);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--border-l1);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--spacing-md);
+            font-family: var(--font-title);
+            text-shadow: var(--glow-gold);
         }
 
         .skill-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
         }
 
         .skill-tab {
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid #666;
-            border-radius: 4px;
+            padding: var(--spacing-md);
+            background: var(--bg-l3);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-sm);
             cursor: pointer;
             text-align: center;
             font-size: 0.9em;
@@ -276,26 +409,28 @@
         }
 
         .skill-tab:hover {
-            border-color: #16a34a;
+            border-color: var(--border-l2);
+            background: rgba(111,169,128,0.15);
         }
 
         .skill-tab.active {
-            background: rgba(22, 163, 74, 0.3);
-            border-color: #16a34a;
-            color: #16a34a;
+            background: rgba(111,169,128,0.2);
+            border-color: var(--border-l2);
+            color: var(--text-l2);
+            box-shadow: var(--glow-jade);
         }
 
         .action-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
+            gap: var(--spacing-md);
         }
 
         .action-item {
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid #666;
-            border-radius: 4px;
+            padding: var(--spacing-lg);
+            background: var(--bg-l3);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
@@ -308,62 +443,66 @@
         }
 
         .action-item:hover {
-            border-color: #16a34a;
-            background: rgba(22, 163, 74, 0.1);
+            border-color: var(--border-l1);
+            background: rgba(201,169,97,0.1);
+            box-shadow: var(--glow-gold);
         }
 
         .action-item.action-locked {
             opacity: 0.6;
             cursor: not-allowed;
-            background: rgba(0, 0, 0, 0.35);
-            border-color: #888;
+            background: var(--bg-l3);
+            border-color: var(--border-l4);
         }
 
         .action-item.action-locked:hover {
-            border-color: #888;
-            background: rgba(0, 0, 0, 0.35);
+            border-color: var(--border-l4);
+            background: var(--bg-l3);
+            box-shadow: none;
         }
 
         .action-item.action-locked .action-name {
-            color: #999;
+            color: var(--text-l4);
         }
 
         .action-item.action-locked .action-desc {
-            color: #f59e0b;
+            color: var(--color-warning);
         }
 
         .action-row {
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid #666;
-            border-radius: 4px;
+            padding: var(--spacing-lg);
+            background: var(--bg-l3);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.3s;
-            margin-bottom: 10px;
+            margin-bottom: var(--spacing-md);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--spacing-md);
         }
 
         .action-row:hover {
-            border-color: #16a34a;
-            background: rgba(22, 163, 74, 0.1);
+            border-color: var(--border-l2);
+            background: rgba(111,169,128,0.1);
         }
 
         .action-item.active {
-            background: rgba(22, 163, 74, 0.3);
-            border-color: #16a34a;
+            background: rgba(111,169,128,0.2);
+            border-color: var(--border-l2);
+            box-shadow: var(--glow-jade);
         }
 
         .action-item.disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            border-color: #888;
+            border-color: var(--border-l4);
         }
 
         .action-item.disabled:hover {
-            border-color: #888;
-            background: rgba(0, 0, 0, 0.2);
+            border-color: var(--border-l4);
+            background: var(--bg-l3);
+            box-shadow: none;
         }
 
         .action-progress-bar {
@@ -372,8 +511,8 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: rgba(0, 0, 0, 0.3);
-            border-top: 1px solid #16a34a;
+            background: var(--bg-l1);
+            border-top: 1px solid var(--border-l2);
             display: none;
         }
 
@@ -383,28 +522,29 @@
 
         .action-progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #16a34a, #22c55e);
+            background: linear-gradient(90deg, var(--border-l2), var(--border-l1));
             transition: width 0.1s;
             width: 0%;
         }
 
         .action-name {
             font-weight: bold;
-            color: #16a34a;
-            margin-bottom: 5px;
+            color: var(--text-l2);
+            margin-bottom: var(--spacing-sm);
+            font-family: var(--font-title);
         }
 
         .action-desc {
             font-size: 0.8em;
-            color: #888;
+            color: var(--text-l4);
         }
 
         .action-detail {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 4px;
-            border-left: 3px solid #16a34a;
+            margin-top: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background: var(--bg-l3);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--border-l1);
             display: none;
         }
 
@@ -415,24 +555,25 @@
         .detail-row {
             display: flex;
             justify-content: space-between;
-            margin: 10px 0;
+            margin: var(--spacing-md) 0;
         }
 
         .btn {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #16a34a, #22c55e);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: linear-gradient(135deg, var(--border-l1), var(--border-l2));
             color: #000;
             border: none;
-            border-radius: 4px;
+            border-radius: var(--radius-md);
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
-            margin-top: 10px;
+            margin-top: var(--spacing-md);
+            box-shadow: var(--glow-gold);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(22, 163, 74, 0.3);
+            box-shadow: var(--glow-gold), 0 8px 16px rgba(0,0,0,0.4);
         }
 
         .btn:disabled {
@@ -441,68 +582,71 @@
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #666, #888);
+            background: linear-gradient(135deg, var(--border-l3), var(--border-l4));
             color: #fff;
         }
 
-        /* ========== 侧边栏面板 ========== */
+        /* ========== 渚ц竟鏍忛潰鏉?========== */
         .side-panel {
-            background: rgba(15, 52, 96, 0.5);
-            border: 1px solid #16a34a;
-            border-radius: 8px;
-            padding: 15px;
+            background: var(--bg-l2);
+            border: 2px solid var(--border-l1);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: var(--spacing-lg);
+            box-shadow: var(--shadow-lg), var(--glow-gold);
         }
 
         .stat-panel {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 12px;
-            border-radius: 4px;
-            border-left: 3px solid #16a34a;
+            background: var(--bg-l3);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--border-l1);
         }
 
         .stat-title {
-            color: #16a34a;
+            color: var(--text-l2);
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: var(--spacing-md);
             font-size: 0.95em;
+            font-family: var(--font-title);
         }
 
         .stat-row {
             display: flex;
             justify-content: space-between;
-            margin: 6px 0;
+            margin: var(--spacing-sm) 0;
             font-size: 0.85em;
         }
 
         .stat-label {
-            color: #888;
+            color: var(--text-l4);
         }
 
         .stat-value {
-            color: #16a34a;
+            color: var(--text-l2);
             font-weight: bold;
+            font-family: var(--font-mono);
         }
 
         .inventory-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: var(--spacing-sm);
         }
 
         .item-slot {
             aspect-ratio: 1;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #666;
-            border-radius: 4px;
+            background: var(--bg-l3);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-sm);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 4px;
+            padding: var(--spacing-xs);
             font-size: 0.7em;
             text-align: center;
             cursor: pointer;
@@ -510,37 +654,38 @@
         }
 
         .item-slot:hover {
-            border-color: #16a34a;
-            background: rgba(22, 163, 74, 0.1);
+            border-color: var(--border-l2);
+            background: rgba(111,169,128,0.15);
+            box-shadow: var(--glow-jade);
         }
 
         #shopGrid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: var(--spacing-sm);
         }
 
         .shop-item:hover {
-            border-color: #16a34a !important;
-            background: rgba(22, 163, 74, 0.2) !important;
+            border-color: var(--border-l1) !important;
+            background: rgba(201,169,97,0.15) !important;
         }
 
         .item-icon {
             font-size: 1.5em;
-            margin-bottom: 2px;
+            margin-bottom: var(--spacing-xs);
         }
 
         .item-name {
-            color: #16a34a;
+            color: var(--text-l2);
             font-weight: bold;
         }
 
         .item-qty {
-            color: #fbbf24;
+            color: var(--text-l2);
             font-size: 0.8em;
         }
 
-        /* ========== 模态框 ========== */
+        /* ========== 妯℃€佹 ========== */
         .modal {
             display: none;
             position: fixed;
@@ -548,7 +693,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -559,81 +704,85 @@
         }
 
         .modal-content {
-            background: #1a1f3a;
-            border: 2px solid #16a34a;
-            border-radius: 8px;
-            padding: 30px;
+            background: var(--bg-l1);
+            border: 2px solid var(--border-l1);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-2xl);
             max-width: 500px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
+            box-shadow: 0 0 30px rgba(201,169,97,0.3);
         }
 
         .modal-title {
             font-size: 1.5em;
-            color: #16a34a;
-            margin-bottom: 20px;
+            color: var(--text-l1);
+            margin-bottom: var(--spacing-xl);
+            font-family: var(--font-title);
         }
 
         .modal-close {
             float: right;
             font-size: 1.5em;
             cursor: pointer;
-            color: #888;
+            color: var(--text-l4);
         }
 
         .modal-close:hover {
-            color: #16a34a;
+            color: var(--text-l1);
         }
 
-        /* ========== 角色创建 ========== */
+        /* ========== 瑙掕壊鍒涘缓 ========== */
         .create-form {
             display: grid;
-            gap: 15px;
+            gap: var(--spacing-lg);
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: var(--spacing-xs);
         }
 
         label {
-            color: #16a34a;
+            color: var(--text-l2);
             font-weight: bold;
             font-size: 0.9em;
         }
 
         input, select {
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #16a34a;
-            color: #e0e0e0;
-            border-radius: 4px;
-            font-family: inherit;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-l2);
+            border: 1px solid var(--border-l3);
+            color: var(--text-l3);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
         }
 
         input:focus, select:focus {
             outline: none;
-            box-shadow: 0 0 10px rgba(22, 163, 74, 0.3);
+            border-color: var(--border-l1);
+            box-shadow: var(--glow-gold);
         }
 
-        /* ========== 其他 ========== */
+        /* ========== 鍏朵粬 ========== */
         .hidden {
             display: none !important;
         }
 
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(22, 163, 74, 0.9);
-            padding: 15px 20px;
-            border-radius: 4px;
+            top: var(--spacing-xl);
+            right: var(--spacing-xl);
+            background: rgba(46,204,113,0.9);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            border-radius: var(--radius-md);
             color: #000;
             font-weight: bold;
             z-index: 999;
             animation: slideIn 0.3s;
+            box-shadow: var(--shadow-lg);
         }
 
         @keyframes slideIn {
@@ -649,10 +798,11 @@
 
         .no-data {
             text-align: center;
-            color: #888;
-            padding: 20px;
+            color: var(--text-l4);
+            padding: var(--spacing-xl);
         }
 
+        /* ========== 鍝嶅簲寮忚璁?========== */
         @media (max-width: 1024px) {
             .panel-container {
                 grid-template-columns: 1fr;
@@ -677,10 +827,15 @@
                 height: 80px;
                 flex-direction: row;
                 justify-content: flex-start;
-                padding: 0 20px;
-                gap: 20px;
+                padding: 0 var(--spacing-lg);
+                gap: var(--spacing-xl);
                 border-right: none;
-                border-bottom: 1px solid #16a34a;
+                border-bottom: 2px solid var(--border-l1);
+            }
+
+            .logo {
+                margin-bottom: 0;
+                margin-right: var(--spacing-md);
             }
 
             .coin-display {
@@ -690,94 +845,123 @@
 
             .player-info {
                 flex-direction: column;
-                gap: 15px;
+                gap: var(--spacing-lg);
                 align-items: flex-start;
             }
 
             .main-content {
-                padding: 15px;
+                padding: var(--spacing-lg);
+            }
+
+            .skill-list {
+                grid-template-columns: 1fr;
+            }
+
+            .action-list {
+                grid-template-columns: 1fr;
             }
         }
 
-        /* ==================== P1-1 战斗UI系统 ==================== */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: var(--spacing-md);
+            }
 
-        /* 战斗容器 */
+            .panel-title {
+                font-size: 1.1em;
+            }
+
+            .player-info {
+                gap: var(--spacing-md);
+            }
+
+            .progress-bar {
+                width: 100%;
+            }
+        }
+
+        /* ==================== P1-1 鎴樻枟UI绯荤粺 ==================== */
+
         .battle-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            padding: 15px;
-            background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(20,20,40,0.4));
-            border-radius: 8px;
+            gap: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background: var(--bg-l2);
+            border: 2px solid var(--border-l1);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg), var(--glow-gold);
         }
         .battle-container.hidden {
             display: none;
         }
 
-        /* 战斗顶部栏 */
         .battle-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #16a34a;
-            border-radius: 6px;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--bg-l3);
+            border: 1px solid var(--border-l2);
+            border-radius: var(--radius-md);
         }
         .battle-title {
-            color: #16a34a;
+            color: var(--text-l1);
             font-weight: bold;
             font-size: 1.1em;
+            font-family: var(--font-title);
         }
         .battle-controls {
             display: flex;
-            gap: 10px;
+            gap: var(--spacing-md);
             align-items: center;
         }
 
-        /* 双方状态栏 */
         .battle-status {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: var(--spacing-lg);
         }
         .combatant {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #444;
-            border-radius: 6px;
-            padding: 12px;
+            background: var(--bg-l3);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
         }
         .combatant.player {
-            border-color: #16a34a;
+            border-color: var(--border-l2);
+            box-shadow: 0 0 10px rgba(111,169,128,0.2);
         }
         .combatant.monster {
-            border-color: #ef4444;
+            border-color: var(--color-danger);
+            box-shadow: 0 0 10px rgba(231,76,60,0.2);
         }
         .combatant-name {
-            color: #fff;
+            color: var(--text-l3);
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: var(--spacing-sm);
             font-size: 0.95em;
         }
-        .combatant-player-name { color: #16a34a; }
-        .combatant-monster-name { color: #ef4444; }
+        .combatant-player-name { color: var(--text-l2); }
+        .combatant-monster-name { color: var(--color-danger); }
         .hp-bar {
             width: 100%;
             height: 24px;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid #555;
-            border-radius: 4px;
+            background: var(--bg-l1);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-sm);
             position: relative;
             overflow: hidden;
-            margin: 8px 0;
+            margin: var(--spacing-sm) 0;
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.4);
         }
         .hp-fill {
             height: 100%;
-            background: linear-gradient(90deg, #16a34a, #22c55e);
+            background: linear-gradient(90deg, var(--hp-full), var(--hp-high));
             transition: width 0.2s;
         }
         .hp-fill.low {
-            background: linear-gradient(90deg, #ef4444, #f87171);
+            background: linear-gradient(90deg, var(--hp-low), var(--color-danger));
         }
         .hp-text {
             position: absolute;
@@ -787,31 +971,32 @@
             font-size: 0.8em;
             font-weight: bold;
             text-shadow: 1px 1px 2px #000;
+            font-family: var(--font-mono);
         }
         .combatant-stats {
             display: flex;
-            gap: 8px;
+            gap: var(--spacing-sm);
             font-size: 0.8em;
-            color: #aaa;
-            margin-top: 6px;
+            color: var(--text-l4);
+            margin-top: var(--spacing-sm);
         }
         .combatant-stats span {
-            background: rgba(0,0,0,0.4);
-            padding: 2px 6px;
-            border-radius: 3px;
+            background: var(--bg-l1);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-xs);
         }
 
-        /* 战斗场景 */
         .battle-scene {
             height: 180px;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid #555;
-            border-radius: 6px;
+            background: var(--bg-l3);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-md);
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            box-shadow: inset 0 0 12px rgba(0,0,0,0.3);
         }
         .monster-sprite {
             font-size: 80px;
@@ -837,72 +1022,70 @@
             100% { transform: translateY(-100px); opacity: 0; }
         }
 
-        /* 战斗日志 */
         .battle-log {
             height: 110px;
             overflow-y: auto;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #444;
-            border-radius: 6px;
-            padding: 10px;
+            background: var(--bg-l1);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
             font-size: 0.8em;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-mono);
         }
         .log-entry {
-            padding: 2px 0;
-            color: #aaa;
+            padding: var(--spacing-xs) 0;
+            color: var(--text-l4);
             line-height: 1.4;
         }
-        .log-info { color: #999; }
-        .log-player-hit { color: #fbbf24; }
-        .log-monster-hit { color: #ef4444; }
-        .log-heal { color: #22c55e; }
-        .log-death { color: #dc2626; font-weight: bold; }
-        .log-victory { color: #16a34a; font-weight: bold; }
-        .log-miss { color: #888; font-style: italic; }
+        .log-info { color: var(--text-l4); }
+        .log-player-hit { color: var(--text-l2); }
+        .log-monster-hit { color: var(--color-danger); }
+        .log-heal { color: var(--color-hp); }
+        .log-death { color: var(--color-danger); font-weight: bold; }
+        .log-victory { color: var(--border-l2); font-weight: bold; }
+        .log-miss { color: var(--text-l4); font-style: italic; }
 
-        /* 食物快捷栏 */
         .food-bar {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 10px 15px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #444;
-            border-radius: 6px;
+            gap: var(--spacing-lg);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--bg-l3);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-md);
         }
         .food-slot {
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(0,0,0,0.2);
-            padding: 6px 12px;
-            border-radius: 4px;
+            gap: var(--spacing-sm);
+            background: var(--bg-l2);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-sm);
         }
         .food-icon { font-size: 1.3em; }
         .food-info {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: var(--spacing-xs);
         }
         .food-name {
-            color: #16a34a;
+            color: var(--text-l2);
             font-weight: bold;
             font-size: 0.9em;
         }
         .food-count {
-            color: #aaa;
+            color: var(--text-l4);
             font-size: 0.8em;
         }
         .food-recovery {
-            color: #aaa;
+            color: var(--text-l4);
             font-size: 0.85em;
         }
         .auto-eat-toggle {
             display: flex;
             align-items: center;
-            gap: 6px;
-            color: #aaa;
+            gap: var(--spacing-sm);
+            color: var(--text-l4);
             font-size: 0.9em;
             cursor: pointer;
             margin-left: auto;
@@ -911,50 +1094,52 @@
             cursor: pointer;
         }
         .auto-eat-toggle input[type="checkbox"]:checked + span {
-            color: #16a34a;
+            color: var(--text-l2);
         }
 
-        /* 速度控制 */
         .battle-speed-control {
             display: flex;
-            gap: 5px;
+            gap: var(--spacing-xs);
         }
         .speed-btn {
-            padding: 6px 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #555;
-            border-radius: 4px;
-            color: #aaa;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-l3);
+            border: 1px solid var(--border-l3);
+            border-radius: var(--radius-sm);
+            color: var(--text-l4);
             cursor: pointer;
             font-weight: bold;
             transition: all 0.2s;
         }
         .speed-btn:hover {
-            background: rgba(0,0,0,0.4);
-            border-color: #666;
+            background: var(--bg-l2);
+            border-color: var(--border-l2);
+            color: var(--text-l2);
         }
         .speed-btn.active {
-            background: rgba(22,163,74,0.3);
-            border-color: #16a34a;
-            color: #16a34a;
+            background: rgba(111,169,128,0.2);
+            border-color: var(--border-l2);
+            color: var(--text-l2);
+            box-shadow: var(--glow-jade);
         }
 
-        /* 撤退按钮 */
         .btn-retreat {
-            padding: 6px 12px;
-            background: rgba(239,68,68,0.2);
-            border: 1px solid #ef4444;
-            border-radius: 4px;
-            color: #ef4444;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: rgba(231,76,60,0.1);
+            border: 1px solid var(--color-danger);
+            border-radius: var(--radius-sm);
+            color: var(--color-danger);
             cursor: pointer;
             font-weight: bold;
             transition: all 0.2s;
         }
         .btn-retreat:hover {
-            background: rgba(239,68,68,0.3);
-            border-color: #f87171;
+            background: rgba(231,76,60,0.2);
+            border-color: var(--color-danger);
+            box-shadow: 0 0 8px rgba(231,76,60,0.3);
         }
     </style>
+
 </head>
 <body>
     <div class="container">
@@ -2138,6 +2323,12 @@
                     return;
                 }
 
+                // 普通战斗特殊处理（P1-5扩展）
+                if (gameState.currentAction.isBattle && gameState.battles && gameState.battles.battleState === 'fighting') {
+                    performNormalBattleTick();
+                    return;
+                }
+
                 const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
 
                 // 检查所需物品是否充足，不足则停止action
@@ -2720,6 +2911,126 @@
             // P1-1 更新UI显示
             updateBattleHP();
             updateProgressBars();
+        }
+
+        // 普通战斗处理（P1-5扩展：简化版，10秒自动完成）
+        function performNormalBattleTick() {
+            if (!gameState.battles) return;
+
+            const battle = gameState.battles;
+            const timeDelta = 0.1;
+
+            // 增加战斗计时
+            battle.turnCount = (battle.turnCount || 0) + timeDelta;
+
+            // 模拟战斗伤害（每2秒一个回合）
+            if (battle.turnCount % 2 < timeDelta) {
+                const playerDmg = Math.floor(Math.random() * 10) + 5;
+                const enemyDmg = Math.floor(Math.random() * 8) + 3;
+
+                battle.currentEnemy.currentHP -= playerDmg;
+                battle.playerHP.current -= enemyDmg;
+
+                battle.log.push(`玩家造成${playerDmg}点伤害`);
+                if (enemyDmg > 0) battle.log.push(`${battle.currentEnemy.name}造成${enemyDmg}点伤害`);
+                if (battle.log.length > 10) battle.log.shift();
+            }
+
+            // 更新UI
+            updateNormalBattleUI();
+
+            // 战斗完成：敌人HP <= 0 或 10秒经过
+            if (battle.currentEnemy.currentHP <= 0 || battle.turnCount >= 10) {
+                completeNormalBattle();
+            }
+        }
+
+        // 更新普通战斗UI
+        function updateNormalBattleUI() {
+            if (!gameState.battles) return;
+
+            const battle = gameState.battles;
+            const player = gameState.player;
+            const playerHPPercent = (battle.playerHP.current / battle.playerHP.max) * 100;
+            const enemyHPPercent = Math.max(0, (battle.currentEnemy.currentHP / battle.currentEnemy.hp) * 100);
+
+            // 更新玩家信息
+            const playerName = document.getElementById('playerNameBattle');
+            if (playerName) playerName.textContent = player.name || '玩家';
+
+            // 更新敌人信息
+            const monsterName = document.getElementById('monsterNameBattle');
+            if (monsterName) monsterName.textContent = `${battle.currentEnemy.icon || '👹'} ${battle.currentEnemy.name}`;
+
+            // 更新玩家HP
+            const playerHPBar = document.querySelector('.combatant.player .hp-fill');
+            if (playerHPBar) {
+                playerHPBar.style.width = Math.max(0, playerHPPercent) + '%';
+                playerHPBar.classList.toggle('low', playerHPPercent < 30);
+            }
+            const playerHPText = document.querySelector('.combatant.player .hp-text');
+            if (playerHPText) {
+                playerHPText.textContent = `${Math.max(0, Math.floor(battle.playerHP.current))}/${Math.floor(battle.playerHP.max)}`;
+            }
+
+            // 更新敌人HP
+            const enemyHPBar = document.querySelector('.combatant.monster .hp-fill');
+            if (enemyHPBar) {
+                enemyHPBar.style.width = enemyHPPercent + '%';
+                enemyHPBar.classList.toggle('low', enemyHPPercent < 30);
+            }
+            const enemyHPText = document.querySelector('.combatant.monster .hp-text');
+            if (enemyHPText) {
+                enemyHPText.textContent = `${Math.max(0, Math.floor(battle.currentEnemy.currentHP))}/${Math.floor(battle.currentEnemy.hp)}`;
+            }
+
+            // 更新战斗日志
+            const battleLog = document.getElementById('battleLog');
+            if (battleLog && battle.log) {
+                battleLog.innerHTML = battle.log.map(log => `<div class="log-entry">${log}</div>`).join('');
+                battleLog.scrollTop = battleLog.scrollHeight;
+            }
+        }
+
+        // 普通战斗完成处理
+        function completeNormalBattle() {
+            const battle = gameState.battles;
+            const areaKey = gameState.currentAction.action;
+            const action = getAction('battle', areaKey);
+            const areaData = action.areaData;
+
+            // 隐藏战斗UI
+            const battleContainer = document.getElementById('battleContainer');
+            if (battleContainer) {
+                battleContainer.classList.add('hidden');
+            }
+
+            // 给予奖励
+            const won = battle.currentEnemy.currentHP <= 0;
+            if (won) {
+                gameState.player.coins += areaData.coins;
+                gameState.skills.battle.exp += areaData.exp;
+
+                // 检查技能升级
+                while (gameState.skills.battle.exp >= 100 * Math.pow(gameState.skills.battle.level, 1.8)) {
+                    gameState.skills.battle.exp -= 100 * Math.pow(gameState.skills.battle.level, 1.8);
+                    gameState.skills.battle.level++;
+                }
+
+                showNotification(`🎉 战胜${battle.currentEnemy.name}！\n+${areaData.coins}金币 +${areaData.exp}经验`, '#6fa980');
+            } else {
+                showNotification(`⚔️ 战斗失败，逃出${areaData.name}`, '#ef4444');
+            }
+
+            // 恢复玩家HP
+            gameState.player.stats.hp.current = Math.min(gameState.player.stats.hp.max, battle.playerHP.current);
+
+            gameState.battles.battleState = 'finished';
+            gameState.currentAction = null;
+            gameState.currentActionProgress = 0;
+
+            updateUI();
+            saveGame();
         }
 
         // 秘境完成处理
@@ -3522,6 +3833,12 @@
                 }
             }
 
+            // 普通战斗启用实时战斗UI
+            if (skill === 'battle') {
+                enterBattleArea(action);
+                return;
+            }
+
             gameState.currentAction = { skill, action };
             gameState.currentActionProgress = 0;
 
@@ -3548,6 +3865,15 @@
         }
 
         function stopAction() {
+            // 如果是普通战斗，隐藏战斗UI
+            if (gameState.currentAction && gameState.currentAction.isBattle) {
+                const battleContainer = document.getElementById('battleContainer');
+                if (battleContainer) {
+                    battleContainer.classList.add('hidden');
+                }
+                gameState.battles = null;
+            }
+
             gameState.currentAction = null;
             gameState.currentActionProgress = 0;
             document.getElementById('stopBtn').style.display = 'none';
@@ -3750,9 +4076,11 @@
 
         function initializeBattleActions() {
             const battleAreas = {
-                forest: { name: '森林', desc: '野兽出没', minLevel: 1, maxLevel: 2 },
-                mountain: { name: '十万大山外围', desc: '危险地带', minLevel: 3, maxLevel: 4 },
-                deepMountain: { name: '十万大山核心', desc: '极度危险', minLevel: 5, maxLevel: 6 }
+                forest: { name: '森林', desc: '野兽出没', minLevel: 1, maxLevel: 2, enemies: ['wolf', 'boar'], coins: 50, exp: 20 },
+                mountain: { name: '十万大山外围', desc: '危险地带', minLevel: 3, maxLevel: 4, enemies: ['tiger', 'bear'], coins: 100, exp: 50 },
+                deepMountain: { name: '十万大山核心', desc: '极度危险', minLevel: 5, maxLevel: 6, enemies: ['demon', 'spirit'], coins: 200, exp: 100 },
+                swamp: { name: '妖兽沼泽', desc: '诡异危险', minLevel: 5, maxLevel: 6, enemies: ['poisonBeast', 'serpent'], coins: 180, exp: 90 },
+                abyss: { name: '魔窟深渊', desc: '极端危险', minLevel: 7, maxLevel: 8, enemies: ['demon-lord', 'abyssal'], coins: 300, exp: 150 }
             };
 
             const actions = {};
@@ -3760,10 +4088,12 @@
                 actions[key] = {
                     name: area.name,
                     desc: area.desc,
-                    duration: 10,
-                    output: { coins: 50, exp: 20 },
+                    duration: 0,
+                    output: { coins: area.coins, exp: area.exp },
                     areaData: area,
-                    requiredLevel: area.minLevel
+                    requiredLevel: area.minLevel,
+                    isBattle: true,
+                    enemies: area.enemies
                 };
             });
 
@@ -3861,6 +4191,73 @@
                 };
                 container.appendChild(actionDiv);
             });
+        }
+
+        // 进入普通战斗区域（扩展P1-1 UI到所有5个区域）
+        function enterBattleArea(areaKey) {
+            const action = getAction('battle', areaKey);
+            const areaData = action.areaData;
+
+            // 简单敌人配置（按区域难度）
+            const enemyConfigs = {
+                forest: [
+                    { name: '野狼', hp: 25, atk: 8, def: 2, spd: 45, icon: '🐺' },
+                    { name: '野猪', hp: 35, atk: 10, def: 4, spd: 35, icon: '🐗' }
+                ],
+                mountain: [
+                    { name: '虎妖', hp: 50, atk: 15, def: 5, spd: 40, icon: '🐯' },
+                    { name: '熊妖', hp: 60, atk: 12, def: 8, spd: 30, icon: '🐻' }
+                ],
+                deepMountain: [
+                    { name: '恶魔', hp: 80, atk: 20, def: 8, spd: 35, icon: '👹' },
+                    { name: '灵兽', hp: 90, atk: 18, def: 10, spd: 40, icon: '✨' }
+                ],
+                swamp: [
+                    { name: '毒兽', hp: 70, atk: 16, def: 6, spd: 38, icon: '🐢' },
+                    { name: '蛇妖', hp: 75, atk: 18, def: 5, spd: 50, icon: '🐍' }
+                ],
+                abyss: [
+                    { name: '魔王', hp: 120, atk: 25, def: 12, spd: 40, icon: '👿' },
+                    { name: '深渊生物', hp: 110, atk: 22, def: 10, spd: 35, icon: '🌀' }
+                ]
+            };
+
+            // 初始化普通战斗状态
+            gameState.battles = gameState.battles || {};
+            gameState.battles.currentArea = areaKey;
+            gameState.battles.playerHP = { current: gameState.player.stats.hp.current, max: gameState.player.stats.hp.max };
+            gameState.battles.startPlayerHP = gameState.player.stats.hp.current;
+
+            // 随机选择敌人
+            const areaEnemies = enemyConfigs[areaKey] || enemyConfigs.forest;
+            const enemyTemplate = areaEnemies[Math.floor(Math.random() * areaEnemies.length)];
+
+            gameState.battles.currentEnemy = {
+                ...enemyTemplate,
+                currentHP: enemyTemplate.hp
+            };
+
+            gameState.battles.battleState = 'fighting';
+            gameState.battles.playerAttackTimer = 0;
+            gameState.battles.enemyAttackTimer = 0;
+            gameState.battles.log = [];
+            gameState.battles.turnCount = 0;
+
+            gameState.currentAction = {
+                skill: 'battle',
+                action: areaKey,
+                isBattle: true
+            };
+            gameState.currentActionProgress = 0;
+
+            const battleContainer = document.getElementById('battleContainer');
+            if (battleContainer) {
+                battleContainer.classList.remove('hidden');
+            }
+
+            showNotification(`进入${areaData.name}！遇到${gameState.battles.currentEnemy.name}！`, '#c9a961');
+            updateNormalBattleUI();
+            updateUI();
         }
 
         // 进入秘境
