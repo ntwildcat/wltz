@@ -506,14 +506,15 @@
         }
 
         .action-item.disabled {
-            opacity: 0.5;
+            opacity: 0.75;
             cursor: not-allowed;
             border-color: var(--border-l4);
+            background: rgba(50, 55, 80, 0.8);
         }
 
         .action-item.disabled:hover {
-            border-color: var(--border-l4);
-            background: var(--bg-l3);
+            border-color: var(--border-l3);
+            background: rgba(50, 55, 80, 0.9);
             box-shadow: none;
         }
 
@@ -548,6 +549,91 @@
 
         .action-desc {
             font-size: 0.8em;
+            color: var(--text-l4);
+        }
+
+        /* ===== P2: 配方卡片新样式 ===== */
+
+        .recipe-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+            justify-content: center;
+        }
+
+        .recipe-icon {
+            font-size: 1.2em;
+        }
+
+        .recipe-name {
+            font-weight: bold;
+            color: var(--text-l1);
+            font-family: var(--font-title);
+            flex: 1;
+        }
+
+        .recipe-time {
+            font-size: 0.85em;
+            color: var(--text-l4);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .recipe-output {
+            font-size: 0.85em;
+            color: var(--text-l2);
+            margin-bottom: var(--spacing-xs);
+            line-height: 1.3;
+        }
+
+        .recipe-materials {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-xs);
+            font-size: 0.75em;
+            justify-content: center;
+        }
+
+        .recipe-mat-enough {
+            color: var(--color-hp);
+            display: inline-block;
+        }
+
+        .recipe-mat-lack {
+            color: var(--color-danger);
+            display: inline-block;
+        }
+
+        .recipe-efficiency {
+            font-size: 0.8em;
+            color: var(--border-l2);
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+        }
+
+        .recipe-lock-hint {
+            font-size: 0.75em;
+            color: var(--color-warning);
+            margin-top: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: rgba(243, 156, 18, 0.1);
+            border-radius: var(--radius-xs);
+            line-height: 1.2;
+        }
+
+        .action-item.recipe-materials-lack {
+            opacity: 0.75;
+            border-color: var(--color-warning);
+        }
+
+        .action-item.recipe-materials-lack:hover {
+            border-color: var(--color-warning);
+            box-shadow: 0 0 12px rgba(243, 156, 18, 0.2);
+        }
+
+        .action-item.disabled .recipe-header,
+        .action-item.disabled .recipe-name {
             color: var(--text-l4);
         }
 
@@ -1440,7 +1526,7 @@
                                 <button id="switchArtBtn" class="btn" style="width: 100%; font-size: 0.9em;" onclick="showArtSwitchModal()">🔄 切换功法</button>
                             </div>
 
-                            <div class="action-list">
+                            <div class="action-list" id="cultivationActions">
                                 <!-- 吐纳灵气 - 已解锁 -->
                                 <div class="action-item" onclick="selectAction('cultivation', 'basic')">
                                     <div class="action-name">🟢 吐纳灵气</div>
@@ -2048,7 +2134,12 @@
                         breakthrough: { name: '筑基丹', desc: '清灵草 ×3', duration: 12, output: { items: [{ id: 'pill', qty: 1 }], skill: 'alchemy', exp: 25 }, requiredLevel: 5, requires: { cleangrass: 3 }, unlocked: false },
                         gather: { name: '聚灵丹', desc: '清灵草 ×2 + 灵米 ×1', duration: 15, output: { items: [{ id: 'gatherpill', qty: 1 }], skill: 'alchemy', exp: 30 }, requiredLevel: 8, requires: { cleangrass: 2, millet: 1 }, unlocked: false },
                         realm: { name: '破境丹', desc: '清灵草 ×5 + 妖丹 ×1', duration: 25, output: { items: [{ id: 'realmpill', qty: 1 }], skill: 'alchemy', exp: 50 }, requiredLevel: 15, requires: { cleangrass: 5 }, unlocked: false },
-                        marrow: { name: '洗髓丹', desc: '妖丹 ×2 + 灵玉粉 ×1', duration: 30, output: { items: [{ id: 'marrpill', qty: 1 }], skill: 'alchemy', exp: 70 }, requiredLevel: 25, requires: {}, unlocked: false }
+                        marrow: { name: '洗髓丹', desc: '妖丹 ×2 + 灵玉粉 ×1', duration: 30, output: { items: [{ id: 'marrpill', qty: 1 }], skill: 'alchemy', exp: 70 }, requiredLevel: 25, requires: {}, unlocked: false },
+                        // P6 金丹期配方
+                        golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 丹火 ×2', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 120 }, requiredLevel: 30, requires: { mushroom: 3, crystal: 1, danhuo: 2 }, unlocked: false },
+                        spirit_pill: { name: '聚灵丹（高级）', desc: '灵芝 ×5 + 玄晶 ×2', duration: 45, output: { items: [{ id: 'spiritpill', qty: 1 }], skill: 'alchemy', exp: 150 }, requiredLevel: 35, requires: { mushroom: 5, crystal: 2 }, unlocked: false },
+                        // P7 元婴期配方
+                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 神识 ×2', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 40, requires: { lotus: 3, tea: 5, shenshi: 2 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2059,7 +2150,13 @@
                     exp: 0,
                     recipes: {
                         practice: { name: '打铁练习', desc: '增加技能经验', duration: 10, output: { skill: 'forging', exp: 15 }, requiredLevel: 1, unlocked: true },
-                        ironsword: { name: '铸造铁剑', desc: '需要铁矿石 ×3', duration: 20, output: { items: [{ id: 'sword', qty: 1 }], skill: 'forging', exp: 25 }, requiredLevel: 5, requires: { ironore: 3 }, unlocked: false }
+                        ironsword: { name: '铸造铁剑', desc: '铁矿石 ×3', duration: 20, output: { items: [{ id: 'sword', qty: 1 }], skill: 'forging', exp: 25 }, requiredLevel: 5, requires: { ironore: 3 }, unlocked: false },
+                        iron_armor: { name: '铁甲', desc: '铁矿石 ×5', duration: 30, output: { items: [{ id: 'ironarmor', qty: 1 }], skill: 'forging', exp: 40 }, requiredLevel: 10, requires: { ironore: 5 }, unlocked: false },
+                        spirit_sword: { name: '灵剑', desc: '灵矿石 ×3 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritsword', qty: 1 }], skill: 'forging', exp: 80 }, requiredLevel: 25, requires: { spiritore: 3, crystal: 1 }, unlocked: false },
+                        // P6 金丹期配方
+                        golden_armor: { name: '金丹法袍', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldenarmor', qty: 1 }], skill: 'forging', exp: 100 }, requiredLevel: 30, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
+                        // P7 元婴期配方
+                        yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 180 }, requiredLevel: 45, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2073,6 +2170,8 @@
                         grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 15 }, requiredLevel: 2, requires: { seed_cleangrass: 1 }, unlocked: false },
                         mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 25 }, requiredLevel: 10, requires: { seed_mushroom: 1 }, unlocked: false },
                         tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 40 }, requiredLevel: 20, requires: { seed_tea: 1 }, unlocked: false },
+                        spirit_fruit: { name: '种植灵果', desc: '中级材料 需灵果种子', duration: 120, output: { items: [{ id: 'spiritfruit', qty: 1 }], skill: 'farming', exp: 50 }, requiredLevel: 15, requires: { seed_spiritfruit: 1 }, unlocked: false },
+                        golden_grass: { name: '种植金灵草', desc: '高级材料 需金灵草种子', duration: 180, output: { items: [{ id: 'goldengrass', qty: 1 }], skill: 'farming', exp: 100 }, requiredLevel: 30, requires: { seed_goldengrass: 1 }, unlocked: false },
                         lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 80 }, requiredLevel: 40, requires: { seed_lotus: 1 }, unlocked: false }
                     },
                     actions: {}
@@ -2086,7 +2185,11 @@
                         stone: { name: '采石', desc: '产出碎石', duration: 5, output: { items: [{ id: 'stone', qty: 1 }], skill: 'mining', exp: 10 }, requiredLevel: 1, unlocked: true },
                         ironore: { name: '采铁矿', desc: '产出铁矿石', duration: 8, output: { items: [{ id: 'ironore', qty: 1 }], skill: 'mining', exp: 15 }, requiredLevel: 5, unlocked: false },
                         spiritore: { name: '采灵矿', desc: '产出灵矿石', duration: 12, output: { items: [{ id: 'spiritore', qty: 1 }], skill: 'mining', exp: 20 }, requiredLevel: 15, unlocked: false },
-                        crystal: { name: '采玄晶', desc: '产出玄晶', duration: 20, output: { items: [{ id: 'crystal', qty: 1 }], skill: 'mining', exp: 30 }, requiredLevel: 30, unlocked: false }
+                        crystal: { name: '采玄晶', desc: '产出玄晶', duration: 20, output: { items: [{ id: 'crystal', qty: 1 }], skill: 'mining', exp: 30 }, requiredLevel: 30, unlocked: false },
+                        // P6 金丹期配方
+                        spiritcrystal: { name: '采灵晶', desc: '产出灵晶', duration: 25, output: { items: [{ id: 'spiritcrystal', qty: 1 }], skill: 'mining', exp: 50 }, requiredLevel: 40, unlocked: false },
+                        // P7 元婴期配方
+                        immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 80 }, requiredLevel: 50, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2169,7 +2272,24 @@
                 shenshi_map: { name: '神识地图', icon: '🗺️', type: 'material' },
 
                 // 装备
-                sword: { name: '桃木剑', icon: '⚔️', type: 'weapon', stats: { atk: 15 } }
+                sword: { name: '桃木剑', icon: '⚔️', type: 'weapon', stats: { atk: 15 } },
+                ironarmor: { name: '铁甲', icon: '🛡️', type: 'armor', stats: { def: 10 } },
+                spiritsword: { name: '灵剑', icon: '⚡', type: 'weapon', stats: { atk: 40 } },
+                goldenarmor: { name: '金丹法袍', icon: '👔', type: 'armor', stats: { def: 25, hp: 50 } },
+                yuanyingsword: { name: '元婴灵剑', icon: '✨', type: 'weapon', stats: { atk: 80 } },
+
+                // P6/P7 新丹药
+                spiritpill: { name: '聚灵丹（高级）', icon: '🔷', type: 'consumable' },
+
+                // P6/P7 新矿石和种子
+                spiritcrystal: { name: '灵晶', icon: '🔹', type: 'ore' },
+                immortalore: { name: '仙矿', icon: '✨', type: 'ore' },
+
+                // P6/P7 新作物
+                spiritfruit: { name: '灵果', icon: '🍎', type: 'material' },
+                goldengrass: { name: '金灵草', icon: '🌾', type: 'material' },
+                seed_spiritfruit: { name: '灵果种子', icon: '🌱', type: 'seed' },
+                seed_goldengrass: { name: '金灵草种子', icon: '🌿', type: 'seed' }
             },
             shop: {
                 upgrades: [
@@ -3765,89 +3885,214 @@
             document.getElementById('skill-' + activeSkill).classList.add('active');
         }
 
+        // ===== P2: 配方卡片三态四信息系统 =====
+
+        /**
+         * 判断配方解锁状态
+         * @returns { unlocked, reason, currentValue, requiredValue }
+         */
+        function getRecipeUnlockState(skillName, recipe) {
+            if (skillName === 'cultivation') {
+                const currentRealmIdx = gameState.player.realmIndex;
+                const requiredRealmIdx = recipe.requiredRealmIndex || 0;
+                const isUnlocked = currentRealmIdx >= requiredRealmIdx;
+                return {
+                    unlocked: isUnlocked,
+                    reason: isUnlocked ? null : 'realm',
+                    currentValue: currentRealmIdx,
+                    requiredValue: requiredRealmIdx
+                };
+            } else {
+                const skill = gameState.skills[skillName];
+                const currentLevel = skill.level;
+                const requiredLevel = recipe.requiredLevel || 1;
+                const isUnlocked = currentLevel >= requiredLevel;
+                return {
+                    unlocked: isUnlocked,
+                    reason: isUnlocked ? null : 'level',
+                    currentValue: currentLevel,
+                    requiredValue: requiredLevel
+                };
+            }
+        }
+
+        /**
+         * 计算配方效率（产出/周期）
+         */
+        function calculateRecipeEfficiency(skillName, recipe) {
+            const duration = recipe.duration || 1;
+
+            // 修炼：修为/秒
+            if (recipe.output && recipe.output.cultivation) {
+                return recipe.output.cultivation / duration;
+            }
+
+            // 其他技能：产出数量/秒
+            if (recipe.output && recipe.output.items && recipe.output.items.length > 0) {
+                return recipe.output.items[0].qty / duration;
+            }
+
+            return 0;
+        }
+
+        /**
+         * 检查材料充足度
+         */
+        function checkMaterialAvailability(recipe) {
+            if (!recipe.requires || Object.keys(recipe.requires).length === 0) {
+                return [];
+            }
+
+            return Object.entries(recipe.requires).map(([itemId, required]) => {
+                const item = GAME_CONFIG.items[itemId];
+                const invItem = gameState.player.inventory.find(i => i.id === itemId);
+                const owned = invItem ? invItem.qty : 0;
+                return {
+                    id: itemId,
+                    name: item?.name || itemId,
+                    icon: item?.icon || '❓',
+                    required,
+                    owned,
+                    enough: owned >= required
+                };
+            });
+        }
+
+        /**
+         * 格式化产出显示
+         */
+        function formatRecipeOutput(output) {
+            const parts = [];
+
+            if (output.cultivation) {
+                parts.push(`✨ +${output.cultivation}修为`);
+            }
+            if (output.coins) {
+                parts.push(`💎 +${output.coins}`);
+            }
+            if (output.exp) {
+                parts.push(`+${output.exp}exp`);
+            }
+            if (output.items && output.items.length > 0) {
+                output.items.forEach(item => {
+                    const cfg = GAME_CONFIG.items[item.id];
+                    if (cfg) {
+                        parts.push(`→ ${cfg.icon}×${item.qty}`);
+                    }
+                });
+            }
+
+            return parts.join('  ');
+        }
+
+        /**
+         * 格式化锁定提示
+         */
+        function formatRecipeLockHint(skillName, state) {
+            if (!state.unlocked) {
+                if (state.reason === 'realm') {
+                    const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满', '金丹初期', '金丹中期', '金丹后期', '金丹圆满', '元婴初期', '元婴中期', '元婴后期'];
+                    const requiredName = realmNames[state.requiredValue] || `未知境界${state.requiredValue}`;
+                    const currentName = realmNames[state.currentValue] || `未知境界${state.currentValue}`;
+                    return `🔒 需要 ${requiredName}（当前：${currentName}）`;
+                } else if (state.reason === 'level') {
+                    return `🔒 需要 Lv.${state.requiredValue}（当前 Lv.${state.currentValue}）`;
+                }
+            }
+            return '';
+        }
+
+        /**
+         * 渲染单个配方卡片（新系统）
+         */
+        function renderRecipeCard(skillName, recipeKey, recipe) {
+            const card = document.createElement('div');
+            const isActive = gameState.currentAction &&
+                            gameState.currentAction.skill === skillName &&
+                            gameState.currentAction.action === recipeKey;
+
+            // 1. 判断解锁状态
+            const unlockState = getRecipeUnlockState(skillName, recipe);
+
+            // 2. 计算效率
+            const efficiency = calculateRecipeEfficiency(skillName, recipe);
+
+            // 3. 检查材料充足度
+            const materials = checkMaterialAvailability(recipe);
+
+            // 4. 判断类名
+            let className = 'action-item';
+            if (isActive) className += ' active';
+            if (!unlockState.unlocked) className += ' disabled';
+            if (materials.length > 0 && !materials.every(m => m.enough) && unlockState.unlocked) {
+                className += ' recipe-materials-lack';
+            }
+
+            card.className = className;
+            card.id = 'action-' + skillName + '-' + recipeKey;
+
+            // 5. 构建 HTML
+            let materialsHtml = '';
+            if (materials.length > 0) {
+                const matsStr = materials.map(m => `
+                    <span class="${m.enough ? 'recipe-mat-enough' : 'recipe-mat-lack'}" title="${m.name}">
+                        ${m.icon}×${m.required} (${m.owned})
+                    </span>
+                `).join('');
+                materialsHtml = `<div class="recipe-materials">${matsStr}</div>`;
+            }
+
+            const lockHint = formatRecipeLockHint(skillName, unlockState);
+            const lockHintHtml = lockHint ? `<div class="recipe-lock-hint">${lockHint}</div>` : '';
+
+            const outputStr = formatRecipeOutput(recipe.output || {});
+            const efficiencyStr = efficiency > 0 ? `<div class="recipe-efficiency">效率: ${efficiency.toFixed(2)}/秒</div>` : '';
+
+            card.innerHTML = `
+                <div class="recipe-header">
+                    <span class="recipe-icon">${unlockState.unlocked ? '🟢' : '⭕'}</span>
+                    <span class="recipe-name">${recipe.name}</span>
+                </div>
+                <div class="recipe-time">⏱ ${recipe.duration}s</div>
+                <div class="recipe-output">${outputStr}</div>
+                ${materialsHtml}
+                ${efficiencyStr}
+                ${lockHintHtml}
+                <div class="action-progress-bar ${isActive ? 'active' : ''}">
+                    <div class="action-progress-fill" style="width: 0%"></div>
+                </div>
+            `;
+
+            // 6. 绑定事件
+            if (unlockState.unlocked && materials.every(m => m.enough || materials.length === 0)) {
+                card.style.cursor = 'pointer';
+                card.onclick = () => selectAction(skillName, recipeKey);
+            } else {
+                card.style.cursor = 'not-allowed';
+            }
+
+            return card;
+        }
+
         function generateRecipeList(skillName) {
             const skill = gameState.skills[skillName];
-            if (!skill.recipes) return;
+            if (!skill || !skill.recipes) return;
 
-            const actionList = document.getElementById(skillName + 'Actions');
+            const elementId = skillName + 'Actions';
+            const actionList = document.getElementById(elementId);
+            if (!actionList) return;
+
             actionList.innerHTML = '';
 
             Object.entries(skill.recipes).forEach(([key, recipe]) => {
-                const div = document.createElement('div');
-                const isActive = gameState.currentAction && gameState.currentAction.skill === skillName && gameState.currentAction.action === key;
-
-                // 检查是否可用（修炼：境界+功法；其他：技能等级）
-                let isUnlocked;
-                if (skillName === 'cultivation') {
-                    isUnlocked = isCultivationRecipeUnlocked(key);
-                } else {
-                    isUnlocked = skill.level >= recipe.requiredLevel;
-                }
-                const isDisabled = !isUnlocked;
-
-                // 状态类：normal/active/disabled
-                let className = 'action-item';
-                if (isActive) className += ' active';
-                if (isDisabled) className += ' disabled';
-
-                div.className = className;
-                div.id = 'action-' + skillName + '-' + key;
-
-                // 产出预览（P0功能）
-                let outputPreview = '';
-                if (recipe.output) {
-                    if (recipe.output.cultivation) {
-                        outputPreview += `修为+${recipe.output.cultivation} `;
+                try {
+                    const card = renderRecipeCard(skillName, key, recipe);
+                    if (card) {
+                        actionList.appendChild(card);
                     }
-                    if (recipe.output.exp) {
-                        outputPreview += `Exp+${recipe.output.exp} `;
-                    }
-                    if (recipe.output.items && recipe.output.items.length > 0) {
-                        const itemStr = recipe.output.items.map(item => {
-                            const itemConfig = GAME_CONFIG.items[item.id];
-                            return `${itemConfig.icon}×${item.qty}`;
-                        }).join(' ');
-                        outputPreview += itemStr;
-                    }
+                } catch (e) {
+                    console.error('[ERROR] Failed to render recipe card:', key, e);
                 }
-
-                // 不可用提示
-                let statusHint = '';
-                if (isDisabled) {
-                    if (skillName === 'cultivation') {
-                        const realmReq = recipe.requiredRealmIndex || 0;
-                        const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满'];
-                        const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
-
-                        if (gameState.player.realmIndex < realmReq) {
-                            statusHint = `<div style="color: #ff6b6b; font-size: 0.75em; margin-top: 5px;">🔒 需要境界: ${realmNames[realmReq]}</div>`;
-                        } else if (currentArt && !currentArt.unlockedRecipes.includes(key)) {
-                            statusHint = `<div style="color: #ff6b6b; font-size: 0.75em; margin-top: 5px;">🔒 当前功法不支持</div>`;
-                        }
-                    } else {
-                        statusHint = `<div style="color: #ff6b6b; font-size: 0.75em; margin-top: 5px;">🔒 需要Lv${recipe.requiredLevel}</div>`;
-                    }
-                }
-
-                div.innerHTML = `
-                    <div>
-                        <div class="action-name">${recipe.name}</div>
-                        <div class="action-desc">${recipe.desc}</div>
-                        <div style="font-size: 0.75em; color: #fbbf24; margin-top: 3px; line-height: 1.3;">⏱${recipe.duration}s | ${outputPreview}</div>
-                        ${statusHint}
-                    </div>
-                    <div class="action-progress-bar ${isActive ? 'active' : ''}">
-                        <div class="action-progress-fill" style="width: 0%"></div>
-                    </div>
-                `;
-
-                if (!isDisabled) {
-                    div.onclick = () => selectAction(skillName, key);
-                } else {
-                    div.style.opacity = '0.5';
-                    div.style.cursor = 'not-allowed';
-                }
-                actionList.appendChild(div);
             });
 
             // 显示第一个配方的详情
@@ -4246,7 +4491,13 @@
                 mountain: { name: '十万大山外围', desc: '危险地带', minLevel: 3, maxLevel: 4, enemies: ['tiger', 'bear'], coins: 100, exp: 50 },
                 deepMountain: { name: '十万大山核心', desc: '极度危险', minLevel: 5, maxLevel: 6, enemies: ['demon', 'spirit'], coins: 200, exp: 100 },
                 swamp: { name: '妖兽沼泽', desc: '诡异危险', minLevel: 5, maxLevel: 6, enemies: ['poisonBeast', 'serpent'], coins: 180, exp: 90 },
-                abyss: { name: '魔窟深渊', desc: '极端危险', minLevel: 7, maxLevel: 8, enemies: ['demon-lord', 'abyssal'], coins: 300, exp: 150 }
+                abyss: { name: '魔窟深渊', desc: '极端危险', minLevel: 7, maxLevel: 8, enemies: ['demon-lord', 'abyssal'], coins: 300, exp: 150 },
+                // P6 金丹期新增
+                goldenPlains: { name: '金丹平原', desc: '金丹修士的猎场', minLevel: 9, maxLevel: 10, enemies: ['golden-beast', 'spirit-wolf'], coins: 500, exp: 200 },
+                tribulationGround: { name: '天劫之地', desc: '雷劫试炼', minLevel: 10, maxLevel: 11, enemies: ['thunder-demon', 'tribulation-spirit'], coins: 800, exp: 350 },
+                // P7 元婴期新增
+                voidSea: { name: '虚空之海', desc: '元婴修士的试炼场', minLevel: 13, maxLevel: 14, enemies: ['void-creature', 'soul-devourer'], coins: 1000, exp: 400 },
+                abyssRuins: { name: '深渊遗迹', desc: '极端危险的废墟', minLevel: 15, maxLevel: 16, enemies: ['abyss-lord', 'ancient-god'], coins: 2000, exp: 800 }
             };
 
             const actions = {};
@@ -4385,6 +4636,24 @@
                 abyss: [
                     { name: '魔王', hp: 120, atk: 25, def: 12, spd: 40, icon: '👿' },
                     { name: '深渊生物', hp: 110, atk: 22, def: 10, spd: 35, icon: '🌀' }
+                ],
+                // P6 金丹期敌人
+                goldenPlains: [
+                    { name: '金甲兽', hp: 200, atk: 40, def: 15, spd: 30, icon: '🦁' },
+                    { name: '灵狼', hp: 150, atk: 45, def: 10, spd: 50, icon: '🐺' }
+                ],
+                tribulationGround: [
+                    { name: '雷劫残魂', hp: 250, atk: 50, def: 18, spd: 35, icon: '⚡' },
+                    { name: '天雷傀儡', hp: 280, atk: 55, def: 20, spd: 30, icon: '🤖' }
+                ],
+                // P7 元婴期敌人
+                voidSea: [
+                    { name: '虚空生物', hp: 800, atk: 80, def: 30, spd: 40, icon: '🌀' },
+                    { name: '噬魂者', hp: 700, atk: 90, def: 25, spd: 55, icon: '👻' }
+                ],
+                abyssRuins: [
+                    { name: '深渊领主', hp: 2000, atk: 120, def: 50, spd: 35, icon: '👿' },
+                    { name: '古神残影', hp: 2500, atk: 150, def: 60, spd: 30, icon: '🌑' }
                 ]
             };
 
