@@ -2156,9 +2156,9 @@
                     name: '天劫之地',
                     desc: '雷劫淬体·通关掉落金丹秘药材料',
                     icon: '⚡',
-                    minRealmIndex: 9,                       // 最低金丹初期
+                    minRealmIndex: 8,                       // 最低筑基圆满：这里掉落突破金丹所需的金丹秘药，必须在突破前就能进入
                     baseRealmIndex: 9,                      // 怪物境界为金丹初期
-                    recommendedLevel: '金丹初期~金丹中期',
+                    recommendedLevel: '筑基圆满~金丹中期',
                     monsters: [
                         { name: '雷劫残魂', type: '雷', hp: 1200, atk: 35, spd: 55, def: 15, attackSpeed: 2.2, drop: 'coins', dropQty: 150 },
                         { name: '天雷傀儡', type: '雷', hp: 1500, atk: 40, spd: 50, def: 18, attackSpeed: 2.3, drop: 'coins', dropQty: 180 },
@@ -2185,9 +2185,9 @@
                     name: '化神秘境',
                     desc: '元神试炼·通关掉落元婴丹材料',
                     icon: '🌌',
-                    minRealmIndex: 13,                      // 最低元婴初期
+                    minRealmIndex: 12,                      // 最低金丹圆满：这里掉落突破元婴所需的元婴丹，必须在突破前就能进入
                     baseRealmIndex: 13,                     // 怪物境界为元婴初期
-                    recommendedLevel: '元婴初期~元婴中期',
+                    recommendedLevel: '金丹圆满~元婴中期',
                     monsters: [
                         { name: '元神残影', type: '无', hp: 5000, atk: 80, spd: 60, def: 30, attackSpeed: 2.1, drop: 'coins', dropQty: 400 },
                         { name: '虚空吞噬者', type: '风', hp: 6000, atk: 90, spd: 70, def: 25, attackSpeed: 1.8, drop: 'coins', dropQty: 450 },
@@ -2245,10 +2245,10 @@
                         realm: { name: '破境丹', desc: '清灵草 ×5 + 妖丹 ×1', duration: 25, output: { items: [{ id: 'realmpill', qty: 1 }], skill: 'alchemy', exp: 50 }, requiredLevel: 15, requires: { cleangrass: 5 }, unlocked: false },
                         marrow: { name: '洗髓丹', desc: '妖丹 ×2 + 灵玉粉 ×1', duration: 30, output: { items: [{ id: 'marrpill', qty: 1 }], skill: 'alchemy', exp: 70 }, requiredLevel: 25, requires: {}, unlocked: false },
                         // P6 金丹期配方
-                        golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 丹火 ×2', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 120 }, requiredLevel: 30, requires: { mushroom: 3, crystal: 1, danhuo: 2 }, unlocked: false },
+                        golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 灵矿石 ×2', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 120 }, requiredLevel: 30, requires: { mushroom: 3, crystal: 1, spiritore: 2 }, unlocked: false },
                         spirit_pill: { name: '聚灵丹（高级）', desc: '灵芝 ×5 + 玄晶 ×2', duration: 45, output: { items: [{ id: 'spiritpill', qty: 1 }], skill: 'alchemy', exp: 150 }, requiredLevel: 35, requires: { mushroom: 5, crystal: 2 }, unlocked: false },
                         // P7 元婴期配方
-                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 神识 ×2', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 40, requires: { lotus: 3, tea: 5, shenshi: 2 }, unlocked: false }
+                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 40, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2415,8 +2415,8 @@
                     { id: 'pill', name: '筑基丹', icon: '🔮', price: 60, desc: '+100灵气', minRealmIndex: 0 },
                     { id: 'gatherpill', name: '聚灵丹', icon: '🔵', price: 100, desc: '+200灵气', minRealmIndex: 0 },
                     { id: 'spiritpill', name: '聚灵丹（高级）', icon: '🔷', price: 500, desc: '恢复大量灵气', minRealmIndex: 10 },
-                    { id: 'goldenpill', name: '金丹秘药', icon: '🟤', price: 5000, desc: '金丹期突破必需', minRealmIndex: 9 },
-                    { id: 'yuanyingpill', name: '元婴丹', icon: '⭕', price: 20000, desc: '元婴期突破必需', minRealmIndex: 13 }
+                    { id: 'goldenpill', name: '金丹秘药', icon: '🟤', price: 5000, desc: '金丹期突破必需', minRealmIndex: 8 },
+                    { id: 'yuanyingpill', name: '元婴丹', icon: '⭕', price: 20000, desc: '元婴期突破必需', minRealmIndex: 12 }
                 ],
                 equipment: [
                     { id: 'sword', name: '桃木剑', icon: '⚔️', price: 150, desc: '攻击力+15', minRealmIndex: 0 },
@@ -2503,8 +2503,8 @@
             mysteryTower: 0.7,
             mysteriousForest: 0.7,
             ancientRuin: 0.4,
-            tribulationGround: 0.15,
-            huashenRealm: 0.065
+            tribulationGround: 0.13,
+            huashenRealm: 0.06
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
