@@ -2440,11 +2440,17 @@
                     { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9 },
                     { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13 }
                 ],
-                special: [
+                arts: [
+                    { id: 'qingmu_art', name: '青木诀', icon: '🌿', price: 200, desc: '修炼速度 ×1.1', minRealmIndex: 1, type: 'art' },
+                    { id: 'liuyun_art', name: '流云诀', icon: '☁️', price: 1200, desc: '修炼速度 ×1.25', minRealmIndex: 3, type: 'art' },
+                    { id: 'xuanshui_art', name: '玄水经', icon: '💧', price: 4000, desc: '修炼速度 ×1.35', minRealmIndex: 5, type: 'art' },
+                    { id: 'lieyang_art', name: '烈阳功', icon: '☀️', price: 8000, desc: '修炼速度 ×1.45', minRealmIndex: 7, type: 'art' },
                     { id: 'golden_art', name: '金丹大道', icon: '📜', price: 10000, desc: '修炼速度 ×1.5', minRealmIndex: 8, type: 'art' },
                     { id: 'fire_art', name: '焚天诀', icon: '🔥', price: 20000, desc: '修炼速度 ×1.8', minRealmIndex: 9, type: 'art' },
                     { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 30000, desc: '修炼速度 ×2.2', minRealmIndex: 11, type: 'art' },
-                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' },
+                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' }
+                ],
+                special: [
                     { id: 'clone_unlock', name: '分身解锁令', icon: '👥', price: 50000, desc: '分身系统尚未开放', minRealmIndex: 13, type: 'unlock' }
                 ]
             }
@@ -3740,6 +3746,39 @@
                 speedMultiplier: 1.2,               // 修炼速度倍率：1.2x（快20%）
                 description: '玄门正宗功法，引气效率远超寻常法门。',
                 origin: 'disciple'                  // 该功法绑定的出身
+            },
+            // 练气/筑基期功法（商城购买，有境界要求）
+            qingmu_art: {
+                id: 'qingmu_art',
+                name: '青木诀',
+                tier: 2,
+                speedMultiplier: 1.1,
+                description: '以草木生机滋养灵脉的入门功法，比引气诀略快。',
+                origin: null
+            },
+            liuyun_art: {
+                id: 'liuyun_art',
+                name: '流云诀',
+                tier: 2,
+                speedMultiplier: 1.25,
+                description: '灵气如流云般周转不息，练气后期的常见选择。',
+                origin: null
+            },
+            xuanshui_art: {
+                id: 'xuanshui_art',
+                name: '玄水经',
+                tier: 3,
+                speedMultiplier: 1.35,
+                description: '水属性中阶功法，灵气绵长，适合筑基修士打磨根基。',
+                origin: null
+            },
+            lieyang_art: {
+                id: 'lieyang_art',
+                name: '烈阳功',
+                tier: 3,
+                speedMultiplier: 1.45,
+                description: '至阳至刚的筑基功法，修炼极快但对经脉要求很高。',
+                origin: null
             },
             // P6 金丹期功法（可获取，非出身绑定）
             golden_art: {
@@ -5465,6 +5504,12 @@
                 return;
             }
 
+            // 境界要求（商品显示与购买都要校验）
+            if ((item.minRealmIndex || 0) > gameState.player.realmIndex) {
+                showNotification(`🔒 ${item.name}需要${getRealmName(item.minRealmIndex)}`, '#f59e0b');
+                return;
+            }
+
             // 永久升级特殊处理（P1功能）
             if (item.type === 'upgrade') {
                 if (gameState.player.boughtUpgrades.includes(itemId)) {
@@ -5495,19 +5540,26 @@
                     showNotification(`✨ 灵田槽位增加1个！共${gameState.player.farmingSlots}个`, '#16a34a');
                 }
             } else if (item.type === 'art') {
-                // 功法购买处理 - 记录拥有并自动装备
+                // 功法购买处理 - 记录拥有；只有比当前功法更快才自动装备
                 if (!gameState.player.ownedArts.includes(itemId)) gameState.player.ownedArts.push(itemId);
-                gameState.player.currentArt = itemId;
-
-                // 获取功法信息
                 const art = CULTIVATION_ARTS[itemId];
-                const speedBonus = art ? ((art.speedMultiplier - 1) * 100).toFixed(0) : '0';
+                const currentSpeed = CULTIVATION_ARTS[gameState.player.currentArt]?.speedMultiplier || 1;
 
-                showNotification(
-                    `✨ 已装备功法：${item.name}！\n修炼速度 ${art?.speedMultiplier?.toFixed(1)}x（提升${speedBonus}%）`,
-                    '#10b981',
-                    'success'
-                );
+                if (art && art.speedMultiplier > currentSpeed) {
+                    gameState.player.currentArt = itemId;
+                    const speedBonus = ((art.speedMultiplier - 1) * 100).toFixed(0);
+                    showNotification(
+                        `✨ 已装备功法：${item.name}！\n修炼速度 ${art.speedMultiplier.toFixed(2)}x（提升${speedBonus}%）`,
+                        '#10b981',
+                        'success'
+                    );
+                } else {
+                    showNotification(
+                        `已习得${item.name}（${art?.speedMultiplier?.toFixed(2)}x），当前功法更快，未自动装备`,
+                        '#10b981',
+                        'success'
+                    );
+                }
 
                 // 更新UI显示新的修炼时间
                 updateArtDisplay();
@@ -5534,6 +5586,7 @@
                 pills: '💊 丹药',
                 equipment: '⚔️ 装备',
                 materials: '🪨 材料',
+                arts: '📜 功法',
                 special: '✨ 特殊'
             };
 
@@ -5543,9 +5596,10 @@
 
             Object.entries(GAME_CONFIG.shop).forEach(([category, items]) => {
                 // 筛选该分类中可见的商品（境界满足要求的）
+                // 功法始终显示（未到境界的灰显并标注要求），其余商品未到境界时隐藏
                 const visibleItems = items.filter(item => {
                     const minRealm = item.minRealmIndex !== undefined ? item.minRealmIndex : 0;
-                    return currentRealmIdx >= minRealm;
+                    return item.type === 'art' || currentRealmIdx >= minRealm;
                 });
 
                 if (visibleItems.length === 0) return; // 如果没有可见商品，跳过该分类
@@ -5558,6 +5612,8 @@
                 visibleItems.forEach(item => {
                     // 检查永久升级是否已购买
                     const isBought = item.type === 'upgrade' && gameState.player.boughtUpgrades.includes(item.id);
+                    const isOwnedArt = item.type === 'art' && (gameState.player.ownedArts || []).includes(item.id);
+                    const isLocked = !isOwnedArt && currentRealmIdx < (item.minRealmIndex || 0);
 
                     const card = document.createElement('div');
                     card.className = 'shop-item';
@@ -5565,30 +5621,39 @@
                     let cardStyle = 'padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #555; border-radius: 4px; transition: all 0.3s; text-align: center;';
                     if (isBought) {
                         cardStyle += 'opacity: 0.5; background: rgba(0,0,0,0.5); border-color: #888; cursor: not-allowed;';
+                    } else if (isLocked) {
+                        cardStyle += 'opacity: 0.55; border-style: dashed; cursor: not-allowed;';
                     } else {
                         cardStyle += 'cursor: pointer;';
                     }
                     card.style.cssText = cardStyle;
 
-                    if (!isBought) {
+                    if (!isBought && !isLocked) {
                         card.onmouseover = () => card.style.borderColor = '#16a34a';
                         card.onmouseout = () => card.style.borderColor = '#555';
                     }
 
-                    const isOwnedArt = item.type === 'art' && (gameState.player.ownedArts || []).includes(item.id);
                     const priceDisplay = isBought ? '✓ 已拥有'
                         : isOwnedArt ? (gameState.player.currentArt === item.id ? '✓ 当前功法' : '已拥有 · 点击装备')
+                        : isLocked ? `🔒 需要${getRealmName(item.minRealmIndex)}`
                         : `${item.price} 灵石`;
-                    const priceColor = isBought ? '#16a34a' : '#fbbf24';
+                    const priceColor = isBought ? '#16a34a' : isLocked ? '#f59e0b' : '#fbbf24';
+                    // 未拥有的功法同时显示价格与境界要求，方便对比规划
+                    const artExtra = item.type === 'art' && !isOwnedArt
+                        ? `<div style="font-size: 0.75em; color: #888; margin-top: 4px;">${isLocked ? item.price + ' 灵石' : '需要' + getRealmName(item.minRealmIndex) + '（已达成）'}</div>`
+                        : '';
 
                     card.innerHTML = `
                         <div style="font-size: 24px; margin-bottom: 5px;">${item.icon}</div>
                         <div style="font-weight: bold; color: #16a34a; margin-bottom: 3px;">${item.name}</div>
                         <div style="font-size: 0.8em; color: #888; margin-bottom: 8px;">${item.desc}</div>
                         <div style="color: ${priceColor}; font-weight: bold;">${priceDisplay}</div>
+                        ${artExtra}
                     `;
 
-                    if (!isBought) {
+                    if (isLocked) {
+                        card.onclick = () => showNotification(`🔒 ${item.name}需要${getRealmName(item.minRealmIndex)}`, '#f59e0b');
+                    } else if (!isBought) {
                         card.onclick = () => buyItem(category, item.id);
                     }
                     shopContainer.appendChild(card);
