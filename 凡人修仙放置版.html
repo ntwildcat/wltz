@@ -1744,6 +1744,13 @@
 
                             <!-- 食物快捷栏与速度控制 -->
                             <div class="food-bar">
+                                <div class="food-slot">
+                                    <span class="food-icon" id="foodIcon">🍽️</span>
+                                    <div class="food-info">
+                                        <span class="food-name" id="foodName">无食物</span>
+                                        <span class="food-count" id="foodCountText">在炼丹中制作</span>
+                                    </div>
+                                </div>
                                 <div class="auto-eat-toggle">
                                     <input type="checkbox" id="autoEatToggle" onchange="toggleAutoEat(this.checked)">
                                     <span>自动食用</span>
@@ -2239,16 +2246,13 @@
                     exp: 0,
                     recipes: {
                         study: { name: '看丹书', desc: '增加经验', duration: 10, output: { skill: 'alchemy', exp: 15 }, requiredLevel: 1, unlocked: true },
-                        restore: { name: '回气丹', desc: '灵米 ×2', duration: 8, output: { items: [{ id: 'restpill', qty: 1 }], skill: 'alchemy', exp: 18 }, requiredLevel: 2, requires: { millet: 2 }, unlocked: false },
-                        breakthrough: { name: '筑基丹', desc: '清灵草 ×3', duration: 12, output: { items: [{ id: 'pill', qty: 1 }], skill: 'alchemy', exp: 25 }, requiredLevel: 5, requires: { cleangrass: 3 }, unlocked: false },
-                        gather: { name: '聚灵丹', desc: '清灵草 ×2 + 灵米 ×1', duration: 15, output: { items: [{ id: 'gatherpill', qty: 1 }], skill: 'alchemy', exp: 30 }, requiredLevel: 8, requires: { cleangrass: 2, millet: 1 }, unlocked: false },
-                        realm: { name: '破境丹', desc: '清灵草 ×5 + 妖丹 ×1', duration: 25, output: { items: [{ id: 'realmpill', qty: 1 }], skill: 'alchemy', exp: 50 }, requiredLevel: 15, requires: { cleangrass: 5 }, unlocked: false },
-                        marrow: { name: '洗髓丹', desc: '妖丹 ×2 + 灵玉粉 ×1', duration: 30, output: { items: [{ id: 'marrpill', qty: 1 }], skill: 'alchemy', exp: 70 }, requiredLevel: 25, requires: {}, unlocked: false },
-                        // P6 金丹期配方
-                        golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 灵矿石 ×2', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 120 }, requiredLevel: 30, requires: { mushroom: 3, crystal: 1, spiritore: 2 }, unlocked: false },
-                        spirit_pill: { name: '聚灵丹（高级）', desc: '灵芝 ×5 + 玄晶 ×2', duration: 45, output: { items: [{ id: 'spiritpill', qty: 1 }], skill: 'alchemy', exp: 150 }, requiredLevel: 35, requires: { mushroom: 5, crystal: 2 }, unlocked: false },
-                        // P7 元婴期配方
-                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 40, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false }
+                        millet_porridge: { name: '灵米粥', desc: '灵米 ×2（战斗食物：恢复100生命）', duration: 8, output: { items: [{ id: 'millet_porridge', qty: 2 }], skill: 'alchemy', exp: 12 }, requiredLevel: 1, requires: { millet: 2 }, unlocked: false },
+                        herb_soup: { name: '灵草汤', desc: '清灵草 ×2 + 灵米 ×1（战斗食物：恢复250生命）', duration: 12, output: { items: [{ id: 'herb_soup', qty: 2 }], skill: 'alchemy', exp: 30 }, requiredLevel: 3, requires: { cleangrass: 2, millet: 1 }, unlocked: false },
+                        breakthrough: { name: '筑基丹', desc: '清灵草 ×3（练气巅峰突破必需）', duration: 12, output: { items: [{ id: 'pill', qty: 1 }], skill: 'alchemy', exp: 45 }, requiredLevel: 4, requires: { cleangrass: 3 }, unlocked: false },
+                        golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 灵矿石 ×2（筑基圆满突破必需）', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 8, requires: { mushroom: 3, crystal: 1, spiritore: 2 }, unlocked: false },
+                        mushroom_stew: { name: '灵芝羹', desc: '灵芝 ×2 + 灵米 ×2（战斗食物：恢复500生命）', duration: 30, output: { items: [{ id: 'mushroom_stew', qty: 2 }], skill: 'alchemy', exp: 240 }, requiredLevel: 9, requires: { mushroom: 2, millet: 2 }, unlocked: false },
+                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2（金丹圆满突破必需）', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 400 }, requiredLevel: 12, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false },
+                        immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 14, requires: { tea: 3, mushroom: 2 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2259,13 +2263,16 @@
                     exp: 0,
                     recipes: {
                         practice: { name: '打铁练习', desc: '增加技能经验', duration: 10, output: { skill: 'forging', exp: 15 }, requiredLevel: 1, unlocked: true },
-                        ironsword: { name: '铸造铁剑', desc: '铁矿石 ×3', duration: 20, output: { items: [{ id: 'sword', qty: 1 }], skill: 'forging', exp: 25 }, requiredLevel: 5, requires: { ironore: 3 }, unlocked: false },
-                        iron_armor: { name: '铁甲', desc: '铁矿石 ×5', duration: 30, output: { items: [{ id: 'ironarmor', qty: 1 }], skill: 'forging', exp: 40 }, requiredLevel: 10, requires: { ironore: 5 }, unlocked: false },
-                        spirit_sword: { name: '灵剑', desc: '灵矿石 ×3 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritsword', qty: 1 }], skill: 'forging', exp: 80 }, requiredLevel: 25, requires: { spiritore: 3, crystal: 1 }, unlocked: false },
-                        // P6 金丹期配方
-                        golden_armor: { name: '金丹法袍', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldenarmor', qty: 1 }], skill: 'forging', exp: 100 }, requiredLevel: 30, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
-                        // P7 元婴期配方
-                        yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 180 }, requiredLevel: 45, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false }
+                        ironsword: { name: '铸造铁剑', desc: '铁矿石 ×3', duration: 20, output: { items: [{ id: 'sword', qty: 1 }], skill: 'forging', exp: 40 }, requiredLevel: 3, requires: { ironore: 3 }, unlocked: false },
+                        iron_armor: { name: '铁甲', desc: '铁矿石 ×5', duration: 30, output: { items: [{ id: 'ironarmor', qty: 1 }], skill: 'forging', exp: 60 }, requiredLevel: 4, requires: { ironore: 5 }, unlocked: false },
+                        spirit_sword: { name: '灵剑', desc: '灵矿石 ×3 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritsword', qty: 1 }], skill: 'forging', exp: 130 }, requiredLevel: 7, requires: { spiritore: 3, crystal: 1 }, unlocked: false },
+                        spirit_armor: { name: '灵甲', desc: '灵矿石 ×4 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritarmor', qty: 1 }], skill: 'forging', exp: 150 }, requiredLevel: 8, requires: { spiritore: 4, crystal: 1 }, unlocked: false },
+                        golden_sword: { name: '金丹剑', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldensword', qty: 1 }], skill: 'forging', exp: 220 }, requiredLevel: 10, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
+                        golden_armor: { name: '金丹法袍', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldenarmor', qty: 1 }], skill: 'forging', exp: 260 }, requiredLevel: 11, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
+                        golden_pendant: { name: '金丹佩', desc: '灵晶 ×1 + 玄晶 ×3', duration: 50, output: { items: [{ id: 'goldenpendant', qty: 1 }], skill: 'forging', exp: 300 }, requiredLevel: 12, requires: { spiritcrystal: 1, crystal: 3 }, unlocked: false },
+                        yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 500 }, requiredLevel: 15, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
+                        yuanying_armor: { name: '元婴法衣', desc: '灵晶 ×4 + 玄晶 ×4', duration: 90, output: { items: [{ id: 'yuanyingarmor', qty: 1 }], skill: 'forging', exp: 560 }, requiredLevel: 16, requires: { spiritcrystal: 4, crystal: 4 }, unlocked: false },
+                        yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 17, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2276,12 +2283,12 @@
                     exp: 0,
                     recipes: {
                         millet: { name: '种植灵米', desc: '食物', duration: 5, output: { items: [{ id: 'millet', qty: 1 }], skill: 'farming', exp: 10 }, requiredLevel: 1, unlocked: true },
-                        grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 15 }, requiredLevel: 2, requires: { seed_cleangrass: 1 }, unlocked: false },
-                        mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 25 }, requiredLevel: 10, requires: { seed_mushroom: 1 }, unlocked: false },
-                        tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 40 }, requiredLevel: 20, requires: { seed_tea: 1 }, unlocked: false },
-                        spirit_fruit: { name: '种植灵果', desc: '中级材料 需灵果种子', duration: 120, output: { items: [{ id: 'spiritfruit', qty: 1 }], skill: 'farming', exp: 50 }, requiredLevel: 15, requires: { seed_spiritfruit: 1 }, unlocked: false },
-                        golden_grass: { name: '种植金灵草', desc: '高级材料 需金灵草种子', duration: 180, output: { items: [{ id: 'goldengrass', qty: 1 }], skill: 'farming', exp: 100 }, requiredLevel: 30, requires: { seed_goldengrass: 1 }, unlocked: false },
-                        lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 80 }, requiredLevel: 40, requires: { seed_lotus: 1 }, unlocked: false }
+                        grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 20 }, requiredLevel: 2, requires: { seed_cleangrass: 1 }, unlocked: false },
+                        mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 70 }, requiredLevel: 5, requires: { seed_mushroom: 1 }, unlocked: false },
+                        spirit_fruit: { name: '种植灵果', desc: '中级材料 需灵果种子', duration: 120, output: { items: [{ id: 'spiritfruit', qty: 1 }], skill: 'farming', exp: 100 }, requiredLevel: 7, requires: { seed_spiritfruit: 1 }, unlocked: false },
+                        tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 190 }, requiredLevel: 9, requires: { seed_tea: 1 }, unlocked: false },
+                        golden_grass: { name: '种植金灵草', desc: '高级材料 需金灵草种子', duration: 180, output: { items: [{ id: 'goldengrass', qty: 1 }], skill: 'farming', exp: 220 }, requiredLevel: 10, requires: { seed_goldengrass: 1 }, unlocked: false },
+                        lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 12, requires: { seed_lotus: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2292,13 +2299,11 @@
                     exp: 0,
                     recipes: {
                         stone: { name: '采石', desc: '产出碎石', duration: 5, output: { items: [{ id: 'stone', qty: 1 }], skill: 'mining', exp: 10 }, requiredLevel: 1, unlocked: true },
-                        ironore: { name: '采铁矿', desc: '产出铁矿石', duration: 8, output: { items: [{ id: 'ironore', qty: 1 }], skill: 'mining', exp: 15 }, requiredLevel: 5, unlocked: false },
-                        spiritore: { name: '采灵矿', desc: '产出灵矿石', duration: 12, output: { items: [{ id: 'spiritore', qty: 1 }], skill: 'mining', exp: 20 }, requiredLevel: 15, unlocked: false },
-                        crystal: { name: '采玄晶', desc: '产出玄晶', duration: 20, output: { items: [{ id: 'crystal', qty: 1 }], skill: 'mining', exp: 30 }, requiredLevel: 30, unlocked: false },
-                        // P6 金丹期配方
-                        spiritcrystal: { name: '采灵晶', desc: '产出灵晶', duration: 25, output: { items: [{ id: 'spiritcrystal', qty: 1 }], skill: 'mining', exp: 50 }, requiredLevel: 40, unlocked: false },
-                        // P7 元婴期配方
-                        immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 80 }, requiredLevel: 50, unlocked: false }
+                        ironore: { name: '采铁矿', desc: '产出铁矿石', duration: 8, output: { items: [{ id: 'ironore', qty: 1 }], skill: 'mining', exp: 25 }, requiredLevel: 3, unlocked: false },
+                        spiritore: { name: '采灵矿', desc: '产出灵矿石', duration: 12, output: { items: [{ id: 'spiritore', qty: 1 }], skill: 'mining', exp: 60 }, requiredLevel: 6, unlocked: false },
+                        crystal: { name: '采玄晶', desc: '产出玄晶', duration: 20, output: { items: [{ id: 'crystal', qty: 1 }], skill: 'mining', exp: 110 }, requiredLevel: 8, unlocked: false },
+                        spiritcrystal: { name: '采灵晶', desc: '产出灵晶', duration: 25, output: { items: [{ id: 'spiritcrystal', qty: 1 }], skill: 'mining', exp: 220 }, requiredLevel: 12, unlocked: false },
+                        immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 330 }, requiredLevel: 15, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2316,9 +2321,9 @@
                     level: 1,
                     exp: 0,
                     recipes: {
-                        gather: { name: '凝聚丹火', desc: '从金丹中提取丹火', duration: 15, output: { items: [{ id: 'danhuo', qty: 1 }], skill: 'danhuo', exp: 20 }, requiredLevel: 1, unlocked: true },
-                        temper: { name: '淬炼法器', desc: '用丹火强化装备', duration: 30, output: { items: [{ id: 'tempered_essence', qty: 1 }], skill: 'danhuo', exp: 40 }, requiredLevel: 10, requires: { danhuo: 3 }, unlocked: false },
-                        golden_pill: { name: '炼制金丹秘药', desc: '金丹期突破辅助丹药', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'danhuo', exp: 80 }, requiredLevel: 20, requires: { danhuo: 5, mushroom: 3, crystal: 1 }, unlocked: false }
+                        gather: { name: '凝聚丹火', desc: '从金丹中提取丹火', duration: 15, output: { items: [{ id: 'danhuo', qty: 1 }], skill: 'danhuo', exp: 30 }, requiredLevel: 1, unlocked: true },
+                        temper: { name: '淬炼法器', desc: '用丹火强化装备', duration: 30, output: { items: [{ id: 'tempered_essence', qty: 1 }], skill: 'danhuo', exp: 90 }, requiredLevel: 3, requires: { danhuo: 3 }, unlocked: false },
+                        golden_pill: { name: '炼制元婴丹', desc: '丹火 ×5 + 九叶莲 ×1 + 悟道茶 ×3（金丹圆满突破必需）', duration: 60, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'danhuo', exp: 300 }, requiredLevel: 6, requires: { danhuo: 5, lotus: 1, tea: 3 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2329,9 +2334,9 @@
                     level: 1,
                     exp: 0,
                     recipes: {
-                        gather: { name: '凝练神识', desc: '从元婴中提取神识', duration: 20, output: { items: [{ id: 'shenshi', qty: 1 }], skill: 'shenshi', exp: 25 }, requiredLevel: 1, unlocked: true },
-                        scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 50 }, requiredLevel: 10, requires: { shenshi: 2 }, unlocked: false },
-                        yuanying_pill: { name: '炼制元婴丹', desc: '元婴期突破辅助丹药', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'shenshi', exp: 100 }, requiredLevel: 20, requires: { shenshi: 8, tea: 5, lotus: 1 }, unlocked: false }
+                        gather: { name: '凝练神识', desc: '从元婴中提取神识', duration: 20, output: { items: [{ id: 'shenshi', qty: 1 }], skill: 'shenshi', exp: 40 }, requiredLevel: 1, unlocked: true },
+                        scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 120 }, requiredLevel: 3, requires: { shenshi: 2 }, unlocked: false },
+                        yuanying_pill: { name: '炼制元婴丹', desc: '元婴期突破辅助丹药', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'shenshi', exp: 300 }, requiredLevel: 6, requires: { shenshi: 8, tea: 5, lotus: 1 }, unlocked: false }
                     },
                     actions: {}
                 }
@@ -2397,6 +2402,17 @@
                 // P6/P7 新作物
                 spiritfruit: { name: '灵果', icon: '🍎', type: 'material' },
                 goldengrass: { name: '金灵草', icon: '🌾', type: 'material' },
+                // 战斗食物（在炼丹中制作；在战斗中HP低于50%时自动食用）
+                millet_porridge: { name: '灵米粥', icon: '🍲', type: 'food', sellPrice: 20 },
+                herb_soup: { name: '灵草汤', icon: '🍜', type: 'food', sellPrice: 60 },
+                mushroom_stew: { name: '灵芝羹', icon: '🥣', type: 'food', sellPrice: 150 },
+                immortal_peach: { name: '蟠桃', icon: '🍑', type: 'food', sellPrice: 400 },
+                // 炼器新增装备
+                spiritarmor: { name: '灵甲', icon: '🛡️', type: 'armor', stats: { def: 16, hp: 30 } },
+                goldensword: { name: '金丹剑', icon: '🗡️', type: 'weapon', stats: { atk: 62 } },
+                goldenpendant: { name: '金丹佩', icon: '📿', type: 'jewelry', stats: { spd: 6, hp: 40 } },
+                yuanyingarmor: { name: '元婴法衣', icon: '🥋', type: 'armor', stats: { def: 45, hp: 120 } },
+                yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', stats: { spd: 10, hp: 80 } },
                 seed_spiritfruit: { name: '灵果种子', icon: '🌱', type: 'seed' },
                 seed_goldengrass: { name: '金灵草种子', icon: '🌿', type: 'seed' }
             },
@@ -2409,14 +2425,6 @@
                     { id: 'millet', name: '灵米', icon: '🌾', price: 10, desc: '普通食物' },
                     { id: 'cleangrass', name: '清灵草', icon: '🍃', price: 25, desc: '炼丹材料' },
                     { id: 'mushroom', name: '灵芝', icon: '🍄', price: 50, desc: '高级材料' }
-                ],
-                pills: [
-                    { id: 'restpill', name: '回气丹', icon: '💊', price: 30, desc: '+50灵气', minRealmIndex: 0 },
-                    { id: 'pill', name: '筑基丹', icon: '🔮', price: 60, desc: '+100灵气', minRealmIndex: 0 },
-                    { id: 'gatherpill', name: '聚灵丹', icon: '🔵', price: 100, desc: '+200灵气', minRealmIndex: 0 },
-                    { id: 'spiritpill', name: '聚灵丹（高级）', icon: '🔷', price: 500, desc: '恢复大量灵气', minRealmIndex: 10 },
-                    { id: 'goldenpill', name: '金丹秘药', icon: '🟤', price: 5000, desc: '金丹期突破必需', minRealmIndex: 8 },
-                    { id: 'yuanyingpill', name: '元婴丹', icon: '⭕', price: 20000, desc: '元婴期突破必需', minRealmIndex: 12 }
                 ],
                 equipment: [
                     { id: 'sword', name: '桃木剑', icon: '⚔️', price: 150, desc: '攻击力+15', minRealmIndex: 0 },
@@ -2466,14 +2474,14 @@
                     description: '由清灵草熬制的汤，恢复250点生命值'
                 },
                 // 高级食物
-                golden_pill: {
-                    id: 'golden_pill',
-                    name: '金丹秘药',
-                    icon: '⭐',
+                mushroom_stew: {
+                    id: 'mushroom_stew',
+                    name: '灵芝羹',
+                    icon: '🥣',
                     hpRestore: 500,           // 恢复HP
                     cooldown: 3.0,
                     minRealm: 9,              // 金丹初期
-                    description: '珍贵的秘药，恢复500点生命值'
+                    description: '灵芝熬制的浓羹，恢复500点生命值'
                 },
                 // 极品食物
                 immortal_peach: {
@@ -2995,9 +3003,15 @@
             deathRecord.cultivationLost = lostCultivation;
 
             // 2. 损失食物（50%）
-            const foodBefore = gameState.player.foodCount;
-            gameState.player.foodCount = Math.floor(gameState.player.foodCount * 0.5);
-            const foodLost = foodBefore - gameState.player.foodCount;
+            let foodLost = 0;
+            gameState.player.inventory.forEach(item => {
+                if (GAME_CONFIG.items[item.id] && GAME_CONFIG.items[item.id].type === 'food') {
+                    const lose = Math.ceil(item.qty * 0.5);
+                    item.qty -= lose;
+                    foodLost += lose;
+                }
+            });
+            gameState.player.inventory = gameState.player.inventory.filter(item => item.qty > 0);
             deathRecord.foodLost = foodLost;
 
             // 3. HP恢复到50%
@@ -3035,23 +3049,60 @@
             saveGame();
         }
 
-        // P0-4 使用食物恢复HP
-        function consumeFood() {
+        // 战斗食物：食物是背包里的物品（在炼丹中制作），foodSlot 保存当前选择的食物ID
+        function getFoodCount() {
+            const foodId = gameState.player.foodSlot;
+            if (!foodId) return 0;
+            const inv = gameState.player.inventory.find(i => i.id === foodId);
+            return inv ? inv.qty : 0;
+        }
+
+        // 战斗开始时：当前食物不可用（没有/吃完/境界不足）就自动换成背包里恢复量最高的可用食物
+        function pickBestFood() {
+            const realm = gameState.player.realmIndex;
+            const usable = id => FOOD_CONFIG.foods[id] && FOOD_CONFIG.foods[id].minRealm <= realm;
+            const current = gameState.player.foodSlot;
+            if (current && usable(current) && getFoodCount() > 0) return;
+            let best = null;
+            gameState.player.inventory.forEach(i => {
+                if (i.qty > 0 && usable(i.id) && (!best || FOOD_CONFIG.foods[i.id].hpRestore > FOOD_CONFIG.foods[best].hpRestore)) {
+                    best = i.id;
+                }
+            });
+            if (best) gameState.player.foodSlot = best;
+        }
+
+        function updateFoodBar() {
+            const foodId = gameState.player.foodSlot;
+            const cfg = foodId && FOOD_CONFIG.foods[foodId];
+            const icon = document.getElementById('foodIcon');
+            const name = document.getElementById('foodName');
+            const count = document.getElementById('foodCountText');
+            if (!icon || !name || !count) return;
+            icon.textContent = cfg ? cfg.icon : '🍽️';
+            name.textContent = cfg ? cfg.name : '无食物';
+            count.textContent = cfg ? `×${getFoodCount()}（+${cfg.hpRestore}）` : '在炼丹中制作';
+            const toggle = document.getElementById('autoEatToggle');
+            if (toggle) toggle.checked = !!gameState.player.autoEat;
+        }
+
+        // P0-4 使用食物恢复HP。hpObj 为要恢复的生命值对象（秘境用玩家生命，普通战斗用战斗内生命）
+        function consumeFood(hpObj = gameState.player.stats.hp, logFn = null) {
             // 检查是否装备了食物
-            if (!gameState.player.foodSlot) {
+            const foodId = gameState.player.foodSlot;
+            if (!foodId) {
                 return false; // 没有装备食物
             }
 
-            // 检查食物数量是否足够（重要：必须有食物才能吃）
-            if (!gameState.player.foodCount || gameState.player.foodCount <= 0) {
-                return false; // 食物不足，无法进食
-            }
-
             // 获取装备的食物配置
-            const foodId = gameState.player.foodSlot;
             const foodConfig = FOOD_CONFIG.foods[foodId];
             if (!foodConfig) {
                 console.warn(`未找到食物配置: ${foodId}`);
+                return false;
+            }
+
+            // 境界不足或食物不足
+            if (gameState.player.realmIndex < foodConfig.minRealm || getFoodCount() <= 0) {
                 return false;
             }
 
@@ -3061,28 +3112,28 @@
             }
 
             // 计算恢复量（不超过最大HP）
-            const hpBefore = gameState.player.stats.hp.current;
-            const hpRestore = Math.min(foodConfig.hpRestore, gameState.player.stats.hp.max - hpBefore);
+            const hpRestore = Math.min(foodConfig.hpRestore, hpObj.max - hpObj.current);
 
             // 只有有恢复量时才能进食
             if (hpRestore <= 0) {
                 return false; // HP满了，不需要进食
             }
 
-            gameState.player.stats.hp.current += hpRestore;
+            hpObj.current += hpRestore;
 
-            // 消耗食物（扣除数量）
-            gameState.player.foodCount--;
+            // 消耗背包里的食物
+            consumeItem(foodId, 1);
             gameState.player.foodUseTimer = 0; // 重置冷却
 
-            // 记录食物使用事件（未来可用于统计）
-            console.log(`使用${foodConfig.name}，恢复HP ${hpRestore}`);
-
-            // P1-1 添加治疗日志和飘字
-            if (hpRestore > 0) {
+            const message = `使用${foodConfig.name}，恢复${hpRestore}HP`;
+            if (logFn) {
+                logFn(message);
+            } else {
+                // P1-1 秘境战斗：治疗日志和飘字
                 showDamageFloat(hpRestore, true);
-                addBattleLog(`使用${foodConfig.name}，恢复${hpRestore}HP`, 'heal');
+                addBattleLog(message, 'heal');
             }
+            updateFoodBar();
 
             return true; // 成功进食
         }
@@ -3100,6 +3151,7 @@
 
             // 初始化HP条
             updateBattleHP();
+            updateFoodBar();
 
             // 清空日志
             document.getElementById('battleLog').innerHTML = '';
@@ -3303,14 +3355,14 @@
         }
 
         // P0-4 自动进食逻辑
-        function checkAndAutoEat() {
+        function checkAndAutoEat(hpObj = gameState.player.stats.hp, logFn = null) {
             // 检查自动进食是否启用
             if (!gameState.player.autoEat) {
                 return;
             }
 
             // 检查是否需要进食（HP低于阈值）
-            const hpPercent = gameState.player.stats.hp.current / gameState.player.stats.hp.max;
+            const hpPercent = hpObj.current / hpObj.max;
             if (hpPercent >= FOOD_CONFIG.autoEatConfig.hpThreshold) {
                 return; // HP足够，不需要进食
             }
@@ -3319,8 +3371,8 @@
             const speedMultiplier = gameState.battleSpeed || 1;
             gameState.player.foodUseTimer += 0.1 * speedMultiplier;
 
-            // 尝试进食（consumeFood()会自动生成日志和飘字）
-            consumeFood();
+            // 尝试进食
+            consumeFood(hpObj, logFn);
         }
 
         // P0-4 双向战斗系统重写
@@ -3415,6 +3467,9 @@
                 if (battle.log.length > 10) battle.log.shift();
             }
 
+            // 战斗食物：生命低于阈值时自动进食（恢复战斗内的生命值）
+            checkAndAutoEat(battle.playerHP, msg => battle.log.push(msg));
+
             // 更新UI
             updateNormalBattleUI();
 
@@ -3477,6 +3532,7 @@
                 const el = document.getElementById(id);
                 if (el) el.textContent = text;
             };
+            updateFoodBar();
             const areaData = getAction('battle', battle.currentArea).areaData;
             setText('battleTitle', `⚔️ 战斗中 · ${areaData.name}`);
             setText('playerAtk', player.stats.atk);
@@ -4676,6 +4732,10 @@
             if (specialUsages[itemId]) {
                 usages.unshift(specialUsages[itemId]);
             }
+            if (FOOD_CONFIG.foods[itemId]) {
+                const food = FOOD_CONFIG.foods[itemId];
+                usages.unshift(`恢复${food.hpRestore}点生命 · 冷却${food.cooldown}秒 · 需要${getRealmName(food.minRealm)}`);
+            }
 
             if (usages.length > 0) {
                 usageText = usages.join('<br/>');
@@ -4684,9 +4744,10 @@
             // P2功能：装备对比显示
             let comparisonHTML = '';
             if (itemConfig.stats) {
-                const currentEquip = itemConfig.type === 'weapon' ?
-                    gameState.player.equipment.weapon :
-                    gameState.player.equipment.jewelry?.includes(itemId) ? itemId : null;
+                const eq = gameState.player.equipment;
+                const currentEquip = itemConfig.type === 'weapon' ? eq.weapon
+                    : itemConfig.type === 'armor' ? eq.armor
+                    : eq.jewelry?.includes(itemId) ? itemId : null;
 
                 if (currentEquip && currentEquip !== itemId) {
                     const currentStats = GAME_CONFIG.items[currentEquip]?.stats || {};
@@ -4712,6 +4773,8 @@
                 consumable: '💊 消耗品：一次性使用，在特定情况下消耗（如丹药用于突破）',
                 material: '🧪 材料：用于制作、合成或升级其他物品的基础材料',
                 ore: '⛏️ 矿物：采矿得到的矿物，用于炼器合成',
+                food: '🍲 战斗食物：设为战斗食物后，战斗中生命低于50%时自动食用恢复生命（死亡会损失一半食物）',
+                armor: '🛡️ 护甲：穿戴后提升防御和生命，只能同时穿戴一件',
                 weapon: '⚔️ 武器装备：穿戴后提升攻击力和其他属性',
                 jewelry: '✨ 首饰：穿戴后提升防御、血量等防御属性',
                 upgrade: '🔧 永久升级：一次性升级，永久提升游戏能力（无法重复购买）'
@@ -4729,19 +4792,16 @@
             // 处理装备按钮显示（P2功能：equipping/unequipping）
             const actionBtn = document.getElementById('itemActionBtn');
             if (actionBtn) {
-                if (itemConfig.type === 'weapon' || itemConfig.type === 'jewelry') {
-                    // 检查是否已装备
-                    let isEquipped = false;
-                    if (itemConfig.type === 'weapon' && gameState.player.equipment.weapon === itemId) {
-                        isEquipped = true;
-                    } else if (itemConfig.type === 'jewelry' && gameState.player.equipment.jewelry?.includes(itemId)) {
-                        isEquipped = true;
-                    }
-
-                    actionBtn.textContent = isEquipped ? '卸下' : '装备';
+                if (itemConfig.type === 'weapon' || itemConfig.type === 'armor' || itemConfig.type === 'jewelry') {
+                    actionBtn.textContent = isItemEquipped(itemId) ? '卸下' : '装备';
                     actionBtn.style.display = 'block';
                     actionBtn.dataset.itemId = itemId;
                     actionBtn.dataset.itemType = itemConfig.type;
+                } else if (itemConfig.type === 'food') {
+                    actionBtn.textContent = gameState.player.foodSlot === itemId ? '当前战斗食物' : '设为战斗食物';
+                    actionBtn.style.display = 'block';
+                    actionBtn.dataset.itemId = itemId;
+                    actionBtn.dataset.itemType = 'food';
                 } else if (itemId === 'tempered_essence') {
                     actionBtn.textContent = `淬炼装备 (${gameState.player.temperLevel || 0}/3)`;
                     actionBtn.style.display = 'block';
@@ -4817,6 +4877,16 @@
             }
         }
 
+        function isItemEquipped(itemId) {
+            const cfg = GAME_CONFIG.items[itemId];
+            const eq = gameState.player.equipment;
+            if (!cfg) return false;
+            if (cfg.type === 'weapon') return eq.weapon === itemId;
+            if (cfg.type === 'armor') return eq.armor === itemId;
+            if (cfg.type === 'jewelry') return (eq.jewelry || []).includes(itemId);
+            return false;
+        }
+
         function closeItemDetail() {
             document.getElementById('itemDetailModal').style.display = 'none';
         }
@@ -4833,6 +4903,21 @@
 
             const itemConfig = GAME_CONFIG.items[itemId];
             if (!itemConfig) return;
+
+            if (itemType === 'food') {
+                const foodConfig = FOOD_CONFIG.foods[itemId];
+                if (!foodConfig) return;
+                if (gameState.player.realmIndex < foodConfig.minRealm) {
+                    showNotification(`${itemConfig.name}需要${getRealmName(foodConfig.minRealm)}才能食用`, '#f59e0b');
+                    return;
+                }
+                gameState.player.foodSlot = itemId;
+                showNotification(`已设为战斗食物：${itemConfig.name}（生命低于50%时自动食用）`, '#16a34a');
+                updateFoodBar();
+                closeItemDetail();
+                saveGame();
+                return;
+            }
 
             if (itemType === 'use') {
                 if (itemId === 'tempered_essence') {
@@ -4859,36 +4944,30 @@
                 return;
             }
 
-            // 检查是否已装备
-            let isEquipped = false;
-            if (itemType === 'weapon' && gameState.player.equipment.weapon === itemId) {
-                isEquipped = true;
-            } else if (itemType === 'jewelry' && gameState.player.equipment.jewelry?.includes(itemId)) {
-                isEquipped = true;
-            }
-
-            if (isEquipped) {
+            const equipment = gameState.player.equipment;
+            if (isItemEquipped(itemId)) {
                 // 卸下装备
                 if (itemType === 'weapon') {
-                    gameState.player.equipment.weapon = null;
+                    equipment.weapon = null;
+                } else if (itemType === 'armor') {
+                    equipment.armor = null;
                 } else if (itemType === 'jewelry') {
-                    gameState.player.equipment.jewelry = gameState.player.equipment.jewelry.filter(id => id !== itemId);
+                    equipment.jewelry = equipment.jewelry.filter(id => id !== itemId);
                 }
                 showNotification(`已卸下${itemConfig.name}`, '#16a34a');
             } else {
-                // 装备
+                // 装备（武器、护甲各一件，首饰可多件）
                 if (itemType === 'weapon') {
-                    gameState.player.equipment.weapon = itemId;
-                    showNotification(`已装备${itemConfig.name}`, '#16a34a');
-                } else if (itemType === 'jewelry') {
-                    // 首饰可以多个装备
-                    if (!gameState.player.equipment.jewelry.includes(itemId)) {
-                        gameState.player.equipment.jewelry.push(itemId);
-                    }
-                    showNotification(`已装备${itemConfig.name}`, '#16a34a');
+                    equipment.weapon = itemId;
+                } else if (itemType === 'armor') {
+                    equipment.armor = itemId;
+                } else if (itemType === 'jewelry' && !equipment.jewelry.includes(itemId)) {
+                    equipment.jewelry.push(itemId);
                 }
+                showNotification(`已装备${itemConfig.name}`, '#16a34a');
             }
 
+            calculateStats();
             updateUI();
             closeItemDetail();
             saveGame();
@@ -5090,6 +5169,8 @@
             gameState.battles.enemyAttackTimer = 0;
             gameState.battles.log = [];
             gameState.battles.turnCount = 0;
+            gameState.player.foodUseTimer = FOOD_CONFIG.autoEatConfig.cooldown;
+            pickBestFood();
 
             gameState.currentAction = {
                 skill: 'battle',
@@ -5147,10 +5228,7 @@
 
             // P0-4 食物系统初始化
             gameState.player.foodUseTimer = FOOD_CONFIG.autoEatConfig.cooldown; // 进食冷却完成
-            // 如果没有装备食物，装备默认食物
-            if (!gameState.player.foodSlot) {
-                gameState.player.foodSlot = FOOD_CONFIG.defaultFood;
-            }
+            pickBestFood(); // 当前食物不可用时，自动换成背包里最好的可用食物
 
             // 初始化第一个怪物
             const firstMonster = dungeon.monsters[0];
@@ -5935,10 +6013,13 @@
                 gameState.version = currentVersion;
             }
 
-            // 新增技能（如丹火/神识）自动补进旧存档，无需清缓存
+            // 新增技能（如丹火/神识）自动补进旧存档，无需清缓存；
+            // 配方由配置派生，每次读档都按最新配置重建（保留技能等级和经验），新增/调整配方对旧存档立即生效
             Object.keys(GAME_CONFIG.skills).forEach(skillName => {
                 if (!gameState.skills[skillName]) {
                     gameState.skills[skillName] = JSON.parse(JSON.stringify(GAME_CONFIG.skills[skillName]));
+                } else if (GAME_CONFIG.skills[skillName].recipes) {
+                    gameState.skills[skillName].recipes = JSON.parse(JSON.stringify(GAME_CONFIG.skills[skillName].recipes));
                 }
             });
             Object.keys(GAME_CONFIG.dungeons).forEach(dungeonId => {
