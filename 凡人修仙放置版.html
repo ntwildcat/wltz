@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>淇粰鏀剧疆 路 鐏垫疆鍐嶄复</title>
+    <title>凡人修仙放置版</title>
         <style>
-        /* ===== MOBILE-FIRST 寮哄埗瑙勫垯 ===== */
+        /* ===== MOBILE-FIRST 强制规则 ===== */
         @media (max-width: 768px) {
             .container { display: flex !important; flex-direction: column !important; width: 100vw !important; height: auto !important; }
             .sidebar { order: 1 !important; width: 100vw !important; height: 80px !important; flex-direction: row !important; align-items: center !important; border-bottom: 2px solid #c9a961 !important; overflow-x: auto !important; }
@@ -17,7 +17,7 @@
             .skill-list { grid-template-columns: 1fr !important; }
         }
 
-        /* ========== 鐎涙ぞ缍嬬€规矮绠?========== */
+        /* ========== 瀛椾綋瀹氫箟 ========== */
         /* @font-face {
             font-family: 'Ma Shan Zheng';
             src: url('fonts/MaShanZheng-Regular.woff2') format('woff2');
@@ -40,46 +40,46 @@
             font-display: swap;
         } */
 
-        /* ========== CSS 閸欐﹢鍣虹化鑽ょ埠 ========== */
+        /* ========== CSS 鍙橀噺绯荤粺 ========== */
         :root {
-            /* 鐎涙ぞ缍嬮弽?*/
+            /* 瀛椾綋鏍?*/
             --font-title: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', serif;
             --font-body: 'STSong', 'Songti SC', 'SimSun', serif;
             --font-mono: 'Courier New', 'Consolas', monospace;
 
-            /* ========== 閼规彃鍍电化鑽ょ埠閿涙碍鎸夋晶銊ゆ叏娴?========== */
-            /* L1閿涙碍绻佹惔鏇礄5鐏炲倽鍎楅弲顖ょ礆 */
-            --bg-l1: rgba(10, 12, 25, 0.95);      /* 閺堚偓濞ｅ崬绨?*/
-            --bg-l2: rgba(25, 30, 50, 0.85);      /* 濞ｅ崬绨?*/
-            --bg-l3: rgba(40, 45, 70, 0.75);      /* 娑擃厼绨?*/
-            --bg-l4: rgba(50, 55, 80, 0.6);       /* 濞村懎绨?*/
-            --bg-l5: rgba(60, 65, 90, 0.5);       /* 閺堚偓濞村懎绨?*/
+            /* ========== 鑹插僵绯荤粺锛氭按澧ㄤ慨浠?========== */
+            /* L1锛氭繁搴曪紙5灞傝儗鏅級 */
+            --bg-l1: rgba(10, 12, 25, 0.95);      /* 鏈€娣卞簳 */
+            --bg-l2: rgba(25, 30, 50, 0.85);      /* 娣卞簳 */
+            --bg-l3: rgba(40, 45, 70, 0.75);      /* 涓簳 */
+            --bg-l4: rgba(50, 55, 80, 0.6);       /* 娴呭簳 */
+            --bg-l5: rgba(60, 65, 90, 0.5);       /* 鏈€娴呭簳 */
 
-            /* L1閿涙俺绔熷鍡礄4鐏炲偊绱?*/
-            --border-l1: #c9a961;                 /* 閸欍倝鎽愰柌?*/
-            --border-l2: #6fa980;                 /* 闂堟帞甯€ */
-            --border-l3: #8b7355;                 /* 閺嗘顥?*/
-            --border-l4: #4a4a4a;                 /* 閻?*/
+            /* L1锛氳竟妗嗭紙4灞傦級 */
+            --border-l1: #c9a961;                 /* 鍙ら摐閲?*/
+            --border-l2: #6fa980;                 /* 闈掔帀 */
+            --border-l3: #8b7355;                 /* 鏆楁 */
+            --border-l4: #4a4a4a;                 /* 鐏?*/
 
-            /* L2閿涙碍鏋冪€涙绱?鐏炲偊绱?*/
-            --text-l1: #e8d4b0;                   /* 闁叉垼澹婇敍鍦?閺嶅洭顣介敍?*/
-            --text-l2: #c9a961;                   /* 閸欍倝鎽愰敍鍦?閺嶅洭顣介敍?*/
-            --text-l3: #9ca69f;                   /* 閻忔壆璞㈤敍鍫燁劀閺傚浄绱?*/
-            --text-l4: #7a8274;                   /* 濞ｈ京璞㈤敍鍫ｇ窡閸斺晪绱?*/
+            /* L2锛氭枃瀛楋紙4灞傦級 */
+            --text-l1: #e8d4b0;                   /* 閲戣壊锛圚1鏍囬锛?*/
+            --text-l2: #c9a961;                   /* 鍙ら摐锛圚2鏍囬锛?*/
+            --text-l3: #9ca69f;                   /* 鐏扮豢锛堟鏂囷級 */
+            --text-l4: #7a8274;                   /* 娣辩豢锛堣緟鍔╋級 */
 
-            /* 閻樿埖鈧浇澹?*/
-            --color-hp: #2ecc71;                  /* HP缂?*/
-            --color-warning: #f39c12;             /* 鐠€锕€鎲″?*/
-            --color-danger: #e74c3c;              /* 閸楅亶娅撶痪?*/
-            --color-success: #27ae60;             /* 閹存劕濮涘ǎ杈╄雹 */
+            /* 鐘舵€佽壊 */
+            --color-hp: #2ecc71;                  /* HP缁?*/
+            --color-warning: #f39c12;             /* 璀﹀憡姗?*/
+            --color-danger: #e74c3c;              /* 鍗遍櫓绾?*/
+            --color-success: #27ae60;             /* 鎴愬姛娣辩豢 */
 
-            /* HP濞撴劕褰夐敍鍫滅矤濠娾€冲煂缁岀尨绱?/
+            /* HP娓愬彉锛堜粠婊″埌绌猴級*/
             --hp-full: #2ecc71;
             --hp-high: #3498db;
             --hp-mid: #f39c12;
             --hp-low: #e74c3c;
 
-            /* 闂冩潙濂栭崪灞藉絺閸?*/
+            /* 闃村奖鍜屽彂鍏?*/
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
             --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
@@ -87,7 +87,7 @@
             --glow-jade: 0 0 12px rgba(111,169,128,0.3);
             --glow-danger: 0 0 12px rgba(231,76,60,0.3);
 
-            /* 闂傜绐?*/
+            /* 闂磋窛 */
             --spacing-xs: 4px;
             --spacing-sm: 8px;
             --spacing-md: 12px;
@@ -96,7 +96,7 @@
             --spacing-2xl: 24px;
             --spacing-3xl: 32px;
 
-            /* 閸﹀棜顫?*/
+            /* 鍦嗚 */
             --radius-xs: 2px;
             --radius-sm: 4px;
             --radius-md: 6px;
@@ -124,7 +124,7 @@
             height: 100vh;
         }
 
-        /* ========== 娓氀嗙珶鐎佃壈鍩呴弽?========== */
+        /* ========== 渚ц竟瀵艰埅鏍?========== */
         .sidebar {
             width: 80px;
             background: var(--bg-l1);
@@ -154,7 +154,7 @@
         }
 
         .logo::before, .logo::after {
-            content: '閳?;
+            content: '鈼?;
             position: absolute;
             color: var(--border-l1);
             font-size: 10px;
@@ -286,7 +286,7 @@
             font-weight: bold;
         }
 
-        /* ========== 娑撹鍞寸€圭懓灏?========== */
+        /* ========== 涓诲唴瀹瑰尯 ========== */
         .main-content {
             flex: 1;
             display: flex;
@@ -361,7 +361,7 @@
             font-weight: bold;
         }
 
-        /* ========== 闂堛垺婢橀崠鍝勭厵 ========== */
+        /* ========== 闈㈡澘鍖哄煙 ========== */
         .panel-container {
             display: grid;
             grid-template-columns: 1fr 350px;
@@ -380,7 +380,7 @@
         }
 
         .main-panel::before, .main-panel::after {
-            content: '閳?;
+            content: '鈼?;
             position: absolute;
             color: var(--border-l1);
             font-size: 12px;
@@ -552,7 +552,7 @@
             color: var(--text-l4);
         }
 
-        /* ===== P2: 閰嶆柟鍗＄墖鏂版牱寮?===== */
+        /* ===== P2: 配方卡片新样式 ===== */
 
         .recipe-header {
             display: flex;
@@ -684,7 +684,7 @@
             color: #fff;
         }
 
-        /* ========== 娓氀嗙珶閺嶅繘娼伴弶?========== */
+        /* ========== 渚ц竟鏍忛潰鏉?========== */
         .side-panel {
             background: var(--bg-l2);
             border: 2px solid var(--border-l1);
@@ -783,7 +783,7 @@
             font-size: 0.8em;
         }
 
-        /* ========== 濡剝鈧焦顢?========== */
+        /* ========== 妯℃€佹 ========== */
         .modal {
             display: none;
             position: fixed;
@@ -831,7 +831,7 @@
             color: var(--text-l1);
         }
 
-        /* ========== 鐟欐帟澹婇崚娑樼紦 ========== */
+        /* ========== 瑙掕壊鍒涘缓 ========== */
         .create-form {
             display: grid;
             gap: var(--spacing-lg);
@@ -864,7 +864,7 @@
             box-shadow: var(--glow-gold);
         }
 
-        /* ========== 閸忔湹绮?========== */
+        /* ========== 鍏朵粬 ========== */
         .hidden {
             display: none !important;
         }
@@ -900,7 +900,7 @@
             padding: var(--spacing-xl);
         }
 
-        /* ========== 閸濆秴绨插蹇氼啎鐠?========== */
+        /* ========== 鍝嶅簲寮忚璁?========== */
         @media (max-width: 1024px) {
             .panel-container {
                 grid-template-columns: 1fr;
@@ -997,7 +997,7 @@
             }
         }
 
-        /* ==================== P1-1 閹存ɑ鏋烾I缁崵绮?==================== */
+        /* ==================== P1-1 鎴樻枟UI绯荤粺 ==================== */
 
         .battle-container {
             display: flex;
@@ -1257,9 +1257,9 @@
         }
     
 
-/* ===== 閹靛婧€缁?UI 鐎瑰苯鍙忛柌宥堫啎閿涘牆绨抽柈?Tab 閺傝顢嶉敍?===== */
+/* ===== 鎵嬫満绔?UI 瀹屽叏閲嶈锛堝簳閮?Tab 鏂规锛?===== */
 @media (max-width: 768px) {
-    /* 閸忋劌鐪?*/
+    /* 鍏ㄥ眬 */
     html, body {
         overflow-x: hidden !important;
         max-width: 100vw !important;
@@ -1269,19 +1269,19 @@
         max-width: 100% !important;
     }
 
-    /* 娑撹顔愰崳顭掔窗閺€閫涜礋缁鹃潧鎮?*/
+    /* 涓诲鍣細鏀逛负绾靛悜 */
     .container {
         flex-direction: column !important;
         height: 100vh !important;
         width: 100vw !important;
     }
 
-    /* 闂呮劘妫屽锔挎櫠 sidebar */
+    /* 闅愯棌宸︿晶 sidebar */
     .sidebar {
         display: none !important;
     }
 
-    /* 娑撹鍞寸€圭懓灏敍姘弿鐎规枻绱濇惔鏇㈠劥閻ｆ瑧鈹栭梻瀵哥舶 Tab */
+    /* 涓诲唴瀹瑰尯锛氬叏瀹斤紝搴曢儴鐣欑┖闂寸粰 Tab */
     .main-content {
         flex: 1 !important;
         width: 100vw !important;
@@ -1291,7 +1291,7 @@
         overflow-x: hidden !important;
     }
 
-    /* 婢舵挳鍎存穱鈩冧紖缁鹃潧鎮滈幒鎺戝灙 */
+    /* 澶撮儴淇℃伅绾靛悜鎺掑垪 */
     .header {
         flex-direction: column !important;
         gap: 8px !important;
@@ -1305,24 +1305,24 @@
         align-items: flex-start !important;
     }
 
-    /* 闂堛垺婢橀崡鏇炲灙 */
+    /* 闈㈡澘鍗曞垪 */
     .panel-container {
         grid-template-columns: 1fr !important;
         gap: 10px !important;
     }
 
-    /* 闂堛垺婢橀懛顏堚偓鍌氱安 */
+    /* 闈㈡澘鑷€傚簲 */
     .main-panel, .side-panel {
         width: 100% !important;
         max-width: 100% !important;
     }
 
-    /* 閹垛偓閼?鐞涘苯濮╅崚妤勩€冮崡鏇炲灙 */
+    /* 鎶€鑳?琛屽姩鍒楄〃鍗曞垪 */
     .skill-list, .action-list {
         grid-template-columns: 1fr !important;
     }
 
-    /* 婢х偛銇囩憴锔芥嚋閻╊喗鐖?*/
+    /* 澧炲ぇ瑙︽懜鐩爣 */
     .action-item {
         min-height: 50px !important;
         padding: 12px !important;
@@ -1332,7 +1332,7 @@
         font-size: 16px !important;
     }
 
-    /* 闂冨弶顒涚€涙劕鍘撶槐鐘冲閸?*/
+    /* 闃叉瀛愬厓绱犳孩鍑?*/
     .action-list, .skill-list {
         min-width: 0 !important;
     }
@@ -1341,7 +1341,7 @@
     }
 }
 
-/* 鎼存洟鍎?Tab 閺嶅骏绱欓崣顏勬躬閹靛婧€閺勫墽銇氶敍?*/
+/* 搴曢儴 Tab 鏍忥紙鍙湪鎵嬫満鏄剧ず锛?*/
 @media (max-width: 768px) {
     .mobile-bottom-tabs {
         position: fixed !important;
@@ -1383,7 +1383,7 @@
     }
 }
 
-/* 濡楀矂娼扮粩顖炴閽樺繐绨抽柈?Tab */
+/* 妗岄潰绔殣钘忓簳閮?Tab */
 @media (min-width: 769px) {
     .mobile-bottom-tabs {
         display: none !important;
@@ -1395,96 +1395,96 @@
 </head>
 <body>
     <div class="container">
-        <!-- 渚ц竟瀵艰埅鏍?-->
+        <!-- 侧边导航栏 -->
         <div class="sidebar">
-            <div class="logo" onclick="showStartScreen()">鈿?/div>
+            <div class="logo" onclick="showStartScreen()">⚡</div>
             <div class="skill-tree" id="skillTree"></div>
             <div style="display: flex; flex-direction: column; gap: 8px; padding: 10px;">
                 <button class="nav-btn" onclick="switchPanel('inventory')" style="width: 100%; padding: 10px; background: rgba(22,163,74,0.2); border: 1px solid #16a34a; border-radius: 4px; color: #e0e0e0; cursor: pointer; transition: all 0.3s;" onmouseover="this.background='rgba(22,163,74,0.4)'" onmouseout="this.background='rgba(22,163,74,0.2)'">
-                    馃帓 鑳屽寘
+                    🎒 背包
                 </button>
                 <button class="nav-btn" onclick="switchPanel('shop')" style="width: 100%; padding: 10px; background: rgba(22,163,74,0.2); border: 1px solid #16a34a; border-radius: 4px; color: #e0e0e0; cursor: pointer; transition: all 0.3s;" onmouseover="this.background='rgba(22,163,74,0.4)'" onmouseout="this.background='rgba(22,163,74,0.2)'">
-                    馃彧 鍟嗗煄
+                    🏪 商城
                 </button>
                 <button class="nav-btn" onclick="switchPanel('settings')" style="width: 100%; padding: 10px; background: rgba(22,163,74,0.2); border: 1px solid #16a34a; border-radius: 4px; color: #e0e0e0; cursor: pointer; transition: all 0.3s;" onmouseover="this.background='rgba(22,163,74,0.4)'" onmouseout="this.background='rgba(22,163,74,0.2)'">
-                    鈿欙笍 璁剧疆
+                    ⚙️ 设置
                 </button>
             </div>
             <div class="coin-display">
-                <div>馃拵 鐏电煶</div>
+                <div>💎 灵石</div>
                 <div id="coinAmount">100</div>
             </div>
         </div>
 
-        <!-- 涓诲唴瀹瑰尯 -->
+        <!-- 主内容区 -->
         <div class="main-content">
-            <!-- 娓告垙寮€濮嬪墠鐨勫垱寤哄睆骞?-->
+            <!-- 游戏开始前的创建屏幕 -->
             <div id="startScreen" class="modal show">
                 <div class="modal-content">
-                    <div class="modal-title">鈿?淇粰鏀剧疆 路 鐏垫疆鍐嶄复 鈿?/div>
-                    <p style="color: #888; margin-bottom: 20px;">鐏垫皵鑻忛啋锛屼綘鐨勪慨浠欎箣璺嵆灏嗗紑鍚?/p>
+                    <div class="modal-title">⚡ 修仙放置 · 灵潮再临 ⚡</div>
+                    <p style="color: #888; margin-bottom: 20px;">灵气苏醒，你的修仙之路即将开启</p>
 
                     <div class="create-form">
                         <div class="form-group">
-                            <label>淇粰鑰呭悕璁?*</label>
-                            <input type="text" id="playerName" placeholder="杈撳叆浣犵殑鍚嶅瓧">
+                            <label>修仙者名讳 *</label>
+                            <input type="text" id="playerName" placeholder="输入你的名字">
                         </div>
 
                         <div class="form-group">
-                            <label>鎬у埆</label>
+                            <label>性别</label>
                             <select id="playerGender">
-                                <option value="鐢?>鐢?/option>
-                                <option value="濂?>濂?/option>
-                                <option value="鍏朵粬">鍏朵粬</option>
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                                <option value="其他">其他</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label>鍑鸿韩鑳屾櫙 *</label>
+                            <label>出身背景 *</label>
                             <select id="playerOrigin">
-                                <option value="">閫夋嫨鍑鸿韩</option>
-                                <option value="orphan">瀛ゅ効 - 澶氬緱鐏电帀楗板搧锛堝伐浣滈€熷害+5%锛?/option>
-                                <option value="disciple">鐜勯棬鍚庤 - 澶氬緱绛戝熀涓瑰拰妗冩湪鍓?/option>
+                                <option value="">选择出身</option>
+                                <option value="orphan">孤儿 - 多得灵玉饰品（工作速度+5%）</option>
+                                <option value="disciple">玄门后裔 - 多得筑基丹和桃木剑</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label>鐏垫牴灞炴€?*</label>
+                            <label>灵根属性 *</label>
                             <select id="playerSpiritRoot">
-                                <option value="">閫夋嫨鐏垫牴</option>
-                                <option value="metal">閲戠伒鏍?- 鍏嬪埗鏈ㄧ伒鏍?/option>
-                                <option value="wood">鏈ㄧ伒鏍?- 鍏嬪埗鍦熺伒鏍?/option>
-                                <option value="water">姘寸伒鏍?- 鍏嬪埗鐏伒鏍?/option>
-                                <option value="fire">鐏伒鏍?- 鍏嬪埗閲戠伒鏍?/option>
-                                <option value="earth">鍦熺伒鏍?- 鍏嬪埗姘寸伒鏍?/option>
-                                <option value="wind">椋庣伒鏍?- 鏃犲厠鍒讹紝鏀婚€?10%</option>
-                                <option value="thunder">闆风伒鏍?- 鍏嬪埗鍐扮伒鏍?/option>
-                                <option value="ice">鍐扮伒鏍?- 鍏嬪埗闆风伒鏍?/option>
+                                <option value="">选择灵根</option>
+                                <option value="metal">金灵根 - 克制木灵根</option>
+                                <option value="wood">木灵根 - 克制土灵根</option>
+                                <option value="water">水灵根 - 克制火灵根</option>
+                                <option value="fire">火灵根 - 克制金灵根</option>
+                                <option value="earth">土灵根 - 克制水灵根</option>
+                                <option value="wind">风灵根 - 无克制，攻速+10%</option>
+                                <option value="thunder">雷灵根 - 克制冰灵根</option>
+                                <option value="ice">冰灵根 - 克制雷灵根</option>
                             </select>
                         </div>
 
                         <button class="btn" onclick="startGame()" style="width: 100%; margin-top: 20px;">
-                            馃専 寮€濮嬩慨琛?馃専
+                            🌟 开始修行 🌟
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- 娓告垙杩涜涓殑鐣岄潰 -->
+            <!-- 游戏进行中的界面 -->
             <div id="gameScreen" class="hidden">
-                <!-- 椤堕儴淇℃伅鏍?-->
+                <!-- 顶部信息栏 -->
                 <div class="header collapsed" onclick="toggleMobileHeader()" style="cursor: pointer;">
                     <div class="player-info">
                         <div class="info-item">
-                            <div class="info-label">淇粰鑰?/div>
+                            <div class="info-label">修仙者</div>
                             <div class="info-value" id="playerNameDisplay">-</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">褰撳墠澧冪晫</div>
-                            <div class="info-value" id="realmDisplay">缁冩皵鍒濇湡</div>
+                            <div class="info-label">当前境界</div>
+                            <div class="info-value" id="realmDisplay">练气初期</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">淇负杩涘害</div>
+                            <div class="info-label">修为进度</div>
                             <div class="progress-bar">
                                 <div class="progress-fill" id="cultivationProgress" style="width: 0%">
                                     <span id="progressText">0%</span>
@@ -1493,17 +1493,18 @@
                         </div>
                     </div>
                     <div id="breakThroughBtn" class="btn btn-secondary" onclick="showBreakthroughModal()" style="display: none;">
-                        鉁?灏濊瘯绐佺牬 鉁?                    </div>
+                        ✨ 尝试突破 ✨
+                    </div>
                 </div>
 
-                <!-- 闈㈡澘瀹瑰櫒 -->
+                <!-- 面板容器 -->
                 <div class="panel-container">
-                    <!-- 涓婚潰鏉?-->
+                    <!-- 主面板 -->
                     <div class="main-panel">
-                        <!-- 鍏ㄥ眬杩涘害鏉?-->
+                        <!-- 全局进度条 -->
                         <div id="globalProgressBar" style="display: none; margin-bottom: 15px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                                <span id="progressActionName" style="color: #16a34a; font-weight: bold;">褰撳墠鍔ㄤ綔</span>
+                                <span id="progressActionName" style="color: #16a34a; font-weight: bold;">当前动作</span>
                                 <span id="progressTimeRemain" style="color: #fbbf24; font-size: 0.9em;">0s</span>
                             </div>
                             <div class="progress-bar" style="height: 6px;">
@@ -1511,122 +1512,122 @@
                             </div>
                         </div>
 
-                        <!-- 淇偧闈㈡澘 -->
+                        <!-- 修炼面板 -->
                         <div id="panel-cultivation" class="panel-content">
-                            <div class="panel-title">馃 淇偧</div>
+                            <div class="panel-title">🧘 修炼</div>
 
-                            <!-- 鍔熸硶閫夋嫨鍣?-->
+                            <!-- 功法选择器 -->
                             <div style="background: rgba(59,130,246,0.1); border: 1px solid #3b82f6; border-radius: 4px; padding: 12px; margin-bottom: 15px;">
-                                <div style="font-size: 0.9em; color: #3b82f6; font-weight: bold; margin-bottom: 8px;">馃摐 褰撳墠鍔熸硶</div>
+                                <div style="font-size: 0.9em; color: #3b82f6; font-weight: bold; margin-bottom: 8px;">📜 当前功法</div>
                                 <div id="currentArtDisplay" style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 3px; margin-bottom: 10px;">
-                                    <div style="color: #fbbf24; font-weight: bold;">鍩虹鍔熸硶</div>
-                                    <div style="font-size: 0.8em; color: #aaa; margin-top: 4px;">閫熷害鍊嶇巼锛?span id="artSpeedDisplay">1.0</span>x</div>
+                                    <div style="color: #fbbf24; font-weight: bold;">基础功法</div>
+                                    <div style="font-size: 0.8em; color: #aaa; margin-top: 4px;">速度倍率：<span id="artSpeedDisplay">1.0</span>x</div>
                                 </div>
-                                <button id="switchArtBtn" class="btn" style="width: 100%; font-size: 0.9em;" onclick="showArtSwitchModal()">馃攧 鍒囨崲鍔熸硶</button>
+                                <button id="switchArtBtn" class="btn" style="width: 100%; font-size: 0.9em;" onclick="showArtSwitchModal()">🔄 切换功法</button>
                             </div>
 
                             <div class="action-list" id="cultivationActions">
-                                <!-- 鍚愮撼鐏垫皵 - 宸茶В閿?-->
+                                <!-- 吐纳灵气 - 已解锁 -->
                                 <div class="action-item" onclick="selectAction('cultivation', 'basic')">
-                                    <div class="action-name">馃煝 鍚愮撼鐏垫皵</div>
-                                    <div class="action-desc">鍩虹淇负 路 5绉?娆?/div>
+                                    <div class="action-name">🟢 吐纳灵气</div>
+                                    <div class="action-desc">基础修为 · 5秒/次</div>
                                 </div>
 
-                                <!-- 灏忓懆澶?- 鏉′欢瑙ｉ攣 -->
+                                <!-- 小周天 - 条件解锁 -->
                                 <div class="action-item action-locked" onclick="selectAction('cultivation', 'small')">
-                                    <div class="action-name">猸?灏忓懆澶?/div>
-                                    <div class="action-desc">鏁堢巼鎻愬崌 路 闇€缁冩皵鍒濇湡</div>
-                                    <div class="action-lock-hint" id="lock-hint-small" style="display: none; font-size: 0.8em; color: #f59e0b; margin-top: 4px;"><span id="lock-level-small">闇€瑕佺粌姘斿垵鏈?/span></div>
+                                    <div class="action-name">⭕ 小周天</div>
+                                    <div class="action-desc">效率提升 · 需练气初期</div>
+                                    <div class="action-lock-hint" id="lock-hint-small" style="display: none; font-size: 0.8em; color: #f59e0b; margin-top: 4px;"><span id="lock-level-small">需要练气初期</span></div>
                                 </div>
 
-                                <!-- 澶у懆澶?- 鏉′欢瑙ｉ攣 -->
+                                <!-- 大周天 - 条件解锁 -->
                                 <div class="action-item action-locked" onclick="selectAction('cultivation', 'big')">
-                                    <div class="action-name">猸?澶у懆澶?/div>
-                                    <div class="action-desc">涓湡涓诲姏 路 闇€缁冩皵鍚庢湡</div>
-                                    <div class="action-lock-hint" id="lock-hint-big" style="display: none; font-size: 0.8em; color: #f59e0b; margin-top: 4px;"><span id="lock-level-big">闇€瑕佺粌姘斿悗鏈?/span></div>
+                                    <div class="action-name">⭕ 大周天</div>
+                                    <div class="action-desc">中期主力 · 需练气后期</div>
+                                    <div class="action-lock-hint" id="lock-hint-big" style="display: none; font-size: 0.8em; color: #f59e0b; margin-top: 4px;"><span id="lock-level-big">需要练气后期</span></div>
                                 </div>
 
-                                <!-- 榫熸伅鏈?- 鏉′欢瑙ｉ攣 -->
+                                <!-- 龟息术 - 条件解锁 -->
                                 <div class="action-item action-locked" onclick="selectAction('cultivation', 'breath')">
-                                    <div class="action-name">猸?榫熸伅鏈?/div>
-                                    <div class="action-desc">楂樹骇鍑?路 闇€缁冩皵宸呭嘲</div>
-                                    <div class="action-lock-hint" id="lock-hint-breath" style="display: none; font-size: 0.8em; color: #f59e0b; margin-top: 4px;"><span id="lock-level-breath">闇€瑕佺粌姘斿穮宄?/span></div>
+                                    <div class="action-name">⭕ 龟息术</div>
+                                    <div class="action-desc">高产出 · 需练气巅峰</div>
+                                    <div class="action-lock-hint" id="lock-hint-breath" style="display: none; font-size: 0.8em; color: #f59e0b; margin-top: 4px;"><span id="lock-level-breath">需要练气巅峰</span></div>
                                 </div>
 
-                                <!-- 椤挎偀 - 鏉′欢瑙ｉ攣 -->
+                                <!-- 顿悟 - 条件解锁 -->
                                 <div class="action-item action-locked" onclick="selectAction('cultivation', 'epiphany')">
-                                    <div class="action-name">猸?椤挎偀</div>
-                                    <div class="action-desc">鍚庢湡鐖嗗彂 路 闇€绛戝熀涓湡</div>
-                                    <div class="action-lock-hint" id="lock-hint-epiphany" style="display: none; font-size: 0.8em; color: #f59e0b; margin-top: 4px;"><span id="lock-level-epiphany">闇€瑕佺瓚鍩轰腑鏈?/span></div>
+                                    <div class="action-name">⭕ 顿悟</div>
+                                    <div class="action-desc">后期爆发 · 需筑基中期</div>
+                                    <div class="action-lock-hint" id="lock-hint-epiphany" style="display: none; font-size: 0.8em; color: #f59e0b; margin-top: 4px;"><span id="lock-level-epiphany">需要筑基中期</span></div>
                                 </div>
                             </div>
 
                             <div class="action-detail show" id="action-detail-cultivation-basic">
                                 <div class="detail-row">
-                                    <span>褰撳墠鍔ㄤ綔:</span>
+                                    <span>当前动作:</span>
                                     <span id="activeActionDisplay">-</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span>杩涘害:</span>
+                                    <span>进度:</span>
                                     <span id="activeProgress">0%</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span>鑾峰緱淇负:</span>
+                                    <span>获得修为:</span>
                                     <span id="activeOutput">0</span>
                                 </div>
                                 <button class="btn" id="stopBtn" onclick="stopAction()" style="display: none;">
-                                    鈴癸笍 鍋滄
+                                    ⏹️ 停止
                                 </button>
                             </div>
                         </div>
 
-                        <!-- 鐐间腹闈㈡澘 -->
+                        <!-- 炼丹面板 -->
                         <div id="panel-alchemy" class="panel-content hidden">
-                            <div class="panel-title">馃И 鐐间腹</div>
+                            <div class="panel-title">🧪 炼丹</div>
                             <div class="skill-list" id="alchemySkills"></div>
                             <div class="action-list" id="alchemyActions"></div>
                             <div class="action-detail" id="action-detail-alchemy"></div>
                         </div>
 
-                        <!-- 鐐煎櫒闈㈡澘 -->
+                        <!-- 炼器面板 -->
                         <div id="panel-forging" class="panel-content hidden">
-                            <div class="panel-title">馃敤 鐐煎櫒</div>
+                            <div class="panel-title">🔨 炼器</div>
                             <div class="skill-list" id="forgingSkills"></div>
                             <div class="action-list" id="forgingActions"></div>
                             <div class="action-detail" id="action-detail-forging"></div>
                         </div>
 
-                        <!-- 鐏电敯闈㈡澘 -->
+                        <!-- 灵田面板 -->
                         <div id="panel-farming" class="panel-content hidden">
-                            <div class="panel-title">馃尵 鐏电敯</div>
+                            <div class="panel-title">🌾 灵田</div>
                             <div class="skill-list" id="farmingSkills"></div>
                             <div class="action-list" id="farmingActions"></div>
                             <div class="action-detail" id="action-detail-farming"></div>
                         </div>
 
-                        <!-- 閲囩熆闈㈡澘 -->
+                        <!-- 采矿面板 -->
                         <div id="panel-mining" class="panel-content hidden">
-                            <div class="panel-title">鉀忥笍 閲囩熆</div>
+                            <div class="panel-title">⛏️ 采矿</div>
                             <div class="skill-list" id="miningSkills"></div>
                             <div class="action-list" id="miningActions"></div>
                             <div class="action-detail" id="action-detail-mining"></div>
                         </div>
 
-                        <!-- 鎴樻枟闈㈡澘 -->
+                        <!-- 战斗面板 -->
                         <div id="panel-battle" class="panel-content hidden">
-                            <div class="panel-title">鈿旓笍 鎴樻枟</div>
-                            <!-- 鎴樻枟/绉樺鏍囩椤?-->
+                            <div class="panel-title">⚔️ 战斗</div>
+                            <!-- 战斗/秘境标签页 -->
                             <div style="display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #444;">
-                                <button id="battleTab-areas" class="panel-tab active" onclick="switchBattleTab('areas')" style="flex: 1; padding: 10px; background: none; border: none; color: #fbbf24; cursor: pointer; font-weight: bold; border-bottom: 3px solid #fbbf24;">鎴樻枟鍖哄煙</button>
-                                <button id="battleTab-dungeons" class="panel-tab" onclick="switchBattleTab('dungeons')" style="flex: 1; padding: 10px; background: none; border: none; color: #666; cursor: pointer; font-weight: bold;">绉樺</button>
+                                <button id="battleTab-areas" class="panel-tab active" onclick="switchBattleTab('areas')" style="flex: 1; padding: 10px; background: none; border: none; color: #fbbf24; cursor: pointer; font-weight: bold; border-bottom: 3px solid #fbbf24;">战斗区域</button>
+                                <button id="battleTab-dungeons" class="panel-tab" onclick="switchBattleTab('dungeons')" style="flex: 1; padding: 10px; background: none; border: none; color: #666; cursor: pointer; font-weight: bold;">秘境</button>
                             </div>
-                            <!-- 鎴樻枟鍖哄煙鍐呭 -->
+                            <!-- 战斗区域内容 -->
                             <div id="battleContent-areas">
-                                <!-- 鍏嬪埗棰勮鏉?-->
+                                <!-- 克制预览条 -->
                                 <div id="battleCounterPreview" style="background: rgba(22,163,74,0.1); border: 1px solid #16a34a; border-radius: 4px; padding: 12px; margin-bottom: 15px; display: none;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                        <div style="color: #16a34a; font-weight: bold;">鈿?鍏嬪埗鍏崇郴棰勮</div>
-                                        <button onclick="showCounterSystemModal()" style="background: rgba(16,179,81,0.2); border: 1px solid #16a34a; color: #16a34a; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 0.85em;">馃摉 璇︽儏</button>
+                                        <div style="color: #16a34a; font-weight: bold;">⚡ 克制关系预览</div>
+                                        <button onclick="showCounterSystemModal()" style="background: rgba(16,179,81,0.2); border: 1px solid #16a34a; color: #16a34a; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 0.85em;">📖 详情</button>
                                     </div>
                                     <div id="counterInfo" style="color: #fbbf24; font-size: 0.9em; line-height: 1.6em;"></div>
                                 </div>
@@ -1634,69 +1635,69 @@
                                 <div class="action-list" id="battleActions"></div>
                                 <div class="action-detail" id="action-detail-battle"></div>
                             </div>
-                            <!-- 绉樺鍐呭 -->
+                            <!-- 秘境内容 -->
                             <div id="battleContent-dungeons" style="display: none;">
                                 <div class="action-list" id="dungeonActions"></div>
                             </div>
                         </div>
 
-                        <!-- P1-1 鎴樻枟UI瀹瑰櫒 -->
+                        <!-- P1-1 战斗UI容器 -->
                         <div id="battleContainer" class="battle-container hidden">
-                            <!-- 鎴樻枟椤堕儴鏍?-->
+                            <!-- 战斗顶部栏 -->
                             <div class="battle-header">
-                                <div class="battle-title">鈿旓笍 绉樺鎴樻枟涓?/div>
+                                <div class="battle-title">⚔️ 秘境战斗中</div>
                                 <div class="battle-controls">
-                                    <button id="btn-retreat" class="btn-retreat" onclick="retreatFromDungeon()">鎾ら€€</button>
+                                    <button id="btn-retreat" class="btn-retreat" onclick="retreatFromDungeon()">撤退</button>
                                 </div>
                             </div>
 
-                            <!-- 鍙屾柟鐘舵€佹爮 -->
+                            <!-- 双方状态栏 -->
                             <div class="battle-status">
                                 <div class="combatant player">
-                                    <div class="combatant-name combatant-player-name" id="playerNameBattle">鐜╁</div>
+                                    <div class="combatant-name combatant-player-name" id="playerNameBattle">玩家</div>
                                     <div class="hp-bar">
                                         <div class="hp-fill" id="playerHPBar"></div>
                                         <div class="hp-text" id="playerHPText">0/0</div>
                                     </div>
                                     <div class="combatant-stats">
-                                        <span>鏀诲嚮: <span id="playerAtk">0</span></span>
-                                        <span>闃插尽: <span id="playerDef">0</span></span>
+                                        <span>攻击: <span id="playerAtk">0</span></span>
+                                        <span>防御: <span id="playerDef">0</span></span>
                                     </div>
                                 </div>
 
                                 <div class="combatant monster">
-                                    <div class="combatant-name combatant-monster-name" id="monsterNameBattle">鏁屼汉</div>
+                                    <div class="combatant-name combatant-monster-name" id="monsterNameBattle">敌人</div>
                                     <div class="hp-bar">
                                         <div class="hp-fill low" id="monsterHPBar"></div>
                                         <div class="hp-text" id="monsterHPText">0/0</div>
                                     </div>
                                     <div class="combatant-stats">
-                                        <span>鏀诲嚮: <span id="monsterAtk">0</span></span>
-                                        <span>闃插尽: <span id="monsterDef">0</span></span>
+                                        <span>攻击: <span id="monsterAtk">0</span></span>
+                                        <span>防御: <span id="monsterDef">0</span></span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 鎴樻枟鍦烘櫙 -->
+                            <!-- 战斗场景 -->
                             <div class="battle-scene">
-                                <div class="monster-sprite" id="monsterSprite">馃懢</div>
+                                <div class="monster-sprite" id="monsterSprite">👾</div>
                                 <div id="damageFloatLayer" class="damage-float-layer"></div>
                             </div>
 
-                            <!-- 鎴樻枟鏃ュ織 -->
+                            <!-- 战斗日志 -->
                             <div id="battleLog" class="battle-log"></div>
 
-                            <!-- 椋熺墿蹇嵎鏍忎笌閫熷害鎺у埗 -->
+                            <!-- 食物快捷栏与速度控制 -->
                             <div class="food-bar">
                                 <div class="auto-eat-toggle">
                                     <input type="checkbox" id="autoEatToggle" onchange="toggleAutoEat(this.checked)">
-                                    <span>鑷姩椋熺敤</span>
+                                    <span>自动食用</span>
                                 </div>
 
                                 <div style="margin-left: auto;"></div>
 
                                 <div class="battle-speed-control">
-                                    <span style="color: #aaa; margin-right: 8px;">閫熷害:</span>
+                                    <span style="color: #aaa; margin-right: 8px;">速度:</span>
                                     <button class="speed-btn active" data-speed="1" onclick="setBattleSpeed(1)">1x</button>
                                     <button class="speed-btn" data-speed="2" onclick="setBattleSpeed(2)">2x</button>
                                     <button class="speed-btn" data-speed="4" onclick="setBattleSpeed(4)">4x</button>
@@ -1704,409 +1705,293 @@
                             </div>
                         </div>
 
-                        <!-- 鑳屽寘闈㈡澘 -->
+                        <!-- 背包面板 -->
                         <div id="panel-inventory" class="panel-content hidden">
-                            <div class="panel-title">馃帓 鑳屽寘</div>
+                            <div class="panel-title">🎒 背包</div>
                             <div style="margin-bottom: 15px;">
-                                <span style="color: #888;">瀹归噺: </span>
+                                <span style="color: #888;">容量: </span>
                                 <span id="inventoryCapacity" style="color: #16a34a; font-weight: bold;">0/50</span>
                             </div>
                             <div class="inventory-grid" id="inventoryGrid"></div>
                         </div>
 
-                        <!-- 鍟嗗煄闈㈡澘 -->
+                        <!-- 商城面板 -->
                         <div id="panel-shop" class="panel-content hidden">
-                            <div class="panel-title">馃彧 鍟嗗煄</div>
+                            <div class="panel-title">🏪 商城</div>
                             <div style="margin-bottom: 15px; color: #fbbf24;">
-                                馃拵 鐏电煶: <span id="shopCoin">100</span>
+                                💎 灵石: <span id="shopCoin">100</span>
                             </div>
                             <div class="inventory-grid" id="shopGrid"></div>
                         </div>
 
-                        <!-- 璁剧疆闈㈡澘 -->
+                        <!-- 设置面板 -->
                         <div id="panel-settings" class="panel-content hidden">
-                            <div class="panel-title">鈿欙笍 璁剧疆</div>
+                            <div class="panel-title">⚙️ 设置</div>
 
-                            <!-- 绂荤嚎璁剧疆 -->
+                            <!-- 离线设置 -->
                             <div class="stat-panel">
-                                <div class="stat-title">鈴?绂荤嚎璁剧疆</div>
+                                <div class="stat-title">⏰ 离线设置</div>
                                 <div class="stat-row">
-                                    <span class="stat-label">鏈€澶氱绾垮鍔?灏忔椂):</span>
+                                    <span class="stat-label">最多离线奖励(小时):</span>
                                     <input type="number" id="maxOfflineHours" min="1" max="24" value="24" style="width: 60px; padding: 5px; background: rgba(0,0,0,0.3); border: 1px solid #16a34a; color: #fff; border-radius: 3px;" onchange="updateSetting('maxOfflineHours', this.value)">
                                 </div>
                             </div>
 
-                            <!-- 閫氱煡璁剧疆 -->
+                            <!-- 通知设置 -->
                             <div class="stat-panel">
-                                <div class="stat-title">馃敂 閫氱煡璁剧疆</div>
+                                <div class="stat-title">🔔 通知设置</div>
                                 <div class="stat-row">
-                                    <span class="stat-label">鍚敤閫氱煡:</span>
+                                    <span class="stat-label">启用通知:</span>
                                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                         <input type="checkbox" id="enableNotifications" checked onchange="updateSetting('enableNotifications', this.checked)" style="width: 20px; height: 20px; cursor: pointer;">
-                                        <span id="notificationStatus">宸插惎鐢?/span>
+                                        <span id="notificationStatus">已启用</span>
                                     </label>
                                 </div>
                             </div>
 
-                            <!-- 鏄剧ず璁剧疆 -->
+                            <!-- 显示设置 -->
                             <div class="stat-panel">
-                                <div class="stat-title">馃帹 鏄剧ず璁剧疆</div>
+                                <div class="stat-title">🎨 显示设置</div>
                                 <div class="stat-row">
-                                    <span class="stat-label">鍚敤闊虫晥:</span>
+                                    <span class="stat-label">启用音效:</span>
                                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                         <input type="checkbox" id="enableSoundEffects" onchange="updateSetting('enableSoundEffects', this.checked)" style="width: 20px; height: 20px; cursor: pointer;">
-                                        <span id="soundStatus">宸茬鐢?/span>
+                                        <span id="soundStatus">已禁用</span>
                                     </label>
                                 </div>
                             </div>
 
-                            <!-- 瀛樻。绠＄悊 -->
+                            <!-- 存档管理 -->
                             <div class="stat-panel">
-                                <div class="stat-title">馃捑 瀛樻。绠＄悊</div>
+                                <div class="stat-title">💾 存档管理</div>
                                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                                    <button class="btn" onclick="exportSave()">馃摜 瀵煎嚭瀛樻。</button>
-                                    <button class="btn btn-secondary" onclick="importSave()">馃摛 瀵煎叆瀛樻。</button>
-                                    <button class="btn btn-secondary" onclick="resetGame()">馃攧 閲嶆柊寮€濮?/button>
+                                    <button class="btn" onclick="exportSave()">📥 导出存档</button>
+                                    <button class="btn btn-secondary" onclick="importSave()">📤 导入存档</button>
+                                    <button class="btn btn-secondary" onclick="resetGame()">🔄 重新开始</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 渚ц竟鏍?-->
+                    <!-- 侧边栏 -->
                     <div class="side-panel">
-                        <!-- 淇负淇℃伅 -->
+                        <!-- 修为信息 -->
                         <div class="stat-panel">
-                            <div class="stat-title">鈿?淇负淇℃伅</div>
+                            <div class="stat-title">⚡ 修为信息</div>
                             <div class="stat-row">
-                                <span class="stat-label">淇负鍊?</span>
+                                <span class="stat-label">修为值:</span>
                                 <span class="stat-value"><span id="cultivationXP">0/100</span></span>
                             </div>
                             <div style="width: 100%; height: 20px; background: rgba(0,0,0,0.3); border: 1px solid #16a34a; border-radius: 3px; margin: 8px 0; overflow: hidden;">
                                 <div style="width: 0%; height: 100%; background: linear-gradient(90deg, #16a34a, #22c55e); transition: width 0.3s;" id="cultivationBar"></div>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">涓嬫绐佺牬:</span>
+                                <span class="stat-label">下次突破:</span>
                                 <span class="stat-value" id="nextBreakthrough">100</span>
                             </div>
                         </div>
 
-                        <!-- 鎶€鑳界粡楠?-->
+                        <!-- 技能经验 -->
                         <div class="stat-panel">
-                            <div class="stat-title">馃搳 鎶€鑳界粡楠?/div>
+                            <div class="stat-title">📊 技能经验</div>
                             <div id="skillExperienceList"></div>
                         </div>
 
-                        <!-- 瑁呭淇℃伅 -->
+                        <!-- 装备信息 -->
                         <div class="stat-panel">
-                            <div class="stat-title">鈿旓笍 瑁呭</div>
+                            <div class="stat-title">⚔️ 装备</div>
                             <div class="stat-row">
-                                <span class="stat-label">姝﹀櫒:</span>
-                                <span class="stat-value" id="weaponDisplay">鏃?/span>
+                                <span class="stat-label">武器:</span>
+                                <span class="stat-value" id="weaponDisplay">无</span>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">闃插叿:</span>
-                                <span class="stat-value" id="armorDisplay">鏃?/span>
+                                <span class="stat-label">防具:</span>
+                                <span class="stat-value" id="armorDisplay">无</span>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">楗板搧:</span>
-                                <span class="stat-value" id="jewelryDisplay">鏃?/span>
+                                <span class="stat-label">饰品:</span>
+                                <span class="stat-value" id="jewelryDisplay">无</span>
                             </div>
                         </div>
 
-                        <!-- P2鍔熻兘锛氬睘鎬ч潰鏉?-->
+                        <!-- P2功能：属性面板 -->
                         <div class="stat-panel">
-                            <div class="stat-title">馃挭 灞炴€ч潰鏉?/div>
+                            <div class="stat-title">💪 属性面板</div>
                             <div class="stat-row">
-                                <span class="stat-label">鐢熷懡鍊?</span>
+                                <span class="stat-label">生命值:</span>
                                 <span class="stat-value" id="hpDisplay">100</span>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">鏀诲嚮鍔?</span>
+                                <span class="stat-label">攻击力:</span>
                                 <span class="stat-value" id="atkDisplay">10</span>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">闃插尽鍔?</span>
+                                <span class="stat-label">防御力:</span>
                                 <span class="stat-value" id="defDisplay">5</span>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">鏀婚€?</span>
+                                <span class="stat-label">攻速:</span>
                                 <span class="stat-value" id="spdDisplay">10</span>
                             </div>
                         </div>
 
-                        <!-- 绂荤嚎鏀剁泭棰勮 -->
+                        <!-- 离线收益预计 -->
                         <div class="stat-panel">
-                            <div class="stat-title">馃寵 绂荤嚎鏀剁泭棰勮</div>
-                            <div id="offlineIncome" class="no-data">鏃犲綋鍓嶈鍔?/div>
+                            <div class="stat-title">🌙 离线收益预计</div>
+                            <div id="offlineIncome" class="no-data">无当前行动</div>
                         </div>
 
-                        <!-- 鑷姩淇濆瓨鎻愮ず -->
+                        <!-- 自动保存提示 -->
                         <div style="text-align: center; color: #666; font-size: 0.8em; margin-top: auto;">
-                            馃捑 宸茶嚜鍔ㄤ繚瀛?                        </div>
+                            💾 已自动保存
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 鐗╁搧璇︽儏寮圭獥锛圥1鍔熻兘锛?->
+    <!-- 物品详情弹窗（P1功能）-->
     <div id="itemDetailModal" class="modal" style="display: none;">
         <div class="modal-content" style="max-width: 400px; padding: 30px;">
             <span class="modal-close" onclick="closeItemDetail()">&times;</span>
             <div style="text-align: center; margin-bottom: 20px;">
-                <div style="font-size: 48px; margin-bottom: 10px;" id="itemIcon">馃摝</div>
-                <div style="font-size: 1.2em; color: #16a34a; font-weight: bold;" id="itemName">鐗╁搧鍚嶇О</div>
+                <div style="font-size: 48px; margin-bottom: 10px;" id="itemIcon">📦</div>
+                <div style="font-size: 1.2em; color: #16a34a; font-weight: bold;" id="itemName">物品名称</div>
             </div>
             <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin-bottom: 15px;">
-                <div style="color: #888; font-size: 0.9em; margin-bottom: 8px;">馃摑 鐗╁搧淇℃伅</div>
+                <div style="color: #888; font-size: 0.9em; margin-bottom: 8px;">📝 物品信息</div>
                 <div style="color: #e0e0e0; line-height: 1.6em;">
-                    <div><span style="color: #888;">绫诲瀷:</span> <span id="itemType">-</span></div>
-                    <div><span style="color: #888;">鎸佹湁鏁伴噺:</span> <span id="itemQty" style="color: #16a34a; font-weight: bold;">0</span></div>
+                    <div><span style="color: #888;">类型:</span> <span id="itemType">-</span></div>
+                    <div><span style="color: #888;">持有数量:</span> <span id="itemQty" style="color: #16a34a; font-weight: bold;">0</span></div>
                 </div>
             </div>
             <div style="background: rgba(22,163,74,0.1); padding: 15px; border-radius: 4px; margin-bottom: 15px; border-left: 3px solid #16a34a;">
-                <div style="color: #16a34a; font-size: 0.9em; margin-bottom: 8px;">馃挕 鐢ㄩ€?/div>
-                <div style="color: #fbbf24; font-size: 0.9em; line-height: 1.6em;" id="itemUsage">鏆傛棤宸茬煡鐢ㄩ€?/div>
+                <div style="color: #16a34a; font-size: 0.9em; margin-bottom: 8px;">💡 用途</div>
+                <div style="color: #fbbf24; font-size: 0.9em; line-height: 1.6em;" id="itemUsage">暂无已知用途</div>
             </div>
             <div style="display: flex; gap: 10px; justify-content: center;">
-                <button class="btn" onclick="closeItemDetail()" style="flex: 1;">鍏抽棴</button>
-                <button class="btn btn-secondary" id="itemActionBtn" onclick="performItemAction()" style="flex: 1; display: none;">鎿嶄綔</button>
+                <button class="btn" onclick="closeItemDetail()" style="flex: 1;">关闭</button>
+                <button class="btn btn-secondary" id="itemActionBtn" onclick="performItemAction()" style="flex: 1; display: none;">操作</button>
             </div>
         </div>
     </div>
 
-    <!-- 绐佺牬妯℃€佹 -->
+    <!-- 突破模态框 -->
     <div id="breakthroughModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeBreakthroughModal()">&times;</span>
-            <div class="modal-title" id="btModalTitle">鉁?绐佺牬淇负 鉁?/div>
+            <div class="modal-title" id="btModalTitle">✨ 突破修为 ✨</div>
             <div class="stat-panel" style="margin-bottom: 20px;">
                 <div class="stat-row">
-                    <span class="stat-label">褰撳墠澧冪晫:</span>
+                    <span class="stat-label">当前境界:</span>
                     <span class="stat-value" id="btCurrentRealm">-</span>
                 </div>
                 <div class="stat-row">
-                    <span class="stat-label">涓嬩竴澧冪晫:</span>
+                    <span class="stat-label">下一境界:</span>
                     <span class="stat-value" id="btNextRealm">-</span>
                 </div>
                 <div class="stat-row">
-                    <span class="stat-label">绐佺牬鏂瑰紡:</span>
-                    <span class="stat-value" id="btBreakthroughType">鑷劧绐佺牬</span>
+                    <span class="stat-label">突破方式:</span>
+                    <span class="stat-value" id="btBreakthroughType">自然突破</span>
                 </div>
-                <!-- 澶у鐣岀獊鐮寸殑涓硅嵂闇€姹傚尯鍩燂紙榛樿闅愯棌锛?-->
+                <!-- 大境界突破的丹药需求区域（默认隐藏） -->
                 <div id="btPillRequirement" style="display: none; margin-top: 15px; padding: 10px; background: rgba(249, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 4px;">
                     <div class="stat-row">
-                        <span class="stat-label">鎵€闇€涓硅嵂:</span>
+                        <span class="stat-label">所需丹药:</span>
                         <span class="stat-value" id="btPillName">-</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">褰撳墠鎷ユ湁:</span>
+                        <span class="stat-label">当前拥有:</span>
                         <span class="stat-value" id="btPillCount">-</span>
                     </div>
                 </div>
             </div>
             <button class="btn" id="btButton" onclick="attemptBreakthrough()" style="width: 100%; margin-top: 20px;">
-                馃専 寮€濮嬬獊鐮?馃専
+                🌟 开始突破 🌟
             </button>
         </div>
     </div>
 
-    <!-- 绂荤嚎缁撶畻妯℃€佹 -->
+    <!-- 离线结算模态框 -->
     <div id="offlineModal" class="modal">
         <div class="modal-content">
-            <div class="modal-title">馃寵 闂叧褰掓潵 馃寵</div>
+            <div class="modal-title">🌙 闭关归来 🌙</div>
             <div id="offlineContent"></div>
             <button class="btn" onclick="closeOfflineModal()" style="width: 100%; margin-top: 20px;">
-                缁х画淇
+                继续修行
             </button>
         </div>
     </div>
 
-    <!-- 鍔熸硶鍒囨崲妯℃€佹 -->
+    <!-- 功法切换模态框 -->
     <div id="artSwitchModal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
             <span class="modal-close" onclick="closeArtSwitchModal()">&times;</span>
-            <div class="modal-title">馃摐 閫夋嫨鍔熸硶</div>
+            <div class="modal-title">📜 选择功法</div>
             <div id="artSwitchList" style="max-height: 400px; overflow-y: auto;"></div>
-            <button class="btn" onclick="closeArtSwitchModal()" style="width: 100%; margin-top: 15px;">鍏抽棴</button>
+            <button class="btn" onclick="closeArtSwitchModal()" style="width: 100%; margin-top: 15px;">关闭</button>
         </div>
     </div>
 
-    <!-- P3浼樺寲锛氬厠鍒剁郴缁熸暀绋嬫ā鎬佹 -->
+    <!-- P3优化：克制系统教程模态框 -->
     <div id="counterSystemModal" class="modal">
         <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
             <span class="modal-close" onclick="closeCounterSystemModal()">&times;</span>
-            <div class="modal-title">鈿?鐏垫牴鍏嬪埗绯荤粺 鈿?/div>
+            <div class="modal-title">⚡ 灵根克制系统 ⚡</div>
 
             <div class="stat-panel">
                 <div class="stat-row" style="background: rgba(16,179,81,0.1); padding: 15px; margin-bottom: 15px; border-radius: 4px;">
-                    <div style="color: #16a34a; font-weight: bold; margin-bottom: 10px;">馃摉 鍏嬪埗绯荤粺璇存槑</div>
+                    <div style="color: #16a34a; font-weight: bold; margin-bottom: 10px;">📖 克制系统说明</div>
                     <div style="color: #9ca69f; font-size: 0.95em; line-height: 1.8;">
-                        鐏垫牴涔嬮棿瀛樺湪鐩哥敓鐩稿厠鐨勫叧绯汇€傚綋浣犵殑鐏垫牴鍏嬪埗鏁屼汉鏃讹紝浼ゅ鎻愬崌30%锛屽懡涓巼鎻愬崌25%銆?br/>
-                        褰撲綘鐨勭伒鏍硅鏁屼汉鍏嬪埗鏃讹紝浼ゅ闄嶄綆20%锛屽懡涓巼闄嶄綆25%銆?                    </div>
+                        灵根之间存在相生相克的关系。当你的灵根克制敌人时，伤害提升30%，命中率提升25%。<br/>
+                        当你的灵根被敌人克制时，伤害降低20%，命中率降低25%。
+                    </div>
                 </div>
 
                 <div class="stat-row" style="background: rgba(50,55,80,0.5); padding: 12px; margin-bottom: 10px; border-radius: 4px;">
-                    <span class="stat-label">浜旇鍏嬪埗寰幆</span>
+                    <span class="stat-label">五行克制循环</span>
                 </div>
                 <div style="margin-left: 10px; margin-bottom: 15px; font-size: 0.95em; line-height: 2;">
-                    馃煛 <span style="color: #fbbf24;">閲戠伒鏍?/span> 鈫?鍏嬪埗 <span style="color: #10b981;">鏈ㄧ伒鏍?/span> 鈫?鍏嬪埗 <span style="color: #8b7355;">鍦熺伒鏍?/span> 鈫?鍏嬪埗 <span style="color: #3498db;">姘寸伒鏍?/span> 鈫?鍏嬪埗 <span style="color: #ef4444;">鐏伒鏍?/span> 鈫?鍏嬪埗 <span style="color: #fbbf24;">閲戠伒鏍?/span><br/>
+                    🟡 <span style="color: #fbbf24;">金灵根</span> → 克制 <span style="color: #10b981;">木灵根</span> → 克制 <span style="color: #8b7355;">土灵根</span> → 克制 <span style="color: #3498db;">水灵根</span> → 克制 <span style="color: #ef4444;">火灵根</span> → 克制 <span style="color: #fbbf24;">金灵根</span><br/>
                 </div>
 
                 <div class="stat-row" style="background: rgba(50,55,80,0.5); padding: 12px; margin-bottom: 10px; border-radius: 4px;">
-                    <span class="stat-label">鐗规畩鐏垫牴</span>
+                    <span class="stat-label">特殊灵根</span>
                 </div>
                 <div style="margin-left: 10px; margin-bottom: 15px; font-size: 0.95em; line-height: 2;">
-                    馃煟 <span style="color: #a78bfa;">闆风伒鏍?/span> 鈫?<span style="color: #60a5fa;">鍐扮伒鏍?/span> (浜掔浉鍏嬪埗)<br/>
-                    馃尓锔?<span style="color: #6b7280;">椋庣伒鏍?/span> - 鏃犲厠鍒跺叧绯伙紝浣嗘敾閫?10%锛岄棯閬?5%
+                    🟣 <span style="color: #a78bfa;">雷灵根</span> ↔ <span style="color: #60a5fa;">冰灵根</span> (互相克制)<br/>
+                    🌪️ <span style="color: #6b7280;">风灵根</span> - 无克制关系，但攻速+10%，闪避+5%
                 </div>
 
                 <div class="stat-row" style="background: rgba(50,55,80,0.5); padding: 12px; margin-bottom: 10px; border-radius: 4px;">
-                    <span class="stat-label">鐏垫牴琚姩灞炴€?/span>
+                    <span class="stat-label">灵根被动属性</span>
                 </div>
                 <div style="margin-left: 10px; font-size: 0.9em; line-height: 1.8; color: #9ca69f;">
-                    馃煛 閲戠伒鏍? 鏀诲嚮鍔?+10%<br/>
-                    馃煝 鏈ㄧ伒鏍? 鐢熷懡涓婇檺 +15%<br/>
-                    馃數 姘寸伒鏍? 鍛戒腑鐜?+10%<br/>
-                    馃敶 鐏伒鏍? 鏆村嚮鐜?+5%<br/>
-                    馃煠 鍦熺伒鏍? 闃插尽鍔?+15%<br/>
-                    馃煟 闆风伒鏍? 鏆村嚮浼ゅ +20%<br/>
-                    馃數 鍐扮伒鏍? 闂伩鐜?+10%<br/>
-                    馃尓锔?椋庣伒鏍? 鏀婚€?+10%, 闂伩 +5%
+                    🟡 金灵根: 攻击力 +10%<br/>
+                    🟢 木灵根: 生命上限 +15%<br/>
+                    🔵 水灵根: 命中率 +10%<br/>
+                    🔴 火灵根: 暴击率 +5%<br/>
+                    🟤 土灵根: 防御力 +15%<br/>
+                    🟣 雷灵根: 暴击伤害 +20%<br/>
+                    🔵 冰灵根: 闪避率 +10%<br/>
+                    🌪️ 风灵根: 攻速 +10%, 闪避 +5%
                 </div>
             </div>
 
-            <button class="btn" onclick="closeCounterSystemModal()" style="width: 100%; margin-top: 20px;">浜嗚В浜?/button>
+            <button class="btn" onclick="closeCounterSystemModal()" style="width: 100%; margin-top: 20px;">了解了</button>
         </div>
     </div>
 
     <script>
-        // ==================== 娓告垙鏁版嵁缁撴瀯 ====================
-        const GAME_CONFIG = {
-    <script>
-    // ==================== 核心游戏状态 ====================
-    let gameState = {
-        version: 2,
-        player: {
-            name: '', spiritRoot: '', realmIndex: 0, cultivation: 0, coins: 100,
-            stats: { hp: { current: 50, max: 50 }, atk: 5, def: 2, spd: 5 },
-            inventory: [], currentAction: null, actionStartTime: 0, lastSave: Date.now()
-        }
-    };
-
-    // ==================== P4新系统：完整配置表 ====================
-    const GAME_CONFIG = {
-        currentVersion: 2,
-        realms: [
-            { index: 0, name: '凡人', nextReq: 50, unlocks: [] },
-            { index: 1, name: '练气初期', nextReq: 100, unlocks: ['small'] },
-            { index: 2, name: '练气中期', nextReq: 200, unlocks: [] },
-            { index: 3, name: '练气后期', nextReq: 300, unlocks: ['big'] },
-            { index: 4, name: '练气巅峰', nextReq: 400, unlocks: ['breath'] },
-            { index: 5, name: '筑基初期', nextReq: 500, unlocks: [] },
-            { index: 6, name: '筑基中期', nextReq: 600, unlocks: ['epiphany'] },
-            { index: 7, name: '筑基后期', nextReq: 700, unlocks: [] },
-            { index: 8, name: '筑基圆满', nextReq: 18379, unlocks: [] },
-            { index: 9, name: '金丹初期', nextReq: 25000, unlocks: [] },
-            { index: 10, name: '金丹中期', nextReq: 31600, unlocks: [] },
-            { index: 11, name: '金丹后期', nextReq: 39200, unlocks: [] },
-            { index: 12, name: '金丹圆满', nextReq: 48000, unlocks: [] },
-            { index: 13, name: '元婴初期', nextReq: 58000, unlocks: [] },
-            { index: 14, name: '元婴中期', nextReq: 70000, unlocks: [] },
-            { index: 15, name: '元婴后期', nextReq: 83000, unlocks: [] },
-            { index: 16, name: '元婴圆满', nextReq: 98000, unlocks: [] }
-        ],
-        cultivation: {
-            basic: { name: '吐纳灵气', duration: 5, output: 5, minRealm: 0 },
-            small: { name: '小周天', duration: 8, output: 15, minRealm: 1 },
-            big: { name: '大周天', duration: 12, output: 30, minRealm: 3 },
-            breath: { name: '龟息术', duration: 20, output: 100, minRealm: 4 },
-            epiphany: { name: '顿悟', duration: 60, output: 500, minRealm: 6 }
-        }
-    };
-
-    function migrateGameData() {
-        const saved = localStorage.getItem('gameState');
-        if (!saved) return;
-        const loaded = JSON.parse(saved);
-        if (loaded.version !== GAME_CONFIG.currentVersion) {
-            loaded.version = GAME_CONFIG.currentVersion;
-            localStorage.setItem('gameState', JSON.stringify(loaded));
-            gameState = loaded;
-        }
-    }
-
-    function calculateStats(realmIndex) {
-        const base = { hp: 50, atk: 5, def: 2, spd: 5 };
-        return {
-            hp: { current: Math.floor(base.hp * (1 + realmIndex * 0.40)), max: Math.floor(base.hp * (1 + realmIndex * 0.40)) },
-            atk: Math.floor(base.atk * (1 + realmIndex * 0.30)),
-            def: Math.floor(base.def * (1 + realmIndex * 0.25)),
-            spd: Math.floor(base.spd * (1 + realmIndex * 0.30))
-        };
-    }
-
-    function updateUI() {
-        const player = gameState.player;
-        const realm = GAME_CONFIG.realms[player.realmIndex];
-        document.getElementById('playerNameDisplay').textContent = player.name;
-        document.getElementById('realmDisplay').textContent = realm.name;
-        document.getElementById('coinAmount').textContent = player.coins;
-        const progress = (player.cultivation / realm.nextReq) * 100;
-        document.getElementById('cultivationProgress').style.width = progress + '%';
-        const stats = calculateStats(player.realmIndex);
-        document.getElementById('hpDisplay').textContent = `${stats.hp.current}/${stats.hp.max}`;
-        document.getElementById('atkDisplay').textContent = stats.atk;
-        document.getElementById('defDisplay').textContent = stats.def;
-        document.getElementById('spdDisplay').textContent = stats.spd;
-    }
-
-    function startGame() {
-        const name = document.getElementById('playerName').value.trim();
-        const spiritRoot = document.getElementById('playerSpiritRoot').value;
-        if (!name || !spiritRoot) { alert('请完整填写信息！'); return; }
-        gameState.player.name = name;
-        gameState.player.spiritRoot = spiritRoot;
-        gameState.player.stats = calculateStats(0);
-        localStorage.setItem('gameState', JSON.stringify(gameState));
-        document.getElementById('startScreen').classList.remove('show');
-        document.getElementById('gameScreen').classList.remove('hidden');
-        setTimeout(() => updateUI(), 50);
-    }
-
-    function showStartScreen() {
-        if (confirm('确定要返回开始屏幕吗？')) {
-            document.getElementById('gameScreen').classList.add('hidden');
-            document.getElementById('startScreen').classList.add('show');
-        }
-    }
-
-    function resetGame() {
-        if (confirm('确定要重新开始吗？')) {
-            localStorage.removeItem('gameState');
-            gameState = { version: 2, player: { name: '', spiritRoot: '', realmIndex: 0, cultivation: 0, coins: 100, stats: { hp: { current: 50, max: 50 }, atk: 5, def: 2, spd: 5 }, inventory: [], currentAction: null } };
-            showStartScreen();
-        }
-    }
-
-    function switchPanel(panelName) {
-        document.querySelectorAll('.panel-content').forEach(p => p.classList.add('hidden'));
-        const el = document.getElementById('panel-' + panelName);
-        if (el) el.classList.remove('hidden');
-    }
-
-    window.addEventListener('load', () => {
-        const saved = localStorage.getItem('gameState');
-        if (saved) {
-            gameState = JSON.parse(saved);
-            migrateGameData();
-            if (gameState.player.name) {
-                document.getElementById('startScreen').classList.remove('show');
-                document.getElementById('gameScreen').classList.remove('hidden');
-                setTimeout(() => updateUI(), 50);
-            }
-        }
-    });
+    let gameState = { version: 2, player: { name: '', spiritRoot: '', realmIndex: 0, cultivation: 0, coins: 100, stats: { hp: { current: 50, max: 50 }, atk: 5, def: 2, spd: 5 }, inventory: [], currentAction: null } };
+    const GAME_CONFIG = { realms: [ { name: '凡人', nextReq: 50 }, { name: '练气初期', nextReq: 100 }, { name: '练气中期', nextReq: 200 }, { name: '练气后期', nextReq: 300 }, { name: '练气巅峰', nextReq: 400 }, { name: '筑基初期', nextReq: 500 }, { name: '筑基中期', nextReq: 600 }, { name: '筑基后期', nextReq: 700 }, { name: '筑基圆满', nextReq: 18379 }, { name: '金丹初期', nextReq: 25000 }, { name: '金丹中期', nextReq: 31600 }, { name: '金丹后期', nextReq: 39200 }, { name: '金丹圆满', nextReq: 48000 }, { name: '元婴初期', nextReq: 58000 }, { name: '元婴中期', nextReq: 70000 }, { name: '元婴后期', nextReq: 83000 }, { name: '元婴圆满', nextReq: 98000 } ] };
+    function startGame() { const name = document.getElementById('playerName').value.trim(); const spiritRoot = document.getElementById('playerSpiritRoot').value; if (!name || !spiritRoot) { alert('请完整填写信息！'); return; } gameState.player.name = name; gameState.player.spiritRoot = spiritRoot; try { localStorage.setItem('gameState', JSON.stringify(gameState)); } catch(e) { console.log('localStorage不可用，使用内存存储'); } document.getElementById('startScreen').classList.remove('show'); document.getElementById('gameScreen').classList.remove('hidden'); updateUI(); }
+    function updateUI() { document.getElementById('playerNameDisplay').textContent = gameState.player.name; document.getElementById('realmDisplay').textContent = GAME_CONFIG.realms[gameState.player.realmIndex].name; document.getElementById('coinAmount').textContent = gameState.player.coins; }
+    function switchPanel(panelName) { document.querySelectorAll('.panel-content').forEach(p => p.classList.add('hidden')); const el = document.getElementById('panel-' + panelName); if (el) el.classList.remove('hidden'); }
+    function showStartScreen() { if (confirm('确定要返回开始屏幕吗？')) { document.getElementById('gameScreen').classList.add('hidden'); document.getElementById('startScreen').classList.add('show'); } }
+    function resetGame() { if (confirm('确定要重新开始吗？')) { localStorage.removeItem('gameState'); gameState = { version: 2, player: { name: '', spiritRoot: '', realmIndex: 0, cultivation: 0, coins: 100, stats: { hp: { current: 50, max: 50 }, atk: 5, def: 2, spd: 5 }, inventory: [], currentAction: null } }; showStartScreen(); } }
+    window.addEventListener('load', () => { const saved = localStorage.getItem('gameState'); if (saved) { gameState = JSON.parse(saved); if (gameState.player.name) { document.getElementById('startScreen').classList.remove('show'); document.getElementById('gameScreen').classList.remove('hidden'); updateUI(); } } });
     </script>
 </body>
 </html>
