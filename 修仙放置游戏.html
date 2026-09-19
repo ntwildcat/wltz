@@ -5595,14 +5595,25 @@
             // 版本迁移函数：自动更新旧数据以支持新配方
             if (!gameState.version) gameState.version = 0;
 
-            const currentVersion = 1;
-            if (gameState.version < currentVersion) {
+            const currentVersion = 2;  // P4：属性系统重写 + 初始化BugFix
+
+            // 版本1→2 迁移
+            if (gameState.version < 1) {
                 // 从GAME_CONFIG更新所有技能配方
                 Object.keys(GAME_CONFIG.skills).forEach(skillName => {
                     if (gameState.skills[skillName] && GAME_CONFIG.skills[skillName].recipes) {
                         gameState.skills[skillName].recipes = JSON.parse(JSON.stringify(GAME_CONFIG.skills[skillName].recipes));
                     }
                 });
+            }
+
+            // 版本2：属性系统重新计算（使用新的境界倍数）
+            if (gameState.version < 2) {
+                calculateStats(); // 重新计算属性使用新系统
+                console.log('✅ 游戏数据已升级至v2（属性系统已更新）');
+            }
+
+            if (gameState.version < currentVersion) {
                 gameState.version = currentVersion;
             }
 
