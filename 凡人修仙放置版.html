@@ -1924,10 +1924,11 @@
                 <div style="color: #16a34a; font-size: 0.9em; margin-bottom: 8px;">💡 用途</div>
                 <div style="color: #fbbf24; font-size: 0.9em; line-height: 1.6em;" id="itemUsage">暂无已知用途</div>
             </div>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button class="btn" onclick="closeItemDetail()" style="flex: 1;">关闭</button>
-                <button class="btn btn-secondary" id="itemActionBtn" onclick="performItemAction()" style="flex: 1; display: none;">操作</button>
-                <button class="btn btn-secondary" id="itemSellBtn" onclick="sellItem()" style="flex: 1; display: none;">出售</button>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                <button class="btn" onclick="closeItemDetail()" style="flex: 1 1 40%;">关闭</button>
+                <button class="btn btn-secondary" id="itemActionBtn" onclick="performItemAction()" style="flex: 1 1 40%; display: none;">操作</button>
+                <button class="btn btn-secondary" id="itemSellBtn" onclick="sellItem(false)" style="flex: 1 1 40%; display: none;">出售</button>
+                <button class="btn btn-secondary" id="itemSellAllBtn" onclick="sellItem(true)" style="flex: 1 1 40%; display: none;">全部出售</button>
             </div>
         </div>
     </div>
@@ -2336,50 +2337,50 @@
             },
             items: {
                 // 食物和材料
-                millet: { name: '灵米', icon: '🌾', type: 'material' },
-                cleangrass: { name: '清灵草', icon: '🍃', type: 'material' },
-                mushroom: { name: '灵芝', icon: '🍄', type: 'material' },
-                tea: { name: '悟道茶叶', icon: '🍵', type: 'material' },
-                lotus: { name: '九叶莲', icon: '🌸', type: 'material' },
+                millet: { name: '灵米', icon: '🌾', type: 'material', sellPrice: 10 },
+                cleangrass: { name: '清灵草', icon: '🍃', type: 'material', sellPrice: 25 },
+                mushroom: { name: '灵芝', icon: '🍄', type: 'material', sellPrice: 50 },
+                tea: { name: '悟道茶叶', icon: '🍵', type: 'material', sellPrice: 100 },
+                lotus: { name: '九叶莲', icon: '🌸', type: 'material', sellPrice: 200 },
 
                 // 种子（秘境掉落）
-                seed_millet: { name: '灵米种子', icon: '🌱', type: 'seed' },
-                seed_cleangrass: { name: '清灵草种子', icon: '🌿', type: 'seed' },
-                seed_mushroom: { name: '灵芝种子', icon: '🍄', type: 'seed' },
-                seed_tea: { name: '悟道茶种子', icon: '🌾', type: 'seed' },
-                seed_lotus: { name: '九叶莲种子', icon: '🌸', type: 'seed' },
+                seed_millet: { name: '灵米种子', icon: '🌱', type: 'seed', sellPrice: 5 },
+                seed_cleangrass: { name: '清灵草种子', icon: '🌿', type: 'seed', sellPrice: 15 },
+                seed_mushroom: { name: '灵芝种子', icon: '🍄', type: 'seed', sellPrice: 30 },
+                seed_tea: { name: '悟道茶种子', icon: '🌾', type: 'seed', sellPrice: 60 },
+                seed_lotus: { name: '九叶莲种子', icon: '🌸', type: 'seed', sellPrice: 150 },
 
                 // 矿石
-                stone: { name: '碎石', icon: '🪨', type: 'ore' },
-                ironore: { name: '铁矿石', icon: '🔩', type: 'ore' },
-                spiritore: { name: '灵矿石', icon: '✨', type: 'ore' },
-                crystal: { name: '玄晶', icon: '💎', type: 'ore' },
+                stone: { name: '碎石', icon: '🪨', type: 'ore', sellPrice: 5 },
+                ironore: { name: '铁矿石', icon: '🔩', type: 'ore', sellPrice: 20 },
+                spiritore: { name: '灵矿石', icon: '✨', type: 'ore', sellPrice: 50 },
+                crystal: { name: '玄晶', icon: '💎', type: 'ore', sellPrice: 200 },
 
                 // 丹药
-                restpill: { name: '回气丹', icon: '💊', type: 'consumable' },
-                pill: { name: '筑基丹', icon: '🔮', type: 'breakthrough_material' },  // 突破材料
-                gatherpill: { name: '聚灵丹', icon: '🔵', type: 'consumable' },
-                realmpill: { name: '破境丹', icon: '🟣', type: 'special' },  // 已弃用，仅供收集
-                marrpill: { name: '洗髓丹', icon: '🟡', type: 'consumable' },
+                restpill: { name: '回气丹', icon: '💊', type: 'consumable', sellPrice: 30 },
+                pill: { name: '筑基丹', icon: '🔮', type: 'breakthrough_material', sellPrice: 60 },  // 突破材料
+                gatherpill: { name: '聚灵丹', icon: '🔵', type: 'consumable', sellPrice: 100 },
+                realmpill: { name: '破境丹', icon: '🟣', type: 'special', sellPrice: 200 },  // 已弃用，仅供收集
+                marrpill: { name: '洗髓丹', icon: '🟡', type: 'consumable', sellPrice: 500 },
                 goldenpill: { name: '金丹秘药', icon: '🟤', type: 'breakthrough_material' },  // P6 突破材料
 
                 // 特殊材料
                 spiritstone: { name: '灵石', icon: '💎', type: 'currency' },
-                jade: { name: '灵玉', icon: '📿', type: 'jewelry', effect: { workSpeed: 0.95 } },
+                jade: { name: '灵玉', icon: '📿', type: 'jewelry', sellPrice: 80, effect: { workSpeed: 0.95 } },
 
                 // P6 丹火相关物品
                 danhuo: { name: '丹火', icon: '🔥', type: 'material', sellPrice: 500 },
-                danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed' },
-                tempered_essence: { name: '淬炼精华', icon: '✨', type: 'material' },
+                danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed', sellPrice: 50 },
+                tempered_essence: { name: '淬炼精华', icon: '✨', type: 'material', sellPrice: 100 },
 
                 // P7 神识相关物品
                 shenshi: { name: '神识', icon: '👁️', type: 'material', sellPrice: 2000 },
-                shenshi_seed: { name: '神识种子', icon: '👁️', type: 'seed' },
+                shenshi_seed: { name: '神识种子', icon: '👁️', type: 'seed', sellPrice: 100 },
                 yuanyingpill: { name: '元婴丹', icon: '⭕', type: 'breakthrough_material' },
-                shenshi_map: { name: '神识地图', icon: '🗺️', type: 'material' },
+                shenshi_map: { name: '神识地图', icon: '🗺️', type: 'material', sellPrice: 200 },
 
                 // 装备
-                sword: { name: '桃木剑', icon: '⚔️', type: 'weapon', stats: { atk: 15 } },
+                sword: { name: '桃木剑', icon: '⚔️', type: 'weapon', sellPrice: 150, stats: { atk: 15 } },
                 ironarmor: { name: '铁甲', icon: '🛡️', type: 'armor', stats: { def: 10 } },
                 spiritsword: { name: '灵剑', icon: '⚡', type: 'weapon', stats: { atk: 40 } },
                 goldenarmor: { name: '金丹法袍', icon: '👔', type: 'armor', stats: { def: 25, hp: 50 } },
@@ -4732,13 +4733,19 @@
             }
 
             const sellBtn = document.getElementById('itemSellBtn');
-            if (sellBtn) {
-                if (itemConfig.sellPrice) {
-                    sellBtn.textContent = `出售1个 (+${itemConfig.sellPrice}灵石)`;
+            const sellAllBtn = document.getElementById('itemSellAllBtn');
+            if (sellBtn && sellAllBtn) {
+                const sellable = getSellableQty(itemId);
+                if (itemConfig.sellPrice && sellable > 0) {
+                    sellBtn.textContent = `出售1个 (+${itemConfig.sellPrice})`;
                     sellBtn.dataset.itemId = itemId;
                     sellBtn.style.display = 'block';
+                    sellAllBtn.textContent = `全部出售 (+${itemConfig.sellPrice * sellable})`;
+                    sellAllBtn.dataset.itemId = itemId;
+                    sellAllBtn.style.display = sellable > 1 ? 'block' : 'none';
                 } else {
                     sellBtn.style.display = 'none';
+                    sellAllBtn.style.display = 'none';
                 }
             }
 
@@ -4757,13 +4764,24 @@
             return true;
         }
 
-        function sellItem() {
-            const itemId = document.getElementById('itemSellBtn').dataset.itemId;
+        // 可出售数量：装备中的物品要留下1件
+        function getSellableQty(itemId) {
+            const inv = gameState.player.inventory.find(i => i.id === itemId);
+            if (!inv) return 0;
+            const eq = gameState.player.equipment;
+            const equipped = eq.weapon === itemId || eq.armor === itemId || (eq.jewelry || []).includes(itemId);
+            return equipped ? Math.max(0, inv.qty - 1) : inv.qty;
+        }
+
+        function sellItem(all) {
+            const itemId = document.getElementById(all ? 'itemSellAllBtn' : 'itemSellBtn').dataset.itemId;
             const itemConfig = GAME_CONFIG.items[itemId];
             if (!itemConfig || !itemConfig.sellPrice) return;
-            if (!consumeItem(itemId, 1)) return;
-            gameState.player.coins += itemConfig.sellPrice;
-            showNotification(`出售${itemConfig.name} +${itemConfig.sellPrice}灵石`, '#16a34a');
+            const qty = all ? getSellableQty(itemId) : Math.min(1, getSellableQty(itemId));
+            if (qty <= 0 || !consumeItem(itemId, qty)) return;
+            const gain = itemConfig.sellPrice * qty;
+            gameState.player.coins += gain;
+            showNotification(`出售${itemConfig.name}×${qty} +${gain}灵石`, '#16a34a');
             updateUI();
             saveGame();
             const remaining = gameState.player.inventory.find(i => i.id === itemId);
