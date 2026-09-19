@@ -1625,7 +1625,10 @@
                             <div id="battleContent-areas">
                                 <!-- 克制预览条 -->
                                 <div id="battleCounterPreview" style="background: rgba(22,163,74,0.1); border: 1px solid #16a34a; border-radius: 4px; padding: 12px; margin-bottom: 15px; display: none;">
-                                    <div style="color: #16a34a; font-weight: bold; margin-bottom: 8px;">⚡ 克制关系预览</div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <div style="color: #16a34a; font-weight: bold;">⚡ 克制关系预览</div>
+                                        <button onclick="showCounterSystemModal()" style="background: rgba(16,179,81,0.2); border: 1px solid #16a34a; color: #16a34a; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 0.85em;">📖 详情</button>
+                                    </div>
                                     <div id="counterInfo" style="color: #fbbf24; font-size: 0.9em; line-height: 1.6em;"></div>
                                 </div>
                                 <div class="skill-list" id="battleSkills"></div>
@@ -1931,6 +1934,55 @@
         </div>
     </div>
 
+    <!-- P3优化：克制系统教程模态框 -->
+    <div id="counterSystemModal" class="modal">
+        <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+            <span class="modal-close" onclick="closeCounterSystemModal()">&times;</span>
+            <div class="modal-title">⚡ 灵根克制系统 ⚡</div>
+
+            <div class="stat-panel">
+                <div class="stat-row" style="background: rgba(16,179,81,0.1); padding: 15px; margin-bottom: 15px; border-radius: 4px;">
+                    <div style="color: #16a34a; font-weight: bold; margin-bottom: 10px;">📖 克制系统说明</div>
+                    <div style="color: #9ca69f; font-size: 0.95em; line-height: 1.8;">
+                        灵根之间存在相生相克的关系。当你的灵根克制敌人时，伤害提升30%，命中率提升25%。<br/>
+                        当你的灵根被敌人克制时，伤害降低20%，命中率降低25%。
+                    </div>
+                </div>
+
+                <div class="stat-row" style="background: rgba(50,55,80,0.5); padding: 12px; margin-bottom: 10px; border-radius: 4px;">
+                    <span class="stat-label">五行克制循环</span>
+                </div>
+                <div style="margin-left: 10px; margin-bottom: 15px; font-size: 0.95em; line-height: 2;">
+                    🟡 <span style="color: #fbbf24;">金灵根</span> → 克制 <span style="color: #10b981;">木灵根</span> → 克制 <span style="color: #8b7355;">土灵根</span> → 克制 <span style="color: #3498db;">水灵根</span> → 克制 <span style="color: #ef4444;">火灵根</span> → 克制 <span style="color: #fbbf24;">金灵根</span><br/>
+                </div>
+
+                <div class="stat-row" style="background: rgba(50,55,80,0.5); padding: 12px; margin-bottom: 10px; border-radius: 4px;">
+                    <span class="stat-label">特殊灵根</span>
+                </div>
+                <div style="margin-left: 10px; margin-bottom: 15px; font-size: 0.95em; line-height: 2;">
+                    🟣 <span style="color: #a78bfa;">雷灵根</span> ↔ <span style="color: #60a5fa;">冰灵根</span> (互相克制)<br/>
+                    🌪️ <span style="color: #6b7280;">风灵根</span> - 无克制关系，但攻速+10%，闪避+5%
+                </div>
+
+                <div class="stat-row" style="background: rgba(50,55,80,0.5); padding: 12px; margin-bottom: 10px; border-radius: 4px;">
+                    <span class="stat-label">灵根被动属性</span>
+                </div>
+                <div style="margin-left: 10px; font-size: 0.9em; line-height: 1.8; color: #9ca69f;">
+                    🟡 金灵根: 攻击力 +10%<br/>
+                    🟢 木灵根: 生命上限 +15%<br/>
+                    🔵 水灵根: 命中率 +10%<br/>
+                    🔴 火灵根: 暴击率 +5%<br/>
+                    🟤 土灵根: 防御力 +15%<br/>
+                    🟣 雷灵根: 暴击伤害 +20%<br/>
+                    🔵 冰灵根: 闪避率 +10%<br/>
+                    🌪️ 风灵根: 攻速 +10%, 闪避 +5%
+                </div>
+            </div>
+
+            <button class="btn" onclick="closeCounterSystemModal()" style="width: 100%; margin-top: 20px;">了解了</button>
+        </div>
+    </div>
+
     <script>
         // ==================== 游戏数据结构 ====================
         const GAME_CONFIG = {
@@ -2109,7 +2161,7 @@
                     recipes: {
                         basic: { name: '吐纳灵气', desc: '基础修为', duration: 5, output: { cultivation: 5, skill: 'cultivation', exp: 8 }, requiredRealmIndex: 0, unlocked: true },
                         small: { name: '小周天', desc: '效率提升', duration: 8, output: { cultivation: 15, skill: 'cultivation', exp: 15 }, requiredRealmIndex: 1, unlocked: false },
-                        big: { name: '大周天', desc: '中期主力', duration: 12, output: { cultivation: 40, skill: 'cultivation', exp: 25 }, requiredRealmIndex: 3, unlocked: false },
+                        big: { name: '大周天', desc: '中期主力', duration: 12, output: { cultivation: 30, skill: 'cultivation', exp: 25 }, requiredRealmIndex: 3, unlocked: false },
                         breath: { name: '龟息术', desc: '高产出', duration: 20, output: { cultivation: 100, skill: 'cultivation', exp: 40 }, requiredRealmIndex: 4, unlocked: false },
                         epiphany: { name: '顿悟', desc: '后期爆发', duration: 60, output: { cultivation: 500, skill: 'cultivation', exp: 80 }, requiredRealmIndex: 6, unlocked: false },
                         // P6 金丹期配方
@@ -2302,13 +2354,33 @@
                     { id: 'mushroom', name: '灵芝', icon: '🍄', price: 50, desc: '高级材料' }
                 ],
                 pills: [
-                    { id: 'restpill', name: '回气丹', icon: '💊', price: 30, desc: '+50灵气' },
-                    { id: 'pill', name: '筑基丹', icon: '🔮', price: 60, desc: '+100灵气' },
-                    { id: 'gatherpill', name: '聚灵丹', icon: '🔵', price: 100, desc: '+200灵气' }
+                    { id: 'restpill', name: '回气丹', icon: '💊', price: 30, desc: '+50灵气', minRealmIndex: 0 },
+                    { id: 'pill', name: '筑基丹', icon: '🔮', price: 60, desc: '+100灵气', minRealmIndex: 0 },
+                    { id: 'gatherpill', name: '聚灵丹', icon: '🔵', price: 100, desc: '+200灵气', minRealmIndex: 0 },
+                    { id: 'spiritpill', name: '聚灵丹（高级）', icon: '🔷', price: 500, desc: '恢复大量灵气', minRealmIndex: 10 },
+                    { id: 'goldenpill', name: '金丹秘药', icon: '🟤', price: 5000, desc: '金丹期突破必需', minRealmIndex: 9 },
+                    { id: 'yuanyingpill', name: '元婴丹', icon: '⭕', price: 20000, desc: '元婴期突破必需', minRealmIndex: 13 }
                 ],
                 equipment: [
-                    { id: 'sword', name: '桃木剑', icon: '⚔️', price: 150, desc: '攻击力+15' },
-                    { id: 'jade', name: '灵玉', icon: '📿', price: 80, desc: '工作速度-5%' }
+                    { id: 'sword', name: '桃木剑', icon: '⚔️', price: 150, desc: '攻击力+15', minRealmIndex: 0 },
+                    { id: 'jade', name: '灵玉', icon: '📿', price: 80, desc: '工作速度-5%', minRealmIndex: 0 },
+                    { id: 'ironarmor', name: '铁甲', icon: '🛡️', price: 300, desc: '防御力+10', minRealmIndex: 5 },
+                    { id: 'spiritsword', name: '灵剑', icon: '⚡', price: 1000, desc: '攻击力+40', minRealmIndex: 8 },
+                    { id: 'goldenarmor', name: '金丹法袍', icon: '👔', price: 3000, desc: '防御力+25', minRealmIndex: 9 },
+                    { id: 'yuanyingsword', name: '元婴灵剑', icon: '✨', price: 10000, desc: '攻击力+80', minRealmIndex: 13 }
+                ],
+                materials: [
+                    { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5 },
+                    { id: 'crystal', name: '玄晶 ×3', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
+                    { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9 },
+                    { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13 }
+                ],
+                special: [
+                    { id: 'golden_art', name: '金丹大道', icon: '📜', price: 10000, desc: '修炼速度 ×1.5', minRealmIndex: 8, type: 'art' },
+                    { id: 'fire_art', name: '焚天诀', icon: '🔥', price: 20000, desc: '修炼速度 ×1.8', minRealmIndex: 9, type: 'art' },
+                    { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 30000, desc: '修炼速度 ×2.2', minRealmIndex: 11, type: 'art' },
+                    { id: 'void_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' },
+                    { id: 'clone_unlock', name: '分身解锁令', icon: '👥', price: 50000, desc: '解锁分身系统', minRealmIndex: 13, type: 'unlock' }
                 ]
             }
         };
@@ -2395,9 +2467,9 @@
                 let baseDmg = attacker.atk || 10;
                 baseDmg += Math.random() * baseDmg * 0.3 - baseDmg * 0.15; // ±15%随机
 
-                // 防御减伤
+                // 防御减伤 (使用原始攻击力计算，符合技术文档)
                 const defenseDEF = defender.def || 0;
-                const damageReduction = (defenseDEF / (baseDmg + defenseDEF + 1)) * 0.75;
+                const damageReduction = (defenseDEF / ((attacker.atk || 10) + defenseDEF)) * 0.75;
                 baseDmg *= (1 - damageReduction);
 
                 return Math.max(1, Math.floor(baseDmg)); // 最少1点伤害
@@ -2843,12 +2915,13 @@
             // === 退出秘境 ===
             resetBattleState('player_dead');
 
-            // === 生成详细死亡通知 ===
+            // === P2修复：生成更详细的死亡通知 ===
+            const damagePercent = ((hpBefore - gameState.player.stats.hp.current) / gameState.player.stats.hp.max * 100).toFixed(0);
             const notificationText = `✗ 被${monster.name}击败！\n\n` +
-                                    `损失修为 ${lostCultivation}\n` +
-                                    `损失食物 ${foodLost}份\n` +
-                                    `HP恢复 ${gameState.player.stats.hp.current}/${gameState.player.stats.hp.max}`;
-            showNotification(notificationText, '#ff4444');
+                                    `丢失修为: ${lostCultivation} (10%)\n` +
+                                    `丢失食物: ${foodLost}份 (50%)\n` +
+                                    `血量: ${gameState.player.stats.hp.current}/${gameState.player.stats.hp.max} (+50%)`;
+            showNotification(notificationText, '#ef4444', 'danger');
 
             // === 更新全局死亡统计 ===
             updateGlobalDeathStats(lostCultivation, foodLost);
@@ -4134,7 +4207,11 @@
                 };
 
                 const playerInfo = counters[playerRoot];
-                counterInfo.innerHTML = `你的灵根: ${playerRootName} → 克制 ${playerInfo.counters} (伤害 ×1.5)<br/>其他敌人保持正常伤害 (×1.0)`;
+                // P3优化：增强克制信息显示，包含更详细的说明
+                const counterHelpText = playerInfo.counters === '无克制'
+                    ? `你的灵根: ${playerRootName} → 无克制关系<br/>✨ 特性：攻速 +10%, 闪避 +5%`
+                    : `你的灵根: ${playerRootName}<br/>⭐ 克制 ${playerInfo.counters} → 伤害 ×1.3, 命中 ×1.25<br/>⚠️ 被克制时 → 伤害 ×0.8, 命中 ×0.75`;
+                counterInfo.innerHTML = counterHelpText;
                 counterPreview.style.display = 'block';
             }
 
@@ -4316,12 +4393,31 @@
         }
 
         function addToInventory(itemId, qty = 1) {
+            // 检查背包容量
+            const inventoryCount = gameState.player.inventory.length;
+            const maxCapacity = gameState.player.inventoryCapacity || 50;
+            const itemName = GAME_CONFIG.items[itemId]?.name || itemId;
+
             const existing = gameState.player.inventory.find(i => i.id === itemId);
             if (existing) {
                 existing.qty += qty;
+                // 检查是否接近满载
+                if (inventoryCount >= maxCapacity * 0.9) {
+                    showNotification(`⚠️ 背包即将满满！(${inventoryCount}/${maxCapacity}) 建议购买背包扩展`, '#f39c12', 'warning');
+                }
             } else {
+                // 检查是否有空间添加新物品
+                if (inventoryCount >= maxCapacity) {
+                    showNotification(`❌ 背包已满无法获取 ${itemName}！请扩展背包容量`, '#ef4444', 'error');
+                    return false; // 返回false表示失败
+                }
                 gameState.player.inventory.push({ id: itemId, qty });
+                // 检查是否接近满载
+                if (inventoryCount + 1 >= maxCapacity * 0.8) {
+                    showNotification(`⚠️ 背包容量即将满满！(${inventoryCount + 1}/${maxCapacity})`, '#f39c12', 'warning');
+                }
             }
+            return true; // 返回true表示成功
         }
 
         // ==================== 物品交互系统（P1功能）====================
@@ -4355,15 +4451,27 @@
                 }
             });
 
-            // 特殊物品说明
+            // P3优化：扩展的物品用途说明
             const specialUsages = {
-                pill: '使用此物品可以增强突破成功率',
-                millet: '灵田产出，可用于炼丹',
-                cleangrass: '灵田产出，炼丹主要材料',
-                stone: '采矿获得，基础炼器材料',
-                ironore: '采矿获得，中级炼器材料',
-                spiritore: '采矿获得，高级炼器材料',
-                crystal: '采矿获得，顶级炼器材料'
+                // 丹药
+                pill: '突破修为必备丹药，用于大境界突破',
+                xujidan: '虚极丹：增强突破成功率，大阶段突破必需',
+                yingyangdan: '阴阳丹：平衡属性，提升修炼效率',
+                shenqidan: '神器丹：提升灵根资质，增加所有属性',
+
+                // 灵田产出
+                millet: '灵米：灵田产出，炼丹的重要材料',
+                cleangrass: '清灵草：灵田主要产出，炼丹必需材料',
+                peach_branch: '桃木枝：灵田稀有产出，炼器高级材料',
+
+                // 采矿产出
+                stone: '灵石碎片：采矿基础产出，炼器基础材料',
+                ironore: '灵铁矿：采矿中级产出，炼器中级材料',
+                spiritore: '灵精矿：采矿高级产出，炼器高级材料',
+                crystal: '灵晶：采矿顶级产出，炼器最高级材料',
+
+                // 其他物品
+                shenshi_map: '神识地图：秘径探查产出，用于发现隐藏宝藏'
             };
 
             if (specialUsages[itemId]) {
@@ -4400,9 +4508,23 @@
                 }
             }
 
+            // P3优化：添加物品类别说明
+            const categoryExplanations = {
+                consumable: '💊 消耗品：一次性使用，在特定情况下消耗（如丹药用于突破）',
+                material: '🧪 材料：用于制作、合成或升级其他物品的基础材料',
+                ore: '⛏️ 矿物：采矿得到的矿物，用于炼器合成',
+                weapon: '⚔️ 武器装备：穿戴后提升攻击力和其他属性',
+                jewelry: '✨ 首饰：穿戴后提升防御、血量等防御属性',
+                upgrade: '🔧 永久升级：一次性升级，永久提升游戏能力（无法重复购买）'
+            };
+
             const itemUsageEl = document.getElementById('itemUsage');
             if (itemUsageEl) {
-                itemUsageEl.innerHTML = usageText + comparisonHTML;
+                let categoryHint = categoryExplanations[itemConfig.type] || '';
+                if (categoryHint) {
+                    categoryHint = '<div style="margin-bottom: 10px; padding: 8px; background: rgba(100,100,100,0.2); border-radius: 3px; font-size: 0.85em; color: #c9a961;">' + categoryHint + '</div>';
+                }
+                itemUsageEl.innerHTML = categoryHint + usageText + comparisonHTML;
             }
 
             // 处理装备按钮显示（P2功能：equipping/unequipping）
@@ -4841,8 +4963,12 @@
             document.getElementById('cultivationBar').style.width = percentage + '%';
             document.getElementById('cultivationProgress').style.width = percentage + '%';
             document.getElementById('progressText').textContent = Math.round(percentage) + '%';
-            // 修为显示动态根据当前境界的需求上限变化
-            document.getElementById('cultivationXP').textContent = `${gameState.player.cultivationXP}/${realm.nextReq}`;
+            // P3修复：修为显示，当达到上限时添加提示
+            let cultivationDisplay = `${gameState.player.cultivationXP}/${realm.nextReq}`;
+            if (gameState.player.cultivationXP >= realm.nextReq) {
+                cultivationDisplay += ` ✨ 可突破`;
+            }
+            document.getElementById('cultivationXP').textContent = cultivationDisplay;
 
             // 显示突破按钮（无冷却时间限制）
             if (gameState.player.cultivationXP >= realm.nextReq) {
@@ -4987,6 +5113,23 @@
                     gameState.player.farmingSlots += 1;
                     showNotification(`✨ 灵田槽位增加1个！共${gameState.player.farmingSlots}个`, '#16a34a');
                 }
+            } else if (item.type === 'art') {
+                // 功法购买处理 - 自动装备并显示反馈
+                gameState.player.currentArt = itemId;
+
+                // 获取功法信息
+                const art = CULTIVATION_ARTS[itemId];
+                const speedBonus = art ? ((art.speedMultiplier - 1) * 100).toFixed(0) : '0';
+
+                showNotification(
+                    `✨ 已装备功法：${item.name}！\n修炼速度 ${art?.speedMultiplier?.toFixed(1)}x（提升${speedBonus}%）`,
+                    '#10b981',
+                    'success'
+                );
+
+                // 更新UI显示新的修炼时间
+                updateArtDisplay();
+                updateActionDisplay();
             } else {
                 // 消耗品处理
                 addToInventory(itemId, 1);
@@ -5003,14 +5146,34 @@
 
             shopContainer.innerHTML = '';
 
-            const categoryNames = { upgrades: '⭐ 永久升级', food: '🌾 食物', pills: '💊 丹药', equipment: '⚔️ 装备' };
+            const categoryNames = {
+                upgrades: '⭐ 永久升级',
+                food: '🌾 食物',
+                pills: '💊 丹药',
+                equipment: '⚔️ 装备',
+                materials: '🪨 材料',
+                special: '✨ 特殊'
+            };
+
+            const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满', '金丹初期', '金丹中期', '金丹后期', '金丹圆满', '元婴初期', '元婴中期', '元婴后期', '元婴圆满'];
+            const currentRealmIdx = gameState.player.realmIndex;
+            const currentRealmName = realmNames[currentRealmIdx] || '未知';
+
             Object.entries(GAME_CONFIG.shop).forEach(([category, items]) => {
+                // 筛选该分类中可见的商品（境界满足要求的）
+                const visibleItems = items.filter(item => {
+                    const minRealm = item.minRealmIndex !== undefined ? item.minRealmIndex : 0;
+                    return currentRealmIdx >= minRealm;
+                });
+
+                if (visibleItems.length === 0) return; // 如果没有可见商品，跳过该分类
+
                 const title = document.createElement('div');
                 title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #16a34a; margin-top: 10px; margin-bottom: 5px;';
                 title.textContent = categoryNames[category] || category;
                 shopContainer.appendChild(title);
 
-                items.forEach(item => {
+                visibleItems.forEach(item => {
                     // 检查永久升级是否已购买
                     const isBought = item.type === 'upgrade' && gameState.player.boughtUpgrades.includes(item.id);
 
@@ -5030,7 +5193,7 @@
                         card.onmouseout = () => card.style.borderColor = '#555';
                     }
 
-                    const priceDisplay = isBought ? '✓ 已拥有' : `${item.price} 💎`;
+                    const priceDisplay = isBought ? '✓ 已拥有' : `${item.price} 灵石`;
                     const priceColor = isBought ? '#16a34a' : '#fbbf24';
 
                     card.innerHTML = `
@@ -5495,6 +5658,13 @@
             const maxOfflineSeconds = (gameState.settings?.maxOfflineHours || 24) * 60 * 60;
             const actualOfflineSeconds = Math.min(offlineSeconds, maxOfflineSeconds);
 
+            // P2修复：检查是否超过离线上限
+            const exceedsLimit = offlineSeconds > maxOfflineSeconds;
+            if (exceedsLimit) {
+                const wastedHours = Math.floor((offlineSeconds - maxOfflineSeconds) / 3600);
+                // 标记超限信息用于显示
+            }
+
             const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
             // 应用工作速度和功法倍率（修炼特殊处理）
             const duration = getAdjustedDuration(gameState.currentAction.skill, action.duration);
@@ -5574,19 +5744,31 @@
             // 检查修为是否达到上限
             const cultivationCapped = gameState.player.cultivationXP >= GAME_CONFIG.realms[gameState.player.realmIndex].nextReq;
 
-            // 显示离线结算
-            showOfflineModal(offlineRewards, actualOfflineSeconds, cultivationCapped);
+            // P2修复：显示离线结算（传入超限标志）
+            showOfflineModal(offlineRewards, actualOfflineSeconds, cultivationCapped, exceedsLimit);
         }
 
-        function showOfflineModal(rewards, offlineSeconds, cultivationCapped = false) {
+        function showOfflineModal(rewards, offlineSeconds, cultivationCapped = false, exceedsLimit = false) {
             const hours = Math.floor(offlineSeconds / 3600);
             const minutes = Math.floor((offlineSeconds % 3600) / 60);
+            const maxHours = gameState.settings?.maxOfflineHours || 24;
 
             let content = `<div class="stat-panel">
                 <div class="stat-row">
                     <span class="stat-label">离线时长:</span>
                     <span class="stat-value">${hours}小时${minutes}分钟</span>
                 </div>`;
+
+            // P2修复：显示超限警告
+            if (exceedsLimit) {
+                const wastedHours = Math.floor((offlineSeconds / 3600) - maxHours);
+                content += `<div class="stat-row" style="background: rgba(239,68,68,0.1); border: 1px solid #ef4444; padding: 8px; margin: 5px 0;">
+                    <span class="stat-label" style="color: #ef4444;">⚠️ 离线超过${maxHours}小时上限</span>
+                </div>
+                <div class="stat-row" style="background: rgba(239,68,68,0.1); border: 1px solid #ef4444; padding: 8px; margin: 5px 0;">
+                    <span class="stat-label" style="color: #999;">✗ 超时${wastedHours}小时，奖励已达上限</span>
+                </div>`;
+            }
 
             if (rewards.coins > 0) {
                 content += `<div class="stat-row">
@@ -5704,6 +5886,15 @@
 
         function closeArtSwitchModal() {
             document.getElementById('artSwitchModal').classList.remove('show');
+        }
+
+        // P3优化：克制系统教程函数
+        function showCounterSystemModal() {
+            document.getElementById('counterSystemModal').classList.add('show');
+        }
+
+        function closeCounterSystemModal() {
+            document.getElementById('counterSystemModal').classList.remove('show');
         }
 
         function switchCultivationArt(artKey) {
