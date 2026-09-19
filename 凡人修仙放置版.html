@@ -2494,6 +2494,32 @@
         };
 
         // Priority 4: 战斗系统完整公式
+        // P4 平衡层：秘境怪物的原始数值按旧属性体系设计，P4 改为「境界×线性倍数」后玩家属性
+        // 明显偏低，这里按系数缩放怪物血量与攻击（系数由战斗模拟标定：最低境界通关率约50%-100%，
+        // 高两个境界基本必过）。原始数值保留在 GAME_CONFIG.dungeons，调平衡只需改此表。
+        const P4_MONSTER_SCALE = {
+            mysteryTower: 0.7,
+            mysteriousForest: 0.7,
+            ancientRuin: 0.4,
+            tribulationGround: 0.15,
+            huashenRealm: 0.065
+        };
+        Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
+            const dungeon = GAME_CONFIG.dungeons[dungeonId];
+            if (!dungeon) return;
+            dungeon.monsters.forEach(m => {
+                m.hp = Math.max(1, Math.round(m.hp * scale));
+                m.atk = Math.max(1, Math.round(m.atk * scale));
+            });
+        });
+
+        // 普通战斗区域的敌人系数（同 P4_MONSTER_SCALE 的思路，由战斗模拟标定）
+        // 目标：对应最低境界通关率约60%-70%，高两个境界基本必过（标准装备：桃木剑，无食物）
+        const P4_AREA_SCALE = {
+            forest: 1, mountain: 1, deepMountain: 0.88, swamp: 1, abyss: 0.8,
+            goldenPlains: 0.58, tribulationGround: 0.44, voidSea: 0.15, abyssRuins: 0.05
+        };
+
         const BATTLE_FORMULAS = {
             // 基础命中率（与速度差成反比）
             // 命中率 = 0.95 - (敌人SPD - 玩家SPD) / (玩家SPD * 10)
@@ -3343,28 +3369,51 @@
             const timeDelta = 0.1;
 
             // 增加战斗计时
+            const prevRound = Math.floor((battle.turnCount || 0) / 2);
             battle.turnCount = (battle.turnCount || 0) + timeDelta;
 
-            // 模拟战斗伤害（每2秒一个回合）
-            if (battle.turnCount % 2 < timeDelta) {
-                const playerDmg = Math.floor(Math.random() * 10) + 5;
-                const enemyDmg = Math.floor(Math.random() * 8) + 3;
+            // 每2秒一个回合：双方按真实属性结算（命中、防御减伤、境界压制）
+            if (Math.floor(battle.turnCount / 2) > prevRound) {
+                const enemy = battle.currentEnemy;
+                const areaRealm = getAction('battle', battle.currentArea).areaData.minLevel;
+                const playerStats = gameState.player.stats;
 
-                battle.currentEnemy.currentHP -= playerDmg;
-                battle.playerHP.current -= enemyDmg;
+                const toEnemy = rollNormalAttack(playerStats, enemy, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm));
+                if (toEnemy.hit) {
+                    enemy.currentHP -= toEnemy.dmg;
+                    battle.log.push(`玩家造成${toEnemy.dmg}点伤害`);
+                } else {
+                    battle.log.push('玩家攻击落空');
+                }
 
-                battle.log.push(`玩家造成${playerDmg}点伤害`);
-                if (enemyDmg > 0) battle.log.push(`${battle.currentEnemy.name}造成${enemyDmg}点伤害`);
+                if (enemy.currentHP > 0) {
+                    const toPlayer = rollNormalAttack(enemy, playerStats, REALM_SUPPRESSION.calculate(areaRealm, gameState.player.realmIndex));
+                    if (toPlayer.hit) {
+                        battle.playerHP.current -= toPlayer.dmg;
+                        battle.log.push(`${enemy.name}造成${toPlayer.dmg}点伤害`);
+                    } else {
+                        battle.log.push(`${enemy.name}攻击落空`);
+                    }
+                }
                 if (battle.log.length > 10) battle.log.shift();
             }
 
             // 更新UI
             updateNormalBattleUI();
 
-            // 战斗完成：敌人HP <= 0 或 10秒经过
-            if (battle.currentEnemy.currentHP <= 0 || battle.turnCount >= 10) {
+            // 战斗完成：敌人HP <= 0、玩家倒下 或 10秒经过
+            if (battle.currentEnemy.currentHP <= 0 || battle.playerHP.current <= 0 || battle.turnCount >= 10) {
                 completeNormalBattle();
             }
+        }
+
+        // 普通战斗单次攻击判定
+        function rollNormalAttack(attacker, defender, suppression) {
+            let hitChance = BATTLE_FORMULAS.calculateHitChance(attacker.spd, defender.spd) * suppression.hitMod;
+            hitChance = Math.max(0.05, Math.min(0.95, hitChance));
+            if (Math.random() >= hitChance) return { hit: false, dmg: 0 };
+            const dmg = BATTLE_FORMULAS.calculateDamage({ atk: attacker.atk }, { def: defender.def });
+            return { hit: true, dmg: Math.max(1, Math.floor(dmg * suppression.dmgMod)) };
         }
 
         // 更新普通战斗UI
@@ -3440,12 +3489,16 @@
                 }
 
                 showNotification(`🎉 战胜${battle.currentEnemy.name}！\n+${areaData.coins}金币 +${areaData.exp}经验`, '#6fa980');
+            } else if (battle.playerHP.current <= 0) {
+                showNotification(`💀 被${battle.currentEnemy.name}击败，重伤逃出${areaData.name}（血量恢复至50%）`, '#ef4444');
             } else {
                 showNotification(`⚔️ 战斗失败，逃出${areaData.name}`, '#ef4444');
             }
 
-            // 恢复玩家HP
-            gameState.player.stats.hp.current = Math.min(gameState.player.stats.hp.max, battle.playerHP.current);
+            // 结算玩家HP：倒下则恢复至50%，否则保留战斗后的剩余血量
+            gameState.player.stats.hp.current = battle.playerHP.current <= 0
+                ? Math.floor(gameState.player.stats.hp.max * 0.5)
+                : Math.min(gameState.player.stats.hp.max, battle.playerHP.current);
 
             gameState.battles.battleState = 'finished';
             gameState.currentAction = null;
@@ -4979,9 +5032,14 @@
             const areaEnemies = enemyConfigs[areaKey] || enemyConfigs.forest;
             const enemyTemplate = areaEnemies[Math.floor(Math.random() * areaEnemies.length)];
 
+            // P4 平衡层：按区域系数缩放敌人血量与攻击（见 P4_AREA_SCALE）
+            const areaScale = P4_AREA_SCALE[areaKey] || 1;
+            const scaledHP = Math.max(1, Math.round(enemyTemplate.hp * areaScale));
             gameState.battles.currentEnemy = {
                 ...enemyTemplate,
-                currentHP: enemyTemplate.hp
+                hp: scaledHP,
+                atk: Math.max(1, Math.round(enemyTemplate.atk * areaScale)),
+                currentHP: scaledHP
             };
 
             gameState.battles.battleState = 'fighting';
