@@ -2647,13 +2647,14 @@
             // 启动Tick系统
             startGameTick();
             buildSkillTree();
-            switchPanel('cultivation');
-            updateUI();
-            // 延迟调用calculateStats以确保DOM已准备好
+
+            // P4BugFix：延迟初始化UI以确保DOM完全加载
             setTimeout(() => {
+                switchPanel('cultivation');
+                updateUI();
                 calculateStats();
                 updateStatsDisplay();
-            }, 100);
+            }, 50);
             gameRunning = true;
 
             // 立即保存游戏（确保新创建的角色不会丢失）
