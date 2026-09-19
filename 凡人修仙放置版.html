@@ -622,6 +622,27 @@
             line-height: 1.2;
         }
 
+        /* 技能面板顶部的技能头：等级 + 经验条 + 还差多少升级 */
+        .skill-exp-header {
+            background: var(--bg-l3);
+            border: 1px solid var(--border-l3);
+            border-left: 3px solid var(--border-l2);
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            margin-bottom: 14px;
+        }
+        .skill-exp-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+        .skill-exp-name { color: var(--text-l1); font-family: var(--font-title); font-weight: bold; }
+        .skill-exp-level { color: var(--text-l2); font-weight: bold; font-family: var(--font-mono); }
+        .skill-exp-track { height: 10px; background: var(--bg-l1); border: 1px solid var(--border-l3); border-radius: 5px; overflow: hidden; }
+        .skill-exp-fill { height: 100%; background: linear-gradient(90deg, var(--border-l2), var(--border-l1)); transition: width 0.3s; }
+        .skill-exp-text { margin-top: 5px; font-size: 0.8em; color: var(--text-l4); }
+        .skill-exp-text b { color: var(--text-l2); }
+        .skill-exp-mini { font-size: 0.62em; color: var(--text-l4); margin-top: 2px; white-space: nowrap; }
+        .recipe-req { font-size: 0.75em; margin-bottom: var(--spacing-xs); }
+        .recipe-req.met { color: var(--color-hp); }
+        .recipe-req.unmet { color: var(--color-warning); }
+
         .action-item.recipe-materials-lack {
             opacity: 0.75;
             border-color: var(--color-warning);
@@ -1556,6 +1577,7 @@
                         <!-- 修炼面板 -->
                         <div id="panel-cultivation" class="panel-content">
                             <div class="panel-title">🧘 修炼</div>
+                            <div class="skill-exp-header" data-skill="cultivation"></div>
 
                             <!-- 功法选择器 -->
                             <div style="background: rgba(59,130,246,0.1); border: 1px solid #3b82f6; border-radius: 4px; padding: 12px; margin-bottom: 15px;">
@@ -1625,6 +1647,7 @@
                         <!-- 炼丹面板 -->
                         <div id="panel-alchemy" class="panel-content hidden">
                             <div class="panel-title">🧪 炼丹</div>
+                            <div class="skill-exp-header" data-skill="alchemy"></div>
                             <div class="skill-list" id="alchemySkills"></div>
                             <div class="action-list" id="alchemyActions"></div>
                             <div class="action-detail" id="action-detail-alchemy"></div>
@@ -1633,6 +1656,7 @@
                         <!-- 炼器面板 -->
                         <div id="panel-forging" class="panel-content hidden">
                             <div class="panel-title">🔨 炼器</div>
+                            <div class="skill-exp-header" data-skill="forging"></div>
                             <div class="skill-list" id="forgingSkills"></div>
                             <div class="action-list" id="forgingActions"></div>
                             <div class="action-detail" id="action-detail-forging"></div>
@@ -1641,6 +1665,7 @@
                         <!-- 灵田面板 -->
                         <div id="panel-farming" class="panel-content hidden">
                             <div class="panel-title">🌾 灵田</div>
+                            <div class="skill-exp-header" data-skill="farming"></div>
                             <div class="skill-list" id="farmingSkills"></div>
                             <div class="action-list" id="farmingActions"></div>
                             <div class="action-detail" id="action-detail-farming"></div>
@@ -1649,6 +1674,7 @@
                         <!-- 采矿面板 -->
                         <div id="panel-mining" class="panel-content hidden">
                             <div class="panel-title">⛏️ 采矿</div>
+                            <div class="skill-exp-header" data-skill="mining"></div>
                             <div class="skill-list" id="miningSkills"></div>
                             <div class="action-list" id="miningActions"></div>
                             <div class="action-detail" id="action-detail-mining"></div>
@@ -1657,6 +1683,7 @@
                         <!-- 丹火面板（金丹期解锁） -->
                         <div id="panel-danhuo" class="panel-content hidden">
                             <div class="panel-title">🔥 丹火</div>
+                            <div class="skill-exp-header" data-skill="danhuo"></div>
                             <div class="action-list" id="danhuoActions"></div>
                             <div class="action-detail" id="action-detail-danhuo"></div>
                         </div>
@@ -1664,6 +1691,7 @@
                         <!-- 神识面板（元婴期解锁） -->
                         <div id="panel-shenshi" class="panel-content hidden">
                             <div class="panel-title">👁️ 神识</div>
+                            <div class="skill-exp-header" data-skill="shenshi"></div>
                             <div class="action-list" id="shenshiActions"></div>
                             <div class="action-detail" id="action-detail-shenshi"></div>
                         </div>
@@ -1671,6 +1699,7 @@
                         <!-- 战斗面板 -->
                         <div id="panel-battle" class="panel-content hidden">
                             <div class="panel-title">⚔️ 战斗</div>
+                            <div class="skill-exp-header" data-skill="battle"></div>
                             <!-- 战斗/秘境标签页 -->
                             <div style="display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #444;">
                                 <button id="battleTab-areas" class="panel-tab active" onclick="switchBattleTab('areas')" style="flex: 1; padding: 10px; background: none; border: none; color: #fbbf24; cursor: pointer; font-weight: bold; border-bottom: 3px solid #fbbf24;">战斗区域</button>
@@ -4089,13 +4118,46 @@
             return COUNTER_RELATIONS[spiritRoot];
         }
 
-        // 增加技能经验并处理升级（指数级: 100 × level^1.8），在线结算与离线结算共用
+        // 升到下一级所需经验（指数级: 100 × level^1.8）
+        function skillExpNeeded(level) {
+            return Math.round(100 * Math.pow(level, 1.8));
+        }
+
+        // 技能经验进度：当前经验、升级所需、还差多少、百分比
+        function getSkillExpInfo(skillName) {
+            const skill = gameState.skills[skillName];
+            if (!skill) return null;
+            const level = skill.level || 1;
+            const exp = Math.floor(skill.exp || 0);
+            const need = skillExpNeeded(level);
+            return { level, exp, need, remain: Math.max(0, need - exp), percent: Math.min(100, (exp / need) * 100) };
+        }
+
+        // 技能面板顶部的技能头：等级 + 经验条 + 还差多少升级
+        function updateSkillHeaders() {
+            document.querySelectorAll('.skill-exp-header').forEach(el => {
+                const skillName = el.dataset.skill;
+                const skill = gameState.skills[skillName];
+                const info = getSkillExpInfo(skillName);
+                if (!skill || !info) return;
+                el.innerHTML = `
+                    <div class="skill-exp-top">
+                        <span class="skill-exp-name">${skill.icon} ${skill.name}</span>
+                        <span class="skill-exp-level">Lv.${info.level}</span>
+                    </div>
+                    <div class="skill-exp-track"><div class="skill-exp-fill" style="width: ${info.percent}%"></div></div>
+                    <div class="skill-exp-text">经验 ${info.exp} / ${info.need} · 还差 <b>${info.remain}</b> 升到 Lv.${info.level + 1}</div>
+                `;
+            });
+        }
+
+        // 增加技能经验并处理升级，在线结算与离线结算共用
         function addSkillExp(skillName, exp) {
             const skill = gameState.skills[skillName];
             if (!skill) return;
             skill.exp += Math.round(exp * (1 + getSkillMod('exp', skillName)));   // 灵根/功法的经验特效
-            while (skill.exp >= 100 * Math.pow(skill.level, 1.8)) {
-                skill.exp -= 100 * Math.pow(skill.level, 1.8);
+            while (skill.exp >= skillExpNeeded(skill.level)) {
+                skill.exp -= skillExpNeeded(skill.level);
                 skill.level++;
                 const effect = calculateSkillLevelEffect(skillName, skill.level);
                 showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#16a34a', 'normal');
@@ -4257,6 +4319,7 @@
             const panel = document.getElementById('panel-' + panelName);
             if (panel) panel.classList.remove('hidden');
             document.body.dataset.panel = panelName;
+            updateSkillHeaders();
             syncMobileTab(panelName);
             renderMobileSkillBar();
 
@@ -4334,7 +4397,9 @@
                 const skill = gameState.skills[skillName];
                 const btn = document.createElement('button');
                 btn.className = 'mobile-skill-btn' + (skillName === current ? ' active' : '');
-                btn.textContent = `${skill.icon} ${skill.name} Lv.${skill.level || 1}`;
+                const info = getSkillExpInfo(skillName);
+                btn.textContent = `${skill.icon} ${skill.name} Lv.${info.level} · ${Math.floor(info.percent)}%`;
+                btn.title = `经验 ${info.exp} / ${info.need}，还差 ${info.remain} 升级`;
                 btn.onclick = () => switchPanel(skillName);
                 bar.appendChild(btn);
             });
@@ -4361,10 +4426,10 @@
                 item.id = 'skill-' + skillName;
                 item.onclick = () => switchPanel(skillName);
 
-                const level = skill.level || 1;
-                const maxExp = 100 * level;
-                const currentExp = skill.exp || 0;
-                const expPercent = Math.min((currentExp / maxExp) * 100, 100);
+                const info = getSkillExpInfo(skillName);
+                const level = info.level;
+                const expPercent = info.percent;
+                item.title = `${skill.name} Lv.${level}：经验 ${info.exp} / ${info.need}，还差 ${info.remain} 升级`;
 
                 // 检查是否有已解锁的配方缺少材料（P2功能 - 材料不足红点）
                 let hasMaterialShortage = false;
@@ -4388,6 +4453,7 @@
                     <div class="exp-bar">
                         <div class="exp-fill" style="width: ${expPercent}%"></div>
                     </div>
+                    <div class="skill-exp-mini">${info.exp}/${info.need}</div>
                     ${warningDot}
                 `;
                 item.style.position = 'relative';
@@ -4560,6 +4626,11 @@
 
             const lockHint = formatRecipeLockHint(skillName, unlockState);
             const lockHintHtml = lockHint ? `<div class="recipe-lock-hint">${lockHint}</div>` : '';
+            // 无论是否解锁都显示等级/境界要求（已达成为绿色，未达成为橙色）
+            const reqText = unlockState.reason === 'realm' || skillName === 'cultivation'
+                ? `境界要求：${getRealmName(unlockState.requiredValue)}`
+                : `等级要求：Lv.${unlockState.requiredValue}`;
+            const reqHtml = `<div class="recipe-req ${unlockState.unlocked ? 'met' : 'unmet'}">${unlockState.unlocked ? '✓' : '✗'} ${reqText}</div>`;
 
             const outputStr = formatRecipeOutput(recipe.output || {});
             const efficiencyStr = efficiency > 0 ? `<div class="recipe-efficiency">效率: ${efficiency.toFixed(2)}/秒</div>` : '';
@@ -4570,6 +4641,7 @@
                     <span class="recipe-name">${recipe.name}</span>
                 </div>
                 <div class="recipe-time">⏱ ${recipe.duration}s</div>
+                ${reqHtml}
                 <div class="recipe-output">${outputStr}</div>
                 ${materialsHtml}
                 ${efficiencyStr}
@@ -4695,6 +4767,7 @@
                         <div class="action-name">${action.name}${boosted}</div>
                         <div class="action-desc">${action.desc}</div>
                         <div style="font-size: 0.75em; color: #fbbf24; margin-top: 3px;">克制倍数: ${counterMod.damage.toFixed(1)}×</div>
+                        <div class="recipe-req ${isDisabled ? 'unmet' : 'met'}">${isDisabled ? '✗' : '✓'} 境界要求：${getRealmName(action.areaData.minLevel)}</div>
                         ${statusHint}
                     </div>
                     <div class="action-progress-bar ${isActive ? 'active' : ''}">
@@ -5827,12 +5900,14 @@
             Object.entries(gameState.skills).forEach(([key, skill]) => {
                 const row = document.createElement('div');
                 row.className = 'stat-row';
+                const info = getSkillExpInfo(key);
                 row.innerHTML = `
                     <span class="stat-label">${skill.icon} ${skill.name}:</span>
-                    <span class="stat-value">Lv.${skill.level}</span>
+                    <span class="stat-value" title="还差 ${info.remain} 升级">Lv.${info.level} <small style="color:#888">(${info.exp}/${info.need})</small></span>
                 `;
                 list.appendChild(row);
             });
+            updateSkillHeaders();
 
             // 更新修炼面板的解锁状态
             updateCultivationRecipes();
