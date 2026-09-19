@@ -1984,14 +1984,242 @@
     </div>
 
     <script>
-    let gameState = { version: 2, player: { name: '', spiritRoot: '', realmIndex: 0, cultivation: 0, coins: 100, stats: { hp: { current: 50, max: 50 }, atk: 5, def: 2, spd: 5 }, inventory: [], currentAction: null } };
-    const GAME_CONFIG = { realms: [ { name: '凡人', nextReq: 50 }, { name: '练气初期', nextReq: 100 }, { name: '练气中期', nextReq: 200 }, { name: '练气后期', nextReq: 300 }, { name: '练气巅峰', nextReq: 400 }, { name: '筑基初期', nextReq: 500 }, { name: '筑基中期', nextReq: 600 }, { name: '筑基后期', nextReq: 700 }, { name: '筑基圆满', nextReq: 18379 }, { name: '金丹初期', nextReq: 25000 }, { name: '金丹中期', nextReq: 31600 }, { name: '金丹后期', nextReq: 39200 }, { name: '金丹圆满', nextReq: 48000 }, { name: '元婴初期', nextReq: 58000 }, { name: '元婴中期', nextReq: 70000 }, { name: '元婴后期', nextReq: 83000 }, { name: '元婴圆满', nextReq: 98000 } ] };
-    function startGame() { const name = document.getElementById('playerName').value.trim(); const spiritRoot = document.getElementById('playerSpiritRoot').value; if (!name || !spiritRoot) { alert('请完整填写信息！'); return; } gameState.player.name = name; gameState.player.spiritRoot = spiritRoot; try { localStorage.setItem('gameState', JSON.stringify(gameState)); } catch(e) { console.log('localStorage不可用，使用内存存储'); } document.getElementById('startScreen').classList.remove('show'); document.getElementById('gameScreen').classList.remove('hidden'); updateUI(); }
-    function updateUI() { document.getElementById('playerNameDisplay').textContent = gameState.player.name; document.getElementById('realmDisplay').textContent = GAME_CONFIG.realms[gameState.player.realmIndex].name; document.getElementById('coinAmount').textContent = gameState.player.coins; }
-    function switchPanel(panelName) { document.querySelectorAll('.panel-content').forEach(p => p.classList.add('hidden')); const el = document.getElementById('panel-' + panelName); if (el) el.classList.remove('hidden'); }
-    function showStartScreen() { if (confirm('确定要返回开始屏幕吗？')) { document.getElementById('gameScreen').classList.add('hidden'); document.getElementById('startScreen').classList.add('show'); } }
-    function resetGame() { if (confirm('确定要重新开始吗？')) { localStorage.removeItem('gameState'); gameState = { version: 2, player: { name: '', spiritRoot: '', realmIndex: 0, cultivation: 0, coins: 100, stats: { hp: { current: 50, max: 50 }, atk: 5, def: 2, spd: 5 }, inventory: [], currentAction: null } }; showStartScreen(); } }
-    window.addEventListener('load', () => { const saved = localStorage.getItem('gameState'); if (saved) { gameState = JSON.parse(saved); if (gameState.player.name) { document.getElementById('startScreen').classList.remove('show'); document.getElementById('gameScreen').classList.remove('hidden'); updateUI(); } } });
+    // ==================== 游戏全局状态 ====================
+    let gameState = {
+        version: 2,
+        player: {
+            name: '', spiritRoot: '', realmIndex: 0, cultivation: 0, coins: 100,
+            stats: { hp: { current: 50, max: 50 }, atk: 5, def: 2, spd: 5 },
+            inventory: [], currentAction: null, actionStartTime: 0, actionProgress: 0
+        }
+    };
+
+    let gameLoopInterval = null;
+
+    // ==================== P4新系统：配置表 ====================
+    const GAME_CONFIG = {
+        realms: [
+            { index: 0, name: '凡人', nextReq: 50 },
+            { index: 1, name: '练气初期', nextReq: 100 },
+            { index: 2, name: '练气中期', nextReq: 200 },
+            { index: 3, name: '练气后期', nextReq: 300 },
+            { index: 4, name: '练气巅峰', nextReq: 400 },
+            { index: 5, name: '筑基初期', nextReq: 500 },
+            { index: 6, name: '筑基中期', nextReq: 600 },
+            { index: 7, name: '筑基后期', nextReq: 700 },
+            { index: 8, name: '筑基圆满', nextReq: 18379 },
+            { index: 9, name: '金丹初期', nextReq: 25000 },
+            { index: 10, name: '金丹中期', nextReq: 31600 },
+            { index: 11, name: '金丹后期', nextReq: 39200 },
+            { index: 12, name: '金丹圆满', nextReq: 48000 },
+            { index: 13, name: '元婴初期', nextReq: 58000 },
+            { index: 14, name: '元婴中期', nextReq: 70000 },
+            { index: 15, name: '元婴后期', nextReq: 83000 },
+            { index: 16, name: '元婴圆满', nextReq: 98000 }
+        ],
+        cultivation: {
+            basic: { name: '吐纳灵气', duration: 5, output: 5, minRealm: 0, icon: '🟢' },
+            small: { name: '小周天', duration: 8, output: 15, minRealm: 1, icon: '⭕' },
+            big: { name: '大周天', duration: 12, output: 30, minRealm: 3, icon: '⭕' },
+            breath: { name: '龟息术', duration: 20, output: 100, minRealm: 4, icon: '⭕' },
+            epiphany: { name: '顿悟', duration: 60, output: 500, minRealm: 6, icon: '⭕' }
+        }
+    };
+
+    // ==================== P4属性系统：境界驱动 ====================
+    function calculateStats(realmIndex) {
+        const base = { hp: 50, atk: 5, def: 2, spd: 5 };
+        const hpMult = 1 + realmIndex * 0.40;
+        const atkMult = 1 + realmIndex * 0.30;
+        const defMult = 1 + realmIndex * 0.25;
+        const spdMult = 1 + realmIndex * 0.30;
+
+        return {
+            hp: { current: Math.floor(base.hp * hpMult), max: Math.floor(base.hp * hpMult) },
+            atk: Math.floor(base.atk * atkMult),
+            def: Math.floor(base.def * defMult),
+            spd: Math.floor(base.spd * spdMult)
+        };
+    }
+
+    // ==================== UI更新 ====================
+    function updateUI() {
+        const player = gameState.player;
+        const realm = GAME_CONFIG.realms[player.realmIndex];
+
+        document.getElementById('playerNameDisplay').textContent = player.name;
+        document.getElementById('realmDisplay').textContent = realm.name;
+        document.getElementById('coinAmount').textContent = player.coins;
+
+        const progress = Math.min(100, (player.cultivation / realm.nextReq) * 100);
+        document.getElementById('cultivationProgress').style.width = progress + '%';
+        document.getElementById('progressText').textContent = Math.floor(progress) + '%';
+        document.getElementById('cultivationXP').textContent = Math.floor(player.cultivation) + '/' + realm.nextReq;
+
+        const stats = calculateStats(player.realmIndex);
+        document.getElementById('hpDisplay').textContent = stats.hp.current + '/' + stats.hp.max;
+        document.getElementById('atkDisplay').textContent = stats.atk;
+        document.getElementById('defDisplay').textContent = stats.def;
+        document.getElementById('spdDisplay').textContent = stats.spd;
+
+        // 更新修仙动作按钮
+        generateCultivationUI();
+        updateProgressBar();
+    }
+
+    function generateCultivationUI() {
+        const container = document.getElementById('cultivationActions');
+        if (!container) return;
+
+        container.innerHTML = '';
+        Object.entries(GAME_CONFIG.cultivation).forEach(([key, recipe]) => {
+            const unlocked = gameState.player.realmIndex >= recipe.minRealm;
+            const div = document.createElement('div');
+            div.className = unlocked ? 'action-item' : 'action-item action-locked';
+            div.innerHTML = `<div class="action-name">${recipe.icon} ${recipe.name}</div><div class="action-desc">${recipe.duration}秒 / +${recipe.output}修为</div>`;
+
+            if (unlocked) {
+                div.onclick = () => startAction(key);
+            }
+            container.appendChild(div);
+        });
+    }
+
+    function updateProgressBar() {
+        if (!gameState.player.currentAction) {
+            document.getElementById('activeActionDisplay').textContent = '-';
+            document.getElementById('activeProgress').textContent = '0%';
+            return;
+        }
+        const recipe = GAME_CONFIG.cultivation[gameState.player.currentAction];
+        const elapsed = (Date.now() - gameState.player.actionStartTime) / 1000;
+        const progress = Math.min(1, elapsed / recipe.duration);
+        document.getElementById('activeProgress').textContent = Math.floor(progress * 100) + '%';
+        document.getElementById('activeActionDisplay').textContent = recipe.name;
+    }
+
+    // ==================== 行动系统 ====================
+    function startAction(actionKey) {
+        const recipe = GAME_CONFIG.cultivation[actionKey];
+        if (gameState.player.realmIndex < recipe.minRealm) return;
+
+        gameState.player.currentAction = actionKey;
+        gameState.player.actionStartTime = Date.now();
+        updateUI();
+    }
+
+    function stopAction() {
+        gameState.player.currentAction = null;
+        updateUI();
+    }
+
+    // ==================== 游戏循环 ====================
+    function gameLoop() {
+        if (!gameState.player.currentAction) return;
+
+        const recipe = GAME_CONFIG.cultivation[gameState.player.currentAction];
+        const elapsed = (Date.now() - gameState.player.actionStartTime) / 1000;
+
+        if (elapsed >= recipe.duration) {
+            gameState.player.cultivation += recipe.output;
+            gameState.player.currentAction = null;
+            checkBreakthrough();
+            saveGame();
+        }
+
+        updateProgressBar();
+    }
+
+    function checkBreakthrough() {
+        const realm = GAME_CONFIG.realms[gameState.player.realmIndex];
+        if (gameState.player.cultivation >= realm.nextReq && gameState.player.realmIndex < 16) {
+            gameState.player.cultivation = 0;
+            gameState.player.realmIndex++;
+            gameState.player.stats = calculateStats(gameState.player.realmIndex);
+            alert('🎉 突破成功！现在是' + GAME_CONFIG.realms[gameState.player.realmIndex].name + '！');
+            updateUI();
+        }
+    }
+
+    // ==================== 保存/加载 ====================
+    function saveGame() {
+        try {
+            localStorage.setItem('gameState', JSON.stringify(gameState));
+        } catch(e) {}
+    }
+
+    function loadGame() {
+        try {
+            const saved = localStorage.getItem('gameState');
+            if (saved) {
+                gameState = JSON.parse(saved);
+            }
+        } catch(e) {}
+    }
+
+    // ==================== 初始化 ====================
+    function startGame() {
+        const name = document.getElementById('playerName').value.trim();
+        const spiritRoot = document.getElementById('playerSpiritRoot').value;
+
+        if (!name || !spiritRoot) {
+            alert('请完整填写信息！');
+            return;
+        }
+
+        gameState.player.name = name;
+        gameState.player.spiritRoot = spiritRoot;
+        gameState.player.realmIndex = 0;
+        gameState.player.stats = calculateStats(0);
+
+        saveGame();
+
+        document.getElementById('startScreen').classList.remove('show');
+        document.getElementById('gameScreen').classList.remove('hidden');
+
+        setTimeout(() => {
+            updateUI();
+            if (gameLoopInterval) clearInterval(gameLoopInterval);
+            gameLoopInterval = setInterval(gameLoop, 100);
+        }, 50);
+    }
+
+    function showStartScreen() {
+        if (confirm('确定要返回开始屏幕吗？')) {
+            stopAction();
+            if (gameLoopInterval) clearInterval(gameLoopInterval);
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.add('show');
+        }
+    }
+
+    function resetGame() {
+        if (confirm('确定要重新开始吗？')) {
+            try { localStorage.removeItem('gameState'); } catch(e) {}
+            gameState = { version: 2, player: { name: '', spiritRoot: '', realmIndex: 0, cultivation: 0, coins: 100, stats: { hp: { current: 50, max: 50 }, atk: 5, def: 2, spd: 5 }, inventory: [], currentAction: null } };
+            showStartScreen();
+        }
+    }
+
+    function switchPanel(panelName) {
+        document.querySelectorAll('.panel-content').forEach(p => p.classList.add('hidden'));
+        const el = document.getElementById('panel-' + panelName);
+        if (el) el.classList.remove('hidden');
+    }
+
+    // ==================== 启动 ====================
+    window.addEventListener('load', () => {
+        loadGame();
+        if (gameState.player.name) {
+            document.getElementById('startScreen').classList.remove('show');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            setTimeout(() => {
+                updateUI();
+                if (gameLoopInterval) clearInterval(gameLoopInterval);
+                gameLoopInterval = setInterval(gameLoop, 100);
+            }, 50);
+        }
+    });
     </script>
 </body>
 </html>
