@@ -3822,6 +3822,19 @@
             return COUNTER_RELATIONS[spiritRoot];
         }
 
+        // 增加技能经验并处理升级（指数级: 100 × level^1.8），在线结算与离线结算共用
+        function addSkillExp(skillName, exp) {
+            const skill = gameState.skills[skillName];
+            if (!skill) return;
+            skill.exp += exp;
+            while (skill.exp >= 100 * Math.pow(skill.level, 1.8)) {
+                skill.exp -= 100 * Math.pow(skill.level, 1.8);
+                skill.level++;
+                const effect = calculateSkillLevelEffect(skillName, skill.level);
+                showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#16a34a', 'normal');
+            }
+        }
+
         function completeAction() {
             const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
             if (!action.output) return;
@@ -3877,18 +3890,7 @@
 
             // 处理技能经验
             if (finalOutput.skill && finalOutput.exp) {
-                const skill = gameState.skills[finalOutput.skill];
-                skill.exp += finalOutput.exp;
-
-                // 技能升级逻辑 (指数级: 100 × level^1.8)
-                while (skill.exp >= 100 * Math.pow(skill.level, 1.8)) {
-                    skill.exp -= 100 * Math.pow(skill.level, 1.8);
-                    skill.level++;
-
-                    // 显示升级 + 效果加成
-                    const effect = calculateSkillLevelEffect(finalOutput.skill, skill.level);
-                    showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#16a34a', 'normal');
-                }
+                addSkillExp(finalOutput.skill, finalOutput.exp);
             }
 
             // 如果有修为产出（修炼/战斗）
@@ -5843,6 +5845,7 @@
         // ==================== 存档系统 ====================
         function saveGame() {
             gameState.lastSaveTime = Date.now();
+            gameState.lastActiveTime = gameState.lastSaveTime;
             try {
                 localStorage.setItem('xiuxianIdleGame', JSON.stringify(gameState));
             } catch (e) {
@@ -5968,6 +5971,23 @@
             const lastActive = gameState.lastActiveTime;
             const offlineSeconds = (now - lastActive) / 1000;
 
+            // 战斗/秘境无法在离线时进行，重新打开页面时战斗界面已丢失，直接中断
+            const savedAction = gameState.currentAction;
+            if (savedAction && (savedAction.isBattle || savedAction.isDungeon)) {
+                if (savedAction.isDungeon) {
+                    resetBattleState('idle');
+                } else {
+                    gameState.battles = null;
+                    gameState.currentAction = null;
+                    gameState.currentActionProgress = 0;
+                    const battleContainer = document.getElementById('battleContainer');
+                    if (battleContainer) battleContainer.classList.add('hidden');
+                }
+                gameState.lastActiveTime = now;
+                showNotification('⚔️ 上次的战斗因离开游戏而中断', '#f59e0b');
+                return;
+            }
+
             if (offlineSeconds < 1 || !gameState.currentAction) {
                 gameState.lastActiveTime = now;
                 return;
@@ -5979,15 +5999,38 @@
 
             // P2修复：检查是否超过离线上限
             const exceedsLimit = offlineSeconds > maxOfflineSeconds;
-            if (exceedsLimit) {
-                const wastedHours = Math.floor((offlineSeconds - maxOfflineSeconds) / 3600);
-                // 标记超限信息用于显示
-            }
+            const wastedHours = exceedsLimit ? Math.floor((offlineSeconds - maxOfflineSeconds) / 3600) : 0;
 
             const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
+            if (!action || !action.output) {
+                gameState.currentAction = null;
+                gameState.lastActiveTime = now;
+                return;
+            }
             // 应用工作速度和功法倍率（修炼特殊处理）
             const duration = getAdjustedDuration(gameState.currentAction.skill, action.duration);
-            const completions = Math.floor(actualOfflineSeconds / duration);
+            if (!(duration > 0)) {
+                gameState.lastActiveTime = now;
+                return;
+            }
+            let completions = Math.floor(actualOfflineSeconds / duration);
+
+            // 需要材料的配方：完成次数受材料库存限制，并扣除离线消耗
+            let materialsRanOut = false;
+            if (action.requires) {
+                Object.entries(action.requires).forEach(([itemId, qty]) => {
+                    const owned = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
+                    const affordable = Math.floor(owned / qty);
+                    if (affordable < completions) {
+                        completions = affordable;
+                        materialsRanOut = true;
+                    }
+                });
+                Object.entries(action.requires).forEach(([itemId, qty]) => {
+                    if (completions > 0) consumeItem(itemId, qty * completions);
+                });
+                if (materialsRanOut) gameState.currentAction = null;
+            }
 
             let offlineRewards = {
                 coins: 0,
@@ -5996,23 +6039,18 @@
                 skillExp: {}
             };
 
-            for (let i = 0; i < completions; i++) {
-                if (action.output.coins) offlineRewards.coins += action.output.coins;
-                if (action.output.cultivation) offlineRewards.cultivation += action.output.cultivation;
-                if (action.output.items) {
-                    action.output.items.forEach(item => {
-                        const existing = offlineRewards.items.find(i => i.id === item.id);
-                        if (existing) existing.qty += item.qty;
-                        else offlineRewards.items.push({ ...item });
-                    });
-                }
-                if (action.output.skill && action.output.exp) {
-                    offlineRewards.skillExp[action.output.skill] = (offlineRewards.skillExp[action.output.skill] || 0) + action.output.exp;
-                }
+            // 与在线 completeAction 一致：先对单次产出应用技能等级加成，再乘以完成次数
+            const perAction = JSON.parse(JSON.stringify(action.output));
+            applySkillLevelBonus(savedAction.skill, perAction);
+            offlineRewards.coins = (perAction.coins || 0) * completions;
+            offlineRewards.cultivation = (perAction.cultivation || 0) * completions;
+            (perAction.items || []).forEach(item => {
+                offlineRewards.items.push({ id: item.id, qty: item.qty * completions });
+            });
+            if (perAction.skill && perAction.exp && completions > 0) {
+                offlineRewards.skillExp[perAction.skill] = perAction.exp * completions;
             }
-
-            // 应用技能等级效果倍率（与在线completeAction保持一致）
-            applySkillLevelBonus(gameState.currentAction.skill, offlineRewards);
+            offlineRewards.items = offlineRewards.items.filter(item => item.qty > 0);
 
             // 应用离线奖励
             gameState.player.coins += offlineRewards.coins;
@@ -6055,7 +6093,7 @@
 
             offlineRewards.items.forEach(item => addToInventory(item.id, item.qty));
             Object.entries(offlineRewards.skillExp).forEach(([skill, exp]) => {
-                gameState.skills[skill].exp += exp;
+                addSkillExp(skill, exp);
             });
 
             gameState.lastActiveTime = now;
@@ -6063,11 +6101,17 @@
             // 检查修为是否达到上限
             const cultivationCapped = gameState.player.cultivationXP >= GAME_CONFIG.realms[gameState.player.realmIndex].nextReq;
 
-            // P2修复：显示离线结算（传入超限标志）
-            showOfflineModal(offlineRewards, actualOfflineSeconds, cultivationCapped, exceedsLimit);
+            // 没有任何收益（例如刷新页面只离开几秒）时不弹结算窗
+            const earnedAnything = offlineRewards.coins > 0 || offlineRewards.cultivation > 0 ||
+                offlineRewards.items.length > 0 || Object.keys(offlineRewards.skillExp).length > 0 ||
+                (offlineRewards.overflowCoins || 0) > 0;
+            if (earnedAnything || exceedsLimit || cultivationCapped) {
+                // P2修复：显示离线结算（传入超限标志）
+                showOfflineModal(offlineRewards, actualOfflineSeconds, cultivationCapped, exceedsLimit, wastedHours);
+            }
         }
 
-        function showOfflineModal(rewards, offlineSeconds, cultivationCapped = false, exceedsLimit = false) {
+        function showOfflineModal(rewards, offlineSeconds, cultivationCapped = false, exceedsLimit = false, wastedHours = 0) {
             const hours = Math.floor(offlineSeconds / 3600);
             const minutes = Math.floor((offlineSeconds % 3600) / 60);
             const maxHours = gameState.settings?.maxOfflineHours || 24;
@@ -6080,7 +6124,6 @@
 
             // P2修复：显示超限警告
             if (exceedsLimit) {
-                const wastedHours = Math.floor((offlineSeconds / 3600) - maxHours);
                 content += `<div class="stat-row" style="background: rgba(239,68,68,0.1); border: 1px solid #ef4444; padding: 8px; margin: 5px 0;">
                     <span class="stat-label" style="color: #ef4444;">⚠️ 离线超过${maxHours}小时上限</span>
                 </div>
@@ -6264,35 +6307,64 @@
             }
         }
 
+        // 存档含中文，btoa/atob 只支持 Latin1，需先转 UTF-8 字节
+        function encodeSave(text) {
+            let binary = '';
+            new TextEncoder().encode(text).forEach(b => { binary += String.fromCharCode(b); });
+            return btoa(binary);
+        }
+
+        function decodeSave(base64) {
+            const binary = atob(base64.trim());
+            return new TextDecoder().decode(Uint8Array.from(binary, c => c.charCodeAt(0)));
+        }
+
         function exportSave() {
-            const dataStr = JSON.stringify(gameState);
-            const dataBase64 = btoa(dataStr);
-            const textarea = document.createElement('textarea');
-            textarea.value = dataBase64;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            alert('存档已复制到剪贴板！');
+            saveGame();
+            const code = encodeSave(JSON.stringify(gameState));
+            const fallback = () => prompt('自动复制失败，请手动复制存档代码:', code);
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(
+                    () => alert('存档已复制到剪贴板！'),
+                    fallback
+                );
+            } else {
+                fallback();
+            }
         }
 
         function importSave() {
             const input = prompt('请粘贴存档代码:');
             if (!input) return;
 
+            let loaded;
             try {
-                const dataStr = atob(input);
-                const loaded = JSON.parse(dataStr);
-                gameState = loaded;
-                handleOfflineTime();
-                document.getElementById('startScreen').classList.remove('show');
-                document.getElementById('gameScreen').classList.remove('hidden');
-                updateUI();
-                saveGame();
-                alert('存档导入成功！');
+                loaded = JSON.parse(decodeSave(input));
             } catch (e) {
                 alert('存档代码无效！');
+                return;
             }
+            if (!loaded || !loaded.player || !loaded.skills || !loaded.player.name) {
+                alert('存档代码无效：缺少角色数据！');
+                return;
+            }
+
+            gameState = loaded;
+            migrateGameData();
+            handleOfflineTime();
+            document.getElementById('startScreen').classList.remove('show');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            if (!gameRunning) {
+                clearInterval(tickInterval);
+                startGameTick();
+                gameRunning = true;
+            }
+            switchPanel('cultivation');
+            updateUI();
+            calculateStats();
+            updateStatsDisplay();
+            saveGame();
+            alert('存档导入成功！');
         }
 
         function resetGame() {
