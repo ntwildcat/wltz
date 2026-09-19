@@ -1390,10 +1390,48 @@
     }
 }
 
+/* 手机端技能栏：补回被隐藏的左侧技能树 */
+.mobile-skill-bar { display: none; }
+@media (max-width: 768px) {
+    .mobile-skill-bar {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        margin-bottom: 12px;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+    }
+    .mobile-skill-btn {
+        flex: 0 0 auto;
+        max-width: none !important;
+        padding: 8px 14px;
+        background: var(--bg-l3);
+        border: 1px solid var(--border-l3);
+        border-radius: var(--radius-md);
+        color: var(--text-l3);
+        font-size: 14px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .mobile-skill-btn.active {
+        background: rgba(111,169,128,0.2);
+        border-color: var(--border-l2);
+        color: var(--text-l1);
+        box-shadow: var(--glow-jade);
+    }
+    /* 非技能面板不需要属性/装备侧栏 */
+    body[data-panel="shop"] .side-panel,
+    body[data-panel="settings"] .side-panel,
+    body[data-panel="inventory"] .side-panel,
+    body[data-panel="battle"] .side-panel {
+        display: none !important;
+    }
+}
+
 </style>
 
 </head>
-<body>
+<body data-panel="cultivation">
     <div class="container">
         <!-- 侧边导航栏 -->
         <div class="sidebar">
@@ -1473,7 +1511,7 @@
             <!-- 游戏进行中的界面 -->
             <div id="gameScreen" class="hidden">
                 <!-- 顶部信息栏 -->
-                <div class="header collapsed" onclick="toggleMobileHeader()" style="cursor: pointer;">
+                <div class="header">
                     <div class="player-info">
                         <div class="info-item">
                             <div class="info-label">修仙者</div>
@@ -1501,6 +1539,8 @@
                 <div class="panel-container">
                     <!-- 主面板 -->
                     <div class="main-panel">
+                        <!-- 手机端技能栏（桌面端隐藏，由左侧技能树代替） -->
+                        <div id="mobileSkillBar" class="mobile-skill-bar"></div>
                         <!-- 全局进度条 -->
                         <div id="globalProgressBar" style="display: none; margin-bottom: 15px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
@@ -3880,6 +3920,9 @@
             // 显示选中面板
             const panel = document.getElementById('panel-' + panelName);
             if (panel) panel.classList.remove('hidden');
+            document.body.dataset.panel = panelName;
+            syncMobileTab(panelName);
+            renderMobileSkillBar();
 
             // 只有技能相关面板才更新技能树高亮
             if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi'].includes(panelName)) {
@@ -3928,16 +3971,43 @@
             updateSettingDisplay('enableSoundEffects');
         }
 
-        function buildSkillTree() {
-            const tree = document.getElementById('skillTree');
-            if (!tree) return;
-            tree.innerHTML = '';
-
+        function getVisibleSkills() {
             const skills = ['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle'];
             const realmIdx = gameState.player.realmIndex;
             if (realmIdx >= 9) skills.push('danhuo');
             if (realmIdx >= 13) skills.push('shenshi');
-            skills.forEach(skillName => {
+            return skills.filter(name => gameState.skills[name]);
+        }
+
+        function renderMobileSkillBar() {
+            const bar = document.getElementById('mobileSkillBar');
+            if (!bar) return;
+            const current = document.body.dataset.panel;
+            bar.innerHTML = '';
+            getVisibleSkills().forEach(skillName => {
+                const skill = gameState.skills[skillName];
+                const btn = document.createElement('button');
+                btn.className = 'mobile-skill-btn' + (skillName === current ? ' active' : '');
+                btn.textContent = `${skill.icon} ${skill.name} Lv.${skill.level || 1}`;
+                btn.onclick = () => switchPanel(skillName);
+                bar.appendChild(btn);
+            });
+        }
+
+        function syncMobileTab(panelName) {
+            const tabName = ['battle', 'shop', 'settings', 'inventory'].includes(panelName) ? panelName : 'cultivation';
+            document.querySelectorAll('.mobile-tab-item').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+        }
+
+        function buildSkillTree() {
+            renderMobileSkillBar();
+            const tree = document.getElementById('skillTree');
+            if (!tree) return;
+            tree.innerHTML = '';
+
+            getVisibleSkills().forEach(skillName => {
                 const skill = gameState.skills[skillName];
                 if (!skill) return;
                 const item = document.createElement('div');
@@ -6241,49 +6311,9 @@
     </div>
 
     <script>
-        // 折叠式 header 切换
-        function toggleMobileHeader() {
-            const header = document.getElementById('header');
-            if (header) {
-                header.classList.toggle('collapsed');
-            }
-        }
-
-        // 手机 Tab 栏切换和内容切换
+        // 手机 Tab 栏：切换到对应面板（高亮与侧栏显示由 switchPanel 同步）
         function switchMobileTab(tabName) {
-            // 更新Tab样式
-            const tabs = document.querySelectorAll('.mobile-tab-item');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-
-            // 显示/隐藏对应内容
-            const mainPanel = document.querySelector('.main-panel');
-            const sidePanel = document.querySelector('.side-panel');
-
-            if (mainPanel && sidePanel) {
-                switch(tabName) {
-                    case 'cultivation':
-                        mainPanel.style.display = 'block';
-                        sidePanel.style.display = 'block';
-                        break;
-                    case 'battle':
-                        mainPanel.style.display = 'block';
-                        sidePanel.style.display = 'none';
-                        break;
-                    case 'shop':
-                        mainPanel.style.display = 'block';
-                        sidePanel.style.display = 'none';
-                        break;
-                    case 'settings':
-                        mainPanel.style.display = 'none';
-                        sidePanel.style.display = 'none';
-                        break;
-                    case 'inventory':
-                        mainPanel.style.display = 'none';
-                        sidePanel.style.display = 'block';
-                        break;
-                }
-            }
+            switchPanel(tabName);
         }
     </script>
 </body>
