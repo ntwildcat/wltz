@@ -2435,8 +2435,8 @@
                     { id: 'golden_art', name: '金丹大道', icon: '📜', price: 10000, desc: '修炼速度 ×1.5', minRealmIndex: 8, type: 'art' },
                     { id: 'fire_art', name: '焚天诀', icon: '🔥', price: 20000, desc: '修炼速度 ×1.8', minRealmIndex: 9, type: 'art' },
                     { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 30000, desc: '修炼速度 ×2.2', minRealmIndex: 11, type: 'art' },
-                    { id: 'void_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' },
-                    { id: 'clone_unlock', name: '分身解锁令', icon: '👥', price: 50000, desc: '解锁分身系统', minRealmIndex: 13, type: 'unlock' }
+                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' },
+                    { id: 'clone_unlock', name: '分身解锁令', icon: '👥', price: 50000, desc: '分身系统尚未开放', minRealmIndex: 13, type: 'unlock' }
                 ]
             }
         };
@@ -2719,6 +2719,7 @@
                 addToInventory('pill', 1);
                 gameState.player.currentArt = 'advanced_art';  // 分配高阶功法
             }
+            gameState.player.ownedArts = [gameState.player.currentArt];
 
             // 初始化战斗技能的行动
             initializeBattleActions();
@@ -5365,6 +5366,19 @@
 
             if (!item) return;
 
+            if (item.type === 'unlock') {
+                showNotification('该功能尚未开放', '#f59e0b');
+                return;
+            }
+
+            // 已拥有的功法：直接装备，不重复扣费
+            if (item.type === 'art' && (gameState.player.ownedArts || []).includes(itemId)) {
+                switchCultivationArt(itemId);
+                updateUI();
+                saveGame();
+                return;
+            }
+
             // 永久升级特殊处理（P1功能）
             if (item.type === 'upgrade') {
                 if (gameState.player.boughtUpgrades.includes(itemId)) {
@@ -5395,7 +5409,8 @@
                     showNotification(`✨ 灵田槽位增加1个！共${gameState.player.farmingSlots}个`, '#16a34a');
                 }
             } else if (item.type === 'art') {
-                // 功法购买处理 - 自动装备并显示反馈
+                // 功法购买处理 - 记录拥有并自动装备
+                if (!gameState.player.ownedArts.includes(itemId)) gameState.player.ownedArts.push(itemId);
                 gameState.player.currentArt = itemId;
 
                 // 获取功法信息
@@ -5474,7 +5489,10 @@
                         card.onmouseout = () => card.style.borderColor = '#555';
                     }
 
-                    const priceDisplay = isBought ? '✓ 已拥有' : `${item.price} 灵石`;
+                    const isOwnedArt = item.type === 'art' && (gameState.player.ownedArts || []).includes(item.id);
+                    const priceDisplay = isBought ? '✓ 已拥有'
+                        : isOwnedArt ? (gameState.player.currentArt === item.id ? '✓ 当前功法' : '已拥有 · 点击装备')
+                        : `${item.price} 灵石`;
                     const priceColor = isBought ? '#16a34a' : '#fbbf24';
 
                     card.innerHTML = `
@@ -5740,7 +5758,7 @@
             // 隐藏丹药需求区域
             document.getElementById('btPillRequirement').style.display = 'none';
 
-            if (isMajorBreakthrough) {
+            if (isMajorBreakthrough && nextRealm) {
                 // 大境界突破
                 document.getElementById('btModalTitle').textContent = `✨ 突破${nextRealm ? nextRealm.name : '大道尽头'} ✨`;
                 document.getElementById('btBreakthroughType').textContent = '需丹药辅助';
@@ -5768,6 +5786,9 @@
                 } else {
                     button.textContent = '丹药不足';
                 }
+            } else if (!nextRealm) {
+                document.getElementById('btBreakthroughType').textContent = '暂无后续境界';
+                document.getElementById('btButton').textContent = '已至大道尽头';
             } else {
                 // 小境界突破
                 document.getElementById('btModalTitle').textContent = '✨ 突破修为 ✨';
@@ -5792,6 +5813,13 @@
                 return;
             }
 
+            // 已是最高境界，没有下一境界可突破
+            if (!GAME_CONFIG.realms[realmIndex + 1]) {
+                showNotification('已至当前大道尽头，后续境界敬请期待', '#f59e0b', 'warning');
+                closeBreakthroughModal();
+                return;
+            }
+
             // 判断是否为大境界突破（新索引规则）
             const isMajorBreakthrough = (realmIndex % 4 === 0 && realmIndex > 0);
 
@@ -5806,6 +5834,7 @@
 
         function performBreakthrough() {
             const nextRealmIndex = gameState.player.realmIndex + 1;
+            if (!GAME_CONFIG.realms[nextRealmIndex]) return;
             gameState.player.realmIndex = nextRealmIndex;
             gameState.player.cultivationXP = 0;
 
@@ -5910,6 +5939,22 @@
             // 战斗区域/秘境的行动表由配置派生，读档时重建，保证新增内容对旧存档生效
             initializeBattleActions();
             initializeDungeons();
+            // 境界索引越界（曾经在最高境界突破会写入不存在的境界）时修回最高境界
+            const maxRealmIndex = GAME_CONFIG.realms.length - 1;
+            if (!(gameState.player.realmIndex >= 0) || gameState.player.realmIndex > maxRealmIndex) {
+                gameState.player.realmIndex = maxRealmIndex;
+                gameState.player.cultivationXP = Math.min(gameState.player.cultivationXP || 0, GAME_CONFIG.realms[maxRealmIndex].nextReq);
+            }
+
+            // 功法：修正曾经写错的商城功法id，并补全「已拥有功法」记录
+            if (gameState.player.currentArt === 'void_art') gameState.player.currentArt = 'soul_art';
+            if (!CULTIVATION_ARTS[gameState.player.currentArt]) {
+                gameState.player.currentArt = gameState.player.origin === 'disciple' ? 'advanced_art' : 'basic_art';
+            }
+            if (!Array.isArray(gameState.player.ownedArts)) {
+                const originArt = gameState.player.origin === 'disciple' ? 'advanced_art' : 'basic_art';
+                gameState.player.ownedArts = [...new Set([originArt, gameState.player.currentArt])];
+            }
             if (gameState.player.temperLevel === undefined) gameState.player.temperLevel = 0;
             if (gameState.player.scoutBonus === undefined) gameState.player.scoutBonus = false;
 
@@ -6210,13 +6255,8 @@
             const listDiv = document.getElementById('artSwitchList');
             listDiv.innerHTML = '';
 
-            // 根据出身确定可用功法
-            let availableArts = [];
-            if (gameState.player.origin === 'orphan') {
-                availableArts = ['basic_art'];
-            } else if (gameState.player.origin === 'disciple') {
-                availableArts = ['advanced_art'];
-            }
+            // 出身功法 + 商城购买的功法
+            const availableArts = (gameState.player.ownedArts || []).filter(key => CULTIVATION_ARTS[key]);
 
             // 只显示该角色拥有的功法
             availableArts.forEach(artKey => {
@@ -6283,13 +6323,8 @@
                 return;
             }
 
-            // 检查该角色是否拥有这个功法（根据出身）
-            const isAllowed = (
-                (gameState.player.origin === 'orphan' && artKey === 'basic_art') ||
-                (gameState.player.origin === 'disciple' && artKey === 'advanced_art')
-            );
-
-            if (!isAllowed) {
+            // 检查该角色是否拥有这个功法（出身功法或商城购买）
+            if (!(gameState.player.ownedArts || []).includes(artKey)) {
                 showNotification('🔒 你不拥有这个功法', '#f59e0b', 'normal');
                 return;
             }
