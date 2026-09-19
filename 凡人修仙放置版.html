@@ -2207,17 +2207,100 @@
         if (el) el.classList.remove('hidden');
     }
 
+    // ==================== 商城系统 ====================
+    const SHOP_ITEMS = [
+        { id: 'qi_pill', name: '筑基丹', icon: '💊', price: 500, desc: '筑基必需品' },
+        { id: 'spirit_stone', name: '灵石矿', icon: '⛏️', price: 100, desc: '+100灵石' },
+        { id: 'practice_manual', name: '修仙秘籍', icon: '📖', price: 300, desc: '加速修为+20%' }
+    ];
+
+    function renderShop() {
+        const container = document.getElementById('shopGrid');
+        if (!container) return;
+        container.innerHTML = '';
+
+        SHOP_ITEMS.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'item-slot';
+            div.innerHTML = `
+                <div class="item-icon">${item.icon}</div>
+                <div class="item-name">${item.name}</div>
+                <div style="font-size:0.7em;color:#c9a961;">${item.price}💎</div>
+            `;
+            div.onclick = () => buyItem(item);
+            container.appendChild(div);
+        });
+    }
+
+    function buyItem(item) {
+        if (gameState.player.coins >= item.price) {
+            gameState.player.coins -= item.price;
+            gameState.player.inventory.push(item.id);
+            alert(`购买成功：${item.name}`);
+            saveGame();
+            updateUI();
+        } else {
+            alert('灵石不足');
+        }
+    }
+
+    // ==================== 背包系统 ====================
+    function renderInventory() {
+        const container = document.getElementById('inventoryGrid');
+        if (!container) return;
+
+        container.innerHTML = '';
+        const items = gameState.player.inventory;
+
+        if (items.length === 0) {
+            container.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#888;">背包为空</div>';
+            return;
+        }
+
+        const itemCounts = {};
+        items.forEach(id => {
+            itemCounts[id] = (itemCounts[id] || 0) + 1;
+        });
+
+        Object.entries(itemCounts).forEach(([id, count]) => {
+            const shopItem = SHOP_ITEMS.find(i => i.id === id);
+            if (!shopItem) return;
+
+            const div = document.createElement('div');
+            div.className = 'item-slot';
+            div.innerHTML = `
+                <div class="item-icon">${shopItem.icon}</div>
+                <div class="item-name">${shopItem.name}</div>
+                <div style="font-size:0.8em;color:#16a34a;">×${count}</div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
     // ==================== 启动 ====================
     window.addEventListener('load', () => {
         loadGame();
+        renderShop();
+
         if (gameState.player.name) {
             document.getElementById('startScreen').classList.remove('show');
             document.getElementById('gameScreen').classList.remove('hidden');
             setTimeout(() => {
                 updateUI();
+                renderInventory();
+                renderShop();
                 if (gameLoopInterval) clearInterval(gameLoopInterval);
                 gameLoopInterval = setInterval(gameLoop, 100);
             }, 50);
+        }
+    });
+
+    // 面板切换时同步数据
+    document.addEventListener('click', (e) => {
+        if (e.target.textContent?.includes('背包')) {
+            setTimeout(renderInventory, 50);
+        } else if (e.target.textContent?.includes('商城')) {
+            setTimeout(renderShop, 50);
         }
     });
     </script>
