@@ -1897,6 +1897,12 @@
                             </div>
                         </div>
 
+                        <!-- 灵根与功法特效 -->
+                        <div class="stat-panel">
+                            <div class="stat-title">🌱 灵根与功法特效</div>
+                            <div id="bonusList" style="font-size: 0.85em; line-height: 1.7; color: #9ca69f;"></div>
+                        </div>
+
                         <!-- 离线收益预计 -->
                         <div class="stat-panel">
                             <div class="stat-title">🌙 离线收益预计</div>
@@ -2025,22 +2031,13 @@
                 </div>
                 <div style="margin-left: 10px; margin-bottom: 15px; font-size: 0.95em; line-height: 2;">
                     🟣 <span style="color: #a78bfa;">雷灵根</span> ↔ <span style="color: #60a5fa;">冰灵根</span> (互相克制)<br/>
-                    🌪️ <span style="color: #6b7280;">风灵根</span> - 无克制关系，但攻速+10%，闪避+5%
+                    🌪️ <span style="color: #6b7280;">风灵根</span> - 无克制关系，但有全面的辅助特效
                 </div>
 
                 <div class="stat-row" style="background: rgba(50,55,80,0.5); padding: 12px; margin-bottom: 10px; border-radius: 4px;">
-                    <span class="stat-label">灵根被动属性</span>
+                    <span class="stat-label">灵根特效（战斗 + 生活技能）</span>
                 </div>
-                <div style="margin-left: 10px; font-size: 0.9em; line-height: 1.8; color: #9ca69f;">
-                    🟡 金灵根: 攻击力 +10%<br/>
-                    🟢 木灵根: 生命上限 +15%<br/>
-                    🔵 水灵根: 命中率 +10%<br/>
-                    🔴 火灵根: 暴击率 +5%<br/>
-                    🟤 土灵根: 防御力 +15%<br/>
-                    🟣 雷灵根: 暴击伤害 +20%<br/>
-                    🔵 冰灵根: 闪避率 +10%<br/>
-                    🌪️ 风灵根: 攻速 +10%, 闪避 +5%
-                </div>
+                <div id="rootEffectList" style="margin-left: 10px; font-size: 0.9em; line-height: 1.8; color: #9ca69f;"></div>
             </div>
 
             <button class="btn" onclick="closeCounterSystemModal()" style="width: 100%; margin-top: 20px;">了解了</button>
@@ -2511,14 +2508,15 @@
 
         // Priority 4: 战斗系统完整公式
         // P4 平衡层：秘境怪物的原始数值按旧属性体系设计，P4 改为「境界×线性倍数」后玩家属性
-        // 明显偏低，这里按系数缩放怪物血量与攻击（系数由战斗模拟标定：最低境界通关率约50%-100%，
-        // 高两个境界基本必过）。原始数值保留在 GAME_CONFIG.dungeons，调平衡只需改此表。
+        // 明显偏低，这里按系数缩放怪物血量与攻击。系数由战斗模拟标定：以「8 个灵根的平均通关率」为准
+        // （保留真实的怪物属性和克制关系），最低境界平均通关率约 60%~90%。原始数值保留在 GAME_CONFIG.dungeons，
+        // 调平衡只需改此表。修改装备/属性/灵根特效后需要重新标定，临界点很陡。
         const P4_MONSTER_SCALE = {
             mysteryTower: 0.7,
-            mysteriousForest: 0.7,
-            ancientRuin: 0.4,
-            tribulationGround: 0.13,
-            huashenRealm: 0.06
+            mysteriousForest: 0.54,
+            ancientRuin: 0.416,
+            tribulationGround: 0.1365,
+            huashenRealm: 0.0636
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -2529,11 +2527,13 @@
             });
         });
 
-        // 普通战斗区域的敌人系数（同 P4_MONSTER_SCALE 的思路，由战斗模拟标定）
-        // 目标：对应最低境界通关率约60%-70%，高两个境界基本必过（标准装备：桃木剑，无食物）
+        // 普通战斗区域的敌人系数：血量与攻击分开缩放（原始模板见 enterBattleArea）。
+        // 标定：无特效玩家（桃木剑、最低境界）通关率约 65%，且敌人平均每击约打掉玩家 12% 最大生命，
+        // 让防御/闪避/生命类特效在普通战斗里同样有价值（只缩放血量会变成纯输出检定，输出型灵根占尽优势）。
         const P4_AREA_SCALE = {
-            forest: 1, mountain: 1, deepMountain: 0.88, swamp: 1, abyss: 0.8,
-            goldenPlains: 0.58, tribulationGround: 0.44, voidSea: 0.15, abyssRuins: 0.05
+            forest: { hp: 1.071, atk: 1.071 }, mountain: { hp: 1.056, atk: 1.117 }, deepMountain: { hp: 0.876, atk: 1.079 },
+            swamp: { hp: 0.978, atk: 1.206 }, abyss: { hp: 0.775, atk: 1.104 }, goldenPlains: { hp: 0.572, atk: 0.735 },
+            tribulationGround: { hp: 0.424, atk: 0.654 }, voidSea: { hp: 0.15, atk: 0.497 }, abyssRuins: { hp: 0.047, atk: 0.353 }
         };
 
         const BATTLE_FORMULAS = {
@@ -2849,20 +2849,24 @@
             const monsterTypeId = SPIRIT_ROOT_MAPPING[monster.type] || monster.type;
             const counterModifier = COUNTER_SYSTEM.getCounterModifier(gameState.player.spiritRoot, monsterTypeId);
             hitChance *= counterModifier.hit;
-            hitChance = Math.max(0.05, Math.min(0.95, hitChance));
+            hitChance += getMod('hit');   // 灵根/功法命中特效
+            hitChance = Math.max(0.05, Math.min(Math.min(0.99, 0.95 + getMod('hit')), hitChance));
 
             if (Math.random() < hitChance) {
                 const baseDmg = gameState.player.stats.atk || 20;
                 let playerDmg = BATTLE_FORMULAS.calculateDamage({ atk: baseDmg }, { def: monster.def || 0 });
                 playerDmg = Math.floor(playerDmg * realmSuppression.dmgMod);
                 playerDmg = Math.floor(playerDmg * counterModifier.damage);
+                // 暴击（基础5%、×1.5，灵根/功法可提高）
+                const isCrit = Math.random() < BASE_CRIT.rate + getMod('crit');
+                if (isCrit) playerDmg = Math.floor(playerDmg * (BASE_CRIT.dmg + getMod('critDmg')));
                 playerDmg = Math.max(1, playerDmg);
 
                 gameState.dungeons.currentMonsterHP -= playerDmg;
 
                 // P1-1 显示伤害飘字和日志
                 showDamageFloat(-playerDmg, false);
-                addBattleLog(`造成${playerDmg}点伤害`, 'player-hit');
+                addBattleLog(`${isCrit ? '暴击！' : ''}造成${playerDmg}点伤害`, 'player-hit');
             } else {
                 // P1-1 显示未命中日志
                 addBattleLog('攻击落空', 'miss');
@@ -2884,6 +2888,7 @@
             const monsterTypeId = SPIRIT_ROOT_MAPPING[monster.type] || monster.type;
             const counterModifier = COUNTER_SYSTEM.getCounterModifier(monsterTypeId, gameState.player.spiritRoot);
             hitChance *= counterModifier.hit;
+            hitChance *= 1 - Math.min(0.6, getMod('dodge'));   // 灵根/功法闪避特效：降低被命中率
             hitChance = Math.max(0.05, Math.min(0.95, hitChance));
 
             if (Math.random() < hitChance) {
@@ -3118,7 +3123,7 @@
             }
 
             // 计算恢复量（不超过最大HP）
-            const hpRestore = Math.min(foodConfig.hpRestore, hpObj.max - hpObj.current);
+            const hpRestore = Math.min(Math.floor(foodConfig.hpRestore * (1 + getMod('foodPct'))), hpObj.max - hpObj.current);
 
             // 只有有恢复量时才能进食
             if (hpRestore <= 0) {
@@ -3390,6 +3395,7 @@
             // P1-1 应用战斗速度倍率
             const speedMultiplier = gameState.battleSpeed || 1;
             const timeDelta = 0.1 * speedMultiplier;
+            applyRegen(gameState.player.stats.hp, timeDelta);   // 灵根/功法的战斗回复特效
 
             // 定义攻击间隔（秒）
             const playerAttackInterval = 2.0 / (1 + gameState.player.stats.spd / 100);
@@ -3446,6 +3452,7 @@
             // 增加战斗计时（受战斗速度按钮影响）
             const prevRound = Math.floor((battle.turnCount || 0) / 2);
             battle.turnCount = (battle.turnCount || 0) + timeDelta * (gameState.battleSpeed || 1);
+            applyRegen(battle.playerHP, timeDelta * (gameState.battleSpeed || 1));   // 灵根/功法的战斗回复特效
 
             // 每2秒一个回合：双方按真实属性结算（命中、防御减伤、境界压制）
             if (Math.floor(battle.turnCount / 2) > prevRound) {
@@ -3453,16 +3460,18 @@
                 const areaRealm = getAction('battle', battle.currentArea).areaData.minLevel;
                 const playerStats = gameState.player.stats;
 
-                const toEnemy = rollNormalAttack(playerStats, enemy, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm));
+                const toEnemy = rollNormalAttack(playerStats, enemy, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm),
+                    { hit: getMod('hit'), crit: BASE_CRIT.rate + getMod('crit'), critMult: BASE_CRIT.dmg + getMod('critDmg') });
                 if (toEnemy.hit) {
                     enemy.currentHP -= toEnemy.dmg;
-                    battle.log.push(`玩家造成${toEnemy.dmg}点伤害`);
+                    battle.log.push(`玩家${toEnemy.crit ? '暴击！' : ''}造成${toEnemy.dmg}点伤害`);
                 } else {
                     battle.log.push('玩家攻击落空');
                 }
 
                 if (enemy.currentHP > 0) {
-                    const toPlayer = rollNormalAttack(enemy, playerStats, REALM_SUPPRESSION.calculate(areaRealm, gameState.player.realmIndex));
+                    const toPlayer = rollNormalAttack(enemy, playerStats, REALM_SUPPRESSION.calculate(areaRealm, gameState.player.realmIndex),
+                        { dodge: getMod('dodge') });
                     if (toPlayer.hit) {
                         battle.playerHP.current -= toPlayer.dmg;
                         battle.log.push(`${enemy.name}造成${toPlayer.dmg}点伤害`);
@@ -3486,12 +3495,16 @@
         }
 
         // 普通战斗单次攻击判定
-        function rollNormalAttack(attacker, defender, suppression) {
+        // mods：{ hit 命中加成, crit 暴击率, critMult 暴击倍率, dodge 守方闪避 }（玩家攻击带 hit/crit，敌人攻击带 dodge）
+        function rollNormalAttack(attacker, defender, suppression, mods = {}) {
             let hitChance = BATTLE_FORMULAS.calculateHitChance(attacker.spd, defender.spd) * suppression.hitMod;
-            hitChance = Math.max(0.05, Math.min(0.95, hitChance));
-            if (Math.random() >= hitChance) return { hit: false, dmg: 0 };
-            const dmg = BATTLE_FORMULAS.calculateDamage({ atk: attacker.atk }, { def: defender.def });
-            return { hit: true, dmg: Math.max(1, Math.floor(dmg * suppression.dmgMod)) };
+            hitChance = hitChance * (1 - Math.min(0.6, mods.dodge || 0)) + (mods.hit || 0);
+            hitChance = Math.max(0.05, Math.min(Math.min(0.99, 0.95 + (mods.hit || 0)), hitChance));
+            if (Math.random() >= hitChance) return { hit: false, dmg: 0, crit: false };
+            let dmg = Math.floor(BATTLE_FORMULAS.calculateDamage({ atk: attacker.atk }, { def: defender.def }) * suppression.dmgMod);
+            const crit = mods.crit ? Math.random() < mods.crit : false;
+            if (crit) dmg = Math.floor(dmg * (mods.critMult || BASE_CRIT.dmg));
+            return { hit: true, dmg: Math.max(1, dmg), crit };
         }
 
         // 更新普通战斗UI
@@ -3625,7 +3638,7 @@
             }
 
             // 随机掉落（神识地图：本次秘境掉落率×1.3，用后消耗）
-            const scoutMult = gameState.player.scoutBonus ? 1.3 : 1;
+            const scoutMult = (gameState.player.scoutBonus ? 1.3 : 1) * (1 + getMod('dropPct'));
             if (gameState.player.scoutBonus) {
                 gameState.player.scoutBonus = false;
                 rewardMsg += '🗺️ 神识地图生效：掉落率+30%\n';
@@ -3753,6 +3766,7 @@
                 name: '青木诀',
                 tier: 2,
                 speedMultiplier: 1.1,
+                effects: { 'time:farming': -0.10, 'exp:farming': 0.10 },  // 特效
                 description: '以草木生机滋养灵脉的入门功法，比引气诀略快。',
                 origin: null
             },
@@ -3761,6 +3775,7 @@
                 name: '流云诀',
                 tier: 2,
                 speedMultiplier: 1.25,
+                effects: { 'time:life': -0.05, dodge: 0.03 },  // 特效
                 description: '灵气如流云般周转不息，练气后期的常见选择。',
                 origin: null
             },
@@ -3769,6 +3784,7 @@
                 name: '玄水经',
                 tier: 3,
                 speedMultiplier: 1.35,
+                effects: { 'time:alchemy': -0.12, foodPct: 0.15 },  // 特效
                 description: '水属性中阶功法，灵气绵长，适合筑基修士打磨根基。',
                 origin: null
             },
@@ -3777,6 +3793,7 @@
                 name: '烈阳功',
                 tier: 3,
                 speedMultiplier: 1.45,
+                effects: { atkPct: 0.08, 'time:forging': -0.10 },  // 特效
                 description: '至阳至刚的筑基功法，修炼极快但对经脉要求很高。',
                 origin: null
             },
@@ -3786,6 +3803,7 @@
                 name: '金丹大道',
                 tier: 3,
                 speedMultiplier: 1.5,               // 修炼速度快50%
+                effects: { hpPct: 0.10, 'exp:alchemy': 0.15, 'exp:danhuo': 0.15 },  // 特效
                 description: '金丹修士的标配功法，以丹火淬炼经脉，修炼效率远超筑基功法。',
                 origin: null                        // 非出身绑定
             },
@@ -3795,7 +3813,8 @@
                 name: '焚天诀',
                 tier: 4,
                 speedMultiplier: 1.8,               // 修炼速度快80%
-                description: '火属性顶级功法，以丹火焚烧杂质，修炼极快但需大量灵石维持。',
+                effects: { atkPct: 0.15, crit: 0.05, defPct: -0.10 },  // 特效
+                description: '火属性顶级功法，以丹火焚烧杂质，修炼极快、攻击强悍，但护体不足。',
                 origin: null                        // 非出身绑定
             },
             // P7 元婴期功法（可获取，非出身绑定）
@@ -3804,6 +3823,7 @@
                 name: '元婴真解',
                 tier: 5,
                 speedMultiplier: 2.2,               // 修炼速度快120%
+                effects: { 'exp:life': 0.10, hpPct: 0.10 },  // 特效
                 description: '元婴修士的标配功法，元神与肉身双修，修炼效率是金丹功法的数倍。',
                 origin: null
             },
@@ -3813,7 +3833,8 @@
                 name: '太虚元神诀',
                 tier: 6,
                 speedMultiplier: 2.8,               // 修炼速度快180%
-                description: '太虚宗门不传之秘，以元神直接吞吐天地灵气，修炼极快但需消耗神识。',
+                effects: { 'exp:shenshi': 0.30, 'time:shenshi': -0.15, dropPct: 0.10 },  // 特效
+                description: '太虚宗门不传之秘，以元神直接吞吐天地灵气，修炼极快，神识修行事半功倍。',
                 origin: null
             }
         };
@@ -3893,6 +3914,132 @@
             ice: 'thunder'
         };
 
+        // ==================== 灵根与功法特效系统 ====================
+        // 灵根（出身时选定）和功法（当前装备）各自带一组特效，玩家的总加成 = 两者之和。
+        // 特效键（数值为小数，可为负）：
+        //   战斗：atkPct / hpPct / defPct / spdPct  属性百分比（作用于境界基础属性）
+        //         hit 命中率加成（上限随之放宽）、crit 暴击率加成、critDmg 暴击伤害倍率加成、dodge 被命中率降低
+        //         regen 战斗中每秒恢复生命上限的比例
+        //         foodPct 食物恢复量加成、dropPct 秘境随机掉落概率加成
+        //   生活：time:<技能> 耗时变化（负数=更快）、exp:<技能> 经验加成、
+        //         double:<技能> 产出翻倍概率、save:<技能> 不消耗材料的概率
+        //         <技能> 可写 life 表示所有生活技能（炼丹/炼器/灵田/采矿/丹火/神识）
+        const LIFE_SKILLS = ['alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi'];
+        const BASE_CRIT = { rate: 0.05, dmg: 1.5 };   // 所有玩家的基础暴击率与暴击倍率
+
+        const SPIRIT_ROOT_EFFECTS = {
+            metal:   { name: '金灵根', effects: { atkPct: 0.13, 'time:mining': -0.15, 'save:forging': 0.10 } },
+            wood:    { name: '木灵根', effects: { hpPct: 0.17, 'time:farming': -0.15, 'double:farming': 0.15 } },
+            water:   { name: '水灵根', effects: { regen: 0.0015, foodPct: 0.25, 'time:alchemy': -0.15 } },
+            fire:    { name: '火灵根', effects: { crit: 0.20, atkPct: 0.06, 'time:forging': -0.15, 'exp:danhuo': 0.25 } },
+            earth:   { name: '土灵根', effects: { defPct: 0.40, 'double:mining': 0.15, 'exp:farming': 0.15 } },
+            thunder: { name: '雷灵根', effects: { crit: 0.06, critDmg: 0.5, 'exp:life': 0.10, 'exp:shenshi': 0.15 } },
+            ice:     { name: '冰灵根', effects: { dodge: 0.17, 'save:alchemy': 0.10, 'exp:alchemy': 0.10 } },
+            wind:    { name: '风灵根', effects: { spdPct: 0.10, dodge: 0.07, 'time:life': -0.06 } }
+        };
+
+        const EFFECT_SKILL_NAMES = { cultivation: '修炼', alchemy: '炼丹', forging: '炼器', farming: '灵田', mining: '采矿', danhuo: '丹火', shenshi: '神识', battle: '战斗', life: '所有生活技能' };
+
+        // 当前灵根 + 当前功法提供的某项特效总和
+        function getMod(key) {
+            const player = gameState && gameState.player;
+            if (!player) return 0;
+            let total = 0;
+            const rootEffects = SPIRIT_ROOT_EFFECTS[player.spiritRoot]?.effects;
+            if (rootEffects && rootEffects[key]) total += rootEffects[key];
+            const artEffects = CULTIVATION_ARTS[player.currentArt]?.effects;
+            if (artEffects && artEffects[key]) total += artEffects[key];
+            return total;
+        }
+
+        // 某个技能的特效（含「所有生活技能」通配）
+        function getSkillMod(kind, skill) {
+            let total = getMod(`${kind}:${skill}`);
+            if (LIFE_SKILLS.includes(skill)) total += getMod(`${kind}:life`);
+            return total;
+        }
+
+        // 战斗中的生命回复（regen 特效）：按秒累积，攒够整数才回血，避免出现小数生命值
+        function applyRegen(hpObj, seconds) {
+            const rate = getMod('regen');
+            if (rate <= 0 || hpObj.current <= 0 || hpObj.current >= hpObj.max) return;
+            gameState.player.regenAcc = (gameState.player.regenAcc || 0) + hpObj.max * rate * seconds;
+            const whole = Math.floor(gameState.player.regenAcc);
+            if (whole > 0) {
+                gameState.player.regenAcc -= whole;
+                hpObj.current = Math.min(hpObj.max, hpObj.current + whole);
+            }
+        }
+
+        // 把特效表转成中文描述列表
+        function describeEffects(effects) {
+            if (!effects) return [];
+            const sign = v => (v > 0 ? '+' : '') + Math.round(v * 100) + '%';
+            const fixed = {
+                atkPct: v => `攻击 ${sign(v)}`, hpPct: v => `生命 ${sign(v)}`, defPct: v => `防御 ${sign(v)}`, spdPct: v => `速度 ${sign(v)}`,
+                hit: v => `命中 ${sign(v)}`, crit: v => `暴击率 ${sign(v)}`, critDmg: v => `暴击伤害 ${sign(v)}`, dodge: v => `闪避 ${sign(v)}`,
+                foodPct: v => `食物恢复 ${sign(v)}`, dropPct: v => `秘境掉落 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
+            };
+            return Object.entries(effects).map(([key, v]) => {
+                if (fixed[key]) return fixed[key](v);
+                const [kind, skill] = key.split(':');
+                const name = EFFECT_SKILL_NAMES[skill] || skill;
+                if (kind === 'time') return `${name}耗时 ${sign(v)}`;
+                if (kind === 'exp') return `${name}经验 ${sign(v)}`;
+                if (kind === 'double') return `${name}产出翻倍 ${sign(v)}`;
+                if (kind === 'save') return `${name}节省材料 ${sign(v)}`;
+                return key;
+            });
+        }
+
+        const ROOT_ICONS = { metal: '🟡', wood: '🟢', water: '🔵', fire: '🔴', earth: '🟤', thunder: '🟣', ice: '❄️', wind: '🌪️' };
+
+        // 侧栏：当前灵根与功法的特效
+        function updateBonusPanel() {
+            const el = document.getElementById('bonusList');
+            if (!el) return;
+            const player = gameState.player;
+            const root = SPIRIT_ROOT_EFFECTS[player.spiritRoot];
+            const art = CULTIVATION_ARTS[player.currentArt];
+            let html = '';
+            if (root) {
+                html += `<div><b style="color:#c9a961">${ROOT_ICONS[player.spiritRoot]} ${root.name}</b>：${describeEffects(root.effects).join(' · ')}</div>`;
+            }
+            if (art) {
+                const eff = describeEffects(art.effects);
+                html += `<div><b style="color:#60a5fa">📜 ${art.name}</b>（修炼×${art.speedMultiplier}）：${eff.length ? eff.join(' · ') : '无特殊效果'}</div>`;
+            }
+            el.innerHTML = html || '无';
+        }
+
+        // 灵根说明弹窗里的特效列表
+        function fillRootEffectList() {
+            const el = document.getElementById('rootEffectList');
+            if (!el) return;
+            el.innerHTML = Object.entries(SPIRIT_ROOT_EFFECTS)
+                .map(([key, root]) => `${ROOT_ICONS[key]} ${root.name}：${describeEffects(root.effects).join('，')}`)
+                .join('<br/>');
+        }
+
+        // 创建角色时的灵根选项：写明克制关系与特效
+        function populateRootOptions() {
+            const select = document.getElementById('playerSpiritRoot');
+            if (!select) return;
+            select.querySelectorAll('option').forEach(option => {
+                const root = SPIRIT_ROOT_EFFECTS[option.value];
+                if (!root) return;
+                const counter = COUNTER_RELATIONS[option.value];
+                const counterText = counter ? `克制${SPIRIT_ROOT_EFFECTS[counter].name}` : '无克制';
+                option.textContent = `${root.name} - ${counterText}｜${describeEffects(root.effects).join('、')}`;
+            });
+        }
+
+        // 商城功法卡片的说明：修炼速度 + 特效
+        function getArtShopDesc(item) {
+            const eff = describeEffects(CULTIVATION_ARTS[item.id]?.effects);
+            return item.desc + (eff.length ? `<br/><span style="color:#6fa980">${eff.join('<br/>')}</span>` : '');
+        }
+
         // 游戏配置常量（便于调整平衡性）
         const GAME_BALANCE = {
             AUTO_SAVE_INTERVAL: 30000,      // 自动保存间隔（毫秒）
@@ -3931,7 +4078,9 @@
                 }
                 return duration;
             } else {
-                return duration * gameState.workSpeedMultiplier;
+                // 灵根/功法的耗时特效（下限30%，避免叠加后过快）
+                const timeMod = Math.max(0.3, 1 + getSkillMod('time', skill));
+                return duration * gameState.workSpeedMultiplier * timeMod;
             }
         }
 
@@ -3944,7 +4093,7 @@
         function addSkillExp(skillName, exp) {
             const skill = gameState.skills[skillName];
             if (!skill) return;
-            skill.exp += exp;
+            skill.exp += Math.round(exp * (1 + getSkillMod('exp', skillName)));   // 灵根/功法的经验特效
             while (skill.exp >= 100 * Math.pow(skill.level, 1.8)) {
                 skill.exp -= 100 * Math.pow(skill.level, 1.8);
                 skill.level++;
@@ -3957,8 +4106,10 @@
             const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
             if (!action.output) return;
 
-            // 消耗所需的材料（P2功能 - 材料消耗）
-            if (action.requires) {
+            // 消耗所需的材料（P2功能 - 材料消耗）；灵根/功法的「节省材料」特效有概率整次不消耗
+            const saveMaterials = action.requires && Math.random() < getSkillMod('save', gameState.currentAction.skill);
+            if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980');
+            if (action.requires && !saveMaterials) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
                     const invIndex = gameState.player.inventory.findIndex(i => i.id === itemId);
                     if (invIndex !== -1) {
@@ -3994,6 +4145,12 @@
                 }
 
                 finalOutput.items = drops;
+            }
+
+            // 灵根/功法的「产出翻倍」特效
+            if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', gameState.currentAction.skill)) {
+                finalOutput.items.forEach(item => { item.qty *= 2; });
+                showNotification('✨ 产出翻倍！', '#6fa980');
             }
 
             // 处理输出
@@ -5194,12 +5351,12 @@
             const enemyTemplate = areaEnemies[Math.floor(Math.random() * areaEnemies.length)];
 
             // P4 平衡层：按区域系数缩放敌人血量与攻击（见 P4_AREA_SCALE）
-            const areaScale = P4_AREA_SCALE[areaKey] || 1;
-            const scaledHP = Math.max(1, Math.round(enemyTemplate.hp * areaScale));
+            const areaScale = P4_AREA_SCALE[areaKey] || { hp: 1, atk: 1 };
+            const scaledHP = Math.max(1, Math.round(enemyTemplate.hp * areaScale.hp));
             gameState.battles.currentEnemy = {
                 ...enemyTemplate,
                 hp: scaledHP,
-                atk: Math.max(1, Math.round(enemyTemplate.atk * areaScale)),
+                atk: Math.max(1, Math.round(enemyTemplate.atk * areaScale.atk)),
                 currentHP: scaledHP
             };
 
@@ -5300,6 +5457,7 @@
             updateCoinDisplay();
             updateShop();
             updateArtDisplay();  // 更新功法显示
+            updateBonusPanel();
         }
 
         // 选择性更新UI（仅更新指定的部分，提高性能）
@@ -5547,6 +5705,7 @@
 
                 if (art && art.speedMultiplier > currentSpeed) {
                     gameState.player.currentArt = itemId;
+                    calculateStats();   // 功法特效可能改变属性
                     const speedBonus = ((art.speedMultiplier - 1) * 100).toFixed(0);
                     showNotification(
                         `✨ 已装备功法：${item.name}！\n修炼速度 ${art.speedMultiplier.toFixed(2)}x（提升${speedBonus}%）`,
@@ -5646,7 +5805,7 @@
                     card.innerHTML = `
                         <div style="font-size: 24px; margin-bottom: 5px;">${item.icon}</div>
                         <div style="font-weight: bold; color: #16a34a; margin-bottom: 3px;">${item.name}</div>
-                        <div style="font-size: 0.8em; color: #888; margin-bottom: 8px;">${item.desc}</div>
+                        <div style="font-size: 0.8em; color: #888; margin-bottom: 8px;">${item.type === 'art' ? getArtShopDesc(item) : item.desc}</div>
                         <div style="color: ${priceColor}; font-weight: bold;">${priceDisplay}</div>
                         ${artExtra}
                     `;
@@ -5778,33 +5937,17 @@
             const defMultiplier = 1 + realmIndex * 0.25;
             const spdMultiplier = 1 + realmIndex * 0.30;
 
+            // === 第三步：灵根 + 功法的属性百分比特效（作用于境界基础属性，先乘后取整，避免小数值被吃掉）===
+            // 正向加成四舍五入（但不低于无加成时的值），负向加成向下取整，避免小数值的加成被取整吃掉
+            const applyPct = (raw, pct) => pct > 0
+                ? Math.max(Math.floor(raw), Math.round(raw * (1 + pct)))
+                : Math.floor(raw * (1 + pct));
             let totalStats = {
-                hp: Math.floor(baseStats.hp * hpMultiplier),
-                atk: Math.floor(baseStats.atk * atkMultiplier),
-                def: Math.floor(baseStats.def * defMultiplier),
-                spd: Math.floor(baseStats.spd * spdMultiplier)
+                hp: applyPct(baseStats.hp * hpMultiplier, getMod('hpPct')),
+                atk: applyPct(baseStats.atk * atkMultiplier, getMod('atkPct')),
+                def: applyPct(baseStats.def * defMultiplier, getMod('defPct')),
+                spd: applyPct(baseStats.spd * spdMultiplier, getMod('spdPct'))
             };
-
-            // === 第三步：添加灵根被动属性加成 ===
-            const rootBonuses = {
-                metal: { atk: 0.10 },                    // 金灵根：攻击力+10%
-                wood: { hp: 0.15 },                      // 木灵根：生命+15%
-                water: { hit: 0.10 },                    // 水灵根：命中+10%
-                fire: { crit: 0.05 },                    // 火灵根：暴击+5%
-                earth: { def: 0.15 },                    // 土灵根：防御+15%
-                thunder: { critDmg: 0.20 },             // 雷灵根：暴击伤害+20%
-                ice: { dodge: 0.10 },                    // 冰灵根：闪避+10%
-                wind: { spd: 0.10, dodge: 0.05 }        // 风灵根：速度+10%, 闪避+5%
-            };
-
-            const playerRoot = gameState.player.spiritRoot;
-            const bonus = rootBonuses[playerRoot];
-            if (bonus) {
-                if (bonus.atk) totalStats.atk = Math.floor(totalStats.atk * (1 + bonus.atk));
-                if (bonus.hp) totalStats.hp = Math.floor(totalStats.hp * (1 + bonus.hp));
-                if (bonus.def) totalStats.def = Math.floor(totalStats.def * (1 + bonus.def));
-                if (bonus.spd) totalStats.spd = Math.floor(totalStats.spd * (1 + bonus.spd));
-            }
 
             // === 第四步：从装备获取属性加成（叠加，不覆盖） ===
             const weapon = gameState.player.equipment.weapon;
@@ -6238,8 +6381,10 @@
                         materialsRanOut = true;
                     }
                 });
+                // 「节省材料」特效：按概率折算实际消耗（库存判断仍按全额，偏保守）
+                const saveRate = Math.min(0.9, getSkillMod('save', savedAction.skill));
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    if (completions > 0) consumeItem(itemId, qty * completions);
+                    if (completions > 0) consumeItem(itemId, Math.round(qty * completions * (1 - saveRate)));
                 });
                 if (materialsRanOut) gameState.currentAction = null;
             }
@@ -6256,8 +6401,10 @@
             applySkillLevelBonus(savedAction.skill, perAction);
             offlineRewards.coins = (perAction.coins || 0) * completions;
             offlineRewards.cultivation = (perAction.cultivation || 0) * completions;
+            // 「产出翻倍」特效：按概率折算（期望值）
+            const doubleRate = getSkillMod('double', savedAction.skill);
             (perAction.items || []).forEach(item => {
-                offlineRewards.items.push({ id: item.id, qty: item.qty * completions });
+                offlineRewards.items.push({ id: item.id, qty: Math.floor(item.qty * completions * (1 + doubleRate) + 1e-9) });
             });
             if (perAction.skill && perAction.exp && completions > 0) {
                 offlineRewards.skillExp[perAction.skill] = perAction.exp * completions;
@@ -6434,8 +6581,9 @@
                             <div style="font-weight: bold; color: #fbbf24; font-size: 1em;">${art.name}</div>
                             <div style="font-size: 0.85em; color: #aaa; margin-top: 4px;">${art.description}</div>
                             <div style="font-size: 0.8em; color: #888; margin-top: 6px;">
-                                修炼速度倍率：<span style="color: #60a5fa;">${art.speedMultiplier.toFixed(1)}x</span>
+                                修炼速度倍率：<span style="color: #60a5fa;">${art.speedMultiplier.toFixed(2)}x</span>
                             </div>
+                            ${describeEffects(art.effects).length ? `<div style="font-size: 0.8em; color: #6fa980; margin-top: 4px;">特效：${describeEffects(art.effects).join(' · ')}</div>` : ''}
                         </div>
                         <div style="text-align: right; color: ${isCurrentArt ? '#22c55e' : '#888'}; font-size: 0.9em;">
                             ${statusText}
@@ -6462,6 +6610,7 @@
 
         // P3优化：克制系统教程函数
         function showCounterSystemModal() {
+            fillRootEffectList();
             document.getElementById('counterSystemModal').classList.add('show');
         }
 
@@ -6488,6 +6637,7 @@
             }
 
             gameState.player.currentArt = artKey;
+            calculateStats();   // 功法特效可能改变属性
             updateArtDisplay();
             updateCultivationRecipes();
             showNotification(`✓ 已切换到 ${CULTIVATION_ARTS[artKey].name}`, '#22c55e', 'success');
@@ -6654,6 +6804,7 @@
 
         // ==================== 页面加载 ====================
         window.addEventListener('load', () => {
+            populateRootOptions();
             loadGame();
         });
 
