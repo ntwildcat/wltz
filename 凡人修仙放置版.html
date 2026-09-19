@@ -1394,6 +1394,7 @@
 .mobile-skill-bar { display: none; }
 @media (max-width: 768px) {
     .mobile-skill-bar {
+        scrollbar-width: none;
         display: flex;
         gap: 8px;
         overflow-x: auto;
@@ -2746,9 +2747,16 @@
             saveGame();
 
             // 自动保存（每30秒）
-            setInterval(() => {
+            startAutoSave();
+        }
+
+        // 自动保存定时器只保留一个（重开新游戏时不会叠加）
+        let autoSaveTimer = null;
+        function startAutoSave() {
+            if (autoSaveTimer) return;
+            autoSaveTimer = setInterval(() => {
                 if (gameRunning) saveGame();
-            }, 30000);
+            }, GAME_BALANCE.AUTO_SAVE_INTERVAL);
         }
 
         function showStartScreen() {
@@ -6010,9 +6018,7 @@
                 updateStatsDisplay();
                 gameRunning = true;
 
-                setInterval(() => {
-                    if (gameRunning) saveGame();
-                }, 30000);
+                startAutoSave();
             } else {
                 // 没有存档或localStorage不可用，显示开始屏幕
                 document.getElementById('startScreen').classList.add('show');
