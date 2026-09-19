@@ -2647,13 +2647,14 @@
             // 启动Tick系统
             startGameTick();
             buildSkillTree();
-            switchPanel('cultivation');
-            updateUI();
-            // 延迟调用calculateStats以确保DOM已准备好
+
+            // P4BugFix：延迟初始化UI以确保DOM完全加载
             setTimeout(() => {
+                switchPanel('cultivation');
+                updateUI();
                 calculateStats();
                 updateStatsDisplay();
-            }, 100);
+            }, 50);
             gameRunning = true;
 
             // 立即保存游戏（确保新创建的角色不会丢失）
@@ -5310,23 +5311,58 @@
         }
 
         function calculateStats() {
-            // 基础属性：从境界配置读取
-            const realmConfig = GAME_CONFIG.realms[gameState.player.realmIndex];
-            const baseStats = realmConfig?.baseStats ? { ...realmConfig.baseStats } : {
-                hp: 50,
-                atk: 5,
-                def: 2,
-                spd: 5
+            // P4重写：境界驱动的属性系统（替代技能等级驱动）
+            const realmIndex = gameState.player.realmIndex;
+
+            // === 第一步：从凡人境界基础属性开始 ===
+            // 使用凡人阶段作为基准，避免各境界baseStats不一致
+            const mortalsConfig = GAME_CONFIG.realms[0]; // 凡人配置
+            const baseStats = { ...mortalsConfig.baseStats }; // {hp: 50, atk: 5, def: 2, spd: 5}
+
+            // === 第二步：境界驱动倍数（核心改动） ===
+            // 每个境界提升对应属性：
+            // - 生命 +40%/级（快速增长，提升续航）
+            // - 攻击 +30%/级（显著提升）
+            // - 防御 +25%/级（稳定防守）
+            // - 速度 +30%/级（战斗体验）
+            const hpMultiplier = 1 + realmIndex * 0.40;
+            const atkMultiplier = 1 + realmIndex * 0.30;
+            const defMultiplier = 1 + realmIndex * 0.25;
+            const spdMultiplier = 1 + realmIndex * 0.30;
+
+            let totalStats = {
+                hp: Math.floor(baseStats.hp * hpMultiplier),
+                atk: Math.floor(baseStats.atk * atkMultiplier),
+                def: Math.floor(baseStats.def * defMultiplier),
+                spd: Math.floor(baseStats.spd * spdMultiplier)
             };
 
-            // 从装备获取属性加成
+            // === 第三步：添加灵根被动属性加成 ===
+            const rootBonuses = {
+                metal: { atk: 0.10 },                    // 金灵根：攻击力+10%
+                wood: { hp: 0.15 },                      // 木灵根：生命+15%
+                water: { hit: 0.10 },                    // 水灵根：命中+10%
+                fire: { crit: 0.05 },                    // 火灵根：暴击+5%
+                earth: { def: 0.15 },                    // 土灵根：防御+15%
+                thunder: { critDmg: 0.20 },             // 雷灵根：暴击伤害+20%
+                ice: { dodge: 0.10 },                    // 冰灵根：闪避+10%
+                wind: { spd: 0.10, dodge: 0.05 }        // 风灵根：速度+10%, 闪避+5%
+            };
+
+            const playerRoot = gameState.player.spiritRoot;
+            const bonus = rootBonuses[playerRoot];
+            if (bonus) {
+                if (bonus.atk) totalStats.atk = Math.floor(totalStats.atk * (1 + bonus.atk));
+                if (bonus.hp) totalStats.hp = Math.floor(totalStats.hp * (1 + bonus.hp));
+                if (bonus.def) totalStats.def = Math.floor(totalStats.def * (1 + bonus.def));
+                if (bonus.spd) totalStats.spd = Math.floor(totalStats.spd * (1 + bonus.spd));
+            }
+
+            // === 第四步：从装备获取属性加成（叠加，不覆盖） ===
             const weapon = gameState.player.equipment.weapon;
             const armor = gameState.player.equipment.armor;
             const jewelry = gameState.player.equipment.jewelry;
 
-            let totalStats = JSON.parse(JSON.stringify(baseStats));
-
-            // 加上武器属性
             if (weapon && GAME_CONFIG.items[weapon]?.stats) {
                 Object.entries(GAME_CONFIG.items[weapon].stats).forEach(([stat, value]) => {
                     if (totalStats.hasOwnProperty(stat)) {
@@ -5335,7 +5371,6 @@
                 });
             }
 
-            // 加上防具属性
             if (armor && GAME_CONFIG.items[armor]?.stats) {
                 Object.entries(GAME_CONFIG.items[armor].stats).forEach(([stat, value]) => {
                     if (totalStats.hasOwnProperty(stat)) {
@@ -5344,7 +5379,6 @@
                 });
             }
 
-            // 加上首饰属性
             jewelry.forEach(jewelryId => {
                 if (GAME_CONFIG.items[jewelryId]?.stats) {
                     Object.entries(GAME_CONFIG.items[jewelryId].stats).forEach(([stat, value]) => {
@@ -5353,12 +5387,6 @@
                         }
                     });
                 }
-            });
-
-            // 根据境界等级加成属性（每升一级+10%）
-            const realmBonus = 1 + gameState.player.realmIndex * 0.1;
-            Object.keys(totalStats).forEach(stat => {
-                totalStats[stat] = Math.floor(totalStats[stat] * realmBonus);
             });
 
             // P8 修改：HP改为 {current, max} 结构
