@@ -2746,6 +2746,11 @@
                 }
 
                 const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
+                if (!action) {
+                    gameState.currentAction = null;
+                    gameState.currentActionProgress = 0;
+                    return;
+                }
 
                 // 检查所需物品是否充足，不足则停止action
                 if (action.requires) {
@@ -3971,6 +3976,16 @@
             updateSettingDisplay('enableSoundEffects');
         }
 
+        function getRealmName(index) {
+            const realm = GAME_CONFIG.realms[index];
+            return realm ? realm.name : `未知境界${index}`;
+        }
+
+        function isBattleAreaUnlocked(action) {
+            const minRealm = action.areaData ? action.areaData.minLevel : 1;
+            return gameState.player.realmIndex >= minRealm;
+        }
+
         function getVisibleSkills() {
             const skills = ['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle'];
             const realmIdx = gameState.player.realmIndex;
@@ -4162,9 +4177,8 @@
         function formatRecipeLockHint(skillName, state) {
             if (!state.unlocked) {
                 if (state.reason === 'realm') {
-                    const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满', '金丹初期', '金丹中期', '金丹后期', '金丹圆满', '元婴初期', '元婴中期', '元婴后期'];
-                    const requiredName = realmNames[state.requiredValue] || `未知境界${state.requiredValue}`;
-                    const currentName = realmNames[state.currentValue] || `未知境界${state.currentValue}`;
+                    const requiredName = getRealmName(state.requiredValue);
+                    const currentName = getRealmName(state.currentValue);
                     return `🔒 需要 ${requiredName}（当前：${currentName}）`;
                 } else if (state.reason === 'level') {
                     return `🔒 需要 Lv.${state.requiredValue}（当前 Lv.${state.currentValue}）`;
@@ -4318,7 +4332,7 @@
                 const isActive = gameState.currentAction && gameState.currentAction.skill === 'battle' && gameState.currentAction.action === key;
 
                 // 检查是否可用
-                const isUnlocked = gameState.player.realmIndex >= (action.requiredLevel - 1);
+                const isUnlocked = isBattleAreaUnlocked(action);
                 const isDisabled = !isUnlocked;
 
                 let className = 'action-item';
@@ -4342,7 +4356,7 @@
                 // 不可用提示
                 let statusHint = '';
                 if (isDisabled) {
-                    statusHint = `<div style="color: #ff6b6b; font-size: 0.75em; margin-top: 5px;">🔒 需要突破至Lv${action.requiredLevel}</div>`;
+                    statusHint = `<div style="color: #ff6b6b; font-size: 0.75em; margin-top: 5px;">🔒 需要${getRealmName(action.areaData.minLevel)}</div>`;
                 }
 
                 div.innerHTML = `
@@ -4381,14 +4395,19 @@
             if (skill === 'cultivation') {
                 if (!isCultivationRecipeUnlocked(action)) {
                     const realmReq = actionObj.requiredRealmIndex || 0;
-                    const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满'];
                     const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
 
                     if (gameState.player.realmIndex < realmReq) {
-                        showNotification(`🔒 需要境界: ${realmNames[realmReq]}`, '#f59e0b', 'normal');
+                        showNotification(`🔒 需要境界: ${getRealmName(realmReq)}`, '#f59e0b', 'normal');
                     } else if (currentArt && !currentArt.unlockedRecipes.includes(action)) {
                         showNotification(`🔒 当前功法 ${currentArt.name} 不支持此配方`, '#f59e0b', 'normal');
                     }
+                    return;
+                }
+            } else if (skill === 'battle') {
+                // 战斗区域按境界解锁（与战斗列表的显示保持一致）
+                if (!isBattleAreaUnlocked(actionObj)) {
+                    showNotification(`🔒 ${actionObj.name}需要${getRealmName(actionObj.areaData.minLevel)}`, '#f59e0b', 'normal');
                     return;
                 }
             } else if (actionObj.requiredLevel) {
@@ -4813,7 +4832,7 @@
 
         // 初始化秘境
         function initializeDungeons() {
-            const dungeonList = ['mysteryTower', 'mysteriousForest', 'ancientRuin'];
+            const dungeonList = Object.keys(GAME_CONFIG.dungeons);
             const dungeonActions = {};
 
             dungeonList.forEach(dungeonId => {
@@ -4866,7 +4885,7 @@
             const container = document.getElementById('dungeonActions');
             container.innerHTML = '';
 
-            const dungeonIds = ['mysteryTower', 'mysteriousForest', 'ancientRuin'];
+            const dungeonIds = Object.keys(GAME_CONFIG.dungeons);
 
             dungeonIds.forEach(dungeonId => {
                 const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -4877,8 +4896,7 @@
                 const statusColor = record.completed ? '#16a34a' : meetsRequirement ? '#fbbf24' : '#666';
                 const statusText = record.completed ? '✓ 已通关' : meetsRequirement ? '✓ 可进入' : '⛔ 境界不足';
 
-                const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满'];
-                const requiredRealmName = realmNames[dungeon.minRealmIndex] || '未知';
+                const requiredRealmName = getRealmName(dungeon.minRealmIndex);
 
                 const actionDiv = document.createElement('div');
                 actionDiv.className = 'action-row';
@@ -5001,9 +5019,8 @@
 
             // 检查最低境界要求（唯一的准入条件）
             if (gameState.player.realmIndex < dungeon.minRealmIndex) {
-                const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满'];
-                const currentRealm = realmNames[gameState.player.realmIndex];
-                const requiredRealm = realmNames[dungeon.minRealmIndex];
+                const currentRealm = getRealmName(gameState.player.realmIndex);
+                const requiredRealm = getRealmName(dungeon.minRealmIndex);
                 showNotification(`需要 ${requiredRealm} 才能进入（当前 ${currentRealm}）`, '#ef4444', 'error');
                 return;
             }
@@ -5404,9 +5421,8 @@
         // 更新修炼配方的解锁状态显示
         function updateCultivationRecipes() {
             const recipes = ['basic', 'small', 'big', 'breath', 'epiphany'];
-            const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满'];
             const currentRealm = gameState.player.realmIndex;
-            const currentRealmName = realmNames[currentRealm] || '未知';
+            const currentRealmName = getRealmName(currentRealm);
 
             recipes.forEach(recipeKey => {
                 const recipe = GAME_CONFIG.skills.cultivation.recipes[recipeKey];
@@ -5447,7 +5463,7 @@
                         const hintSpan = targetItem.querySelector(`#lock-level-${recipeKey}`);
                         if (hintSpan) {
                             const requiredRealm = recipe.requiredRealmIndex || 0;
-                            const requiredRealmName = realmNames[requiredRealm] || '未知';
+                            const requiredRealmName = getRealmName(requiredRealm);
                             hintSpan.textContent = `需要${requiredRealmName}（当前${currentRealmName}）`;
                         }
                     }
@@ -5795,6 +5811,12 @@
                     gameState.skills[skillName] = JSON.parse(JSON.stringify(GAME_CONFIG.skills[skillName]));
                 }
             });
+            Object.keys(GAME_CONFIG.dungeons).forEach(dungeonId => {
+                if (!gameState.dungeons[dungeonId]) gameState.dungeons[dungeonId] = { completed: false };
+            });
+            // 战斗区域/秘境的行动表由配置派生，读档时重建，保证新增内容对旧存档生效
+            initializeBattleActions();
+            initializeDungeons();
             if (gameState.player.temperLevel === undefined) gameState.player.temperLevel = 0;
             if (gameState.player.scoutBonus === undefined) gameState.player.scoutBonus = false;
 
@@ -5844,6 +5866,7 @@
                 document.getElementById('startScreen').classList.remove('show');
                 document.getElementById('gameScreen').classList.remove('hidden');
                 startGameTick();
+                switchPanel('cultivation');
                 updateUI();
                 calculateStats();
                 updateStatsDisplay();
