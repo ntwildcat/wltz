@@ -1699,7 +1699,7 @@
                         <div id="battleContainer" class="battle-container hidden">
                             <!-- 战斗顶部栏 -->
                             <div class="battle-header">
-                                <div class="battle-title">⚔️ 秘境战斗中</div>
+                                <div class="battle-title" id="battleTitle">⚔️ 秘境战斗中</div>
                                 <div class="battle-controls">
                                     <button id="btn-retreat" class="btn-retreat" onclick="retreatFromDungeon()">撤退</button>
                                 </div>
@@ -3087,6 +3087,7 @@
             // 隐藏所有面板，显示战斗UI
             document.querySelectorAll('.panel-content').forEach(el => el.classList.add('hidden'));
             battleContainer.classList.remove('hidden');
+            document.getElementById('battleTitle').textContent = '⚔️ 秘境战斗中';
 
             // 初始化HP条
             updateBattleHP();
@@ -3219,7 +3220,8 @@
 
         // P1-4 从秘径撤退（模态对话框版本）
         function retreatFromDungeon() {
-            if (gameState.dungeons.battleState !== 'fighting') return;
+            const isNormalBattle = !!(gameState.currentAction && gameState.currentAction.isBattle);
+            if (!isNormalBattle && gameState.dungeons.battleState !== 'fighting') return;
 
             // 显示自定义确认模态框
             const modal = document.createElement('div');
@@ -3248,7 +3250,7 @@
             `;
 
             dialog.innerHTML = `
-                <p style="font-size: 1.1em; margin-bottom: 20px;">确定要撤退秘径吗?</p>
+                <p style="font-size: 1.1em; margin-bottom: 20px;">确定要撤退${isNormalBattle ? '' : '秘境'}吗?</p>
                 <div style="display: flex; gap: 10px; justify-content: center;">
                     <button style="
                         padding: 10px 20px;
@@ -3277,9 +3279,14 @@
             const buttons = dialog.querySelectorAll('button');
             buttons[0].onclick = () => {
                 modal.remove();
-                resetBattleState('idle');
-                showNotification('已撤退秘径', '#fbbf24');
-                updateUI();
+                if (isNormalBattle) {
+                    stopAction();
+                    showNotification('已撤退', '#fbbf24');
+                } else {
+                    resetBattleState('idle');
+                    showNotification('已撤退秘境', '#fbbf24');
+                    updateUI();
+                }
             };
             buttons[1].onclick = () => {
                 modal.remove();
@@ -3369,9 +3376,9 @@
             const battle = gameState.battles;
             const timeDelta = 0.1;
 
-            // 增加战斗计时
+            // 增加战斗计时（受战斗速度按钮影响）
             const prevRound = Math.floor((battle.turnCount || 0) / 2);
-            battle.turnCount = (battle.turnCount || 0) + timeDelta;
+            battle.turnCount = (battle.turnCount || 0) + timeDelta * (gameState.battleSpeed || 1);
 
             // 每2秒一个回合：双方按真实属性结算（命中、防御减伤、境界压制）
             if (Math.floor(battle.turnCount / 2) > prevRound) {
@@ -3456,6 +3463,19 @@
                 enemyHPText.textContent = `${Math.max(0, Math.floor(battle.currentEnemy.currentHP))}/${Math.floor(battle.currentEnemy.hp)}`;
             }
 
+            // 标题、双方攻防、怪物图标
+            const setText = (id, text) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = text;
+            };
+            const areaData = getAction('battle', battle.currentArea).areaData;
+            setText('battleTitle', `⚔️ 战斗中 · ${areaData.name}`);
+            setText('playerAtk', player.stats.atk);
+            setText('playerDef', player.stats.def);
+            setText('monsterAtk', battle.currentEnemy.atk);
+            setText('monsterDef', battle.currentEnemy.def);
+            setText('monsterSprite', battle.currentEnemy.icon || '👾');
+
             // 更新战斗日志
             const battleLog = document.getElementById('battleLog');
             if (battleLog && battle.log) {
@@ -3481,15 +3501,9 @@
             const won = battle.currentEnemy.currentHP <= 0;
             if (won) {
                 gameState.player.coins += areaData.coins;
-                gameState.skills.battle.exp += areaData.exp;
+                addSkillExp('battle', areaData.exp);
 
-                // 检查技能升级
-                while (gameState.skills.battle.exp >= 100 * Math.pow(gameState.skills.battle.level, 1.8)) {
-                    gameState.skills.battle.exp -= 100 * Math.pow(gameState.skills.battle.level, 1.8);
-                    gameState.skills.battle.level++;
-                }
-
-                showNotification(`🎉 战胜${battle.currentEnemy.name}！\n+${areaData.coins}金币 +${areaData.exp}经验`, '#6fa980');
+                showNotification(`🎉 战胜${battle.currentEnemy.name}！\n+${areaData.coins}灵石 +${areaData.exp}经验`, '#6fa980');
             } else if (battle.playerHP.current <= 0) {
                 showNotification(`💀 被${battle.currentEnemy.name}击败，重伤逃出${areaData.name}（血量恢复至50%）`, '#ef4444');
             } else {
@@ -5966,7 +5980,8 @@
             }
         }
 
-        function handleOfflineTime() {
+        // quietUnder：离开时间小于该秒数且无特殊情况时，只结算收益、不弹结算窗（用于切换标签页）
+        function handleOfflineTime(quietUnder = 0) {
             const now = Date.now();
             const lastActive = gameState.lastActiveTime;
             const offlineSeconds = (now - lastActive) / 1000;
@@ -6105,7 +6120,10 @@
             const earnedAnything = offlineRewards.coins > 0 || offlineRewards.cultivation > 0 ||
                 offlineRewards.items.length > 0 || Object.keys(offlineRewards.skillExp).length > 0 ||
                 (offlineRewards.overflowCoins || 0) > 0;
-            if (earnedAnything || exceedsLimit || cultivationCapped) {
+            const quiet = offlineSeconds < quietUnder && !exceedsLimit && !cultivationCapped;
+            if (quiet) {
+                if (earnedAnything) showNotification(`⏱️ 离开${Math.floor(offlineSeconds)}秒，已结算期间收益`, '#6fa980');
+            } else if (earnedAnything || exceedsLimit || cultivationCapped) {
                 // P2修复：显示离线结算（传入超限标志）
                 showOfflineModal(offlineRewards, actualOfflineSeconds, cultivationCapped, exceedsLimit, wastedHours);
             }
@@ -6454,6 +6472,30 @@
 
         window.addEventListener('beforeunload', () => {
             if (gameRunning) saveGame();
+        });
+        // 手机浏览器关闭/切走时可能不触发 beforeunload
+        window.addEventListener('pagehide', () => {
+            if (gameRunning) saveGame();
+        });
+
+        // 页面被隐藏（切标签页、锁屏、切应用）时浏览器会限制甚至冻结定时器：
+        // 隐藏时暂停游戏循环，切回前台按离线规则补算；战斗只暂停不结算、不中断。
+        document.addEventListener('visibilitychange', () => {
+            if (!gameRunning) return;
+            if (document.hidden) {
+                saveGame();
+                clearInterval(tickInterval);
+            } else {
+                const action = gameState.currentAction;
+                if (action && (action.isBattle || action.isDungeon)) {
+                    gameState.lastActiveTime = Date.now();
+                } else {
+                    handleOfflineTime(60);
+                }
+                clearInterval(tickInterval);
+                startGameTick();
+                updateUI();
+            }
         });
     </script>
 
