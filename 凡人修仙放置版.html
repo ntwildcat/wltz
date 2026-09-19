@@ -1613,6 +1613,20 @@
                             <div class="action-detail" id="action-detail-mining"></div>
                         </div>
 
+                        <!-- 丹火面板（金丹期解锁） -->
+                        <div id="panel-danhuo" class="panel-content hidden">
+                            <div class="panel-title">🔥 丹火</div>
+                            <div class="action-list" id="danhuoActions"></div>
+                            <div class="action-detail" id="action-detail-danhuo"></div>
+                        </div>
+
+                        <!-- 神识面板（元婴期解锁） -->
+                        <div id="panel-shenshi" class="panel-content hidden">
+                            <div class="panel-title">👁️ 神识</div>
+                            <div class="action-list" id="shenshiActions"></div>
+                            <div class="action-detail" id="action-detail-shenshi"></div>
+                        </div>
+
                         <!-- 战斗面板 -->
                         <div id="panel-battle" class="panel-content hidden">
                             <div class="panel-title">⚔️ 战斗</div>
@@ -1873,6 +1887,7 @@
             <div style="display: flex; gap: 10px; justify-content: center;">
                 <button class="btn" onclick="closeItemDetail()" style="flex: 1;">关闭</button>
                 <button class="btn btn-secondary" id="itemActionBtn" onclick="performItemAction()" style="flex: 1; display: none;">操作</button>
+                <button class="btn btn-secondary" id="itemSellBtn" onclick="sellItem()" style="flex: 1; display: none;">出售</button>
             </div>
         </div>
     </div>
@@ -2313,12 +2328,12 @@
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', effect: { workSpeed: 0.95 } },
 
                 // P6 丹火相关物品
-                danhuo: { name: '丹火', icon: '🔥', type: 'material' },
+                danhuo: { name: '丹火', icon: '🔥', type: 'material', sellPrice: 500 },
                 danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed' },
                 tempered_essence: { name: '淬炼精华', icon: '✨', type: 'material' },
 
                 // P7 神识相关物品
-                shenshi: { name: '神识', icon: '👁️', type: 'material' },
+                shenshi: { name: '神识', icon: '👁️', type: 'material', sellPrice: 2000 },
                 shenshi_seed: { name: '神识种子', icon: '👁️', type: 'seed' },
                 yuanyingpill: { name: '元婴丹', icon: '⭕', type: 'breakthrough_material' },
                 shenshi_map: { name: '神识地图', icon: '🗺️', type: 'material' },
@@ -2539,6 +2554,8 @@
                 inventoryCapacity: 50,
                 farmingSlots: 1,
                 boughtUpgrades: [],  // 已购买的永久升级ID列表
+                temperLevel: 0,      // 丹火淬炼次数（最多3次，每次装备属性+10%）
+                scoutBonus: false,   // 神识探查：下次秘境掉落率+30%
                 // P2功能：属性系统
                 stats: {
                     hp: { current: 100, max: 100 },  // 生命值（当前/最大）[P8修改]
@@ -3423,10 +3440,15 @@
                 });
             }
 
-            // 随机掉落
+            // 随机掉落（神识地图：本次秘境掉落率×1.3，用后消耗）
+            const scoutMult = gameState.player.scoutBonus ? 1.3 : 1;
+            if (gameState.player.scoutBonus) {
+                gameState.player.scoutBonus = false;
+                rewardMsg += '🗺️ 神识地图生效：掉落率+30%\n';
+            }
             if (rewards.random) {
                 rewards.random.forEach(drop => {
-                    if (Math.random() < drop.probability) {
+                    if (Math.random() < drop.probability * scoutMult) {
                         const qty = Array.isArray(drop.qty) ? Math.floor(Math.random() * (drop.qty[1] - drop.qty[0] + 1)) + drop.qty[0] : drop.qty;
                         addToInventory(drop.id, qty);
                         const item = GAME_CONFIG.items[drop.id];
@@ -3860,12 +3882,12 @@
             if (panel) panel.classList.remove('hidden');
 
             // 只有技能相关面板才更新技能树高亮
-            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle'].includes(panelName)) {
+            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi'].includes(panelName)) {
                 updateSkillTree(panelName);
             }
 
             // 生成配方/技能列表
-            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining'].includes(panelName)) {
+            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi'].includes(panelName)) {
                 generateRecipeList(panelName);
             } else if (panelName === 'battle') {
                 generateBattleList();
@@ -3912,8 +3934,12 @@
             tree.innerHTML = '';
 
             const skills = ['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle'];
+            const realmIdx = gameState.player.realmIndex;
+            if (realmIdx >= 9) skills.push('danhuo');
+            if (realmIdx >= 13) skills.push('shenshi');
             skills.forEach(skillName => {
                 const skill = gameState.skills[skillName];
+                if (!skill) return;
                 const item = document.createElement('div');
                 item.className = 'skill-item';
                 item.id = 'skill-' + skillName;
@@ -3956,7 +3982,8 @@
         function updateSkillTree(activeSkill) {
             buildSkillTree();
             document.querySelectorAll('.skill-item').forEach(item => item.classList.remove('active'));
-            document.getElementById('skill-' + activeSkill).classList.add('active');
+            const activeItem = document.getElementById('skill-' + activeSkill);
+            if (activeItem) activeItem.classList.add('active');
         }
 
         // ===== P2: 配方卡片三态四信息系统 =====
@@ -4472,7 +4499,10 @@
                 crystal: '灵晶：采矿顶级产出，炼器最高级材料',
 
                 // 其他物品
-                shenshi_map: '神识地图：秘径探查产出，用于发现隐藏宝藏'
+                shenshi_map: '神识地图：使用后，下一次通关秘境的随机掉落率 +30%',
+                tempered_essence: '淬炼精华：使用后所有装备属性 +10%，最多叠加3次',
+                danhuo: '丹火：可炼制金丹秘药、淬炼装备，或出售换取灵石',
+                shenshi: '神识：可炼制元婴丹、探查秘境，或出售换取灵石'
             };
 
             if (specialUsages[itemId]) {
@@ -4544,8 +4574,29 @@
                     actionBtn.style.display = 'block';
                     actionBtn.dataset.itemId = itemId;
                     actionBtn.dataset.itemType = itemConfig.type;
+                } else if (itemId === 'tempered_essence') {
+                    actionBtn.textContent = `淬炼装备 (${gameState.player.temperLevel || 0}/3)`;
+                    actionBtn.style.display = 'block';
+                    actionBtn.dataset.itemId = itemId;
+                    actionBtn.dataset.itemType = 'use';
+                } else if (itemId === 'shenshi_map') {
+                    actionBtn.textContent = gameState.player.scoutBonus ? '已生效' : '使用';
+                    actionBtn.style.display = 'block';
+                    actionBtn.dataset.itemId = itemId;
+                    actionBtn.dataset.itemType = 'use';
                 } else {
                     actionBtn.style.display = 'none';
+                }
+            }
+
+            const sellBtn = document.getElementById('itemSellBtn');
+            if (sellBtn) {
+                if (itemConfig.sellPrice) {
+                    sellBtn.textContent = `出售1个 (+${itemConfig.sellPrice}灵石)`;
+                    sellBtn.dataset.itemId = itemId;
+                    sellBtn.style.display = 'block';
+                } else {
+                    sellBtn.style.display = 'none';
                 }
             }
 
@@ -4553,6 +4604,31 @@
             const modalEl = document.getElementById('itemDetailModal');
             if (modalEl) {
                 modalEl.style.display = 'flex';
+            }
+        }
+
+        function consumeItem(itemId, qty) {
+            const idx = gameState.player.inventory.findIndex(i => i.id === itemId);
+            if (idx === -1 || gameState.player.inventory[idx].qty < qty) return false;
+            gameState.player.inventory[idx].qty -= qty;
+            if (gameState.player.inventory[idx].qty <= 0) gameState.player.inventory.splice(idx, 1);
+            return true;
+        }
+
+        function sellItem() {
+            const itemId = document.getElementById('itemSellBtn').dataset.itemId;
+            const itemConfig = GAME_CONFIG.items[itemId];
+            if (!itemConfig || !itemConfig.sellPrice) return;
+            if (!consumeItem(itemId, 1)) return;
+            gameState.player.coins += itemConfig.sellPrice;
+            showNotification(`出售${itemConfig.name} +${itemConfig.sellPrice}灵石`, '#16a34a');
+            updateUI();
+            saveGame();
+            const remaining = gameState.player.inventory.find(i => i.id === itemId);
+            if (remaining) {
+                showItemDetail(itemId, remaining.qty);
+            } else {
+                closeItemDetail();
             }
         }
 
@@ -4572,6 +4648,31 @@
 
             const itemConfig = GAME_CONFIG.items[itemId];
             if (!itemConfig) return;
+
+            if (itemType === 'use') {
+                if (itemId === 'tempered_essence') {
+                    if ((gameState.player.temperLevel || 0) >= 3) {
+                        showNotification('装备已淬炼至最高3次', '#f59e0b');
+                        return;
+                    }
+                    if (!consumeItem(itemId, 1)) return;
+                    gameState.player.temperLevel = (gameState.player.temperLevel || 0) + 1;
+                    showNotification(`🔥 淬炼成功！装备属性 +${gameState.player.temperLevel * 10}%`, '#16a34a');
+                } else if (itemId === 'shenshi_map') {
+                    if (gameState.player.scoutBonus) {
+                        showNotification('神识地图效果已生效，通关下一个秘境后消耗', '#f59e0b');
+                        return;
+                    }
+                    if (!consumeItem(itemId, 1)) return;
+                    gameState.player.scoutBonus = true;
+                    showNotification('🗺️ 下次秘境掉落率 +30%', '#16a34a');
+                }
+                calculateStats();
+                updateUI();
+                closeItemDetail();
+                saveGame();
+                return;
+            }
 
             // 检查是否已装备
             let isEquipped = false;
@@ -5362,11 +5463,12 @@
             const weapon = gameState.player.equipment.weapon;
             const armor = gameState.player.equipment.armor;
             const jewelry = gameState.player.equipment.jewelry;
+            const temperMult = 1 + 0.1 * (gameState.player.temperLevel || 0);
 
             if (weapon && GAME_CONFIG.items[weapon]?.stats) {
                 Object.entries(GAME_CONFIG.items[weapon].stats).forEach(([stat, value]) => {
                     if (totalStats.hasOwnProperty(stat)) {
-                        totalStats[stat] += value;
+                        totalStats[stat] += Math.floor(value * temperMult);
                     }
                 });
             }
@@ -5374,7 +5476,7 @@
             if (armor && GAME_CONFIG.items[armor]?.stats) {
                 Object.entries(GAME_CONFIG.items[armor].stats).forEach(([stat, value]) => {
                     if (totalStats.hasOwnProperty(stat)) {
-                        totalStats[stat] += value;
+                        totalStats[stat] += Math.floor(value * temperMult);
                     }
                 });
             }
@@ -5383,7 +5485,7 @@
                 if (GAME_CONFIG.items[jewelryId]?.stats) {
                     Object.entries(GAME_CONFIG.items[jewelryId].stats).forEach(([stat, value]) => {
                         if (totalStats.hasOwnProperty(stat)) {
-                            totalStats[stat] += value;
+                            totalStats[stat] += Math.floor(value * temperMult);
                         }
                     });
                 }
@@ -5616,6 +5718,15 @@
             if (gameState.version < currentVersion) {
                 gameState.version = currentVersion;
             }
+
+            // 新增技能（如丹火/神识）自动补进旧存档，无需清缓存
+            Object.keys(GAME_CONFIG.skills).forEach(skillName => {
+                if (!gameState.skills[skillName]) {
+                    gameState.skills[skillName] = JSON.parse(JSON.stringify(GAME_CONFIG.skills[skillName]));
+                }
+            });
+            if (gameState.player.temperLevel === undefined) gameState.player.temperLevel = 0;
+            if (gameState.player.scoutBonus === undefined) gameState.player.scoutBonus = false;
 
             // 确保equipment字段存在（向后兼容）
             if (!gameState.player.equipment) {
@@ -6038,6 +6149,8 @@
                         inventoryCapacity: 50,
                         farmingSlots: 1,
                         boughtUpgrades: [],
+                        temperLevel: 0,
+                        scoutBonus: false,
                         // 属性系统
                         stats: {
                             hp: 100,
