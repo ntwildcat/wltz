@@ -1459,3 +1459,15 @@ display: none !important;
 .auto-battle-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border-l4); background: transparent; color: var(--text-l3); cursor: pointer; font-weight: bold; }
 .auto-battle-btn.on { border-color: var(--border-l2); color: var(--border-l2); background: rgba(111, 169, 128, 0.12); }
 .auto-battle-status { margin-right: 10px; font-size: 0.85em; color: var(--border-l2); }
+
+/* 新手引导 */
+.tutorial-modal { max-width: 520px; }
+.tutorial-title { font-size: 1.25em; color: var(--text-l1); font-weight: bold; margin-bottom: 14px; text-align: center; }
+.tutorial-body { color: var(--text-l3); line-height: 1.85; font-size: 0.95em; min-height: 160px; }
+.tutorial-body b { color: var(--border-l1); }
+.tutorial-dots { display: flex; justify-content: center; gap: 8px; margin: 16px 0 12px; }
+.tutorial-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--border-l4); }
+.tutorial-dots i.on { background: var(--border-l1); }
+.tutorial-actions { display: flex; justify-content: space-between; gap: 10px; }
+.tutorial-actions .btn { flex: 1; }
+.tutorial-skip { opacity: 0.6; }
