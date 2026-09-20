@@ -322,6 +322,24 @@
                     },
                     actions: {}
                 },
+                // P9 悟道技能（化神期新技能）：八种法则，每种一个「参悟」行动，法则等级见 LAW_EFFECTS
+                wudao: {
+                    name: '悟道',
+                    icon: '☯️',
+                    level: 1,
+                    exp: 0,
+                    recipes: {
+                        metal: { name: '参悟金之法则', desc: '锋锐与杀伐之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        wood: { name: '参悟木之法则', desc: '生机与繁育之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        water: { name: '参悟水之法则', desc: '滋养与流转之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        fire: { name: '参悟火之法则', desc: '焚灭与淬炼之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        earth: { name: '参悟土之法则', desc: '厚重与承载之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        wind: { name: '参悟风之法则', desc: '迅捷与自在之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        thunder: { name: '参悟雷之法则', desc: '雷霆与天罚之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        ice: { name: '参悟冰之法则', desc: '寒凝与静守之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false }
+                    },
+                    actions: {}
+                },
                 // P7 神识技能（元婴期新技能）
                 shenshi: {
                     name: '神识',
@@ -330,7 +348,7 @@
                     exp: 0,
                     recipes: {
                         gather: { name: '凝练神识', desc: '从元婴中提取神识', duration: 20, output: { items: [{ id: 'shenshi', qty: 1 }], skill: 'shenshi', exp: 40 }, requiredLevel: 1, unlocked: true },
-                        seed: { name: '培育神识', desc: '以神识种子培育，一次得到 4 份神识（种子来自化神秘境）', duration: 25, output: { items: [{ id: 'shenshi', qty: 4 }], skill: 'shenshi', exp: 80 }, requiredLevel: 2, requires: { shenshi_seed: 1 }, unlocked: false },
+                        seed: { name: '培育神识', desc: '以神识种子培育，一次得到 4 份神识（种子来自元婴秘境）', duration: 25, output: { items: [{ id: 'shenshi', qty: 4 }], skill: 'shenshi', exp: 80 }, requiredLevel: 2, requires: { shenshi_seed: 1 }, unlocked: false },
                         huashen_pill: { name: '炼制化神丹', desc: '神识 ×12 + 悟道茶 ×5 + 九叶莲 ×3（元婴圆满突破必需）', duration: 100, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'shenshi', exp: 400 }, requiredLevel: 8, requires: { shenshi: 12, tea: 5, lotus: 3 }, unlocked: false },
                         scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 120 }, requiredLevel: 3, requires: { shenshi: 2 }, unlocked: false },
                         meditate: { name: '神识入定', desc: '悟道果 ×1 → 神识 ×3', duration: 60, output: { items: [{ id: 'shenshi', qty: 3 }], skill: 'shenshi', exp: 260 }, requiredLevel: 10, requires: { daofruit: 1 }, unlocked: false }
@@ -880,7 +898,7 @@
         }
 
         function getCloneFactor() {
-            return SKILL_LEVEL_EFFECTS.shenshi.formula((gameState.skills.shenshi || {}).level || 1);
+            return SKILL_LEVEL_EFFECTS.shenshi.formula((gameState.skills.shenshi || {}).level || 1) / (1 + getMod('cloneSpeed'));
         }
 
         function getCloneDuration(skill, duration, key) {
@@ -1955,7 +1973,7 @@
                     do {
                         stepNormalBattle(battle);
                     } while (battle.currentEnemy.currentHP > 0 && battle.playerHP.current > 0 && battle.turnCount < 10);
-                    elapsed += battle.turnCount / AUTO_BATTLE_OFFLINE_EFFICIENCY;   // 每场按 1/0.8 倍时间计，等价于离线只有 80% 效率
+                    elapsed += battle.turnCount / Math.min(1, AUTO_BATTLE_OFFLINE_EFFICIENCY + getMod('autoOffline'));   // 每场按 1/效率 倍时间计（基础 0.8，悟道·冰之法则可提高）
                     r.fights++;
                     const won = battle.currentEnemy.currentHP <= 0;
                     hp.current = battle.playerHP.current <= 0 ? Math.floor(hp.max * 0.5) : Math.min(hp.max, battle.playerHP.current);
@@ -2328,9 +2346,158 @@
             wind:    { name: '风灵根', effects: { spdPct: 0.10, dodge: 0.07, 'time:life': -0.06 } }
         };
 
-        const EFFECT_SKILL_NAMES = { cultivation: '修炼', alchemy: '炼丹', forging: '炼器', farming: '灵田', mining: '采矿', danhuo: '丹火', shenshi: '神识', battle: '战斗', life: '所有生活技能' };
+        const EFFECT_SKILL_NAMES = { cultivation: '修炼', alchemy: '炼丹', forging: '炼器', farming: '灵田', mining: '采矿', danhuo: '丹火', shenshi: '神识', battle: '战斗', wudao: '悟道', life: '所有生活技能' };
 
-        // 当前灵根 + 当前功法提供的某项特效总和
+        // ==================== 悟道：八种法则 ====================
+        // 化神初期起可用。每种法则有独立的领悟等级（累计经验推算，不单独存等级），效果 = 每级效果 × 等级 + 各里程碑加成，
+        // 通过 getMod() 统一接入战斗 / 生活技能 / 全局加成。等级上限随境界提高（化神初期 10，每高一个境界 +5，最高 30）。
+        // 与自身灵根同名的法则，参悟速度 +50%。
+        const LAW_IDS = ['metal', 'wood', 'water', 'fire', 'earth', 'wind', 'thunder', 'ice'];
+        const LAW_MAX_LEVEL = 30;
+        const LAW_UNLOCK_REALM = 17;            // 化神初期
+        const LAW_EXP_PER_COMPLETION = 12;      // 每次参悟获得的法则经验
+        const LAW_RESONANCE_BONUS = 0.5;        // 与灵根同名的法则，经验 +50%
+        const LAW_MILESTONE_LEVELS = [5, 10, 15, 20, 25];
+
+        const LAW_EFFECTS = {
+            metal:   { name: '金之法则', icon: '🟡', perLevel: { atkPct: 0.004 },
+                       milestones: { 5: { crit: 0.02 }, 10: { 'save:forging': 0.03 }, 15: { crit: 0.02 }, 20: { 'save:forging': 0.03 }, 25: { critDmg: 0.10 } } },
+            wood:    { name: '木之法则', icon: '🟢', perLevel: { hpPct: 0.004 },
+                       milestones: { 5: { regen: 0.0005 }, 10: { 'double:farming': 0.03 }, 15: { regen: 0.0005 }, 20: { 'double:farming': 0.03 }, 25: { cloneSpeed: 0.08 } } },
+            water:   { name: '水之法则', icon: '🔵', perLevel: { foodPct: 0.006 },
+                       milestones: { 5: { regen: 0.0005 }, 10: { 'exp:alchemy': 0.05 }, 15: { 'save:alchemy': 0.03 }, 20: { 'exp:alchemy': 0.05 }, 25: { 'save:alchemy': 0.03 } } },
+            fire:    { name: '火之法则', icon: '🔴', perLevel: { critDmg: 0.006 },
+                       milestones: { 5: { atkPct: 0.02 }, 10: { 'time:danhuo': -0.04 }, 15: { atkPct: 0.02 }, 20: { 'time:alchemy': -0.04 }, 25: { 'time:danhuo': -0.04 } } },
+            earth:   { name: '土之法则', icon: '🟤', perLevel: { defPct: 0.006 },
+                       milestones: { 5: { hpPct: 0.02 }, 10: { 'double:mining': 0.03 }, 15: { hpPct: 0.02 }, 20: { 'double:mining': 0.03 }, 25: { 'exp:mining': 0.10 } } },
+            wind:    { name: '风之法则', icon: '🌪️', perLevel: { spdPct: 0.004 },
+                       milestones: { 5: { dodge: 0.02 }, 10: { 'time:life': -0.02 }, 15: { dodge: 0.02 }, 20: { 'time:life': -0.02 }, 25: { 'time:life': -0.02 } } },
+            thunder: { name: '雷之法则', icon: '🟣', perLevel: { crit: 0.002 },
+                       milestones: { 5: { hit: 0.02 }, 10: { 'exp:shenshi': 0.06 }, 15: { dropPct: 0.05 }, 20: { 'exp:shenshi': 0.06 }, 25: { dropPct: 0.05 } } },
+            ice:     { name: '冰之法则', icon: '❄️', perLevel: { dodge: 0.003 },
+                       milestones: { 5: { defPct: 0.02 }, 10: { cultSpeed: 0.05 }, 15: { autoOffline: 0.03 }, 20: { cultSpeed: 0.05 }, 25: { autoOffline: 0.04 } } }
+        };
+
+        // 升到 level 级所需的累计法则经验（level 级 = 从 level-1 升上来所需 lawNeed(level)）
+        function lawNeed(level) { return Math.round(25 * Math.pow(level, 1.5)); }
+        function lawCumulative(level) {
+            let sum = 0;
+            for (let l = 1; l <= level; l++) sum += lawNeed(l);
+            return sum;
+        }
+
+        // 当前境界允许领悟到的最高等级（未到化神初期为 0）
+        function lawLevelCap() {
+            const realm = gameState.player.realmIndex;
+            if (realm < LAW_UNLOCK_REALM) return 0;
+            return Math.min(LAW_MAX_LEVEL, 10 + 5 * (realm - LAW_UNLOCK_REALM));
+        }
+
+        function getLawStore() {
+            if (!gameState.laws) gameState.laws = {};
+            return gameState.laws;
+        }
+
+        function getLawInfo(id) {
+            let exp = Math.floor(getLawStore()[id] || 0);
+            let level = 0;
+            while (level < LAW_MAX_LEVEL && exp >= lawNeed(level + 1)) {
+                exp -= lawNeed(level + 1);
+                level++;
+            }
+            const maxed = level >= LAW_MAX_LEVEL;
+            const need = maxed ? 0 : lawNeed(level + 1);
+            return { level, exp: maxed ? 0 : exp, need, percent: maxed ? 100 : (exp / need) * 100, maxed };
+        }
+
+        // 某个法则在指定等级下的全部效果
+        function getLawEffectsAt(id, level) {
+            const def = LAW_EFFECTS[id];
+            const total = {};
+            if (!def || level <= 0) return total;
+            const add = (eff, mult) => Object.entries(eff).forEach(([k, v]) => { total[k] = (total[k] || 0) + v * mult; });
+            add(def.perLevel, level);
+            Object.entries(def.milestones).forEach(([lv, eff]) => { if (level >= Number(lv)) add(eff, 1); });
+            return total;
+        }
+
+        // 全部法则的加成合计（带缓存；法则升级或读档时失效）
+        let lawTotalsCache = null;
+        function invalidateLawTotals() { lawTotalsCache = null; }
+        function getLawTotals() {
+            if (!lawTotalsCache) {
+                lawTotalsCache = {};
+                LAW_IDS.forEach(id => {
+                    Object.entries(getLawEffectsAt(id, getLawInfo(id).level)).forEach(([k, v]) => {
+                        lawTotalsCache[k] = (lawTotalsCache[k] || 0) + v;
+                    });
+                });
+            }
+            return lawTotalsCache;
+        }
+
+        function isLawResonant(id) {
+            return gameState.player.spiritRoot === id;
+        }
+
+        // 参悟获得法则经验；返回是否已到当前境界的领悟上限
+        function addLawExp(id, completions = 1) {
+            if (!LAW_EFFECTS[id]) return false;
+            const cap = lawLevelCap();
+            const store = getLawStore();
+            const before = getLawInfo(id).level;
+            const mult = 1 + getSkillMod('exp', 'wudao') + (isLawResonant(id) ? LAW_RESONANCE_BONUS : 0);
+            const capExp = lawCumulative(cap);
+            store[id] = Math.min(capExp, (store[id] || 0) + LAW_EXP_PER_COMPLETION * completions * mult);
+            const after = getLawInfo(id).level;
+            if (after > before) {
+                invalidateLawTotals();
+                const def = LAW_EFFECTS[id];
+                const isMs = LAW_MILESTONE_LEVELS.includes(after);
+                const msText = isMs ? '（里程碑：' + describeEffects(def.milestones[after]).join('、') + '）' : '';
+                showNotification(`${def.icon} ${def.name} 领悟到 Lv.${after}${msText}`, '#c9a961');
+            }
+            if (document.body.dataset.panel === 'wudao') generateLawList();
+            return after >= cap;
+        }
+
+        function describeLawNext(id) {
+            const { level } = getLawInfo(id);
+            const next = LAW_MILESTONE_LEVELS.find(m => m > level);
+            if (!next) return '';
+            return `下一里程碑 Lv.${next}：${describeEffects(LAW_EFFECTS[id].milestones[next]).join('、')}`;
+        }
+
+        // 悟道面板：八种法则卡片
+        function generateLawList() {
+            const list = document.getElementById('wudaoActions');
+            if (!list) return;
+            const cap = lawLevelCap();
+            const cur = gameState.currentAction;
+            list.innerHTML = '';
+            LAW_IDS.forEach(id => {
+                const def = LAW_EFFECTS[id];
+                const info = getLawInfo(id);
+                const eff = describeEffects(getLawEffectsAt(id, info.level));
+                const atCap = info.level >= cap;
+                const active = cur && cur.skill === 'wudao' && cur.action === id;
+                const card = document.createElement('div');
+                card.className = 'action-item law-card' + (active ? ' active' : '') + (atCap ? ' law-capped' : '');
+                card.id = 'action-wudao-' + id;
+                card.innerHTML = `
+                    <div class="recipe-header"><span class="recipe-icon">${def.icon}</span><span class="recipe-name">${def.name}</span>${isLawResonant(id) ? '<span class="law-resonant" title="与你的灵根相合：参悟速度 +50%">✦ 灵根相合</span>' : ''}</div>
+                    <div class="law-level">Lv.${info.level} <small>/ ${cap}</small></div>
+                    <div class="mastery-track"><div class="mastery-fill" style="width: ${info.percent}%"></div></div>
+                    <div class="law-exp">${atCap ? '已至当前境界上限，突破后可继续领悟' : `${info.exp} / ${info.need}`}</div>
+                    <div class="law-effects">${eff.length ? eff.join(' · ') : '尚未领悟'}</div>
+                    <div class="law-next">${describeLawNext(id)}</div>
+                    <div class="action-progress-bar ${active ? 'active' : ''}"><div class="action-progress-fill" style="width: 0%"></div></div>`;
+                card.onclick = () => selectAction('wudao', id);
+                list.appendChild(card);
+            });
+        }
+
+        // 当前灵根 + 当前功法 + 悟道法则提供的某项特效总和
         function getMod(key) {
             const player = gameState && gameState.player;
             if (!player) return 0;
@@ -2339,6 +2506,7 @@
             if (rootEffects && rootEffects[key]) total += rootEffects[key];
             const artEffects = CULTIVATION_ARTS[player.currentArt]?.effects;
             if (artEffects && artEffects[key]) total += artEffects[key];
+            total += getLawTotals()[key] || 0;
             return total;
         }
 
@@ -2368,7 +2536,8 @@
             const fixed = {
                 atkPct: v => `攻击 ${sign(v)}`, hpPct: v => `生命 ${sign(v)}`, defPct: v => `防御 ${sign(v)}`, spdPct: v => `速度 ${sign(v)}`,
                 hit: v => `命中 ${sign(v)}`, crit: v => `暴击率 ${sign(v)}`, critDmg: v => `暴击伤害 ${sign(v)}`, dodge: v => `闪避 ${sign(v)}`,
-                foodPct: v => `食物恢复 ${sign(v)}`, dropPct: v => `秘境掉落 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
+                foodPct: v => `食物恢复 ${sign(v)}`, dropPct: v => `秘境掉落 ${sign(v)}`,
+                cultSpeed: v => `修炼速度 ${sign(v)}`, cloneSpeed: v => `分身速度 ${sign(v)}`, autoOffline: v => `离线自动战斗效率 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
             };
             return Object.entries(effects).map(([key, v]) => {
                 if (fixed[key]) return fixed[key](v);
@@ -2398,6 +2567,11 @@
             if (art) {
                 const eff = describeEffects(art.effects);
                 html += `<div><b style="color:#60a5fa">📜 ${art.name}</b>（修炼×${art.speedMultiplier}）：${eff.length ? eff.join(' · ') : '无特殊效果'}</div>`;
+            }
+            // 悟道：已领悟的法则合计
+            const lawParts = LAW_IDS.filter(id => getLawInfo(id).level > 0).map(id => `${LAW_EFFECTS[id].icon}${LAW_EFFECTS[id].name.replace('之法则', '')}Lv.${getLawInfo(id).level}`);
+            if (lawParts.length) {
+                html += `<div><b style="color:#c084fc">☯️ 悟道</b>：${lawParts.join(' ')}</div>`;
             }
             el.innerHTML = html || '无';
         }
@@ -2463,10 +2637,11 @@
         function getAdjustedDuration(skill, duration, recipeKey = null) {
             if (skill === 'cultivation') {
                 const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
+                const cultMult = 1 + getMod('cultSpeed');   // 悟道法则的修炼速度加成
                 if (currentArt) {
-                    return duration / currentArt.speedMultiplier; // 倍率越高，持续时间越短
+                    return duration / (currentArt.speedMultiplier * cultMult); // 倍率越高，持续时间越短
                 }
-                return duration;
+                return duration / cultMult;
             } else {
                 // 灵根/功法的耗时特效（下限30%，避免叠加后过快）
                 const timeMod = Math.max(0.3, 1 + getSkillMod('time', skill) + getMasteryBonus(skill, recipeKey).time);
@@ -2787,6 +2962,13 @@
                 addMasteryExp(act.skill, actionKey, action.duration);
             }
 
+            // 悟道：参悟一次增加对应法则的经验；到当前境界上限则停止
+            if (act.skill === 'wudao' && addLawExp(actionKey, 1)) {
+                showNotification(`${LAW_EFFECTS[actionKey].name}已至当前境界的领悟上限，突破后可继续`, '#f59e0b');
+                gameState.currentAction = null;
+                gameState.currentActionProgress = 0;
+            }
+
             // 如果有修为产出（修炼/战斗）
             if (finalOutput.cultivation) {
                 const currentRealm = GAME_CONFIG.realms[gameState.player.realmIndex];
@@ -2881,13 +3063,15 @@
             renderMobileSkillBar();
 
             // 只有技能相关面板才更新技能树高亮
-            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi'].includes(panelName)) {
+            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi', 'wudao'].includes(panelName)) {
                 updateSkillTree(panelName);
             }
 
             // 生成配方/技能列表
             if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi'].includes(panelName)) {
                 generateRecipeList(panelName);
+            } else if (panelName === 'wudao') {
+                generateLawList();
             } else if (panelName === 'battle') {
                 generateBattleList();
             } else if (panelName === 'shop') {
@@ -2942,6 +3126,7 @@
             const realmIdx = gameState.player.realmIndex;
             if (realmIdx >= 9) skills.push('danhuo');
             if (realmIdx >= 13) skills.push('shenshi');
+            if (realmIdx >= LAW_UNLOCK_REALM) skills.push('wudao');
             return skills.filter(name => gameState.skills[name]);
         }
 
@@ -3395,6 +3580,16 @@
                 // 战斗区域按境界解锁（与战斗列表的显示保持一致）
                 if (!isBattleAreaUnlocked(actionObj)) {
                     showNotification(`🔒 ${actionObj.name}需要${getRealmName(actionObj.areaData.minLevel)}`, '#f59e0b', 'normal');
+                    return;
+                }
+            } else if (skill === 'wudao') {
+                // 悟道：化神初期起可参悟；法则到当前境界上限后不能继续
+                if (gameState.player.realmIndex < LAW_UNLOCK_REALM) {
+                    showNotification(`🔒 悟道需要${getRealmName(LAW_UNLOCK_REALM)}`, '#f59e0b', 'normal');
+                    return;
+                }
+                if (getLawInfo(action).level >= lawLevelCap()) {
+                    showNotification(`${LAW_EFFECTS[action].name}已至当前境界的领悟上限，突破后可继续`, '#f59e0b', 'normal');
                     return;
                 }
             } else if (actionObj.requiredLevel) {
@@ -4898,6 +5093,7 @@
         function migrateGameData() {
             // 版本迁移函数：自动更新旧数据以支持新配方
             if (!gameState.version) gameState.version = 0;
+            invalidateLawTotals();   // 读档 / 导入后重新计算悟道法则加成
             if (gameState.tutorialSeen === undefined) gameState.tutorialSeen = true;   // 已有存档的玩家不再自动弹出引导
 
             const currentVersion = 2;  // P4：属性系统重写 + 初始化BugFix
@@ -5302,6 +5498,10 @@
             // 离线期间的配方精通经验（按完成次数 × 配方基础耗时）
             if (LIFE_SKILLS.includes(savedAction.skill) && completions > 0) {
                 addMasteryExp(savedAction.skill, savedAction.action, action.duration * completions);
+            }
+            // 离线期间的悟道：按完成次数增加法则经验，到上限则停止
+            if (savedAction.skill === 'wudao' && completions > 0 && addLawExp(savedAction.action, completions)) {
+                gameState.currentAction = null;
             }
 
             gameState.lastActiveTime = now;
