@@ -3212,10 +3212,6 @@
                 item.innerHTML = `
                     <div class="skill-name">${skill.icon} ${skill.name}</div>
                     <div class="skill-level">Lv.${level}</div>
-                    <div class="exp-bar">
-                        <div class="exp-fill" style="width: ${expPercent}%"></div>
-                    </div>
-                    <div class="skill-exp-mini">${info.exp}/${info.need}</div>
                     ${warningDot}
                 `;
                 item.style.position = 'relative';
