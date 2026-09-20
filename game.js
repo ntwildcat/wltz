@@ -144,7 +144,7 @@
                 // P7 元婴期秘境：化神秘境
                 huashenRealm: {
                     id: 'huashenRealm',
-                    name: '化神秘境',
+                    name: '元婴秘境',
                     desc: '元神试炼·通关掉落元婴丹材料',
                     icon: '🌌',
                     minRealmIndex: 12,                      // 最低金丹圆满：这里掉落突破元婴所需的元婴丹，必须在突破前就能进入
@@ -168,6 +168,33 @@
                         ],
                         coins: [8000, 15000],
                         skillExp: 250
+                    }
+                },
+                // P9 化神期秘境：太虚幻境（入口元婴圆满；这里掉落突破化神所需的化神丹，必须在突破前就能进入）
+                taixuDream: {
+                    id: 'taixuDream',
+                    name: '太虚幻境',
+                    desc: '虚实交织的幻境·通关掉落化神丹材料',
+                    icon: '🌠',
+                    minRealmIndex: 16,                      // 最低元婴圆满
+                    baseRealmIndex: 17,                     // 怪物境界为化神初期
+                    recommendedLevel: '元婴圆满~化神中期',
+                    monsters: [
+                        { name: '幻境行者', type: '风', hp: 20600, atk: 150, spd: 70, def: 50, attackSpeed: 2.0, drop: 'coins', dropQty: 800 },
+                        { name: '虚实道人', type: '水', hp: 24720, atk: 165, spd: 65, def: 55, attackSpeed: 2.1, drop: 'coins', dropQty: 900 },
+                        { name: '万象傀儡', type: '雷', hp: 22660, atk: 170, spd: 60, def: 65, attackSpeed: 2.2, drop: 'coins', dropQty: 1000 },
+                        { name: '心魔化身', type: '无', hp: 26780, atk: 180, spd: 75, def: 60, attackSpeed: 1.9, drop: 'coins', dropQty: 1100 },
+                        { name: '太虚道主', type: '无', hp: 51500, atk: 220, spd: 70, def: 70, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 4000 }
+                    ],
+                    rewards: {
+                        fixed: [],
+                        random: [
+                            { id: 'huashenpill', qty: 1, probability: 0.35 },
+                            { id: 'lotus', qty: [3, 5], probability: 1 },
+                            { id: 'immortalore', qty: [3, 6], probability: 1 }
+                        ],
+                        coins: [15000, 30000],
+                        skillExp: 400
                     }
                 }
             },
@@ -469,7 +496,8 @@
             mysteriousForest: 0.54,
             ancientRuin: 0.416,
             tribulationGround: 0.1365,
-            huashenRealm: 0.0636
+            huashenRealm: 0.0636,
+            taixuDream: 0.03
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -486,7 +514,8 @@
         const P4_AREA_SCALE = {
             forest: { hp: 1.071, atk: 1.071 }, mountain: { hp: 1.056, atk: 1.117 }, deepMountain: { hp: 0.876, atk: 1.079 },
             swamp: { hp: 0.978, atk: 1.206 }, abyss: { hp: 0.775, atk: 1.104 }, goldenPlains: { hp: 0.572, atk: 0.735 },
-            tribulationGround: { hp: 0.424, atk: 0.654 }, voidSea: { hp: 0.15, atk: 0.497 }, abyssRuins: { hp: 0.047, atk: 0.353 }
+            tribulationGround: { hp: 0.424, atk: 0.654 }, voidSea: { hp: 0.15, atk: 0.497 }, abyssRuins: { hp: 0.047, atk: 0.353 },
+            chaosWastes: { hp: 0.037, atk: 0.18 }, nineNether: { hp: 0.0175, atk: 0.14 }
         };
 
         const BATTLE_FORMULAS = {
@@ -783,168 +812,168 @@
         }
 
         // ==================== 游戏Tick系统 ====================
-        // ==================== 分身系统 ====================
-        // 元婴初期起自带一个分身：主角之外并行做一件生活技能配方（不能修炼 / 战斗，不能与主角做同一个配方）。
-        // 分身耗时 = 主角调整后耗时 × getCloneFactor()（基础 1.6，神识每级 -0.01，最低 1.2）；
-        // 共用背包与材料，享受精通 / 特效等全部加成；离线也会结算。
-        const CLONE_UNLOCK_REALM = 13;   // 元婴初期
-
-        function isCloneUnlocked() {
-            return gameState.player.realmIndex >= CLONE_UNLOCK_REALM;
-        }
-
-        function getClone() {
-            if (!gameState.clone) gameState.clone = { action: null, progress: 0 };
-            return gameState.clone;
-        }
-
-        function getCloneFactor() {
-            return SKILL_LEVEL_EFFECTS.shenshi.formula((gameState.skills.shenshi || {}).level || 1);
-        }
-
-        function getCloneDuration(skill, duration, key) {
-            return getAdjustedDuration(skill, duration, key) * getCloneFactor();
-        }
-
-        function cloneHasMaterials(action) {
-            if (!action.requires) return true;
-            return Object.entries(action.requires).every(([itemId, qty]) => {
-                const inv = gameState.player.inventory.find(i => i.id === itemId);
-                return inv && inv.qty >= qty;
-            });
-        }
-
-        // 让分身开始做某个配方
-        function assignClone(skill, key) {
-            if (!isCloneUnlocked()) { showNotification('🔒 分身要到元婴初期才会出现', '#f59e0b'); return; }
-            if (!LIFE_SKILLS.includes(skill)) { showNotification('分身只能做生活技能的配方', '#f59e0b'); return; }
-            const recipe = getAction(skill, key);
-            if (!recipe || !getRecipeUnlockState(skill, recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#f59e0b'); return; }
-            const main = gameState.currentAction;
-            if (main && main.skill === skill && main.action === key) {
-                showNotification('主角正在做这个配方，分身不能重复（请让分身做别的）', '#f59e0b');
-                return;
-            }
-            if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#ef4444', 'error'); return; }
-            const c = getClone();
-            const prev = c.action;
-            c.action = { skill, action: key };
-            c.progress = 0;
-            showNotification(`🌀 分身开始：${recipe.name}`, '#c9a961');
-            if (prev && prev.skill !== skill) generateRecipeList(prev.skill);
-            generateRecipeList(skill);
-            renderCloneBar();
-            saveGame();
-        }
-
-        function stopClone(silent = false) {
-            const c = getClone();
-            const prev = c.action;
-            c.action = null;
-            c.progress = 0;
-            if (!silent) showNotification('🌀 分身已停止', '#c9a961');
-            if (prev) generateRecipeList(prev.skill);
-            renderCloneBar();
-        }
-
-        // 每个游戏 tick（0.1 秒）推进分身的行动
-        function tickClone() {
-            if (!isCloneUnlocked()) return;
-            const c = getClone();
-            if (!c.action) return;
-            const action = getAction(c.action.skill, c.action.action);
-            if (!action || !action.output) { stopClone(true); return; }
-            if (!cloneHasMaterials(action)) {
-                showNotification(`🌀 分身：${action.name}所需材料不足，已停止`, '#ef4444', 'error');
-                stopClone(true);
-                return;
-            }
-            c.progress += 0.1;
-            const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
-            if (c.progress >= duration) {
-                completeAction(c.action);
-                c.progress = 0;
-            }
-            tickCloneBar(duration);
-        }
-
-        // 分身状态条：整体重绘（分配 / 停止 / 解锁时）
-        function renderCloneBar() {
-            const bar = document.getElementById('cloneBar');
-            if (!bar) return;
-            if (!isCloneUnlocked()) { bar.style.display = 'none'; return; }
-            bar.style.display = 'block';
-            const c = getClone();
-            const action = c.action ? getAction(c.action.skill, c.action.action) : null;
-            const factor = getCloneFactor();
-            if (action) {
-                bar.innerHTML = `<div class="clone-bar-top"><span>🌀 分身：<b>${action.name}</b></span><span id="cloneRemain"></span>
-                    <button class="btn btn-secondary clone-stop" onclick="stopClone()">停止</button></div>
-                    <div class="progress-bar" style="height: 6px;"><div id="cloneFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div>`;
-            } else {
-                bar.innerHTML = `<div class="clone-bar-top"><span>🌀 分身空闲</span><span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span></div>`;
-            }
-        }
-
-        // 分身状态条：每 tick 只更新进度
-        function tickCloneBar(duration) {
-            const c = getClone();
-            const pct = Math.min(100, (c.progress / duration) * 100);
-            const fill = document.getElementById('cloneFill');
-            if (fill) fill.style.width = pct + '%';
-            const remain = document.getElementById('cloneRemain');
-            if (remain) remain.textContent = Math.max(0, duration - c.progress).toFixed(1) + 's';
-            const card = document.getElementById('action-' + c.action.skill + '-' + c.action.action);
-            const cardFill = card && card.querySelector('.action-progress-fill');
-            if (cardFill) cardFill.style.width = pct + '%';
-        }
-
-        // 分身离线结算：与主角的离线规则一致（材料限制、节省材料、产出翻倍、技能 / 精通经验），耗时按分身倍率
-        function settleCloneOffline(offlineSeconds) {
-            if (!isCloneUnlocked() || !(offlineSeconds >= 1)) return;
-            const c = getClone();
-            if (!c.action) return;
-            const { skill, action: key } = c.action;
-            const action = getAction(skill, key);
-            if (!action || !action.output) { c.action = null; return; }
-            const budget = Math.min(offlineSeconds, (gameState.settings?.maxOfflineHours || 24) * 3600);
-            const duration = getCloneDuration(skill, action.duration, key);
-            if (!(duration > 0)) return;
-            let n = Math.floor(budget / duration);
-            let ranOut = false;
-            if (action.requires) {
-                Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    const owned = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
-                    const affordable = Math.floor(owned / qty);
-                    if (affordable < n) { n = affordable; ranOut = true; }
-                });
-                const saveRate = Math.min(0.9, getSkillMod('save', skill) + getMasteryBonus(skill, key).save);
-                Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    if (n > 0) consumeItem(itemId, Math.round(qty * n * (1 - saveRate)));
-                });
-            }
-            if (n > 0) {
-                const per = JSON.parse(JSON.stringify(action.output));
-                applySkillLevelBonus(skill, per);
-                const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double;
-                gameState.player.coins += (per.coins || 0) * n;
-                (per.items || []).forEach(item => {
-                    const qty = Math.floor(item.qty * n * (1 + doubleRate) + 1e-9);
-                    if (qty > 0) addToInventory(item.id, qty);
-                });
-                if (per.skill && per.exp) addSkillExp(per.skill, per.exp * n, key);
-                addMasteryExp(skill, key, action.duration * n);
-                showNotification(`🌀 分身离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
-            }
-            if (ranOut) c.action = null;
-            c.progress = 0;
-            renderCloneBar();
-            if (!c.action) generateRecipeList(skill);
-        }
-
-        function startGameTick() {
-            tickInterval = setInterval(() => {
-                tickClone();
+        // ==================== 分身系统 ====================
+        // 元婴初期起自带一个分身：主角之外并行做一件生活技能配方（不能修炼 / 战斗，不能与主角做同一个配方）。
+        // 分身耗时 = 主角调整后耗时 × getCloneFactor()（基础 1.6，神识每级 -0.01，最低 1.2）；
+        // 共用背包与材料，享受精通 / 特效等全部加成；离线也会结算。
+        const CLONE_UNLOCK_REALM = 13;   // 元婴初期
+
+        function isCloneUnlocked() {
+            return gameState.player.realmIndex >= CLONE_UNLOCK_REALM;
+        }
+
+        function getClone() {
+            if (!gameState.clone) gameState.clone = { action: null, progress: 0 };
+            return gameState.clone;
+        }
+
+        function getCloneFactor() {
+            return SKILL_LEVEL_EFFECTS.shenshi.formula((gameState.skills.shenshi || {}).level || 1);
+        }
+
+        function getCloneDuration(skill, duration, key) {
+            return getAdjustedDuration(skill, duration, key) * getCloneFactor();
+        }
+
+        function cloneHasMaterials(action) {
+            if (!action.requires) return true;
+            return Object.entries(action.requires).every(([itemId, qty]) => {
+                const inv = gameState.player.inventory.find(i => i.id === itemId);
+                return inv && inv.qty >= qty;
+            });
+        }
+
+        // 让分身开始做某个配方
+        function assignClone(skill, key) {
+            if (!isCloneUnlocked()) { showNotification('🔒 分身要到元婴初期才会出现', '#f59e0b'); return; }
+            if (!LIFE_SKILLS.includes(skill)) { showNotification('分身只能做生活技能的配方', '#f59e0b'); return; }
+            const recipe = getAction(skill, key);
+            if (!recipe || !getRecipeUnlockState(skill, recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#f59e0b'); return; }
+            const main = gameState.currentAction;
+            if (main && main.skill === skill && main.action === key) {
+                showNotification('主角正在做这个配方，分身不能重复（请让分身做别的）', '#f59e0b');
+                return;
+            }
+            if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#ef4444', 'error'); return; }
+            const c = getClone();
+            const prev = c.action;
+            c.action = { skill, action: key };
+            c.progress = 0;
+            showNotification(`🌀 分身开始：${recipe.name}`, '#c9a961');
+            if (prev && prev.skill !== skill) generateRecipeList(prev.skill);
+            generateRecipeList(skill);
+            renderCloneBar();
+            saveGame();
+        }
+
+        function stopClone(silent = false) {
+            const c = getClone();
+            const prev = c.action;
+            c.action = null;
+            c.progress = 0;
+            if (!silent) showNotification('🌀 分身已停止', '#c9a961');
+            if (prev) generateRecipeList(prev.skill);
+            renderCloneBar();
+        }
+
+        // 每个游戏 tick（0.1 秒）推进分身的行动
+        function tickClone() {
+            if (!isCloneUnlocked()) return;
+            const c = getClone();
+            if (!c.action) return;
+            const action = getAction(c.action.skill, c.action.action);
+            if (!action || !action.output) { stopClone(true); return; }
+            if (!cloneHasMaterials(action)) {
+                showNotification(`🌀 分身：${action.name}所需材料不足，已停止`, '#ef4444', 'error');
+                stopClone(true);
+                return;
+            }
+            c.progress += 0.1;
+            const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
+            if (c.progress >= duration) {
+                completeAction(c.action);
+                c.progress = 0;
+            }
+            tickCloneBar(duration);
+        }
+
+        // 分身状态条：整体重绘（分配 / 停止 / 解锁时）
+        function renderCloneBar() {
+            const bar = document.getElementById('cloneBar');
+            if (!bar) return;
+            if (!isCloneUnlocked()) { bar.style.display = 'none'; return; }
+            bar.style.display = 'block';
+            const c = getClone();
+            const action = c.action ? getAction(c.action.skill, c.action.action) : null;
+            const factor = getCloneFactor();
+            if (action) {
+                bar.innerHTML = `<div class="clone-bar-top"><span>🌀 分身：<b>${action.name}</b></span><span id="cloneRemain"></span>
+                    <button class="btn btn-secondary clone-stop" onclick="stopClone()">停止</button></div>
+                    <div class="progress-bar" style="height: 6px;"><div id="cloneFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div>`;
+            } else {
+                bar.innerHTML = `<div class="clone-bar-top"><span>🌀 分身空闲</span><span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span></div>`;
+            }
+        }
+
+        // 分身状态条：每 tick 只更新进度
+        function tickCloneBar(duration) {
+            const c = getClone();
+            const pct = Math.min(100, (c.progress / duration) * 100);
+            const fill = document.getElementById('cloneFill');
+            if (fill) fill.style.width = pct + '%';
+            const remain = document.getElementById('cloneRemain');
+            if (remain) remain.textContent = Math.max(0, duration - c.progress).toFixed(1) + 's';
+            const card = document.getElementById('action-' + c.action.skill + '-' + c.action.action);
+            const cardFill = card && card.querySelector('.action-progress-fill');
+            if (cardFill) cardFill.style.width = pct + '%';
+        }
+
+        // 分身离线结算：与主角的离线规则一致（材料限制、节省材料、产出翻倍、技能 / 精通经验），耗时按分身倍率
+        function settleCloneOffline(offlineSeconds) {
+            if (!isCloneUnlocked() || !(offlineSeconds >= 1)) return;
+            const c = getClone();
+            if (!c.action) return;
+            const { skill, action: key } = c.action;
+            const action = getAction(skill, key);
+            if (!action || !action.output) { c.action = null; return; }
+            const budget = Math.min(offlineSeconds, (gameState.settings?.maxOfflineHours || 24) * 3600);
+            const duration = getCloneDuration(skill, action.duration, key);
+            if (!(duration > 0)) return;
+            let n = Math.floor(budget / duration);
+            let ranOut = false;
+            if (action.requires) {
+                Object.entries(action.requires).forEach(([itemId, qty]) => {
+                    const owned = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
+                    const affordable = Math.floor(owned / qty);
+                    if (affordable < n) { n = affordable; ranOut = true; }
+                });
+                const saveRate = Math.min(0.9, getSkillMod('save', skill) + getMasteryBonus(skill, key).save);
+                Object.entries(action.requires).forEach(([itemId, qty]) => {
+                    if (n > 0) consumeItem(itemId, Math.round(qty * n * (1 - saveRate)));
+                });
+            }
+            if (n > 0) {
+                const per = JSON.parse(JSON.stringify(action.output));
+                applySkillLevelBonus(skill, per);
+                const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double;
+                gameState.player.coins += (per.coins || 0) * n;
+                (per.items || []).forEach(item => {
+                    const qty = Math.floor(item.qty * n * (1 + doubleRate) + 1e-9);
+                    if (qty > 0) addToInventory(item.id, qty);
+                });
+                if (per.skill && per.exp) addSkillExp(per.skill, per.exp * n, key);
+                addMasteryExp(skill, key, action.duration * n);
+                showNotification(`🌀 分身离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
+            }
+            if (ranOut) c.action = null;
+            c.progress = 0;
+            renderCloneBar();
+            if (!c.action) generateRecipeList(skill);
+        }
+
+        function startGameTick() {
+            tickInterval = setInterval(() => {
+                tickClone();
                 if (!gameState.currentAction) return;
 
                 // 秘境战斗特殊处理
@@ -3735,7 +3764,10 @@
                 tribulationGround: { name: '天劫之地', desc: '雷劫试炼', minLevel: 10, maxLevel: 11, enemies: ['thunder-demon', 'tribulation-spirit'], coins: 800, exp: 350 },
                 // P7 元婴期新增
                 voidSea: { name: '虚空之海', desc: '元婴修士的试炼场', minLevel: 13, maxLevel: 14, enemies: ['void-creature', 'soul-devourer'], coins: 1000, exp: 400 },
-                abyssRuins: { name: '深渊遗迹', desc: '极端危险的废墟', minLevel: 15, maxLevel: 16, enemies: ['abyss-lord', 'ancient-god'], coins: 2000, exp: 800 }
+                abyssRuins: { name: '深渊遗迹', desc: '极端危险的废墟', minLevel: 15, maxLevel: 16, enemies: ['abyss-lord', 'ancient-god'], coins: 2000, exp: 800 },
+                // P9 化神期新增
+                chaosWastes: { name: '混沌荒原', desc: '化神修士的试炼场', minLevel: 17, maxLevel: 18, enemies: ['chaos-beast', 'void-walker'], coins: 4000, exp: 1600 },
+                nineNether: { name: '九幽冥渊', desc: '幽冥深处的绝地', minLevel: 19, maxLevel: 20, enemies: ['nether-lord', 'ghost-emperor'], coins: 8000, exp: 3200 }
             };
 
             const actions = {};
@@ -3849,63 +3881,72 @@
         }
 
         // 进入普通战斗区域（扩展P1-1 UI到所有5个区域）
-        // 各战斗区域的敌人模板（按区域难度）；实际血量 / 攻击再乘 P4_AREA_SCALE
-        const BATTLE_ENEMY_CONFIGS = {
-                forest: [
-                    { name: '野狼', hp: 25, atk: 8, def: 2, spd: 45, icon: '🐺' },
-                    { name: '野猪', hp: 35, atk: 10, def: 4, spd: 35, icon: '🐗' }
-                ],
-                mountain: [
-                    { name: '虎妖', hp: 50, atk: 15, def: 5, spd: 40, icon: '🐯' },
-                    { name: '熊妖', hp: 60, atk: 12, def: 8, spd: 30, icon: '🐻' }
-                ],
-                deepMountain: [
-                    { name: '恶魔', hp: 80, atk: 20, def: 8, spd: 35, icon: '👹' },
-                    { name: '灵兽', hp: 90, atk: 18, def: 10, spd: 40, icon: '✨' }
-                ],
-                swamp: [
-                    { name: '毒兽', hp: 70, atk: 16, def: 6, spd: 38, icon: '🐢' },
-                    { name: '蛇妖', hp: 75, atk: 18, def: 5, spd: 50, icon: '🐍' }
-                ],
-                abyss: [
-                    { name: '魔王', hp: 120, atk: 25, def: 12, spd: 40, icon: '👿' },
-                    { name: '深渊生物', hp: 110, atk: 22, def: 10, spd: 35, icon: '🌀' }
-                ],
-                // P6 金丹期敌人
-                goldenPlains: [
-                    { name: '金甲兽', hp: 200, atk: 40, def: 15, spd: 30, icon: '🦁' },
-                    { name: '灵狼', hp: 150, atk: 45, def: 10, spd: 50, icon: '🐺' }
-                ],
-                tribulationGround: [
-                    { name: '雷劫残魂', hp: 250, atk: 50, def: 18, spd: 35, icon: '⚡' },
-                    { name: '天雷傀儡', hp: 280, atk: 55, def: 20, spd: 30, icon: '🤖' }
-                ],
-                // P7 元婴期敌人
-                voidSea: [
-                    { name: '虚空生物', hp: 800, atk: 80, def: 30, spd: 40, icon: '🌀' },
-                    { name: '噬魂者', hp: 700, atk: 90, def: 25, spd: 55, icon: '👻' }
-                ],
-                abyssRuins: [
-                    { name: '深渊领主', hp: 2000, atk: 120, def: 50, spd: 35, icon: '👿' },
-                    { name: '古神残影', hp: 2500, atk: 150, def: 60, spd: 30, icon: '🌑' }
-                ]
-            };
-
-        // 按区域随机生成一个敌人（在线战斗与离线自动战斗共用）
-        function createAreaEnemy(areaKey) {
-            const areaEnemies = BATTLE_ENEMY_CONFIGS[areaKey] || BATTLE_ENEMY_CONFIGS.forest;
-            const enemyTemplate = areaEnemies[Math.floor(Math.random() * areaEnemies.length)];
-            // P4 平衡层：按区域系数缩放敌人血量与攻击（见 P4_AREA_SCALE）
-            const areaScale = P4_AREA_SCALE[areaKey] || { hp: 1, atk: 1 };
-            const scaledHP = Math.max(1, Math.round(enemyTemplate.hp * areaScale.hp));
-            return {
-                ...enemyTemplate,
-                hp: scaledHP,
-                atk: Math.max(1, Math.round(enemyTemplate.atk * areaScale.atk)),
-                currentHP: scaledHP
-            };
-        }
-
+        // 各战斗区域的敌人模板（按区域难度）；实际血量 / 攻击再乘 P4_AREA_SCALE
+        const BATTLE_ENEMY_CONFIGS = {
+                forest: [
+                    { name: '野狼', hp: 25, atk: 8, def: 2, spd: 45, icon: '🐺' },
+                    { name: '野猪', hp: 35, atk: 10, def: 4, spd: 35, icon: '🐗' }
+                ],
+                mountain: [
+                    { name: '虎妖', hp: 50, atk: 15, def: 5, spd: 40, icon: '🐯' },
+                    { name: '熊妖', hp: 60, atk: 12, def: 8, spd: 30, icon: '🐻' }
+                ],
+                deepMountain: [
+                    { name: '恶魔', hp: 80, atk: 20, def: 8, spd: 35, icon: '👹' },
+                    { name: '灵兽', hp: 90, atk: 18, def: 10, spd: 40, icon: '✨' }
+                ],
+                swamp: [
+                    { name: '毒兽', hp: 70, atk: 16, def: 6, spd: 38, icon: '🐢' },
+                    { name: '蛇妖', hp: 75, atk: 18, def: 5, spd: 50, icon: '🐍' }
+                ],
+                abyss: [
+                    { name: '魔王', hp: 120, atk: 25, def: 12, spd: 40, icon: '👿' },
+                    { name: '深渊生物', hp: 110, atk: 22, def: 10, spd: 35, icon: '🌀' }
+                ],
+                // P6 金丹期敌人
+                goldenPlains: [
+                    { name: '金甲兽', hp: 200, atk: 40, def: 15, spd: 30, icon: '🦁' },
+                    { name: '灵狼', hp: 150, atk: 45, def: 10, spd: 50, icon: '🐺' }
+                ],
+                tribulationGround: [
+                    { name: '雷劫残魂', hp: 250, atk: 50, def: 18, spd: 35, icon: '⚡' },
+                    { name: '天雷傀儡', hp: 280, atk: 55, def: 20, spd: 30, icon: '🤖' }
+                ],
+                // P7 元婴期敌人
+                voidSea: [
+                    { name: '虚空生物', hp: 800, atk: 80, def: 30, spd: 40, icon: '🌀' },
+                    { name: '噬魂者', hp: 700, atk: 90, def: 25, spd: 55, icon: '👻' }
+                ],
+                abyssRuins: [
+                    { name: '深渊领主', hp: 2000, atk: 120, def: 50, spd: 35, icon: '👿' },
+                    { name: '古神残影', hp: 2500, atk: 150, def: 60, spd: 30, icon: '🌑' }
+                ],
+                // P9 化神期敌人
+                chaosWastes: [
+                    { name: '混沌兽', hp: 3000, atk: 200, def: 80, spd: 40, icon: '🐲' },
+                    { name: '虚空行者', hp: 2600, atk: 230, def: 70, spd: 55, icon: '🌀' }
+                ],
+                nineNether: [
+                    { name: '九幽魔君', hp: 6000, atk: 320, def: 120, spd: 45, icon: '😈' },
+                    { name: '幽冥鬼帝', hp: 5200, atk: 350, def: 110, spd: 55, icon: '💀' }
+                ]
+            };
+
+        // 按区域随机生成一个敌人（在线战斗与离线自动战斗共用）
+        function createAreaEnemy(areaKey) {
+            const areaEnemies = BATTLE_ENEMY_CONFIGS[areaKey] || BATTLE_ENEMY_CONFIGS.forest;
+            const enemyTemplate = areaEnemies[Math.floor(Math.random() * areaEnemies.length)];
+            // P4 平衡层：按区域系数缩放敌人血量与攻击（见 P4_AREA_SCALE）
+            const areaScale = P4_AREA_SCALE[areaKey] || { hp: 1, atk: 1 };
+            const scaledHP = Math.max(1, Math.round(enemyTemplate.hp * areaScale.hp));
+            return {
+                ...enemyTemplate,
+                hp: scaledHP,
+                atk: Math.max(1, Math.round(enemyTemplate.atk * areaScale.atk)),
+                currentHP: scaledHP
+            };
+        }
+
         function enterBattleArea(areaKey, auto = false) {
             const action = getAction('battle', areaKey);
             const areaData = action.areaData;
