@@ -454,10 +454,10 @@
                     { id: 'yuanyingsword', name: '元婴灵剑', icon: '✨', price: 10000, desc: '攻击力+80', minRealmIndex: 13 }
                 ],
                 materials: [
-                    { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5 },
-                    { id: 'crystal', name: '玄晶 ×3', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
-                    { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9 },
-                    { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13 }
+                    { id: 'spiritore', name: '灵矿石', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5 },
+                    { id: 'crystal', name: '玄晶', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
+                    { id: 'spiritcrystal', name: '灵晶', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9 },
+                    { id: 'immortalore', name: '仙矿', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13 }
                 ],
                 arts: [
                     { id: 'qingmu_art', name: '青木诀', icon: '🌿', price: 200, desc: '修炼速度 ×1.1', minRealmIndex: 1, type: 'art' },
