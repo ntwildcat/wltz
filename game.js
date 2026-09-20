@@ -4592,34 +4592,28 @@
             document.getElementById('cultivationBar').style.width = percentage + '%';
             document.getElementById('cultivationProgress').style.width = percentage + '%';
             document.getElementById('progressText').textContent = Math.round(percentage) + '%';
-            // P3修复：修为显示，当达到上限时添加提示
+            // 修为显示：达到上限时提示可突破；大境界缺丹药时明确写出缺什么
+            const full = gameState.player.cultivationXP >= realm.nextReq;
+            const isMajor = (gameState.player.realmIndex % 4 === 0 && gameState.player.realmIndex > 0) && !!GAME_CONFIG.realms[gameState.player.realmIndex + 1];
+            const req = isMajor ? MAJOR_BREAKTHROUGH_PILLS[gameState.player.realmIndex] : null;
+            const pillQty = req ? ((gameState.player.inventory.find(item => item.id === req.pillId) || {}).qty || 0) : 0;
+            const lackPill = full && !!req && pillQty < req.qty;
             let cultivationDisplay = `${gameState.player.cultivationXP}/${realm.nextReq}`;
-            if (gameState.player.cultivationXP >= realm.nextReq) {
-                cultivationDisplay += ` ✨ 可突破`;
-            }
+            if (full) cultivationDisplay += lackPill ? ` ⚠ 缺${req.pillName}` : ` ✨ 可突破`;
             document.getElementById('cultivationXP').textContent = cultivationDisplay;
 
-            // 显示突破按钮（无冷却时间限制）
-            if (gameState.player.cultivationXP >= realm.nextReq) {
-                // 修为足够，检查是否为大境界突破（新索引规则）
-                const isMajorBreakthrough = (gameState.player.realmIndex % 4 === 0 && gameState.player.realmIndex > 0);
-                if (isMajorBreakthrough) {
-                    // 大境界突破需要检查丹药
-                    const requirement = MAJOR_BREAKTHROUGH_PILLS[gameState.player.realmIndex];
-                    if (requirement) {
-                        const pillInInventory = gameState.player.inventory.find(item => item.id === requirement.pillId);
-                        const currentQty = pillInInventory ? pillInInventory.qty : 0;
-                        // 只有丹药充足才显示
-                        document.getElementById('breakThroughBtn').style.display = currentQty >= requirement.qty ? 'block' : 'none';
-                    } else {
-                        document.getElementById('breakThroughBtn').style.display = 'block';
-                    }
-                } else {
-                    // 小境界突破直接显示
-                    document.getElementById('breakThroughBtn').style.display = 'block';
-                }
+            // 突破按钮：修为满了就显示。大境界缺丹药时也显示，点开能看到所需丹药和获取方式
+            const btBtn = document.getElementById('breakThroughBtn');
+            if (full && GAME_CONFIG.realms[gameState.player.realmIndex + 1]) {
+                btBtn.style.display = 'block';
+                btBtn.classList.toggle('btn-warn', lackPill);
+                btBtn.textContent = lackPill ? `⚠ 修为已满 · 需${req.pillName}×${req.qty}（点击查看获取方式）` : '✨ 尝试突破 ✨';
+            } else if (full) {
+                btBtn.style.display = 'block';   // 已是最高境界：点开会提示尽头
+                btBtn.classList.remove('btn-warn');
+                btBtn.textContent = '✨ 尝试突破 ✨';
             } else {
-                document.getElementById('breakThroughBtn').style.display = 'none';
+                btBtn.style.display = 'none';
             }
 
             if (gameState.currentAction) {
@@ -5109,6 +5103,28 @@
         }
 
         // ==================== 突破系统 ====================
+        // 某种突破丹药的获取途径：从配置里自动汇总（配方 + 秘境掉落），避免文字与实际脱节
+        function getPillSources(pillId) {
+            const lines = [];
+            const itemName = id => (GAME_CONFIG.items[id] || {}).name || id;
+            Object.entries(gameState.skills).forEach(([skillName, skill]) => {
+                Object.values(skill.recipes || {}).forEach(recipe => {
+                    if (!((recipe.output && recipe.output.items) || []).some(i => i.id === pillId)) return;
+                    const mats = Object.entries(recipe.requires || {}).map(([id, q]) => `${itemName(id)}×${q}`).join('、');
+                    const ok = skill.level >= (recipe.requiredLevel || 1);
+                    lines.push(`${ok ? '✓' : '○'} ${skill.name}·${recipe.name}（需${skill.name} Lv.${recipe.requiredLevel}，当前 Lv.${skill.level}${mats ? '；材料：' + mats : ''}）`);
+                });
+            });
+            Object.values(GAME_CONFIG.dungeons).forEach(d => {
+                const drop = [...((d.rewards || {}).fixed || []), ...((d.rewards || {}).random || [])].find(x => x.id === pillId);
+                if (!drop) return;
+                const ok = gameState.player.realmIndex >= d.minRealmIndex;
+                lines.push(`${ok ? '✓' : '○'} 秘境「${d.name}」通关掉落${drop.probability ? '（约 ' + Math.round(drop.probability * 100) + '%）' : ''}（入口：${getRealmName(d.minRealmIndex)}）`);
+            });
+            if (pillId === 'pill') lines.push('玄门后裔出身开局自带 1 个');
+            return lines;
+        }
+
         function showBreakthroughModal() {
             const realmIndex = gameState.player.realmIndex;
             const currentRealm = GAME_CONFIG.realms[realmIndex];
@@ -5142,6 +5158,18 @@
                         ? `${currentQty} ✅`
                         : `${currentQty} ❌`;
                     document.getElementById('btPillCount').textContent = qtyDisplay;
+
+                    // 丹药不足时列出获取方式
+                    const guide = document.getElementById('btPillGuide');
+                    if (guide) {
+                        if (currentQty >= pillReq.qty) {
+                            guide.style.display = 'none';
+                        } else {
+                            guide.style.display = 'block';
+                            guide.innerHTML = '<div class="bt-guide-title">获取方式（✓ 已满足条件，○ 尚未满足）</div>' +
+                                getPillSources(pillReq.pillId).map(t => `<div class="bt-guide-line">${t}</div>`).join('');
+                        }
+                    }
                 }
 
                 // 更新按钮文本

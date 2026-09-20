@@ -1797,3 +1797,9 @@ body[data-panel="shop"] .coin-display { border-color: var(--cinnabar-2) !importa
 .item-name { font-size: 0.95em; line-height: 1.25; }
 .item-qty { font-size: 0.85em; }
 .item-stats { font-size: 0.68em; }
+
+/* 突破指引：缺丹药时的提示按钮与获取方式 */
+#breakThroughBtn.btn-warn { border-color: var(--color-warning); color: var(--color-warning); background: rgba(201, 138, 62, 0.1); }
+.bt-guide { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-l3); font-size: 0.85em; line-height: 1.7; color: var(--text-l3); text-align: left; }
+.bt-guide-title { color: var(--text-l2); margin-bottom: 4px; }
+.bt-guide-line { padding-left: 4px; }
