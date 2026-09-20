@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=9.0">
+    <link rel="stylesheet" href="style.css?v=9.2">
 
 </head>
 <body data-panel="cultivation">
@@ -560,6 +560,32 @@
     </div>
 
     <!-- 物品详情弹窗（P1功能）-->
+    <!-- 购买数量对话框 -->
+    <div id="buyModal" class="modal" style="display: none;">
+        <div class="modal-content" role="dialog" aria-modal="true" style="max-width: 380px; padding: 30px;">
+            <button type="button" class="modal-close" onclick="closeBuyDialog()" aria-label="关闭">&times;</button>
+            <div style="text-align: center; margin-bottom: 16px;">
+                <div style="font-size: 44px; margin-bottom: 8px;" id="buyIcon">📦</div>
+                <div style="font-size: 1.2em; color: #6f9c8a; font-weight: bold;" id="buyName">商品</div>
+                <div style="color: #888; font-size: 0.85em; margin-top: 4px;" id="buyDesc"></div>
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 12px 15px; border-radius: 4px; margin-bottom: 14px; line-height: 1.8em;">
+                <div><span style="color: #888;">单价:</span> <span id="buyUnitPrice">-</span></div>
+                <div><span style="color: #888;">已有:</span> <span id="buyOwned">0</span></div>
+                <div><span style="color: #888;">灵石:</span> <span id="buyCoins">0</span></div>
+            </div>
+            <div class="sell-qty-row" style="margin-bottom: 14px;">
+                <span>数量</span>
+                <button class="btn btn-secondary" onclick="changeBuyQty(-1)">−</button>
+                <input type="number" id="buyQty" name="buyQty" min="1" value="1" autocomplete="off" inputmode="numeric" aria-label="购买数量" oninput="updateBuyLabel()">
+                <button class="btn btn-secondary" onclick="changeBuyQty(1)">+</button>
+                <button class="btn btn-secondary" onclick="changeBuyQty('max')">最大</button>
+            </div>
+            <div id="buyTotalHint" style="text-align: center; color: #c4483a; min-height: 1.4em; font-size: 0.85em;"></div>
+            <button class="btn" id="buyConfirmBtn" onclick="confirmBuy()" style="width: 100%;">购买</button>
+        </div>
+    </div>
+
     <div id="itemDetailModal" class="modal" style="display: none;">
         <div class="modal-content" role="dialog" aria-modal="true" style="max-width: 400px; padding: 30px;">
             <button type="button" class="modal-close" onclick="closeItemDetail()" aria-label="关闭">&times;</button>
@@ -700,7 +726,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=9.0"></script>
+    <script src="game.js?v=9.2"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

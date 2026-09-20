@@ -412,9 +412,9 @@
                 spiritpill: { name: '聚灵丹（高级）', icon: '🔷', type: 'consumable' },
 
                 // P6/P7 新矿石和种子
-                spiritcrystal: { name: '灵晶', icon: '🔹', type: 'ore' },
-                immortalore: { name: '仙矿', icon: '✨', type: 'ore' },
-                chaosstone: { name: '混沌石', icon: '🌑', type: 'ore' },
+                spiritcrystal: { name: '灵晶', icon: '🔹', type: 'ore', sellPrice: 200 },
+                immortalore: { name: '仙矿', icon: '✨', type: 'ore', sellPrice: 800 },
+                chaosstone: { name: '混沌石', icon: '🌑', type: 'ore', sellPrice: 1200 },
                 daofruit: { name: '悟道果', icon: '🍇', type: 'material', sellPrice: 600 },
                 seed_daofruit: { name: '悟道果种子', icon: '🌰', type: 'seed', sellPrice: 300 },
 
@@ -454,10 +454,10 @@
                     { id: 'yuanyingsword', name: '元婴灵剑', icon: '✨', price: 10000, desc: '攻击力+80', minRealmIndex: 13 }
                 ],
                 materials: [
-                    { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5 },
-                    { id: 'crystal', name: '玄晶 ×3', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
-                    { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9 },
-                    { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13 }
+                    { id: 'spiritore', name: '灵矿石', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5 },
+                    { id: 'crystal', name: '玄晶', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
+                    { id: 'spiritcrystal', name: '灵晶', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9 },
+                    { id: 'immortalore', name: '仙矿', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13 }
                 ],
                 arts: [
                     { id: 'qingmu_art', name: '青木诀', icon: '🌿', price: 200, desc: '修炼速度 ×1.1', minRealmIndex: 1, type: 'art' },
@@ -3934,6 +3934,10 @@
                 usages.unshift(`恢复${food.hpRestore}点生命 · 冷却${food.cooldown}秒 · 需要${getRealmName(food.minRealm)}`);
             }
 
+            if (!itemConfig.sellPrice) {
+                usages.push(itemConfig.type === 'breakthrough_material' ? '突破丹药不能出售（大境界突破必需）' : '此物品不可出售');
+            }
+
             if (usages.length > 0) {
                 usageText = usages.join('<br/>');
             }
@@ -4832,7 +4836,83 @@
             document.getElementById('inventoryCapacity').textContent = `${inventory.length}/${gameState.player.inventoryCapacity}`;
         }
 
-        function buyItem(shopId, itemId) {
+        // 普通商品（食物 / 材料 / 装备）可以选购买数量；功法、永久升级等独一无二的只能买一次，仍直接购买
+        function isBulkBuyable(item) {
+            return !!item && !['art', 'upgrade', 'unlock'].includes(item.type);
+        }
+
+        function findShopItem(itemId) {
+            let found = null;
+            Object.values(GAME_CONFIG.shop).forEach(category => {
+                const f = category.find(i => i.id === itemId);
+                if (f) found = f;
+            });
+            return found;
+        }
+
+        // 购买数量对话框：数量 / 总价实时显示，最多可买 = 灵石 ÷ 单价
+        function openBuyDialog(shopId, itemId) {
+            const item = findShopItem(itemId);
+            if (!item) return;
+            const modal = document.getElementById('buyModal');
+            const input = document.getElementById('buyQty');
+            modal.dataset.shopId = shopId;
+            modal.dataset.itemId = itemId;
+            document.getElementById('buyIcon').textContent = item.icon;
+            document.getElementById('buyName').textContent = item.name;
+            document.getElementById('buyDesc').textContent = item.desc || '';
+            document.getElementById('buyUnitPrice').textContent = `${item.price} 灵石`;
+            document.getElementById('buyOwned').textContent = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
+            document.getElementById('buyCoins').textContent = gameState.player.coins;
+            input.value = 1;
+            modal.style.display = 'flex';
+            updateBuyLabel();
+        }
+
+        function closeBuyDialog() {
+            document.getElementById('buyModal').style.display = 'none';
+        }
+
+        function getBuyMax() {
+            const modal = document.getElementById('buyModal');
+            const item = findShopItem(modal.dataset.itemId);
+            if (!item) return 1;
+            return Math.max(1, Math.min(999, Math.floor(gameState.player.coins / item.price)));
+        }
+
+        function changeBuyQty(delta) {
+            const input = document.getElementById('buyQty');
+            const max = getBuyMax();
+            const cur = parseInt(input.value, 10) || 1;
+            input.value = delta === 'max' ? max : Math.max(1, Math.min(max, cur + delta));
+            updateBuyLabel();
+        }
+
+        function updateBuyLabel() {
+            const modal = document.getElementById('buyModal');
+            const item = findShopItem(modal.dataset.itemId);
+            if (!item) return;
+            const input = document.getElementById('buyQty');
+            const q = Math.max(1, Math.min(999, parseInt(input.value, 10) || 1));
+            const total = item.price * q;
+            const btn = document.getElementById('buyConfirmBtn');
+            btn.textContent = `购买 ${q} 个（${total} 灵石）`;
+            btn.disabled = total > gameState.player.coins;
+            document.getElementById('buyTotalHint').textContent = total > gameState.player.coins ? '灵石不足' : '';
+        }
+
+        function confirmBuy() {
+            const modal = document.getElementById('buyModal');
+            const q = Math.max(1, Math.min(999, parseInt(document.getElementById('buyQty').value, 10) || 1));
+            if (buyItem(modal.dataset.shopId, modal.dataset.itemId, q)) {
+                // 买完更新对话框里的持有数量与灵石，方便继续买；不够钱时自动收起
+                document.getElementById('buyOwned').textContent = (gameState.player.inventory.find(i => i.id === modal.dataset.itemId) || { qty: 0 }).qty;
+                document.getElementById('buyCoins').textContent = gameState.player.coins;
+                changeBuyQty(0);
+            }
+        }
+
+        function buyItem(shopId, itemId, qty = 1) {
             let item = null;
             let price = 0;
 
@@ -4880,6 +4960,16 @@
                 return;
             }
 
+            // 只有普通商品可以一次买多个；独一无二的固定按 1 个
+            if (!isBulkBuyable(item)) qty = 1;
+            qty = Math.max(1, Math.floor(qty));
+            const totalPrice = price * qty;
+            if (gameState.player.coins < totalPrice) {
+                showNotification(`灵石不足！需要${totalPrice}，拥有${gameState.player.coins}`, '#c4483a', 'error');
+                return false;
+            }
+            price = totalPrice;
+
             // 扣灵石
             gameState.player.coins -= price;
 
@@ -4925,12 +5015,16 @@
                 updateActionDisplay();
             } else {
                 // 消耗品处理
-                addToInventory(itemId, 1);
-                showNotification(`购买成功：${item.name}`, '#6f9c8a');
+                if (!addToInventory(itemId, qty)) {
+                    gameState.player.coins += price;   // 背包放不下：退款
+                    return false;
+                }
+                showNotification(`购买成功：${item.name} ×${qty}`, '#6f9c8a');
             }
 
             updateUI();
             saveGame();
+            return true;
         }
 
         function updateShop() {
@@ -5013,7 +5107,7 @@
                     if (isLocked) {
                         card.onclick = () => showNotification(`🔒 ${item.name}需要${getRealmName(item.minRealmIndex)}`, '#c98a3e');
                     } else if (!isBought) {
-                        card.onclick = () => buyItem(category, item.id);
+                        card.onclick = () => (isBulkBuyable(item) ? openBuyDialog(category, item.id) : buyItem(category, item.id));
                     }
                     shopContainer.appendChild(card);
                 });
