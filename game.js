@@ -1396,10 +1396,9 @@
         }
 
         // 普通战斗处理（P1-5扩展：简化版，10秒自动完成）
-        function performNormalBattleTick() {
-            if (!gameState.battles) return;
-
-            const battle = gameState.battles;
+        // 普通战斗推进一步（0.1 秒 × 战斗速度）：计时、双方回合结算、自动进食；不含任何界面更新
+        // 在线战斗与离线自动战斗共用，保证两者规则一致
+        function stepNormalBattle(battle) {
             const timeDelta = 0.1;
 
             // 增加战斗计时（受战斗速度按钮影响）
@@ -1438,6 +1437,14 @@
 
             // 战斗食物：生命低于阈值时自动进食（恢复战斗内的生命值）
             checkAndAutoEat(battle.playerHP, msg => battle.log.push(msg));
+        }
+
+        function performNormalBattleTick() {
+            if (!gameState.battles) return;
+
+            const battle = gameState.battles;
+
+            stepNormalBattle(battle);
 
             // 更新UI
             updateNormalBattleUI();
@@ -1537,17 +1544,15 @@
 
             // 给予奖励
             const won = battle.currentEnemy.currentHP <= 0;
+            const auto = getAutoBattle();
             if (won) {
-                // 战斗区域精通：灵石与经验加成，并获得精通经验（每胜一场 10）
-                const reward = 1 + getMasteryBonus('battle', areaKey).reward;
-                const coins = Math.round(areaData.coins * reward);
-                const exp = Math.round(areaData.exp * reward);
-                gameState.player.coins += coins;
-                addSkillExp('battle', exp);
-                addMasteryExp('battle', areaKey, 10);
-
-                showNotification(`🎉 战胜${battle.currentEnemy.name}！
+                const { coins, exp } = grantNormalBattleWin(areaKey);
+                auto.wins++; auto.coins += coins; auto.exp += exp;
+                // 托管中不逐场弹胜利提示，统计显示在托管栏里
+                if (!auto.enabled) {
+                    showNotification(`🎉 战胜${battle.currentEnemy.name}！
 +${coins}灵石 +${exp}经验`, '#6fa980');
+                }
             } else if (battle.playerHP.current <= 0) {
                 showNotification(`💀 被${battle.currentEnemy.name}击败，重伤逃出${areaData.name}（血量恢复至50%）`, '#ef4444');
             } else {
@@ -1565,6 +1570,103 @@
 
             updateUI();
             saveGame();
+
+            // 自动战斗托管：胜利清零连败计数，连败 3 场则停下；否则立刻续战同一区域
+            if (auto.enabled) {
+                auto.streak = won ? 0 : auto.streak + 1;
+                if (!won) auto.losses++;
+                if (auto.streak >= AUTO_BATTLE_MAX_LOSS_STREAK) {
+                    showNotification(`🤖 自动战斗已停止：连续 ${auto.streak} 场未能取胜，请检查装备与食物`, '#f59e0b');
+                    renderAutoBattleBar();
+                } else {
+                    enterBattleArea(areaKey, true);
+                }
+            }
+        }
+
+        // 一场普通战斗取胜的奖励：精通加成后的灵石 / 经验，并获得该区域精通经验（每胜一场 10）
+        function grantNormalBattleWin(areaKey) {
+            const areaData = getAction('battle', areaKey).areaData;
+            const reward = 1 + getMasteryBonus('battle', areaKey).reward;
+            const coins = Math.round(areaData.coins * reward);
+            const exp = Math.round(areaData.exp * reward);
+            gameState.player.coins += coins;
+            addSkillExp('battle', exp);
+            addMasteryExp('battle', areaKey, 10);
+            return { coins, exp };
+        }
+
+        // ==================== 自动战斗托管 ====================
+        const AUTO_BATTLE_MAX_LOSS_STREAK = 3;   // 连续几场没赢就停止托管
+
+        function getAutoBattle() {
+            if (!gameState.autoBattle) {
+                gameState.autoBattle = { enabled: false, wins: 0, losses: 0, streak: 0, coins: 0, exp: 0 };
+            }
+            return gameState.autoBattle;
+        }
+
+        function toggleAutoBattle() {
+            const auto = getAutoBattle();
+            auto.enabled = !auto.enabled;
+            auto.streak = 0;
+            // 打开托管时，若正好在打普通战斗，本场结束后就会自动续战
+            showNotification(auto.enabled ? '🤖 自动战斗已开启：打完一场自动续战，离线时也会继续' : '🤖 自动战斗已关闭', '#c9a961');
+            renderAutoBattleBar();
+            saveGame();
+        }
+
+        function renderAutoBattleBar() {
+            const auto = getAutoBattle();
+            const fighting = !!(gameState.currentAction && gameState.currentAction.isBattle);
+            const stats = (auto.wins + auto.losses) > 0
+                ? ` · 本次 胜${auto.wins} 负${auto.losses} · +${auto.coins}灵石 +${auto.exp}经验` : '';
+            const html = `<button class="auto-battle-btn ${auto.enabled ? 'on' : ''}" onclick="toggleAutoBattle()">🤖 自动战斗：${auto.enabled ? '开' : '关'}</button>` +
+                `<span class="auto-battle-stat">${auto.enabled ? (fighting ? '托管中' : '未在战斗，进入区域后开始') : '开启后打完自动续战，离线也会继续（消耗食物，连败 3 场自动停止）'}${stats}</span>`;
+            const bar = document.getElementById('autoBattleBar');
+            if (bar) bar.innerHTML = html;
+            const st = document.getElementById('autoBattleStatus');
+            if (st) st.textContent = auto.enabled ? `🤖 托管中 胜${auto.wins} 负${auto.losses}` : '';
+        }
+
+        // 离线自动战斗：用与在线完全相同的战斗规则无头模拟（真实消耗食物、真实胜负、真实奖励）
+        // 战斗速度临时设为 5，使每步 0.5 秒，既保证食物冷却 / 回复按时间折算，又控制计算量
+        function runOfflineAutoBattle(areaKey, budgetSeconds) {
+            const auto = getAutoBattle();
+            const hp = gameState.player.stats.hp;
+            const savedSpeed = gameState.battleSpeed;
+            const savedTimer = gameState.player.foodUseTimer;
+            gameState.battleSpeed = 5;
+            const r = { fights: 0, wins: 0, losses: 0, coins: 0, exp: 0, stopped: false };
+            let elapsed = 0, streak = 0;
+            try {
+                while (elapsed < budgetSeconds && r.fights < 20000) {
+                    const battle = { currentArea: areaKey, playerHP: { current: hp.current, max: hp.max },
+                        currentEnemy: createAreaEnemy(areaKey), log: [], turnCount: 0 };
+                    gameState.player.foodUseTimer = FOOD_CONFIG.autoEatConfig.cooldown;
+                    pickBestFood();
+                    do {
+                        stepNormalBattle(battle);
+                    } while (battle.currentEnemy.currentHP > 0 && battle.playerHP.current > 0 && battle.turnCount < 10);
+                    elapsed += battle.turnCount;
+                    r.fights++;
+                    const won = battle.currentEnemy.currentHP <= 0;
+                    hp.current = battle.playerHP.current <= 0 ? Math.floor(hp.max * 0.5) : Math.min(hp.max, battle.playerHP.current);
+                    if (won) {
+                        const g = grantNormalBattleWin(areaKey);
+                        r.wins++; r.coins += g.coins; r.exp += g.exp; streak = 0;
+                    } else {
+                        r.losses++;
+                        if (++streak >= AUTO_BATTLE_MAX_LOSS_STREAK) { r.stopped = true; break; }
+                    }
+                }
+            } finally {
+                gameState.battleSpeed = savedSpeed;
+                gameState.player.foodUseTimer = savedTimer;
+            }
+            auto.wins += r.wins; auto.losses += r.losses; auto.coins += r.coins; auto.exp += r.exp; auto.streak = streak;
+            r.elapsed = Math.round(elapsed);
+            return r;
         }
 
         // 秘境完成处理
@@ -2445,6 +2547,7 @@
             if (panel) panel.classList.remove('hidden');
             document.body.dataset.panel = panelName;
             updateSkillHeaders();
+            if (panelName === 'battle') renderAutoBattleBar();
             syncMobileTab(panelName);
             renderMobileSkillBar();
 
@@ -3439,6 +3542,7 @@
 
         // 切换战斗/秘境标签页
         function switchBattleTab(tab) {
+            renderAutoBattleBar();
             const areaBtn = document.getElementById('battleTab-areas');
             const dungeonBtn = document.getElementById('battleTab-dungeons');
             const areaContent = document.getElementById('battleContent-areas');
@@ -3505,51 +3609,67 @@
         }
 
         // 进入普通战斗区域（扩展P1-1 UI到所有5个区域）
-        function enterBattleArea(areaKey) {
+        // 各战斗区域的敌人模板（按区域难度）；实际血量 / 攻击再乘 P4_AREA_SCALE
+        const BATTLE_ENEMY_CONFIGS = {
+                forest: [
+                    { name: '野狼', hp: 25, atk: 8, def: 2, spd: 45, icon: '🐺' },
+                    { name: '野猪', hp: 35, atk: 10, def: 4, spd: 35, icon: '🐗' }
+                ],
+                mountain: [
+                    { name: '虎妖', hp: 50, atk: 15, def: 5, spd: 40, icon: '🐯' },
+                    { name: '熊妖', hp: 60, atk: 12, def: 8, spd: 30, icon: '🐻' }
+                ],
+                deepMountain: [
+                    { name: '恶魔', hp: 80, atk: 20, def: 8, spd: 35, icon: '👹' },
+                    { name: '灵兽', hp: 90, atk: 18, def: 10, spd: 40, icon: '✨' }
+                ],
+                swamp: [
+                    { name: '毒兽', hp: 70, atk: 16, def: 6, spd: 38, icon: '🐢' },
+                    { name: '蛇妖', hp: 75, atk: 18, def: 5, spd: 50, icon: '🐍' }
+                ],
+                abyss: [
+                    { name: '魔王', hp: 120, atk: 25, def: 12, spd: 40, icon: '👿' },
+                    { name: '深渊生物', hp: 110, atk: 22, def: 10, spd: 35, icon: '🌀' }
+                ],
+                // P6 金丹期敌人
+                goldenPlains: [
+                    { name: '金甲兽', hp: 200, atk: 40, def: 15, spd: 30, icon: '🦁' },
+                    { name: '灵狼', hp: 150, atk: 45, def: 10, spd: 50, icon: '🐺' }
+                ],
+                tribulationGround: [
+                    { name: '雷劫残魂', hp: 250, atk: 50, def: 18, spd: 35, icon: '⚡' },
+                    { name: '天雷傀儡', hp: 280, atk: 55, def: 20, spd: 30, icon: '🤖' }
+                ],
+                // P7 元婴期敌人
+                voidSea: [
+                    { name: '虚空生物', hp: 800, atk: 80, def: 30, spd: 40, icon: '🌀' },
+                    { name: '噬魂者', hp: 700, atk: 90, def: 25, spd: 55, icon: '👻' }
+                ],
+                abyssRuins: [
+                    { name: '深渊领主', hp: 2000, atk: 120, def: 50, spd: 35, icon: '👿' },
+                    { name: '古神残影', hp: 2500, atk: 150, def: 60, spd: 30, icon: '🌑' }
+                ]
+            };
+
+        // 按区域随机生成一个敌人（在线战斗与离线自动战斗共用）
+        function createAreaEnemy(areaKey) {
+            const areaEnemies = BATTLE_ENEMY_CONFIGS[areaKey] || BATTLE_ENEMY_CONFIGS.forest;
+            const enemyTemplate = areaEnemies[Math.floor(Math.random() * areaEnemies.length)];
+            // P4 平衡层：按区域系数缩放敌人血量与攻击（见 P4_AREA_SCALE）
+            const areaScale = P4_AREA_SCALE[areaKey] || { hp: 1, atk: 1 };
+            const scaledHP = Math.max(1, Math.round(enemyTemplate.hp * areaScale.hp));
+            return {
+                ...enemyTemplate,
+                hp: scaledHP,
+                atk: Math.max(1, Math.round(enemyTemplate.atk * areaScale.atk)),
+                currentHP: scaledHP
+            };
+        }
+
+        function enterBattleArea(areaKey, auto = false) {
             const action = getAction('battle', areaKey);
             const areaData = action.areaData;
 
-            // 简单敌人配置（按区域难度）
-            const enemyConfigs = {
-                forest: [
-                    { name: '野狼', hp: 25, atk: 8, def: 2, spd: 45, icon: '🐺' },
-                    { name: '野猪', hp: 35, atk: 10, def: 4, spd: 35, icon: '🐗' }
-                ],
-                mountain: [
-                    { name: '虎妖', hp: 50, atk: 15, def: 5, spd: 40, icon: '🐯' },
-                    { name: '熊妖', hp: 60, atk: 12, def: 8, spd: 30, icon: '🐻' }
-                ],
-                deepMountain: [
-                    { name: '恶魔', hp: 80, atk: 20, def: 8, spd: 35, icon: '👹' },
-                    { name: '灵兽', hp: 90, atk: 18, def: 10, spd: 40, icon: '✨' }
-                ],
-                swamp: [
-                    { name: '毒兽', hp: 70, atk: 16, def: 6, spd: 38, icon: '🐢' },
-                    { name: '蛇妖', hp: 75, atk: 18, def: 5, spd: 50, icon: '🐍' }
-                ],
-                abyss: [
-                    { name: '魔王', hp: 120, atk: 25, def: 12, spd: 40, icon: '👿' },
-                    { name: '深渊生物', hp: 110, atk: 22, def: 10, spd: 35, icon: '🌀' }
-                ],
-                // P6 金丹期敌人
-                goldenPlains: [
-                    { name: '金甲兽', hp: 200, atk: 40, def: 15, spd: 30, icon: '🦁' },
-                    { name: '灵狼', hp: 150, atk: 45, def: 10, spd: 50, icon: '🐺' }
-                ],
-                tribulationGround: [
-                    { name: '雷劫残魂', hp: 250, atk: 50, def: 18, spd: 35, icon: '⚡' },
-                    { name: '天雷傀儡', hp: 280, atk: 55, def: 20, spd: 30, icon: '🤖' }
-                ],
-                // P7 元婴期敌人
-                voidSea: [
-                    { name: '虚空生物', hp: 800, atk: 80, def: 30, spd: 40, icon: '🌀' },
-                    { name: '噬魂者', hp: 700, atk: 90, def: 25, spd: 55, icon: '👻' }
-                ],
-                abyssRuins: [
-                    { name: '深渊领主', hp: 2000, atk: 120, def: 50, spd: 35, icon: '👿' },
-                    { name: '古神残影', hp: 2500, atk: 150, def: 60, spd: 30, icon: '🌑' }
-                ]
-            };
 
             // 初始化普通战斗状态
             gameState.battles = gameState.battles || {};
@@ -3557,19 +3677,8 @@
             gameState.battles.playerHP = { current: gameState.player.stats.hp.current, max: gameState.player.stats.hp.max };
             gameState.battles.startPlayerHP = gameState.player.stats.hp.current;
 
-            // 随机选择敌人
-            const areaEnemies = enemyConfigs[areaKey] || enemyConfigs.forest;
-            const enemyTemplate = areaEnemies[Math.floor(Math.random() * areaEnemies.length)];
-
-            // P4 平衡层：按区域系数缩放敌人血量与攻击（见 P4_AREA_SCALE）
-            const areaScale = P4_AREA_SCALE[areaKey] || { hp: 1, atk: 1 };
-            const scaledHP = Math.max(1, Math.round(enemyTemplate.hp * areaScale.hp));
-            gameState.battles.currentEnemy = {
-                ...enemyTemplate,
-                hp: scaledHP,
-                atk: Math.max(1, Math.round(enemyTemplate.atk * areaScale.atk)),
-                currentHP: scaledHP
-            };
+            // 随机生成敌人
+            gameState.battles.currentEnemy = createAreaEnemy(areaKey);
 
             gameState.battles.battleState = 'fighting';
             gameState.battles.playerAttackTimer = 0;
@@ -3591,8 +3700,13 @@
                 battleContainer.classList.remove('hidden');
             }
 
-            showNotification(`进入${areaData.name}！遇到${gameState.battles.currentEnemy.name}！`, '#c9a961');
+            // 手动进入时重置本次托管统计；自动续战不弹进入提示，避免每场刷屏
+            if (!auto) {
+                Object.assign(getAutoBattle(), { wins: 0, losses: 0, streak: 0, coins: 0, exp: 0 });
+                showNotification(`进入${areaData.name}！遇到${gameState.battles.currentEnemy.name}！`, '#c9a961');
+            }
             updateNormalBattleUI();
+            renderAutoBattleBar();
             updateUI();
         }
 
@@ -4542,6 +4656,30 @@
 
             // 战斗/秘境无法在离线时进行，重新打开页面时战斗界面已丢失，直接中断
             const savedAction = gameState.currentAction;
+
+            // 开了自动战斗托管的普通战斗：离线期间按真实战斗规则模拟，之后接着在线续战
+            const autoCfg = getAutoBattle();
+            if (savedAction && savedAction.isBattle && autoCfg.enabled && offlineSeconds >= 10) {
+                const areaAction = getAction('battle', savedAction.action);
+                if (areaAction && isBattleAreaUnlocked(areaAction)) {
+                    const maxOffline = (gameState.settings?.maxOfflineHours || 24) * 60 * 60;
+                    const budget = Math.min(offlineSeconds, maxOffline);
+                    gameState.battles = null;
+                    gameState.currentAction = null;
+                    gameState.currentActionProgress = 0;
+                    const res = runOfflineAutoBattle(savedAction.action, budget);
+                    gameState.lastActiveTime = now;
+                    const mins = Math.max(1, Math.round(res.elapsed / 60));
+                    const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验` +
+                        (res.stopped ? `\n⚠️ 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，已停止（请检查装备与食物）` : '');
+                    showNotification(msg, res.stopped ? '#f59e0b' : '#6fa980');
+                    if (!res.stopped) enterBattleArea(savedAction.action, true);
+                    renderAutoBattleBar();
+                    saveGame();
+                    return;
+                }
+            }
+
             if (savedAction && (savedAction.isBattle || savedAction.isDungeon)) {
                 if (savedAction.isDungeon) {
                     resetBattleState('idle');

@@ -261,6 +261,7 @@
                             </div>
                             <!-- 战斗区域内容 -->
                             <div id="battleContent-areas">
+                                <div id="autoBattleBar" class="auto-battle-bar"></div>
                                 <!-- 克制预览条 -->
                                 <div id="battleCounterPreview" style="background: rgba(22,163,74,0.1); border: 1px solid #16a34a; border-radius: 4px; padding: 12px; margin-bottom: 15px; display: none;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -285,7 +286,7 @@
                             <div class="battle-header">
                                 <div class="battle-title" id="battleTitle">⚔️ 秘境战斗中</div>
                                 <div class="battle-controls">
-                                    <button id="btn-retreat" class="btn-retreat" onclick="retreatFromDungeon()">撤退</button>
+                                    <span id="autoBattleStatus" class="auto-battle-status"></span><button id="btn-retreat" class="btn-retreat" onclick="retreatFromDungeon()">撤退</button>
                                 </div>
                             </div>
 

@@ -1453,3 +1453,9 @@ display: none !important;
     }
 }
 
+
+/* 自动战斗托管 */
+.auto-battle-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; font-size: 0.85em; color: var(--text-l4); }
+.auto-battle-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border-l4); background: transparent; color: var(--text-l3); cursor: pointer; font-weight: bold; }
+.auto-battle-btn.on { border-color: var(--border-l2); color: var(--border-l2); background: rgba(111, 169, 128, 0.12); }
+.auto-battle-status { margin-right: 10px; font-size: 0.85em; color: var(--border-l2); }
