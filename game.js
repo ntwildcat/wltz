@@ -1596,6 +1596,7 @@
 
         // ==================== 自动战斗托管 ====================
         const AUTO_BATTLE_MAX_LOSS_STREAK = 3;   // 连续几场没赢就停止托管
+        const AUTO_BATTLE_OFFLINE_EFFICIENCY = 0.8;   // 离线 / 后台托管的效率：同样时长只完成 80% 的场次（奖励与食物消耗同比例）
 
         function getAutoBattle() {
             if (!gameState.autoBattle) {
@@ -1646,7 +1647,7 @@
                     do {
                         stepNormalBattle(battle);
                     } while (battle.currentEnemy.currentHP > 0 && battle.playerHP.current > 0 && battle.turnCount < 10);
-                    elapsed += battle.turnCount;
+                    elapsed += battle.turnCount / AUTO_BATTLE_OFFLINE_EFFICIENCY;   // 每场按 1/0.8 倍时间计，等价于离线只有 80% 效率
                     r.fights++;
                     const won = battle.currentEnemy.currentHP <= 0;
                     hp.current = battle.playerHP.current <= 0 ? Math.floor(hp.max * 0.5) : Math.min(hp.max, battle.playerHP.current);
