@@ -744,6 +744,7 @@
             // 立即保存游戏（确保新创建的角色不会丢失）
             gameState.tutorialSeen = false;
             saveGame();
+            updateSlotLabel();
 
             // 自动保存（每30秒）
             startAutoSave();
@@ -4553,10 +4554,11 @@
 
         // ==================== 存档系统 ====================
         function saveGame() {
+            if (!currentSlot) return;   // 还没选择存档槽位（存档选择界面）时不保存
             gameState.lastSaveTime = Date.now();
             gameState.lastActiveTime = gameState.lastSaveTime;
             try {
-                localStorage.setItem('xiuxianIdleGame', JSON.stringify(gameState));
+                localStorage.setItem(slotKey(currentSlot), JSON.stringify(gameState));
             } catch (e) {
                 console.error('Failed to save game:', e);
                 if (e.name === 'QuotaExceededError') {
@@ -4650,47 +4652,153 @@
             }
         }
 
-        function loadGame() {
-            let saved = null;
-            let storageAvailable = false;
+        // ---- 多存档（最多 3 个槽位）----
+        // 每个槽位独立存在 localStorage['xiuxianIdleGame_slot1..3']；进入游戏后当前槽位记在 currentSlot。
+        // 切换存档 / 删除存档都会重新载入页面，保证不同存档的状态互不串扰。
+        const SAVE_SLOT_COUNT = 3;
+        const LEGACY_SAVE_KEY = 'xiuxianIdleGame';   // 旧版单存档键，首次运行时迁移到槽位 1
+        let currentSlot = null;
+
+        function slotKey(n) { return `${LEGACY_SAVE_KEY}_slot${n}`; }
+
+        function readSlot(n) {
             try {
-                saved = localStorage.getItem('xiuxianIdleGame');
-                storageAvailable = true;
+                const raw = localStorage.getItem(slotKey(n));
+                return raw ? raw : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // 旧版单存档迁移：只在三个槽位都为空、且存在旧存档时执行一次
+        function migrateLegacySave() {
+            try {
+                const legacy = localStorage.getItem(LEGACY_SAVE_KEY);
+                if (!legacy) return;
+                const anySlot = [1, 2, 3].some(n => localStorage.getItem(slotKey(n)));
+                if (!anySlot) localStorage.setItem(slotKey(1), legacy);
+                localStorage.removeItem(LEGACY_SAVE_KEY);
+            } catch (e) { /* 存储不可用时忽略 */ }
+        }
+
+        // 渲染存档选择界面
+        function renderSlotSelect() {
+            const box = document.getElementById('slotSelect');
+            if (!box) return;
+            let html = '';
+            for (let n = 1; n <= SAVE_SLOT_COUNT; n++) {
+                const raw = readSlot(n);
+                if (!raw) {
+                    html += `<div class="slot-card empty" onclick="openSlot(${n})">
+                        <div class="slot-title">存档 ${n}</div>
+                        <div class="slot-info">＋ 新建角色</div>
+                    </div>`;
+                    continue;
+                }
+                let info;
+                try {
+                    const d = JSON.parse(raw);
+                    const realm = GAME_CONFIG.realms[d.player.realmIndex] ? getRealmName(d.player.realmIndex) : '未知境界';
+                    const when = d.lastSaveTime ? new Date(d.lastSaveTime).toLocaleString() : '—';
+                    info = `<div class="slot-name">${d.player.name || '无名'} · ${realm}</div>
+                        <div class="slot-info">灵石 ${d.player.coins} · 最后保存 ${when}</div>`;
+                } catch (e) {
+                    info = '<div class="slot-name">⚠️ 存档已损坏</div><div class="slot-info">可以删除后重新创建</div>';
+                }
+                html += `<div class="slot-card" onclick="openSlot(${n})">
+                    <div class="slot-title">存档 ${n}</div>
+                    ${info}
+                    <button class="slot-delete" onclick="event.stopPropagation(); deleteSlot(${n})" title="删除此存档">🗑</button>
+                </div>`;
+            }
+            box.innerHTML = html;
+        }
+
+        function showSlotSelect() {
+            document.getElementById('createSection').style.display = 'none';
+            document.getElementById('slotSelect').style.display = '';
+            document.getElementById('slotHint').style.display = '';
+            renderSlotSelect();
+        }
+
+        function deleteSlot(n) {
+            if (!confirm(`确定要删除存档 ${n} 吗？此存档的所有进度将永久丢失！`)) return;
+            try { localStorage.removeItem(slotKey(n)); } catch (e) { /* 忽略 */ }
+            renderSlotSelect();
+        }
+
+        // 点击槽位：有存档则进入，没有则打开创建角色界面（新角色自动播放新手引导）
+        function openSlot(n) {
+            currentSlot = n;
+            const raw = readSlot(n);
+            if (raw) {
+                enterSavedGame(raw);
+            } else {
+                document.getElementById('slotSelect').style.display = 'none';
+                document.getElementById('slotHint').style.display = 'none';
+                document.getElementById('createSection').style.display = '';
+                document.getElementById('createSlotLabel').textContent = `存档 ${n}`;
+            }
+        }
+
+        // 游戏内：保存后回到存档选择（重新载入页面以彻底清空当前存档状态）
+        function backToSlotSelect() {
+            if (gameRunning) saveGame();
+            gameRunning = false;
+            location.reload();
+        }
+
+        function enterSavedGame(raw) {
+            let loaded;
+            try {
+                loaded = JSON.parse(raw);
+            } catch (e) {
+                alert('存档已损坏，无法读取');
+                currentSlot = null;
+                return;
+            }
+            gameState = loaded;
+
+            // 数据迁移：自动更新旧数据（P2功能）
+            migrateGameData();
+
+            // 处理离线时间
+            handleOfflineTime();
+
+            // 显示游戏界面
+            document.getElementById('startScreen').classList.remove('show');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            startGameTick();
+            switchPanel('cultivation');
+            updateUI();
+            calculateStats();
+            updateStatsDisplay();
+            gameRunning = true;
+            updateSlotLabel();
+
+            startAutoSave();
+        }
+
+        function updateSlotLabel() {
+            const el = document.getElementById('currentSlotLabel');
+            if (el) el.textContent = currentSlot ? `当前：存档 ${currentSlot}（${gameState.player.name}）` : '';
+        }
+
+        // 页面加载：迁移旧存档，显示存档选择界面
+        function loadGame() {
+            let storageAvailable = true;
+            try {
+                localStorage.getItem(LEGACY_SAVE_KEY);
             } catch (e) {
                 // localStorage unavailable - 在data: URL中会发生
                 storageAvailable = false;
             }
-
-            if (saved) {
-                const loaded = JSON.parse(saved);
-                gameState = loaded;
-
-                // 数据迁移：自动更新旧数据（P2功能）
-                migrateGameData();
-
-                // 处理离线时间
-                handleOfflineTime();
-
-                // 显示游戏界面
-                document.getElementById('startScreen').classList.remove('show');
-                document.getElementById('gameScreen').classList.remove('hidden');
-                startGameTick();
-                switchPanel('cultivation');
-                updateUI();
-                calculateStats();
-                updateStatsDisplay();
-                gameRunning = true;
-
-                startAutoSave();
-            } else {
-                // 没有存档或localStorage不可用，显示开始屏幕
-                document.getElementById('startScreen').classList.add('show');
-                document.getElementById('gameScreen').classList.add('hidden');
-
-                // 如果localStorage不可用，显示提示
-                if (!storageAvailable) {
-                    showNotification('💾 本地存储不可用 - 使用本地HTML文件打开游戏以保存存档', '#ff9800', 'normal');
-                }
+            migrateLegacySave();
+            document.getElementById('startScreen').classList.add('show');
+            document.getElementById('gameScreen').classList.add('hidden');
+            showSlotSelect();
+            if (!storageAvailable) {
+                showNotification('💾 本地存储不可用 - 使用本地HTML文件打开游戏以保存存档', '#ff9800', 'normal');
             }
         }
 
@@ -5128,86 +5236,18 @@
             calculateStats();
             updateStatsDisplay();
             saveGame();
-            alert('存档导入成功！');
+            updateSlotLabel();
+            alert('存档导入成功！（已覆盖当前存档）');
         }
 
+        // 删除当前存档并回到存档选择界面
         function resetGame() {
-            if (confirm('确定要重新开始吗？所有进度将丢失！')) {
-                localStorage.removeItem('xiuxianIdleGame');
-                gameRunning = false;
+            if (!currentSlot) return;
+            if (confirm(`确定要删除当前存档（存档 ${currentSlot}）吗？此存档的所有进度将永久丢失！`)) {
+                try { localStorage.removeItem(slotKey(currentSlot)); } catch (e) { /* 忽略 */ }
+                gameRunning = false;   // 避免 beforeunload 把存档又写回去
                 clearInterval(tickInterval);
-
-                // 重置游戏状态
-                gameState = {
-                    player: {
-                        name: '',
-                        gender: '男',
-                        origin: '',
-                        spiritRoot: '',
-                        realmIndex: 0,
-                        cultivationXP: 0,
-                        coins: 100,
-                        inventory: [],
-                        equipment: { weapon: null, armor: null, jewelry: [] },
-                        lastBreakthroughTime: 0,
-                        // 永久升级跟踪
-                        inventoryCapacity: 50,
-                        farmingSlots: 1,
-                        boughtUpgrades: [],
-                        temperLevel: 0,
-                        scoutBonus: false,
-                        // 属性系统
-                        stats: {
-                            hp: 100,
-                            atk: 10,
-                            def: 5,
-                            spd: 10
-                        }
-                    },
-                    skills: JSON.parse(JSON.stringify(GAME_CONFIG.skills)),
-                    currentAction: null,
-                    currentActionProgress: 0,
-                    workSpeedMultiplier: 1,
-                    lastSaveTime: Date.now(),
-                    lastActiveTime: Date.now(),
-                    // 秘境系统
-                    dungeons: {
-                        currentDungeon: null,
-                        currentMonsterIndex: 0,
-                        currentMonsterHP: 0,
-                        defeatCount: 0,
-                        bossDefeated: false,
-                        mysteryTower: {
-                            completed: false
-                        },
-                        mysteriousForest: {
-                            completed: false
-                        },
-                        ancientRuin: {
-                            completed: false
-                        }
-                    },
-                    // P2功能：用户设置
-                    settings: {
-                        maxOfflineHours: 24,
-                        enableNotifications: true,
-                        enableSoundEffects: false,
-                        theme: 'dark'
-                    }
-                };
-
-                // 隐藏游戏界面，显示开始屏幕
-                document.getElementById('gameScreen').classList.add('hidden');
-                document.getElementById('startScreen').classList.add('show');
-
-                // 清空表单
-                document.getElementById('playerName').value = '';
-                document.getElementById('playerGender').value = '男';
-                document.getElementById('playerOrigin').value = '';
-                document.getElementById('playerSpiritRoot').value = '';
-
-                // 刷新UI确保所有状态都被重置
-                updateUI();
+                location.reload();
             }
         }
 
