@@ -4501,6 +4501,21 @@
         }
 
         // ==================== UI更新 ====================
+        // 当前打开的配方 / 法则 / 战斗列表随数据实时刷新：突破后解锁的配方、技能升级后解锁的配方、
+        // 精通等级与进度、材料数量等，不用再切换面板才能看到变化
+        const RECIPE_PANELS = ['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi'];
+        function refreshVisiblePanelLists() {
+            const panel = document.body.dataset.panel;
+            if (RECIPE_PANELS.includes(panel)) {
+                generateRecipeList(panel);
+            } else if (panel === 'wudao') {
+                generateLawList();
+            } else if (panel === 'battle') {
+                const a = gameState.currentAction;
+                if (!(a && (a.isBattle || a.isDungeon))) generateBattleList();   // 战斗进行中不重绘，避免打断战斗界面
+            }
+        }
+
         function updateUI() {
             if (getCloneSlotCount() >= 2 && !gameState.cloneUnlockNotified2) {
                 gameState.cloneUnlockNotified2 = true;
@@ -4512,6 +4527,7 @@
             }
             renderCloneBar();
             if (document.body.dataset.panel === 'equipment') renderEquipmentPanel();
+            refreshVisiblePanelLists();
             updatePlayerInfo();
             updateProgressBars();
             updateInventory();
