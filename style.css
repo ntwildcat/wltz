@@ -1789,3 +1789,11 @@ input:focus, select:focus { border-color: var(--bronze); box-shadow: none; }
 .coin-display { cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
 .coin-display:hover { background: var(--bg-l3) !important; border-color: var(--bronze) !important; }
 body[data-panel="shop"] .coin-display { border-color: var(--cinnabar-2) !important; box-shadow: inset 0 0 0 1px var(--cinnabar) !important; }
+
+/* 背包物品格：更小、按宽度自动排列（原来固定 3 列 + 正方形，格子很大） */
+.inventory-grid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+.item-slot { aspect-ratio: auto; min-height: 70px; padding: 6px 4px; font-size: 0.72em; gap: 1px; }
+.item-icon { font-size: 1.25em; margin-bottom: 2px; line-height: 1.2; }
+.item-name { font-size: 0.95em; line-height: 1.25; }
+.item-qty { font-size: 0.85em; }
+.item-stats { font-size: 0.68em; }
