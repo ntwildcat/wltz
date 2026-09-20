@@ -645,6 +645,12 @@
         .recipe-mastery { font-size: 0.72em; color: var(--text-l4); margin: 2px 0 6px; }
         .recipe-mastery b { color: var(--border-l1); }
         .mastery-track { height: 4px; background: var(--bg-l1); border-radius: 2px; overflow: hidden; margin: 3px auto 0; max-width: 140px; }
+        .skill-pool { font-size: 0.75em; color: var(--text-l4); margin-top: 4px; }
+        .pool-track { position: relative; overflow: visible; }
+        .pool-fill { background: linear-gradient(90deg, #6b8fd4, #a78bd4); }
+        .pool-mark { position: absolute; top: -2px; width: 1px; height: 8px; background: var(--border-l1); opacity: 0.7; }
+        .infuse-btn { margin-top: 3px; font-size: 0.95em; padding: 1px 8px; border-radius: 8px; border: 1px solid var(--border-l1); background: transparent; color: var(--border-l1); cursor: pointer; }
+        .infuse-btn:hover { background: var(--border-l1); color: var(--bg-l1); }
         .mastery-fill { height: 100%; background: linear-gradient(90deg, var(--border-l2), var(--border-l1)); transition: width 0.3s; }
 
         .action-item.recipe-materials-lack {
@@ -4165,23 +4171,76 @@
             return { level, exp: maxed ? 0 : exp, need, percent: maxed ? 100 : (exp / need) * 100, maxed };
         }
 
+        // ---- 精通池（阶段二）：每个生活技能一个共用池，做任何配方都会有 25% 的精通经验额外流入 ----
+        const MASTERY_POOL_RATE = 0.25;
+        const MASTERY_POOL_PER_RECIPE = 7030;   // 池容量 = 该技能配方数 × 一个配方满级所需经验
+        const MASTERY_POOL_CHECKPOINTS = [
+            { at: 0.10, exp: 0.05, desc: '技能经验 +5%' },
+            { at: 0.25, time: -0.03, desc: '全部配方耗时 -3%' },
+            { at: 0.50, main: 0.03, desc: '全部配方产出翻倍/节省材料 +3%' },
+            { at: 0.95, time: -0.03, main: 0.03, desc: '再来一次：耗时 -3%、翻倍/节省 +3%' }
+        ];
+
+        function getMasteryPoolCap(skillName) {
+            const cfg = GAME_CONFIG.skills[skillName];
+            const n = cfg && cfg.recipes ? Object.keys(cfg.recipes).length : 0;
+            return Math.max(1, n) * MASTERY_POOL_PER_RECIPE;
+        }
+
+        function getMasteryPoolInfo(skillName) {
+            const store = getMasteryStore(skillName);
+            const cap = getMasteryPoolCap(skillName);
+            const exp = Math.min(cap, Math.floor((store && store.pool) || 0));
+            const percent = exp / cap;
+            return { exp, cap, percent, reached: MASTERY_POOL_CHECKPOINTS.filter(c => percent >= c.at) };
+        }
+
+        function getMasteryPoolBonus(skillName) {
+            const b = { main: 0, time: 0, exp: 0 };
+            if (!LIFE_SKILLS.includes(skillName)) return b;
+            getMasteryPoolInfo(skillName).reached.forEach(c => {
+                b.main += c.main || 0; b.time += c.time || 0; b.exp += c.exp || 0;
+            });
+            return b;
+        }
+
+        // 把池里的精通经验灌入某个配方（最多灌到下一级；1:1，池减少会失去检查点加成）
+        function infuseMastery(skillName, key) {
+            const store = getMasteryStore(skillName);
+            if (!store || !LIFE_SKILLS.includes(skillName)) return;
+            const info = getMasteryInfo(skillName, key);
+            if (info.maxed) return;
+            const amount = Math.min(Math.floor(store.pool || 0), info.need - info.exp);
+            if (amount <= 0) { showNotification('精通池是空的', '#c9a961'); return; }
+            store.pool -= amount;
+            addMasteryExp(skillName, key, amount, true);
+            if (typeof generateRecipeList === 'function') generateRecipeList(skillName);
+            updateSkillHeaders();
+        }
+
         // 精通带来的加成（double/save 为概率，time 为耗时变化，exp 为技能经验加成，dmg 为战斗伤害，reward 为战斗奖励）
         function getMasteryBonus(skillName, key) {
             const none = { double: 0, save: 0, time: 0, exp: 0, dmg: 0, reward: 0 };
+            if (LIFE_SKILLS.includes(skillName) && !key) {
+                const pb = getMasteryPoolBonus(skillName);
+                const isD = MASTERY_DOUBLE_SKILLS.includes(skillName);
+                return { ...none, double: isD ? pb.main : 0, save: isD ? 0 : pb.main, time: pb.time, exp: pb.exp };
+            }
             if (!key) return none;
             const { level } = getMasteryInfo(skillName, key);
             const steps = level - 1;
             const tiers = MASTERY_MILESTONES.filter(t => level >= t).length;
             if (skillName === 'battle') return { ...none, reward: 0.01 * steps, dmg: 0.02 * tiers };
             if (!LIFE_SKILLS.includes(skillName)) return none;
-            const perLevel = 0.0075 * steps;
+            const pb = getMasteryPoolBonus(skillName);
+            const perLevel = 0.0075 * steps + pb.main;
             const isDouble = MASTERY_DOUBLE_SKILLS.includes(skillName);
             return {
                 ...none,
                 double: isDouble ? perLevel : 0,
                 save: isDouble ? 0 : perLevel,
-                time: -0.03 * tiers,
-                exp: level >= MASTERY_MAX_LEVEL ? 0.10 : 0
+                time: -0.03 * tiers + pb.time,
+                exp: (level >= MASTERY_MAX_LEVEL ? 0.10 : 0) + pb.exp
             };
         }
 
@@ -4203,10 +4262,19 @@
         }
 
         // 增加配方精通经验；升级时提示
-        function addMasteryExp(skillName, key, amount) {
+        function addMasteryExp(skillName, key, amount, fromPool = false) {
             const store = getMasteryStore(skillName);
             if (!store || !key || !(amount > 0)) return;
             const before = getMasteryInfo(skillName, key).level;
+            if (!fromPool && LIFE_SKILLS.includes(skillName)) {
+                const cap = getMasteryPoolCap(skillName);
+                const poolBefore = getMasteryPoolInfo(skillName).reached.length;
+                store.pool = Math.min(cap, (store.pool || 0) + amount * MASTERY_POOL_RATE);
+                const rc = getMasteryPoolInfo(skillName).reached;
+                if (rc.length > poolBefore) {
+                    showNotification(`🎓 ${gameState.skills[skillName].name}精通池达到 ${Math.round(rc[rc.length - 1].at * 100)}%：${rc[rc.length - 1].desc}`, '#c9a961');
+                }
+            }
             store.recipes[key] = (store.recipes[key] || 0) + amount;
             const after = getMasteryInfo(skillName, key).level;
             if (after > before) {
@@ -4245,6 +4313,12 @@
                     </div>
                     <div class="skill-exp-track"><div class="skill-exp-fill" style="width: ${info.percent}%"></div></div>
                     <div class="skill-exp-text">经验 ${info.exp} / ${info.need} · 还差 <b>${info.remain}</b> 升到 Lv.${info.level + 1}</div>
+                    ${LIFE_SKILLS.includes(skillName) ? (() => {
+                        const pi = getMasteryPoolInfo(skillName);
+                        const tip = MASTERY_POOL_CHECKPOINTS.map(c => `${pi.percent >= c.at ? '✓' : '○'} ${Math.round(c.at * 100)}%：${c.desc}`).join('&#10;');
+                        return `<div class="skill-pool" title="${tip}">🎓 精通池 ${pi.exp}/${pi.cap}（${(pi.percent * 100).toFixed(1)}%）
+                            <div class="skill-exp-track pool-track"><div class="skill-exp-fill pool-fill" style="width: ${pi.percent * 100}%"></div>${MASTERY_POOL_CHECKPOINTS.map(c => `<i class="pool-mark" style="left:${c.at * 100}%"></i>`).join('')}</div></div>`;
+                    })() : ''}
                 `;
             });
         }
@@ -4748,6 +4822,7 @@
                 masteryHtml = `<div class="recipe-mastery" title="${describeMastery(skillName, recipeKey)}">
                     🎓 精通 <b>Lv.${m.level}</b>${m.maxed ? ' ✦满级' : ` · ${m.exp}/${m.need}`}
                     <div class="mastery-track"><div class="mastery-fill" style="width: ${m.percent}%"></div></div>
+                    ${!m.maxed && getMasteryPoolInfo(skillName).exp > 0 ? `<button class="infuse-btn" onclick="event.stopPropagation(); infuseMastery('${skillName}', '${recipeKey}')" title="从精通池转入经验，直到升下一级（池减少，可能失去检查点加成）">灌注</button>` : ''}
                 </div>`;
             }
 
