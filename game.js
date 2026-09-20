@@ -21,7 +21,12 @@
                 { name: '元婴初期', nextReq: 58000, baseStats: { hp: 800, atk: 80, def: 40, spd: 30 }, bonusPerLevel: { atk: 4.0, def: 0.8, spd: 0.6 } },      // 100 × 13^2.5 ≈ 58000
                 { name: '元婴中期', nextReq: 70000, baseStats: { hp: 900, atk: 90, def: 45, spd: 33 }, bonusPerLevel: { atk: 4.4, def: 0.88, spd: 0.66 } },    // 100 × 14^2.5 ≈ 70000
                 { name: '元婴后期', nextReq: 83000, baseStats: { hp: 1000, atk: 100, def: 50, spd: 36 }, bonusPerLevel: { atk: 5.0, def: 1.0, spd: 0.72 } },   // 100 × 15^2.5 ≈ 83000
-                { name: '元婴圆满', nextReq: 98000, baseStats: { hp: 1150, atk: 115, def: 58, spd: 40 }, bonusPerLevel: { atk: 5.6, def: 1.12, spd: 0.8 } }   // 100 × 16^2.5 ≈ 98000
+                { name: '元婴圆满', nextReq: 98000, baseStats: { hp: 1150, atk: 115, def: 58, spd: 40 }, bonusPerLevel: { atk: 5.6, def: 1.12, spd: 0.8 } },  // 100 × 16^2.5 ≈ 98000
+                // P9 化神期扩展（索引17-20，大阶段突破点；属性由 P4 公式按境界索引自动延伸）
+                { name: '化神初期', nextReq: 116000 },   // 沿曲线 100 × n^2.5，取整
+                { name: '化神中期', nextReq: 136000 },
+                { name: '化神后期', nextReq: 158000 },
+                { name: '化神圆满', nextReq: 182000 }
             ],
             // P2功能：秘境系统
             dungeons: {
@@ -202,6 +207,7 @@
                         golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 灵矿石 ×2（筑基圆满突破必需）', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 8, requires: { mushroom: 3, crystal: 1, spiritore: 2 }, unlocked: false },
                         mushroom_stew: { name: '灵芝羹', desc: '灵芝 ×2 + 灵米 ×2（战斗食物：恢复500生命）', duration: 30, output: { items: [{ id: 'mushroom_stew', qty: 2 }], skill: 'alchemy', exp: 240 }, requiredLevel: 9, requires: { mushroom: 2, millet: 2 }, unlocked: false },
                         yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2（金丹圆满突破必需）', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 400 }, requiredLevel: 12, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false },
+                        huashen_pill_alchemy: { name: '化神丹', desc: '九叶莲 ×5 + 悟道茶 ×8 + 仙矿 ×2（元婴圆满突破必需）', duration: 120, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'alchemy', exp: 700 }, requiredLevel: 17, requires: { lotus: 5, tea: 8, immortalore: 2 }, unlocked: false },
                         immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 14, requires: { tea: 3, mushroom: 2 }, unlocked: false }
                     },
                     actions: {}
@@ -285,6 +291,7 @@
                     recipes: {
                         gather: { name: '凝练神识', desc: '从元婴中提取神识', duration: 20, output: { items: [{ id: 'shenshi', qty: 1 }], skill: 'shenshi', exp: 40 }, requiredLevel: 1, unlocked: true },
                         seed: { name: '培育神识', desc: '以神识种子培育，一次得到 4 份神识（种子来自化神秘境）', duration: 25, output: { items: [{ id: 'shenshi', qty: 4 }], skill: 'shenshi', exp: 80 }, requiredLevel: 2, requires: { shenshi_seed: 1 }, unlocked: false },
+                        huashen_pill: { name: '炼制化神丹', desc: '神识 ×12 + 悟道茶 ×5 + 九叶莲 ×3（元婴圆满突破必需）', duration: 100, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'shenshi', exp: 400 }, requiredLevel: 8, requires: { shenshi: 12, tea: 5, lotus: 3 }, unlocked: false },
                         scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 120 }, requiredLevel: 3, requires: { shenshi: 2 }, unlocked: false }
                     },
                     actions: {}
@@ -332,6 +339,7 @@
                 shenshi: { name: '神识', icon: '👁️', type: 'material', sellPrice: 2000 },
                 shenshi_seed: { name: '神识种子', icon: '👁️', type: 'seed', sellPrice: 100 },
                 yuanyingpill: { name: '元婴丹', icon: '⭕', type: 'breakthrough_material' },
+                huashenpill: { name: '化神丹', icon: '🔮', type: 'breakthrough_material' },  // P9 突破材料
                 shenshi_map: { name: '神识地图', icon: '🗺️', type: 'material', sellPrice: 200 },
 
                 // 装备
@@ -2009,7 +2017,8 @@
         const MAJOR_BREAKTHROUGH_PILLS = {
             4: { pillId: 'pill', pillName: '筑基丹', qty: 1 },   // 练气巅峰(索引4)→筑基初期(索引5)
             8: { pillId: 'goldenpill', pillName: '金丹秘药', qty: 1 },  // P6 筑基圆满(索引8)→金丹初期(索引9)
-            12: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 }  // P7 金丹圆满(索引12)→元婴初期(索引13)
+            12: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 },  // P7 金丹圆满(索引12)→元婴初期(索引13)
+            16: { pillId: 'huashenpill', pillName: '化神丹', qty: 1 }   // P9 元婴圆满(索引16)→化神初期(索引17)
         };
 
         // 功法系统（绑定到角色出身，影响修炼速度）
