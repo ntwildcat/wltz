@@ -438,7 +438,7 @@
             shop: {
                 upgrades: [
                     { id: 'inventory_slot', name: '背包扩展', icon: '📦', price: 100, desc: '+5格容量', type: 'upgrade', bought: false },
-                    { id: 'farming_slot', name: '灵田槽位', icon: '🌾', price: 500, desc: '+1种植槽', type: 'upgrade', bought: false },
+                    { id: 'farming_slot', name: '第二块灵田', icon: '🌾', price: 5000, desc: '解锁第二块灵田：可与主角同时种植灵田配方，速度相同，可种同一种作物（只能买一次）', type: 'upgrade', bought: false },
                     { id: 'jewelry_slot2', name: '第二饰品栏位', icon: '💍', price: 8000, desc: '解锁第二个饰品栏位（可同时佩戴两件不同的饰品）', minRealmIndex: 9, type: 'upgrade', bought: false }
                 ],
                 food: [
@@ -1007,17 +1007,17 @@
         // 分身离线结算：与主角的离线规则一致（材料限制、节省材料、产出翻倍、技能 / 精通经验），耗时按分身倍率
         function settleCloneOffline(offlineSeconds) {
             if (!isCloneUnlocked() || !(offlineSeconds >= 1)) return;
-            activeClones().forEach((c, slot) => settleOneClone(c, slot, offlineSeconds));
+            activeClones().forEach((c, slot) => settleOneClone(c, `分身${slot + 1}`, offlineSeconds));
             renderCloneBar();
         }
 
-        function settleOneClone(c, slot, offlineSeconds) {
+        function settleOneClone(c, label, offlineSeconds, durationFn = getCloneDuration) {
             if (!c.action) return;
             const { skill, action: key } = c.action;
             const action = getAction(skill, key);
             if (!action || !action.output) { c.action = null; return; }
             const budget = Math.min(offlineSeconds, (gameState.settings?.maxOfflineHours || 24) * 3600);
-            const duration = getCloneDuration(skill, action.duration, key);
+            const duration = durationFn(skill, action.duration, key);
             if (!(duration > 0)) return;
             let n = Math.floor(budget / duration);
             let ranOut = false;
@@ -1043,14 +1043,101 @@
                 });
                 if (per.skill && per.exp) addSkillExp(per.skill, per.exp * n, key);
                 addMasteryExp(skill, key, action.duration * n);
-                showNotification(`🌀 分身${slot + 1}离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
+                showNotification(`🌀 ${label}离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
             }
             if (ranOut) { c.action = null; generateRecipeList(skill); }
             c.progress = 0;
         }
 
+        // ==================== 第二块灵田 ====================
+        // 商城购买「第二块灵田」（boughtUpgrades 里的 farming_slot，5000 灵石，只能买一次）后，主角之外多一块田：
+        // 并行做灵田配方，速度与主角相同（不打折），可与主角种同一种作物；共用背包与材料，离线也结算。
+        function isFarmPlotUnlocked() {
+            return (gameState.player.boughtUpgrades || []).includes('farming_slot');
+        }
+
+        function getFarmPlot() {
+            if (!gameState.farmPlot) gameState.farmPlot = { action: null, progress: 0 };
+            return gameState.farmPlot;
+        }
+
+        function assignFarmPlot(key) {
+            if (!isFarmPlotUnlocked()) { showNotification('🔒 需要先在商城购买「第二块灵田」', '#c98a3e'); return; }
+            const recipe = getAction('farming', key);
+            if (!recipe || !getRecipeUnlockState('farming', recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#c98a3e'); return; }
+            if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#c4483a', 'error'); return; }
+            const f = getFarmPlot();
+            f.action = { skill: 'farming', action: key };
+            f.progress = 0;
+            showNotification(`🌾 第二块田开始：${recipe.name}`, '#b89a5b');
+            generateRecipeList('farming');
+            renderPlotBar();
+            saveGame();
+        }
+
+        function stopFarmPlot(silent = false) {
+            const f = getFarmPlot();
+            const had = !!f.action;
+            f.action = null;
+            f.progress = 0;
+            if (!silent && had) showNotification('🌾 第二块田已停止', '#b89a5b');
+            generateRecipeList('farming');
+            renderPlotBar();
+        }
+
+        function tickFarmPlot() {
+            if (!isFarmPlotUnlocked()) return;
+            const f = getFarmPlot();
+            if (!f.action) return;
+            const action = getAction('farming', f.action.action);
+            if (!action || !action.output) { stopFarmPlot(true); return; }
+            if (!cloneHasMaterials(action)) {
+                showNotification(`🌾 第二块田：${action.name}所需材料不足，已停止`, '#c4483a', 'error');
+                stopFarmPlot(true);
+                return;
+            }
+            f.progress += 0.1;
+            const duration = getAdjustedDuration('farming', action.duration, f.action.action);
+            if (f.progress >= duration) {
+                completeAction(f.action);
+                f.progress = 0;
+            }
+            tickPlotBar(duration);
+        }
+
+        function renderPlotBar() {
+            const bar = document.getElementById('plotBar');
+            if (!bar) return;
+            if (!isFarmPlotUnlocked()) { bar.style.display = 'none'; return; }
+            bar.style.display = 'block';
+            const f = getFarmPlot();
+            const action = f.action ? getAction('farming', f.action.action) : null;
+            bar.innerHTML = action
+                ? `<div class="clone-row"><div class="clone-bar-top"><span>🌾 第二块田：<b>${action.name}</b></span><span id="plotRemain"></span>
+                    <button class="btn btn-secondary clone-stop" onclick="stopFarmPlot()">停止</button></div>
+                    <div class="progress-bar" style="height: 6px;"><div id="plotFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div>`
+                : `<div class="clone-row"><div class="clone-bar-top"><span>🌾 第二块田空闲</span><span class="clone-hint">在灵田面板的配方卡片上点「种到第二块田」</span></div></div>`;
+        }
+
+        function tickPlotBar(duration) {
+            const f = getFarmPlot();
+            const pct = Math.min(100, (f.progress / duration) * 100);
+            const fill = document.getElementById('plotFill');
+            if (fill) fill.style.width = pct + '%';
+            const remain = document.getElementById('plotRemain');
+            if (remain) remain.textContent = Math.max(0, duration - f.progress).toFixed(1) + 's';
+        }
+
+        // 离线结算：与分身共用同一套离线规则，只是耗时不打折
+        function settleFarmPlotOffline(offlineSeconds) {
+            if (!isFarmPlotUnlocked() || !(offlineSeconds >= 1)) return;
+            settleOneClone(getFarmPlot(), '第二块田', offlineSeconds, getAdjustedDuration);
+            renderPlotBar();
+        }
+
         function startGameTick() {
             tickInterval = setInterval(() => {
+                tickFarmPlot();
                 tickClone();
                 if (!gameState.currentAction) return;
 
@@ -3432,6 +3519,17 @@
                 card.className = className;
             }
 
+            // 第二块灵田（商城购买后）：灵田配方可以种到第二块田
+            if (skillName === 'farming' && unlockState.unlocked && isFarmPlotUnlocked()) {
+                const fa = getFarmPlot().action;
+                const plotHere = fa && fa.action === recipeKey;
+                if (plotHere) className += ' clone-active';
+                cloneHtml += plotHere
+                    ? `<button class="clone-btn on" onclick="event.stopPropagation(); stopFarmPlot()">🌾 第二块田进行中 · 点击停止</button>`
+                    : `<button class="clone-btn" onclick="event.stopPropagation(); assignFarmPlot('${recipeKey}')">🌾 种到第二块田</button>`;
+                card.className = className;
+            }
+
             card.innerHTML = `
                 <div class="recipe-header">
                     <span class="recipe-icon">${unlockState.unlocked ? '🟢' : '⭕'}</span>
@@ -4529,6 +4627,7 @@
                 showNotification('🌀 元婴出窍——分身解锁！它能在生活技能里与你并行做事（配方卡片上点「交给分身」）', '#b89a5b');
             }
             renderCloneBar();
+            renderPlotBar();
             if (document.body.dataset.panel === 'equipment') renderEquipmentPanel();
             refreshVisiblePanelLists();
             updatePlayerInfo();
@@ -4779,8 +4878,8 @@
                     gameState.player.inventoryCapacity += 5;
                     showNotification(`✨ 背包已扩展至${gameState.player.inventoryCapacity}格！`, '#6f9c8a');
                 } else if (itemId === 'farming_slot') {
-                    gameState.player.farmingSlots += 1;
-                    showNotification(`✨ 灵田槽位增加1个！共${gameState.player.farmingSlots}个`, '#6f9c8a');
+                    showNotification('✨ 已解锁第二块灵田！在灵田面板的配方卡片上点「种到第二块田」', '#6f9c8a');
+                    updateUI();
                 } else if (itemId === 'jewelry_slot2') {
                     showNotification('✨ 已解锁第二个饰品栏位！去「装备」界面佩戴', '#6f9c8a');
                 }
@@ -5567,6 +5666,7 @@
 
             // 分身的离线结算（与主角行动无关，先结算）
             settleCloneOffline(offlineSeconds);
+            settleFarmPlotOffline(offlineSeconds);
 
             // 战斗/秘境无法在离线时进行，重新打开页面时战斗界面已丢失，直接中断
             const savedAction = gameState.currentAction;
@@ -6107,7 +6207,9 @@
                 if (autoBattling && (Date.now() - gameState.lastActiveTime) >= 10000) {
                     handleOfflineTime(60);   // 自动战斗托管：后台期间按离线规则模拟战斗
                 } else if (action && (action.isBattle || action.isDungeon)) {
-                    settleCloneOffline((Date.now() - gameState.lastActiveTime) / 1000);   // 主角在战斗时，分身仍按离线结算
+                    const awaySecs = (Date.now() - gameState.lastActiveTime) / 1000;
+                    settleCloneOffline(awaySecs);   // 主角在战斗时，分身与第二块田仍按离线结算
+                    settleFarmPlotOffline(awaySecs);
                     gameState.lastActiveTime = Date.now();
                 } else {
                     handleOfflineTime(60);
