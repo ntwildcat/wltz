@@ -5516,11 +5516,14 @@
         //   化神 = 天地法则（雷霆劈落、八种法则符文环绕旋转、屏幕震动）
         // 用 canvas 绘制，不依赖外部资源；尊重「减少动态效果」；设置里可关闭。
         const BREAKTHROUGH_FX = {
+            1:  { name: '练气', line: '引气入体，踏上仙途', kind: 'qi', dur: 3.8 },   // 凡人 → 练气初期：踏入修仙之门
             5:  { name: '筑基', line: '根基已成，百脉皆通', kind: 'foundation', dur: 4.2 },
             9:  { name: '金丹', line: '丹成九转，金光内蕴', kind: 'core', dur: 4.2 },
             13: { name: '元婴', line: '元神出窍，神游太虚', kind: 'nascent', dur: 4.4 },
             17: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 }
         };
+        // 灵根对应的颜色（灵气入体特效用你自己的灵根色）
+        const ROOT_FX_COLORS = { metal: '#d8c078', wood: '#7fae9a', water: '#7d9bb5', fire: '#d9614f', earth: '#b08d5a', wind: '#b7c9c2', thunder: '#b39ddb', ice: '#a8d8e8' };
         const LAW_RUNES = [['金', '#d8c078'], ['木', '#7fae9a'], ['水', '#7d9bb5'], ['火', '#d9614f'], ['土', '#b08d5a'], ['风', '#b7c9c2'], ['雷', '#b39ddb'], ['冰', '#a8d8e8']];
         let fxState = null;
 
@@ -5557,6 +5560,55 @@
                 ctx.arc(cx + Math.cos(sp.a) * d, cy + Math.sin(sp.a) * d, sp.r * (1 - p * 0.5), 0, Math.PI * 2);
                 ctx.fill();
             });
+        }
+
+        // 凡人 → 练气：天地灵气化作细丝，沿螺旋线涌入体内，点亮丹田，随后以你自己灵根的颜色绽放
+        function fxDrawQi(ctx, W, H, t, s) {
+            const cx = W / 2, cy = H * 0.32;
+            const fade = t > 3.2 ? Math.max(0, (3.8 - t) / 0.6) : 1;
+            const hex = ROOT_FX_COLORS[gameState.player.spiritRoot] || '#7fae9a';
+            const rgb = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(', ');
+            ctx.fillStyle = `rgba(8, 13, 11, ${0.6 * Math.min(1, t / 0.4) * fade})`;
+            ctx.fillRect(0, 0, W, H);
+            if (!s.p) s.p = Array.from({ length: 120 }, () => ({ a: fxRand(0, 6.28), d: fxRand(0.25, 1) * Math.max(W, H) * 0.6, w: fxRand(1.2, 3.2), delay: fxRand(0, 1.3), len: fxRand(0.05, 0.11) }));
+            s.p.forEach(q => {
+                const k = fxEase((t - q.delay) / 1.9);
+                if (k <= 0 || k >= 1) return;
+                const pt = kk => [cx + Math.cos(q.a + kk * q.w * 2.2) * q.d * (1 - kk), cy + Math.sin(q.a + kk * q.w * 2.2) * q.d * (1 - kk)];
+                // 沿螺旋线画一小段弯曲的拖尾（多段折线近似曲线），越靠近中心越亮
+                ctx.strokeStyle = `rgba(${rgb}, ${0.8 * (0.35 + k * 0.65) * fade})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                for (let j = 0; j <= 8; j++) {
+                    const [x, y] = pt(Math.max(0, k - q.len * (1 - j / 8)));
+                    if (j === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            });
+            const glow = fxEase((t - 1.2) / 1.2);
+            if (glow > 0) {
+                const rr = 20 + glow * 46 + Math.sin(t * 8) * 2;
+                const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr * 2.4);
+                g.addColorStop(0, `rgba(255, 255, 255, ${0.9 * fade})`);
+                g.addColorStop(0.3, `rgba(${rgb}, ${0.75 * fade})`);
+                g.addColorStop(1, `rgba(${rgb}, 0)`);
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rr * 2.4, 0, Math.PI * 2); ctx.fill();
+            }
+            [2.1, 2.5].forEach((t0, i) => {
+                const k = (t - t0) / 1.1;
+                if (k <= 0 || k >= 1) return;
+                ctx.strokeStyle = `rgba(${rgb}, ${0.8 * (1 - k) * fade})`;
+                ctx.lineWidth = 4 - i * 1.5;
+                ctx.beginPath(); ctx.arc(cx, cy, 50 + fxEase(k) * Math.max(W, H) * 0.4, 0, Math.PI * 2); ctx.stroke();
+            });
+            if (t > 2.1) {
+                if (!s.b) s.b = Array.from({ length: 36 }, () => ({ a: fxRand(0, 6.28), v: fxRand(0.15, 0.7), r: fxRand(1.5, 3.2) }));
+                const k = Math.min(1, (t - 2.1) / 1.5);
+                s.b.forEach(b => {
+                    ctx.fillStyle = `rgba(${rgb}, ${0.9 * (1 - k) * fade})`;
+                    ctx.beginPath(); ctx.arc(cx + Math.cos(b.a) * fxEase(k) * Math.max(W, H) * 0.5 * b.v, cy + Math.sin(b.a) * fxEase(k) * Math.max(W, H) * 0.5 * b.v, b.r, 0, Math.PI * 2); ctx.fill();
+                });
+            }
         }
 
         function fxDrawFoundation(ctx, W, H, t, s) {
@@ -5742,14 +5794,15 @@
             document.body.classList.toggle('fx-shake', t < 1.9);
         }
 
-        const FX_DRAWERS = { minor: fxDrawMinor, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw };
+        const FX_DRAWERS = { minor: fxDrawMinor, qi: fxDrawQi, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw };
 
         // 播放突破特效：newRealmIndex = 突破后的境界索引；major = 是否大境界突破
         function playBreakthroughEffect(newRealmIndex, major) {
             if (gameState.settings && gameState.settings.breakthroughFx === false) return;
             stopBreakthroughFx();
             const realmName = getRealmName(newRealmIndex);
-            const cfg = major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null;
+            let cfg = major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null;
+            if (cfg && cfg.kind === 'qi') cfg = { ...cfg, line: `${(SPIRIT_ROOT_EFFECTS[gameState.player.spiritRoot] || {}).name || '灵根'}觉醒，引气入体` };
             const dur = major ? cfg.dur : 1.6;
             const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             const el = document.createElement('div');
@@ -5804,7 +5857,7 @@
             closeBreakthroughModal();
             updateUI();
             saveGame();
-            playBreakthroughEffect(nextRealmIndex, wasMajor);
+            playBreakthroughEffect(nextRealmIndex, wasMajor || nextRealmIndex === 1);   // 凡人 → 练气也是「入道」大事件
         }
 
         function performMajorBreakthrough() {
