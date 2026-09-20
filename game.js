@@ -4659,8 +4659,15 @@
 
             // 开了自动战斗托管的普通战斗：离线期间按真实战斗规则模拟，之后接着在线续战
             const autoCfg = getAutoBattle();
-            if (savedAction && savedAction.isBattle && autoCfg.enabled && offlineSeconds >= 10) {
+            if (savedAction && savedAction.isBattle && autoCfg.enabled) {
                 const areaAction = getAction('battle', savedAction.action);
+                if (areaAction && isBattleAreaUnlocked(areaAction) && offlineSeconds < 10) {
+                    // 刷新页面等极短离开：直接开一场新战斗续上
+                    gameState.battles = null;
+                    gameState.lastActiveTime = now;
+                    enterBattleArea(savedAction.action, true);
+                    return;
+                }
                 if (areaAction && isBattleAreaUnlocked(areaAction)) {
                     const maxOffline = (gameState.settings?.maxOfflineHours || 24) * 60 * 60;
                     const budget = Math.min(offlineSeconds, maxOffline);
@@ -5181,7 +5188,10 @@
                 clearInterval(tickInterval);
             } else {
                 const action = gameState.currentAction;
-                if (action && (action.isBattle || action.isDungeon)) {
+                const autoBattling = !!(action && action.isBattle && getAutoBattle().enabled);
+                if (autoBattling && (Date.now() - gameState.lastActiveTime) >= 10000) {
+                    handleOfflineTime(60);   // 自动战斗托管：后台期间按离线规则模拟战斗
+                } else if (action && (action.isBattle || action.isDungeon)) {
                     gameState.lastActiveTime = Date.now();
                 } else {
                     handleOfflineTime(60);
