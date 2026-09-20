@@ -755,7 +755,7 @@
             { title: '🔨 生活技能', body: `<b>采矿、灵田</b>产出材料，<b>炼丹、炼器</b>用材料制作丹药、食物和装备，后期还有<b>丹火、神识</b>。配方按技能等级解锁。<br/><br/>
                 每个配方做得越多，<b>🎓 精通</b>等级越高，会带来翻倍、省材料、缩短耗时等加成；把鼠标悬停（手机上点一下）可以看到详情。` },
             { title: '⚔️ 战斗', body: `进入<b>战斗区域</b>打怪，获得灵石和经验，区域随境界解锁。战斗时生命低会自动吃你装备的<b>食物</b>（在炼丹里制作，背包里设为战斗食物）。<br/><br/>
-                <b>🤖 自动战斗</b>可以让你打完自动续战，离线也会继续。<b>秘境</b>是一次性挑战，掉落种子和突破材料，但失败会有损失，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
+                <b>🔁 循环战斗</b>：进入战斗区域后会一直打下去，点「撤退」才退出，离线也会继续。<b>秘境</b>是一次性挑战，掉落种子和突破材料，但失败会有损失，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
             { title: '🏪 商城与小提示', body: `用灵石在<b>商城</b>买装备、材料、食物和功法；功法和灵根都有各自的特效，可以在修炼面板切换功法。<br/><br/>
                 💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份。这个介绍可以在<b>设置 → 玩法介绍</b>里随时重看。祝你道途顺遂！` }
         ];
@@ -1631,10 +1631,14 @@
                 if (isNormalBattle) {
                     stopAction();
                     showNotification('已撤退', '#c2a25f');
+                    switchPanel('battle');
+                    switchBattleTab('areas');
                 } else {
                     resetBattleState('idle');
                     showNotification('已撤退秘境', '#c2a25f');
                     updateUI();
+                    switchPanel('battle');
+                    switchBattleTab('dungeons');
                 }
             };
             buttons[1].onclick = () => {
@@ -1895,17 +1899,19 @@
             updateUI();
             saveGame();
 
-            // 自动战斗托管：胜利清零连败计数，连败 3 场则停下；否则立刻续战同一区域
-            if (auto.enabled) {
-                auto.streak = won ? 0 : auto.streak + 1;
-                if (!won) auto.losses++;
-                if (auto.streak >= AUTO_BATTLE_MAX_LOSS_STREAK) {
-                    showNotification(`🤖 自动战斗已停止：连续 ${auto.streak} 场未能取胜，请检查装备与食物`, '#c98a3e');
-                    renderAutoBattleBar();
-                } else {
-                    enterBattleArea(areaKey, true);
-                }
+            // 循环战斗：打完一场立刻在同一区域开下一场，直到玩家点击「撤退」才退出；
+            // 但玩家被击败（生命归零）时循环结束，回到战斗界面，不能靠反复死亡赖在战斗里
+            auto.streak = won ? 0 : auto.streak + 1;
+            if (!won) auto.losses++;
+            const died = !won && battle.playerHP.current <= 0;
+            if (died) {
+                showNotification('💀 你被击败了，本轮循环战斗结束', '#c4483a');
+                switchPanel('battle');
+                switchBattleTab('areas');
+                renderAutoBattleBar();
+                return;
             }
+            enterBattleArea(areaKey, true);
         }
 
         // 一场普通战斗取胜的奖励：精通加成后的灵石 / 经验，并获得该区域精通经验（每胜一场 10）
@@ -1926,19 +1932,10 @@
 
         function getAutoBattle() {
             if (!gameState.autoBattle) {
-                gameState.autoBattle = { enabled: false, wins: 0, losses: 0, streak: 0, coins: 0, exp: 0 };
+                gameState.autoBattle = { enabled: true, wins: 0, losses: 0, streak: 0, coins: 0, exp: 0 };
             }
+            gameState.autoBattle.enabled = true;   // 循环战斗是默认行为（旧存档里可能存着 false）
             return gameState.autoBattle;
-        }
-
-        function toggleAutoBattle() {
-            const auto = getAutoBattle();
-            auto.enabled = !auto.enabled;
-            auto.streak = 0;
-            // 打开托管时，若正好在打普通战斗，本场结束后就会自动续战
-            showNotification(auto.enabled ? '🤖 自动战斗已开启：打完一场自动续战，离线时也会继续' : '🤖 自动战斗已关闭', '#b89a5b');
-            renderAutoBattleBar();
-            saveGame();
         }
 
         function renderAutoBattleBar() {
@@ -1946,12 +1943,10 @@
             const fighting = !!(gameState.currentAction && gameState.currentAction.isBattle);
             const stats = (auto.wins + auto.losses) > 0
                 ? ` · 本次 胜${auto.wins} 负${auto.losses} · +${auto.coins}灵石 +${auto.exp}经验` : '';
-            const html = `<button class="auto-battle-btn ${auto.enabled ? 'on' : ''}" onclick="toggleAutoBattle()">🤖 自动战斗：${auto.enabled ? '开' : '关'}</button>` +
-                `<span class="auto-battle-stat">${auto.enabled ? (fighting ? '托管中' : '未在战斗，进入区域后开始') : '开启后打完自动续战，离线也会继续（消耗食物，连败 3 场自动停止）'}${stats}</span>`;
             const bar = document.getElementById('autoBattleBar');
-            if (bar) bar.innerHTML = html;
+            if (bar) bar.innerHTML = `<span class="auto-battle-stat">🔁 进入战斗区域后会一直循环战斗，点击「撤退」才会退出；离线也会继续（消耗食物，离线时连败 3 场自动停止）${fighting ? stats : ''}</span>`;
             const st = document.getElementById('autoBattleStatus');
-            if (st) st.textContent = auto.enabled ? `🤖 托管中 胜${auto.wins} 负${auto.losses}` : '';
+            if (st) st.textContent = fighting ? `🔁 循环战斗 胜${auto.wins} 负${auto.losses}` : '';
         }
 
         // 离线自动战斗：用与在线完全相同的战斗规则无头模拟（真实消耗食物、真实胜负、真实奖励）
@@ -1982,6 +1977,7 @@
                         r.wins++; r.coins += g.coins; r.exp += g.exp; streak = 0;
                     } else {
                         r.losses++;
+                        if (battle.playerHP.current <= 0) { r.died = true; break; }   // 被击败：与在线一致，循环结束
                         if (++streak >= AUTO_BATTLE_MAX_LOSS_STREAK) { r.stopped = true; break; }
                     }
                 }
@@ -4592,34 +4588,28 @@
             document.getElementById('cultivationBar').style.width = percentage + '%';
             document.getElementById('cultivationProgress').style.width = percentage + '%';
             document.getElementById('progressText').textContent = Math.round(percentage) + '%';
-            // P3修复：修为显示，当达到上限时添加提示
+            // 修为显示：达到上限时提示可突破；大境界缺丹药时明确写出缺什么
+            const full = gameState.player.cultivationXP >= realm.nextReq;
+            const isMajor = (gameState.player.realmIndex % 4 === 0 && gameState.player.realmIndex > 0) && !!GAME_CONFIG.realms[gameState.player.realmIndex + 1];
+            const req = isMajor ? MAJOR_BREAKTHROUGH_PILLS[gameState.player.realmIndex] : null;
+            const pillQty = req ? ((gameState.player.inventory.find(item => item.id === req.pillId) || {}).qty || 0) : 0;
+            const lackPill = full && !!req && pillQty < req.qty;
             let cultivationDisplay = `${gameState.player.cultivationXP}/${realm.nextReq}`;
-            if (gameState.player.cultivationXP >= realm.nextReq) {
-                cultivationDisplay += ` ✨ 可突破`;
-            }
+            if (full) cultivationDisplay += lackPill ? ` ⚠ 缺${req.pillName}` : ` ✨ 可突破`;
             document.getElementById('cultivationXP').textContent = cultivationDisplay;
 
-            // 显示突破按钮（无冷却时间限制）
-            if (gameState.player.cultivationXP >= realm.nextReq) {
-                // 修为足够，检查是否为大境界突破（新索引规则）
-                const isMajorBreakthrough = (gameState.player.realmIndex % 4 === 0 && gameState.player.realmIndex > 0);
-                if (isMajorBreakthrough) {
-                    // 大境界突破需要检查丹药
-                    const requirement = MAJOR_BREAKTHROUGH_PILLS[gameState.player.realmIndex];
-                    if (requirement) {
-                        const pillInInventory = gameState.player.inventory.find(item => item.id === requirement.pillId);
-                        const currentQty = pillInInventory ? pillInInventory.qty : 0;
-                        // 只有丹药充足才显示
-                        document.getElementById('breakThroughBtn').style.display = currentQty >= requirement.qty ? 'block' : 'none';
-                    } else {
-                        document.getElementById('breakThroughBtn').style.display = 'block';
-                    }
-                } else {
-                    // 小境界突破直接显示
-                    document.getElementById('breakThroughBtn').style.display = 'block';
-                }
+            // 突破按钮：修为满了就显示。大境界缺丹药时也显示，点开能看到所需丹药和获取方式
+            const btBtn = document.getElementById('breakThroughBtn');
+            if (full && GAME_CONFIG.realms[gameState.player.realmIndex + 1]) {
+                btBtn.style.display = 'block';
+                btBtn.classList.toggle('btn-warn', lackPill);
+                btBtn.textContent = lackPill ? `⚠ 修为已满 · 需${req.pillName}×${req.qty}（点击查看获取方式）` : '✨ 尝试突破 ✨';
+            } else if (full) {
+                btBtn.style.display = 'block';   // 已是最高境界：点开会提示尽头
+                btBtn.classList.remove('btn-warn');
+                btBtn.textContent = '✨ 尝试突破 ✨';
             } else {
-                document.getElementById('breakThroughBtn').style.display = 'none';
+                btBtn.style.display = 'none';
             }
 
             if (gameState.currentAction) {
@@ -5109,6 +5099,28 @@
         }
 
         // ==================== 突破系统 ====================
+        // 某种突破丹药的获取途径：从配置里自动汇总（配方 + 秘境掉落），避免文字与实际脱节
+        function getPillSources(pillId) {
+            const lines = [];
+            const itemName = id => (GAME_CONFIG.items[id] || {}).name || id;
+            Object.entries(gameState.skills).forEach(([skillName, skill]) => {
+                Object.values(skill.recipes || {}).forEach(recipe => {
+                    if (!((recipe.output && recipe.output.items) || []).some(i => i.id === pillId)) return;
+                    const mats = Object.entries(recipe.requires || {}).map(([id, q]) => `${itemName(id)}×${q}`).join('、');
+                    const ok = skill.level >= (recipe.requiredLevel || 1);
+                    lines.push(`${ok ? '✓' : '○'} ${skill.name}·${recipe.name}（需${skill.name} Lv.${recipe.requiredLevel}，当前 Lv.${skill.level}${mats ? '；材料：' + mats : ''}）`);
+                });
+            });
+            Object.values(GAME_CONFIG.dungeons).forEach(d => {
+                const drop = [...((d.rewards || {}).fixed || []), ...((d.rewards || {}).random || [])].find(x => x.id === pillId);
+                if (!drop) return;
+                const ok = gameState.player.realmIndex >= d.minRealmIndex;
+                lines.push(`${ok ? '✓' : '○'} 秘境「${d.name}」通关掉落${drop.probability ? '（约 ' + Math.round(drop.probability * 100) + '%）' : ''}（入口：${getRealmName(d.minRealmIndex)}）`);
+            });
+            if (pillId === 'pill') lines.push('玄门后裔出身开局自带 1 个');
+            return lines;
+        }
+
         function showBreakthroughModal() {
             const realmIndex = gameState.player.realmIndex;
             const currentRealm = GAME_CONFIG.realms[realmIndex];
@@ -5142,6 +5154,18 @@
                         ? `${currentQty} ✅`
                         : `${currentQty} ❌`;
                     document.getElementById('btPillCount').textContent = qtyDisplay;
+
+                    // 丹药不足时列出获取方式
+                    const guide = document.getElementById('btPillGuide');
+                    if (guide) {
+                        if (currentQty >= pillReq.qty) {
+                            guide.style.display = 'none';
+                        } else {
+                            guide.style.display = 'block';
+                            guide.innerHTML = '<div class="bt-guide-title">获取方式（✓ 已满足条件，○ 尚未满足）</div>' +
+                                getPillSources(pillReq.pillId).map(t => `<div class="bt-guide-line">${t}</div>`).join('');
+                        }
+                    }
                 }
 
                 // 更新按钮文本
@@ -5540,8 +5564,9 @@
                     const mins = Math.max(1, Math.round(res.elapsed / 60));
                     const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验` +
                         (res.stopped ? `\n⚠️ 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，已停止（请检查装备与食物）` : '');
-                    showNotification(msg, res.stopped ? '#c98a3e' : '#6fa980');
-                    if (!res.stopped) enterBattleArea(savedAction.action, true);
+                    showNotification(msg + (res.died ? `
+💀 第 ${res.fights} 场被击败，循环战斗已结束（生命恢复至50%，请检查装备与食物）` : ''), (res.stopped || res.died) ? '#c98a3e' : '#6fa980');
+                    if (!res.stopped && !res.died) enterBattleArea(savedAction.action, true);
                     renderAutoBattleBar();
                     saveGame();
                     return;
