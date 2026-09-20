@@ -1513,3 +1513,13 @@ display: none !important;
 .slot-info { color: var(--text-l3); font-size: 0.85em; }
 .slot-delete { position: absolute; top: 8px; right: 10px; background: transparent; border: none; cursor: pointer; font-size: 1.1em; opacity: 0.6; }
 .slot-delete:hover { opacity: 1; }
+
+/* 分身 */
+.clone-bar { margin-bottom: 15px; padding: 8px 12px; border: 1px solid var(--border-l2); border-radius: 8px; background: rgba(111, 169, 128, 0.08); font-size: 0.9em; color: var(--text-l3); }
+.clone-bar-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.clone-bar-top b { color: var(--border-l2); }
+.clone-hint { color: var(--text-l4); font-size: 0.85em; }
+.clone-stop { padding: 2px 10px; font-size: 0.85em; }
+.clone-btn { margin: 3px 0 6px; font-size: 0.8em; padding: 2px 10px; border-radius: 10px; border: 1px solid var(--border-l2); background: transparent; color: var(--border-l2); cursor: pointer; }
+.clone-btn:hover, .clone-btn.on { background: rgba(111, 169, 128, 0.2); }
+.action-item.clone-active { box-shadow: inset 0 0 0 1px var(--border-l2); }
