@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=9.8">
+    <link rel="stylesheet" href="style.css?v=9.9">
 
 </head>
 <body data-panel="cultivation">
@@ -458,6 +458,10 @@
                                         <span>突破境界时播放特效</span>
                                     </label>
                                 </div>
+                                <div class="stat-row" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                                    <span class="stat-label">突破特效回放:</span>
+                                    <div id="fxReplayList" class="fx-replay-list"></div>
+                                </div>
                                 <div class="stat-row">
                                     <label class="stat-label" for="notificationSeconds">通知停留时间:</label>
                                     <select id="notificationSeconds" name="notificationSeconds" autocomplete="off" onchange="updateSetting('notificationSeconds', this.value)">
@@ -734,7 +738,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=9.8"></script>
+    <script src="game.js?v=9.9"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

@@ -3270,6 +3270,7 @@
             document.getElementById('enableNotifications').checked = settings.enableNotifications;
             document.getElementById('fontScale').value = String(settings.fontScale || 100);
             document.getElementById('breakthroughFx').checked = settings.breakthroughFx !== false;
+            renderFxReplay();
             document.getElementById('notificationSeconds').value = String(settings.notificationSeconds || 2);
             updateSettingDisplay('enableNotifications');
         }
@@ -5794,11 +5795,27 @@
             document.body.classList.toggle('fx-shake', t < 1.9);
         }
 
+        // 设置里的「突破特效回放」：只列出已经突破过的大境界（含凡人入练气）
+        function renderFxReplay() {
+            const box = document.getElementById('fxReplayList');
+            if (!box) return;
+            const reached = Object.keys(BREAKTHROUGH_FX).map(Number).filter(i => i <= gameState.player.realmIndex).sort((a, b) => a - b);
+            box.innerHTML = reached.length
+                ? reached.map(i => `<button class="btn btn-secondary fx-replay-btn" onclick="replayBreakthroughFx(${i})">▶ ${BREAKTHROUGH_FX[i].name}<small>${getRealmName(i)}</small></button>`).join('')
+                : '<div class="settings-hint">还没有突破过大境界。突破后可以在这里回放对应的特效。</div>';
+        }
+
+        function replayBreakthroughFx(idx) {
+            if (idx > gameState.player.realmIndex || !BREAKTHROUGH_FX[idx]) return;   // 只能回放已经突破过的
+            playBreakthroughEffect(idx, true, true);
+        }
+
         const FX_DRAWERS = { minor: fxDrawMinor, qi: fxDrawQi, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw };
 
         // 播放突破特效：newRealmIndex = 突破后的境界索引；major = 是否大境界突破
-        function playBreakthroughEffect(newRealmIndex, major) {
-            if (gameState.settings && gameState.settings.breakthroughFx === false) return;
+        // force = true：设置里「回放」时使用，即使关闭了突破特效也播放
+        function playBreakthroughEffect(newRealmIndex, major, force = false) {
+            if (!force && gameState.settings && gameState.settings.breakthroughFx === false) return;
             stopBreakthroughFx();
             const realmName = getRealmName(newRealmIndex);
             let cfg = major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null;
