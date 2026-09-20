@@ -755,7 +755,7 @@
             { title: '🔨 生活技能', body: `<b>采矿、灵田</b>产出材料，<b>炼丹、炼器</b>用材料制作丹药、食物和装备，后期还有<b>丹火、神识</b>。配方按技能等级解锁。<br/><br/>
                 每个配方做得越多，<b>🎓 精通</b>等级越高，会带来翻倍、省材料、缩短耗时等加成；把鼠标悬停（手机上点一下）可以看到详情。` },
             { title: '⚔️ 战斗', body: `进入<b>战斗区域</b>打怪，获得灵石和经验，区域随境界解锁。战斗时生命低会自动吃你装备的<b>食物</b>（在炼丹里制作，背包里设为战斗食物）。<br/><br/>
-                <b>🔁 循环战斗</b>：进入战斗区域后会一直打下去，点「撤退」才退出，离线也会继续。<b>秘境</b>是一次性挑战，掉落种子和突破材料，但失败会有损失，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
+                <b>🔁 循环战斗</b>：进入战斗区域后会一直打下去，点「撤退」才退出，离线也会继续。<b>秘境</b>同样会一直循环挑战，掉落种子和突破材料，但被击败会损失修为和食物，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
             { title: '🏪 商城与小提示', body: `用灵石在<b>商城</b>买装备、材料、食物和功法；功法和灵根都有各自的特效，可以在修炼面板切换功法。<br/><br/>
                 💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份。这个介绍可以在<b>设置 → 玩法介绍</b>里随时重看。祝你道途顺遂！` }
         ];
@@ -1113,20 +1113,40 @@
             return SKILL_LEVEL_EFFECTS.battle.formula((gameState.skills.battle || {}).level || 1);
         }
 
-        function performPlayerAttack(monster) {
+        // 秘境：玩家命中怪物的概率（含境界压制、灵根克制、灵根 / 功法命中特效）
+        function getDungeonPlayerHit(monster) {
             const playerSPD = gameState.player.stats.spd || 50;
             const monsterSPD = monster.spd || 40;
             let hitChance = BATTLE_FORMULAS.calculateHitChance(playerSPD, monsterSPD);
-
             const monsterRealmIndex = GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon].baseRealmIndex || 0;
             const realmSuppression = REALM_SUPPRESSION.calculate(gameState.player.realmIndex, monsterRealmIndex);
             hitChance *= realmSuppression.hitMod;
-
             const monsterTypeId = SPIRIT_ROOT_MAPPING[monster.type] || monster.type;
             const counterModifier = COUNTER_SYSTEM.getCounterModifier(gameState.player.spiritRoot, monsterTypeId);
             hitChance *= counterModifier.hit;
             hitChance += getMod('hit');   // 灵根/功法命中特效
             hitChance = Math.max(0.05, Math.min(Math.min(0.99, 0.95 + getMod('hit')), hitChance));
+            return { hitChance, realmSuppression, counterModifier };
+        }
+
+        // 秘境：怪物命中玩家的概率（含反向境界压制、克制、玩家闪避特效）
+        function getDungeonMonsterHit(monster) {
+            const monsterSPD = monster.spd || 40;
+            const playerSPD = gameState.player.stats.spd || 50;
+            let hitChance = BATTLE_FORMULAS.calculateHitChance(monsterSPD, playerSPD);
+            const monsterRealmIndex = GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon].baseRealmIndex || 0;
+            const realmSuppression = REALM_SUPPRESSION.calculate(monsterRealmIndex, gameState.player.realmIndex);
+            hitChance *= realmSuppression.hitMod;
+            const monsterTypeId = SPIRIT_ROOT_MAPPING[monster.type] || monster.type;
+            const counterModifier = COUNTER_SYSTEM.getCounterModifier(monsterTypeId, gameState.player.spiritRoot);
+            hitChance *= counterModifier.hit;
+            hitChance *= 1 - Math.min(0.6, getMod('dodge'));   // 灵根 / 功法闪避特效：降低被命中率
+            hitChance = Math.max(0.05, Math.min(0.95, hitChance));
+            return { hitChance, realmSuppression, counterModifier };
+        }
+
+        function performPlayerAttack(monster) {
+            const { hitChance, realmSuppression, counterModifier } = getDungeonPlayerHit(monster);
 
             if (Math.random() < hitChance) {
                 const baseDmg = gameState.player.stats.atk || 20;
@@ -1152,21 +1172,7 @@
 
         // 计算怪物对玩家的伤害
         function performMonsterAttack(monster) {
-            const monsterSPD = monster.spd || 40;
-            const playerSPD = gameState.player.stats.spd || 50;
-            let hitChance = BATTLE_FORMULAS.calculateHitChance(monsterSPD, playerSPD);
-
-            // 怪物也受境界压制（反向）
-            const monsterRealmIndex = GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon].baseRealmIndex || 0;
-            const realmSuppression = REALM_SUPPRESSION.calculate(monsterRealmIndex, gameState.player.realmIndex);
-            hitChance *= realmSuppression.hitMod;
-
-            // 怪物也受克制（反向）
-            const monsterTypeId = SPIRIT_ROOT_MAPPING[monster.type] || monster.type;
-            const counterModifier = COUNTER_SYSTEM.getCounterModifier(monsterTypeId, gameState.player.spiritRoot);
-            hitChance *= counterModifier.hit;
-            hitChance *= 1 - Math.min(0.6, getMod('dodge'));   // 灵根/功法闪避特效：降低被命中率
-            hitChance = Math.max(0.05, Math.min(0.95, hitChance));
+            const { hitChance, realmSuppression, counterModifier } = getDungeonMonsterHit(monster);
 
             if (Math.random() < hitChance) {
                 const baseDmg = monster.atk || 10;
@@ -1335,6 +1341,10 @@
 
             updateUI();
             saveGame();
+
+            // 被击败：循环结束，回到战斗界面的秘境列表
+            switchPanel('battle');
+            switchBattleTab('dungeons');
         }
 
         // 战斗食物：食物是背包里的物品（在炼丹中制作），foodSlot 保存当前选择的食物ID
@@ -1493,6 +1503,8 @@
             document.getElementById('playerDef').textContent = Math.floor(gameState.player.stats.def);
             document.getElementById('monsterAtk').textContent = Math.floor(monster.atk);
             document.getElementById('monsterDef').textContent = Math.floor(monster.def);
+            document.getElementById('playerHit').textContent = Math.round(getDungeonPlayerHit(monster).hitChance * 100) + '%';
+            document.getElementById('monsterHit').textContent = Math.round(getDungeonMonsterHit(monster).hitChance * 100) + '%';
         }
 
         // P1-1 显示伤害飘字
@@ -1835,6 +1847,20 @@
                 enemyHPText.textContent = `${Math.max(0, Math.floor(battle.currentEnemy.currentHP))}/${Math.floor(battle.currentEnemy.hp)}`;
             }
 
+            // 双方命中率
+            {
+                const areaRealm = getAction('battle', battle.currentArea).areaData.minLevel;
+                const pSup = REALM_SUPPRESSION.calculate(player.realmIndex, areaRealm);
+                const eSup = REALM_SUPPRESSION.calculate(areaRealm, player.realmIndex);
+                const e = battle.currentEnemy;
+                const clamp = (v, hi) => Math.max(0.05, Math.min(hi, v));
+                const ph = clamp(BATTLE_FORMULAS.calculateHitChance(player.stats.spd, e.spd) * pSup.hitMod + getMod('hit'), Math.min(0.99, 0.95 + getMod('hit')));
+                const eh = clamp(BATTLE_FORMULAS.calculateHitChance(e.spd, player.stats.spd) * eSup.hitMod * (1 - Math.min(0.6, getMod('dodge'))), 0.95);
+                const ph1 = document.getElementById('playerHit'), eh1 = document.getElementById('monsterHit');
+                if (ph1) ph1.textContent = Math.round(ph * 100) + '%';
+                if (eh1) eh1.textContent = Math.round(eh * 100) + '%';
+            }
+
             // 标题、双方攻防、怪物图标
             const setText = (id, text) => {
                 const el = document.getElementById(id);
@@ -2051,6 +2077,9 @@
             showNotification(rewardMsg.trim(), '#6f9c8a');
             updateUI();
             saveGame();
+
+            // 循环挑战：通关后立刻再进同一个秘境，直到撤退或被击败
+            enterDungeon(dungeonId, true);
         }
 
         // 境界压制系统（纵向位阶感）
@@ -4415,7 +4444,7 @@
         }
 
         // 进入秘境
-        function enterDungeon(dungeonId) {
+        function enterDungeon(dungeonId, auto = false) {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
 
             // 凡人无法进入秘境
@@ -4446,8 +4475,8 @@
             // 确保玩家HP是current/max结构
             if (typeof gameState.player.stats.hp === 'number') {
                 gameState.player.stats.hp = { current: gameState.player.stats.hp, max: gameState.player.stats.hp };
-            } else {
-                // 恢复到最大HP
+            } else if (!auto) {
+                // 手动进入：恢复到最大HP；循环续战时不回血（与战斗区域一致，靠食物和生命回复撑下去）
                 gameState.player.stats.hp.current = gameState.player.stats.hp.max;
             }
 
@@ -4466,7 +4495,7 @@
             };
             gameState.currentActionProgress = 0;
 
-            showNotification(`进入 ${dungeon.name}！`, '#c2a25f');
+            if (!auto) showNotification(`进入 ${dungeon.name}！循环挑战，点「撤退」或被击败才会退出`, '#c2a25f');
             updateActionDisplay();
             updateUI();
 
