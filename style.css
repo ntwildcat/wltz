@@ -1807,3 +1807,38 @@ body[data-panel="shop"] .coin-display { border-color: var(--cinnabar-2) !importa
 .settings-hint { font-size: 0.8em; color: var(--text-l4); padding: 6px 2px 2px; line-height: 1.6; }
 
 #buyConfirmBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* 战斗日志：更高、可滚动、滚动不带动整页 */
+.battle-log { height: 170px; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.battle-log-hint { font-size: 0.75em; color: var(--text-l4); margin: 6px 0 4px; }
+.log-entry { padding: 2px 0; }
+
+/* 战斗区域 / 秘境卡片：敌人、奖励与掉落 */
+.area-reward { font-size: 0.75em; color: var(--text-l3); line-height: 1.6; margin-top: 4px; text-align: left; }
+.area-drops { color: var(--text-l2); }
+
+/* 突破特效 */
+.fx-overlay { position: fixed; inset: 0; z-index: 2000; pointer-events: none; overflow: hidden; }
+.fx-major { pointer-events: auto; cursor: pointer; }
+.fx-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fx-text { position: absolute; left: 0; right: 0; top: 34%; text-align: center; color: var(--paper); padding: 0 16px; }
+.fx-title { font-family: var(--font-title); font-size: clamp(2.6rem, 10vw, 5.8rem); letter-spacing: 0.25em; text-indent: 0.25em; text-shadow: 0 0 22px rgba(200, 170, 90, 0.6), 0 2px 0 rgba(0, 0, 0, 0.6); animation: fxTitle 4s both; }
+.fx-sub { margin-top: 10px; font-size: clamp(1rem, 3.2vw, 1.4rem); letter-spacing: 0.12em; color: var(--text-l2); animation: fxSub 4s both; }
+.fx-skip { margin-top: 26px; font-size: 0.8rem; color: var(--text-l4); animation: fxSub 4s both; }
+@keyframes fxTitle { 0% { opacity: 0; transform: scale(1.5); filter: blur(10px); } 10% { opacity: 1; transform: scale(1); filter: blur(0); } 82% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes fxSub { 0%, 14% { opacity: 0; transform: translateY(8px); } 26% { opacity: 1; transform: translateY(0); } 82% { opacity: 1; } 100% { opacity: 0; } }
+.fx-minor .fx-text { top: 36%; }
+.fx-minor .fx-title { font-size: clamp(1.8rem, 6vw, 2.8rem); animation: fxTitleMinor 1.6s both; }
+.fx-minor .fx-sub { animation: fxTitleMinor 1.6s 0.05s both; }
+@keyframes fxTitleMinor { 0% { opacity: 0; transform: translateY(10px); } 22% { opacity: 1; transform: translateY(0); } 75% { opacity: 1; } 100% { opacity: 0; } }
+.fx-seal { display: inline-block; margin-top: 14px; padding: 2px 12px 4px; background: var(--cinnabar); color: var(--paper); font-family: var(--font-title); font-size: 1.6rem; border-radius: 2px; box-shadow: inset 0 0 0 2px rgba(220, 209, 182, 0.3); animation: fxSeal 1.6s both; }
+@keyframes fxSeal { 0% { opacity: 0; transform: scale(2) rotate(-8deg); } 30% { opacity: 1; transform: scale(1) rotate(-3deg); } 78% { opacity: 1; } 100% { opacity: 0; } }
+.fx-law .fx-title { text-shadow: 0 0 26px rgba(160, 160, 255, 0.7), 0 2px 0 rgba(0, 0, 0, 0.6); }
+.fx-nascent .fx-title { text-shadow: 0 0 26px rgba(150, 240, 226, 0.7), 0 2px 0 rgba(0, 0, 0, 0.6); }
+.fx-reduced .fx-title, .fx-reduced .fx-sub, .fx-reduced .fx-skip, .fx-reduced .fx-seal { animation: none !important; opacity: 1; }
+.fx-reduced { background: rgba(10, 9, 6, 0.75); }
+body.fx-shake .container { animation: fxShake 0.12s linear infinite; }
+@keyframes fxShake { 0% { transform: translate(0, 0); } 25% { transform: translate(-3px, 2px); } 50% { transform: translate(3px, -2px); } 75% { transform: translate(-2px, -3px); } 100% { transform: translate(2px, 3px); } }
+.fx-major .fx-text { top: 54%; }
+.fx-major .fx-title { text-shadow: 0 0 14px rgba(0, 0, 0, 0.85), 0 0 26px rgba(200, 170, 90, 0.55), 0 2px 0 rgba(0, 0, 0, 0.7); }
+.fx-major .fx-sub { text-shadow: 0 0 10px rgba(0, 0, 0, 0.9); }

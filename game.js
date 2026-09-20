@@ -737,6 +737,7 @@
                 maxOfflineHours: 24,           // 最多离线奖励小时数
                 enableNotifications: true,      // 启用通知（关闭后只显示失败 / 警告等重要提示）
                 fontScale: 100,                 // 字体大小（百分比：90 小 / 100 中 / 115 大 / 130 特大）
+                breakthroughFx: true,           // 突破特效
                 notificationSeconds: 2,         // 通知停留时间（秒）
                 theme: 'dark'                   // 主题（dark/light）
             }
@@ -1527,7 +1528,7 @@
         // ==================== P1-1 战斗UI系统函数 ====================
 
         // P1-1 初始化战斗UI
-        function renderBattleUI() {
+        function renderBattleUI(keepLog = false) {
             const battleContainer = document.getElementById('battleContainer');
 
             // 隐藏所有面板，显示战斗UI
@@ -1539,8 +1540,8 @@
             updateBattleHP();
             updateFoodBar();
 
-            // 清空日志
-            document.getElementById('battleLog').innerHTML = '';
+            // 手动进入时清空日志；循环续战（通关后再进）保留最近 30 条
+            if (!keepLog) resetBattleLog(); else renderBattleLog(true);
 
             // 设置初始速度
             gameState.battleSpeed = 1;
@@ -1622,22 +1623,50 @@
         }
 
         // P1-1 添加战斗日志
+        // 战斗日志：一次循环战斗（从进入战斗区域 / 秘境到撤退或被击败）期间共用一份，保留最近 30 条，可上下滚动查看。
+        // 条目是字符串或 { text, cls }；普通战斗的 battle.log 直接指向这份数组（stepNormalBattle 往里 push 字符串）
+        const BATTLE_LOG_MAX = 30;
+        const battleLogEntries = [];
+        let battleLogRendered = '';
+
+        function trimBattleLog(arr = battleLogEntries) {
+            while (arr.length > BATTLE_LOG_MAX) arr.shift();
+        }
+
+        function battleLogClass(entry) {
+            if (typeof entry !== 'string') return entry.cls || 'info';
+            if (/^获得/.test(entry)) return 'heal';
+            if (/落空/.test(entry)) return 'miss';
+            if (/^玩家/.test(entry)) return 'player-hit';
+            if (/使用|恢复/.test(entry)) return 'heal';
+            if (/击败|战胜|遭遇|——/.test(entry)) return /遭遇|——/.test(entry) ? 'info' : 'victory';
+            return 'monster-hit';
+        }
+
+        // 重绘日志；用户往上翻看时保持滚动位置，停在底部时才自动跟随最新一条
+        function renderBattleLog(force = false) {
+            const el = document.getElementById('battleLog');
+            if (!el) return;
+            const last = battleLogEntries[battleLogEntries.length - 1];
+            const key = battleLogEntries.length + '|' + (last ? (typeof last === 'string' ? last : last.text) : '');
+            if (!force && key === battleLogRendered) return;
+            battleLogRendered = key;
+            const stick = el.scrollHeight - el.scrollTop - el.clientHeight < 28;
+            const prev = el.scrollTop;
+            el.innerHTML = battleLogEntries.map(e => `<div class="log-entry log-${battleLogClass(e)}">${typeof e === 'string' ? e : e.text}</div>`).join('');
+            el.scrollTop = stick ? el.scrollHeight : prev;
+        }
+
+        function resetBattleLog() {
+            battleLogEntries.length = 0;
+            renderBattleLog(true);
+        }
+
         function addBattleLog(msg, type = 'info') {
-            const battleLog = document.getElementById('battleLog');
-            const logEntry = document.createElement('div');
-            logEntry.className = 'log-entry log-' + type;
-
             const time = new Date().toLocaleTimeString('zh-CN', {hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'});
-            logEntry.textContent = `[${time}] ${msg}`;
-
-            battleLog.appendChild(logEntry);
-            battleLog.scrollTop = battleLog.scrollHeight;
-
-            // 限制日志条数
-            const entries = battleLog.querySelectorAll('.log-entry');
-            if (entries.length > 8) {
-                entries[0].remove();
-            }
+            battleLogEntries.push({ text: `[${time}] ${msg}`, cls: type });
+            trimBattleLog();
+            renderBattleLog();
         }
 
         // P1-1 设置战斗速度
@@ -1860,7 +1889,7 @@
                         battle.log.push(`${enemy.name}攻击落空`);
                     }
                 }
-                if (battle.log.length > 10) battle.log.shift();
+                trimBattleLog(battle.log);
             }
 
             // 战斗食物：生命低于阈值时自动进食（恢复战斗内的生命值）
@@ -1963,12 +1992,8 @@
             setText('monsterDef', battle.currentEnemy.def);
             setText('monsterSprite', battle.currentEnemy.icon || '👾');
 
-            // 更新战斗日志
-            const battleLog = document.getElementById('battleLog');
-            if (battleLog && battle.log) {
-                battleLog.innerHTML = battle.log.map(log => `<div class="log-entry">${log}</div>`).join('');
-                battleLog.scrollTop = battleLog.scrollHeight;
-            }
+            // 更新战斗日志（共用日志，仅在有新条目时重绘，保留用户的滚动位置）
+            renderBattleLog();
         }
 
         // 普通战斗完成处理
@@ -1987,9 +2012,13 @@
             // 给予奖励
             const won = battle.currentEnemy.currentHP <= 0;
             const auto = getAutoBattle();
+            battleLogEntries.push(won ? `🎉 战胜${battle.currentEnemy.name}` : (battle.playerHP.current <= 0 ? `💀 被${battle.currentEnemy.name}击败` : `⚔️ 未能击败${battle.currentEnemy.name}（超时）`));
+            trimBattleLog();
             if (won) {
                 const { coins, exp } = grantNormalBattleWin(areaKey);
                 auto.wins++; auto.coins += coins; auto.exp += exp;
+                battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验`);
+                trimBattleLog();
                 // 托管中不逐场弹胜利提示，统计显示在托管栏里
                 if (!auto.enabled) {
                     showNotification(`🎉 战胜${battle.currentEnemy.name}！
@@ -3240,6 +3269,7 @@
             document.getElementById('maxOfflineHours').value = settings.maxOfflineHours;
             document.getElementById('enableNotifications').checked = settings.enableNotifications;
             document.getElementById('fontScale').value = String(settings.fontScale || 100);
+            document.getElementById('breakthroughFx').checked = settings.breakthroughFx !== false;
             document.getElementById('notificationSeconds').value = String(settings.notificationSeconds || 2);
             updateSettingDisplay('enableNotifications');
         }
@@ -3598,6 +3628,33 @@
             }
         }
 
+        // 战斗区域奖励说明：每场灵石 / 经验（含该区域精通加成）；战斗区域目前没有物品掉落
+        function areaRewardHtml(areaKey, action) {
+            const a = action.areaData;
+            const bonus = 1 + getMasteryBonus('battle', areaKey).reward;
+            const enemies = (BATTLE_ENEMY_CONFIGS[areaKey] || []).map(e => `${e.icon || ''}${e.name}`).join('、');
+            return `<div class="area-reward">
+                    <div>敌人：${enemies || '—'}</div>
+                    <div>每场奖励：💎 ${Math.round(a.coins * bonus)} 灵石 · ${Math.round(a.exp * bonus)} 战斗经验${bonus > 1 ? '（含精通加成）' : ''}</div>
+                    <div class="area-drops">掉落物：无（只获得灵石与经验）</div>
+                </div>`;
+        }
+
+        // 秘境奖励说明：固定掉落、随机掉落（含概率）、灵石与经验
+        function dungeonDropHtml(dungeon) {
+            const name = id => (GAME_CONFIG.items[id] || {}).name || id;
+            const qty = q => Array.isArray(q) ? (q[0] === q[1] ? q[0] : `${q[0]}–${q[1]}`) : q;
+            const r = dungeon.rewards || {};
+            const fixed = (r.fixed || []).map(d => `${name(d.id)}×${qty(d.qty)}（必掉）`);
+            const random = (r.random || []).map(d => `${name(d.id)}×${qty(d.qty)}（${Math.round((d.probability || 1) * 100)}%）`);
+            const coins = Array.isArray(r.coins) ? `${r.coins[0]}–${r.coins[1]} 灵石` : (r.coins ? `${r.coins} 灵石` : '');
+            const list = fixed.concat(random);
+            return `<div class="area-reward">
+                    <div class="area-drops">通关掉落：${list.length ? list.join('、') : '无物品'}</div>
+                    <div>另有：${coins}${r.skillExp ? ' · ' + r.skillExp + ' 战斗经验' : ''}（每只怪物还会掉灵石）</div>
+                </div>`;
+        }
+
         function generateBattleList() {
             const skill = gameState.skills.battle;
             const actionList = document.getElementById('battleActions');
@@ -3650,17 +3707,6 @@
                 div.className = className;
                 div.id = 'action-battle-' + key;
 
-                // 使用新的克制系统显示信息
-                // 这里假设战斗区域的敌人类型是'metal'，实际可能需要从action中获取
-                const battleEnemyType = 'metal'; // 或从真实敌人数据获取
-                const counterMod = COUNTER_SYSTEM.getCounterModifier(gameState.player.spiritRoot, battleEnemyType);
-                let boosted = '';
-                if (counterMod.damage > 1.0) {
-                    boosted = ' ⚡克制'; // 克制敌人
-                } else if (counterMod.damage < 1.0) {
-                    boosted = ' ⚠️被克'; // 被敌人克制
-                }
-
                 // 不可用提示
                 let statusHint = '';
                 if (isDisabled) {
@@ -3669,9 +3715,9 @@
 
                 div.innerHTML = `
                     <div>
-                        <div class="action-name">${action.name}${boosted}</div>
+                        <div class="action-name">${action.name}</div>
                         <div class="action-desc">${action.desc}</div>
-                        <div style="font-size: 0.75em; color: #c2a25f; margin-top: 3px;">克制倍数: ${counterMod.damage.toFixed(1)}×</div>
+                        ${areaRewardHtml(key, action)}
                         <div class="recipe-req ${isDisabled ? 'unmet' : 'met'}">${isDisabled ? '✗' : '✓'} 境界要求：${getRealmName(action.areaData.minLevel)}</div>
                         ${isDisabled ? '' : (() => { const m = getMasteryInfo('battle', key); return `<div class="recipe-mastery" title="${describeMastery('battle', key)}">🎓 精通 <b>Lv.${m.level}</b>${m.maxed ? ' ✦满级' : ` · ${m.exp}/${m.need}`}<div class="mastery-track"><div class="mastery-fill" style="width: ${m.percent}%"></div></div></div>`; })()}
                         ${statusHint}
@@ -4426,7 +4472,8 @@
                         <div style="flex: 1;">
                             <div style="font-weight: bold; color: #c2a25f;">${dungeon.name}</div>
                             <div style="font-size: 0.85em; color: #aaa;">${dungeon.desc}</div>
-                            <div style="font-size: 0.75em; color: ${statusColor}; margin-top: 4px;">${statusText}</div>
+                            <div style="font-size: 0.75em; color: ${statusColor}; margin-top: 4px;">${statusText} · 入口：${requiredRealmName}</div>
+                            ${dungeonDropHtml(dungeon)}
                         </div>
                     </div>
                 `;
@@ -4525,7 +4572,10 @@
             gameState.battles.battleState = 'fighting';
             gameState.battles.playerAttackTimer = 0;
             gameState.battles.enemyAttackTimer = 0;
-            gameState.battles.log = [];
+            if (!auto) resetBattleLog();
+            gameState.battles.log = battleLogEntries;   // 整个循环战斗共用一份日志（最近 30 条）
+            battleLogEntries.push(`—— 遭遇 ${gameState.battles.currentEnemy.name} ——`);
+            trimBattleLog();
             gameState.battles.turnCount = 0;
             gameState.player.foodUseTimer = FOOD_CONFIG.autoEatConfig.cooldown;
             pickBestFood();
@@ -4609,7 +4659,7 @@
             updateUI();
 
             // P1-1 初始化战斗UI
-            renderBattleUI();
+            renderBattleUI(auto);
         }
 
         // ==================== UI更新 ====================
@@ -5457,9 +5507,347 @@
             }
         }
 
+        // ==================== 突破特效 ====================
+        // 小境界：一圈铜色涟漪加火花 + 朱印「破」，约 1.6 秒，不挡操作。
+        // 大境界：每个境界有自己的特效（约 4 秒，点击可跳过）：
+        //   筑基 = 地脉升起（大地色石柱自下而上拔起、尘土飞扬、震动）
+        //   金丹 = 金丹凝结（金色光点旋转汇聚成丹，光环扩散）
+        //   元婴 = 元神出窍（青白色婴儿元神从丹田升起，拖出光带）
+        //   化神 = 天地法则（雷霆劈落、八种法则符文环绕旋转、屏幕震动）
+        // 用 canvas 绘制，不依赖外部资源；尊重「减少动态效果」；设置里可关闭。
+        const BREAKTHROUGH_FX = {
+            1:  { name: '练气', line: '引气入体，踏上仙途', kind: 'qi', dur: 3.8 },   // 凡人 → 练气初期：踏入修仙之门
+            5:  { name: '筑基', line: '根基已成，百脉皆通', kind: 'foundation', dur: 4.2 },
+            9:  { name: '金丹', line: '丹成九转，金光内蕴', kind: 'core', dur: 4.2 },
+            13: { name: '元婴', line: '元神出窍，神游太虚', kind: 'nascent', dur: 4.4 },
+            17: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 }
+        };
+        // 灵根对应的颜色（灵气入体特效用你自己的灵根色）
+        const ROOT_FX_COLORS = { metal: '#d8c078', wood: '#7fae9a', water: '#7d9bb5', fire: '#d9614f', earth: '#b08d5a', wind: '#b7c9c2', thunder: '#b39ddb', ice: '#a8d8e8' };
+        const LAW_RUNES = [['金', '#d8c078'], ['木', '#7fae9a'], ['水', '#7d9bb5'], ['火', '#d9614f'], ['土', '#b08d5a'], ['风', '#b7c9c2'], ['雷', '#b39ddb'], ['冰', '#a8d8e8']];
+        let fxState = null;
+
+        function stopBreakthroughFx() {
+            if (!fxState) return;
+            cancelAnimationFrame(fxState.raf);
+            clearTimeout(fxState.timer);
+            fxState.el.remove();
+            document.body.classList.remove('fx-shake');
+            fxState = null;
+        }
+
+        const fxEase = t => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+        const fxRand = (a, b) => a + Math.random() * (b - a);
+
+        // ---- 各特效的绘制函数：draw(ctx, W, H, t, s)，t 为秒，s 为该特效的持久状态 ----
+        function fxDrawMinor(ctx, W, H, t, s) {
+            const cx = W / 2, cy = H * 0.42;
+            const p = Math.min(1, t / 1.3);
+            for (let k = 0; k < 2; k++) {
+                const pk = Math.min(1, Math.max(0, (t - k * 0.22) / 1.1));
+                if (pk <= 0) continue;
+                ctx.strokeStyle = `rgba(194, 162, 95, ${0.65 * (1 - pk)})`;
+                ctx.lineWidth = 3 - k;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 30 + fxEase(pk) * Math.min(W, H) * 0.3, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            if (!s.sparks) s.sparks = Array.from({ length: 18 }, () => ({ a: fxRand(0, 6.28), v: fxRand(0.6, 1.3), r: fxRand(1.5, 3) }));
+            s.sparks.forEach(sp => {
+                const d = 30 + fxEase(p) * Math.min(W, H) * 0.26 * sp.v;
+                ctx.fillStyle = `rgba(232, 212, 160, ${0.9 * (1 - p)})`;
+                ctx.beginPath();
+                ctx.arc(cx + Math.cos(sp.a) * d, cy + Math.sin(sp.a) * d, sp.r * (1 - p * 0.5), 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // 凡人 → 练气：天地灵气化作细丝，沿螺旋线涌入体内，点亮丹田，随后以你自己灵根的颜色绽放
+        function fxDrawQi(ctx, W, H, t, s) {
+            const cx = W / 2, cy = H * 0.32;
+            const fade = t > 3.2 ? Math.max(0, (3.8 - t) / 0.6) : 1;
+            const hex = ROOT_FX_COLORS[gameState.player.spiritRoot] || '#7fae9a';
+            const rgb = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(', ');
+            ctx.fillStyle = `rgba(8, 13, 11, ${0.6 * Math.min(1, t / 0.4) * fade})`;
+            ctx.fillRect(0, 0, W, H);
+            if (!s.p) s.p = Array.from({ length: 120 }, () => ({ a: fxRand(0, 6.28), d: fxRand(0.25, 1) * Math.max(W, H) * 0.6, w: fxRand(1.2, 3.2), delay: fxRand(0, 1.3), len: fxRand(0.05, 0.11) }));
+            s.p.forEach(q => {
+                const k = fxEase((t - q.delay) / 1.9);
+                if (k <= 0 || k >= 1) return;
+                const pt = kk => [cx + Math.cos(q.a + kk * q.w * 2.2) * q.d * (1 - kk), cy + Math.sin(q.a + kk * q.w * 2.2) * q.d * (1 - kk)];
+                // 沿螺旋线画一小段弯曲的拖尾（多段折线近似曲线），越靠近中心越亮
+                ctx.strokeStyle = `rgba(${rgb}, ${0.8 * (0.35 + k * 0.65) * fade})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                for (let j = 0; j <= 8; j++) {
+                    const [x, y] = pt(Math.max(0, k - q.len * (1 - j / 8)));
+                    if (j === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            });
+            const glow = fxEase((t - 1.2) / 1.2);
+            if (glow > 0) {
+                const rr = 20 + glow * 46 + Math.sin(t * 8) * 2;
+                const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr * 2.4);
+                g.addColorStop(0, `rgba(255, 255, 255, ${0.9 * fade})`);
+                g.addColorStop(0.3, `rgba(${rgb}, ${0.75 * fade})`);
+                g.addColorStop(1, `rgba(${rgb}, 0)`);
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rr * 2.4, 0, Math.PI * 2); ctx.fill();
+            }
+            [2.1, 2.5].forEach((t0, i) => {
+                const k = (t - t0) / 1.1;
+                if (k <= 0 || k >= 1) return;
+                ctx.strokeStyle = `rgba(${rgb}, ${0.8 * (1 - k) * fade})`;
+                ctx.lineWidth = 4 - i * 1.5;
+                ctx.beginPath(); ctx.arc(cx, cy, 50 + fxEase(k) * Math.max(W, H) * 0.4, 0, Math.PI * 2); ctx.stroke();
+            });
+            if (t > 2.1) {
+                if (!s.b) s.b = Array.from({ length: 36 }, () => ({ a: fxRand(0, 6.28), v: fxRand(0.15, 0.7), r: fxRand(1.5, 3.2) }));
+                const k = Math.min(1, (t - 2.1) / 1.5);
+                s.b.forEach(b => {
+                    ctx.fillStyle = `rgba(${rgb}, ${0.9 * (1 - k) * fade})`;
+                    ctx.beginPath(); ctx.arc(cx + Math.cos(b.a) * fxEase(k) * Math.max(W, H) * 0.5 * b.v, cy + Math.sin(b.a) * fxEase(k) * Math.max(W, H) * 0.5 * b.v, b.r, 0, Math.PI * 2); ctx.fill();
+                });
+            }
+        }
+
+        function fxDrawFoundation(ctx, W, H, t, s) {
+            const fade = Math.min(1, t / 0.5) * (t > 3.5 ? Math.max(0, (4.2 - t) / 0.7) : 1);
+            ctx.fillStyle = `rgba(14, 12, 8, ${0.6 * fade})`;
+            ctx.fillRect(0, 0, W, H);
+            if (!s.pillars) {
+                const n = Math.max(7, Math.round(W / 150));
+                s.pillars = Array.from({ length: n }, (_, i) => ({ x: (i + 0.5) * W / n, w: W / n * 0.62, h: fxRand(0.32, 0.72) * H, d: 0.12 * i + fxRand(0, 0.15) }));
+                s.dust = Array.from({ length: 90 }, () => ({ x: fxRand(0, W), y: fxRand(H * 0.5, H), v: fxRand(20, 70), r: fxRand(1, 3), d: fxRand(0, 2) }));
+            }
+            s.pillars.forEach(p => {
+                const k = fxEase((t - 0.25 - p.d) / 0.95);
+                if (k <= 0) return;
+                const h = p.h * k, x = p.x - p.w / 2, y = H - h;
+                const g = ctx.createLinearGradient(0, y, 0, H);
+                g.addColorStop(0, `rgba(146, 116, 70, ${0.92 * fade})`);
+                g.addColorStop(1, `rgba(52, 42, 28, ${0.92 * fade})`);
+                ctx.fillStyle = g;
+                ctx.fillRect(x, y, p.w, h);
+                ctx.fillStyle = `rgba(232, 212, 160, ${0.85 * fade})`;
+                ctx.fillRect(x, y, p.w, 4);
+                ctx.strokeStyle = `rgba(20, 16, 10, ${0.5 * fade})`;
+                for (let yy = y + 26; yy < H; yy += 26) { ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + p.w, yy); ctx.stroke(); }
+            });
+            s.dust.forEach(d => {
+                if (t < d.d) return;
+                const y = d.y - (t - d.d) * d.v;
+                ctx.fillStyle = `rgba(200, 176, 120, ${0.5 * fade * Math.max(0, 1 - (t - d.d) / 2.6)})`;
+                ctx.beginPath(); ctx.arc(d.x, y, d.r, 0, Math.PI * 2); ctx.fill();
+            });
+            const ln = fxEase((t - 1.6) / 0.9);
+            if (ln > 0) {
+                ctx.strokeStyle = `rgba(232, 212, 160, ${0.8 * fade})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(W / 2 - ln * W / 2, H * 0.62); ctx.lineTo(W / 2 + ln * W / 2, H * 0.62); ctx.stroke();
+            }
+            document.body.classList.toggle('fx-shake', t > 0.3 && t < 1.6);
+        }
+
+        function fxDrawCore(ctx, W, H, t, s) {
+            const cx = W / 2, cy = H * 0.32, R = Math.max(W, H) * 0.55;
+            const fade = t > 3.6 ? Math.max(0, (4.2 - t) / 0.6) : 1;
+            ctx.fillStyle = `rgba(12, 10, 6, ${0.55 * Math.min(1, t / 0.4) * fade})`;
+            ctx.fillRect(0, 0, W, H);
+            if (!s.pts) s.pts = Array.from({ length: 170 }, () => ({ a: fxRand(0, 6.28), d: fxRand(0.35, 1) * R, w: fxRand(1.2, 3.2), r: fxRand(1.2, 2.8) }));
+            const conv = fxEase(t / 1.7);
+            s.pts.forEach(p => {
+                const dist = p.d * (1 - conv), ang = p.a + conv * p.w * 2.4;
+                const x = cx + Math.cos(ang) * dist, y = cy + Math.sin(ang) * dist;
+                ctx.fillStyle = `rgba(232, 204, 120, ${0.9 * fade * (t < 1.9 ? 1 : Math.max(0, 1 - (t - 1.9) / 0.4))})`;
+                ctx.beginPath(); ctx.arc(x, y, p.r, 0, Math.PI * 2); ctx.fill();
+            });
+            const orb = fxEase((t - 1.2) / 0.9);
+            if (orb > 0) {
+                const rr = 26 + orb * 62 + Math.sin(t * 9) * 3 * orb;
+                const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr * 2.2);
+                g.addColorStop(0, `rgba(255, 246, 214, ${0.95 * fade})`);
+                g.addColorStop(0.35, `rgba(240, 200, 100, ${0.85 * fade})`);
+                g.addColorStop(1, 'rgba(200, 150, 60, 0)');
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(cx, cy, rr * 2.2, 0, Math.PI * 2); ctx.fill();
+            }
+            [2.0, 2.45, 2.9].forEach((t0, i) => {
+                const k = (t - t0) / 1.1;
+                if (k <= 0 || k >= 1) return;
+                ctx.strokeStyle = `rgba(232, 204, 120, ${0.7 * (1 - k) * fade})`;
+                ctx.lineWidth = 4 - i;
+                ctx.beginPath(); ctx.arc(cx, cy, 60 + fxEase(k) * Math.max(W, H) * 0.42, 0, Math.PI * 2); ctx.stroke();
+            });
+            if (t > 2.0) {
+                if (!s.spark) s.spark = Array.from({ length: 40 }, () => ({ a: fxRand(0, 6.28), v: fxRand(0.2, 0.8), r: fxRand(1.5, 3.5) }));
+                s.spark.forEach(sp => {
+                    const k = Math.min(1, (t - 2.0) / 1.6);
+                    ctx.fillStyle = `rgba(255, 236, 170, ${0.9 * (1 - k) * fade})`;
+                    ctx.beginPath(); ctx.arc(cx + Math.cos(sp.a) * fxEase(k) * R * sp.v, cy + Math.sin(sp.a) * fxEase(k) * R * sp.v, sp.r, 0, Math.PI * 2); ctx.fill();
+                });
+            }
+        }
+
+        function fxDrawNascent(ctx, W, H, t, s) {
+            const cx = W / 2, base = H * 0.86;
+            const fade = t > 3.7 ? Math.max(0, (4.4 - t) / 0.7) : 1;
+            const bg = ctx.createRadialGradient(cx, H * 0.5, 0, cx, H * 0.5, Math.max(W, H) * 0.7);
+            bg.addColorStop(0, `rgba(20, 44, 46, ${0.55 * fade * Math.min(1, t / 0.5)})`);
+            bg.addColorStop(1, `rgba(6, 12, 14, ${0.85 * fade * Math.min(1, t / 0.5)})`);
+            ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+            for (let k = 0; k < 3; k++) {
+                const pk = (t - k * 0.35) / 1.5;
+                if (pk <= 0 || pk >= 1) continue;
+                ctx.strokeStyle = `rgba(160, 226, 216, ${0.6 * (1 - pk) * fade})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.ellipse(cx, base, 30 + pk * 160, 8 + pk * 34, 0, 0, Math.PI * 2); ctx.stroke();
+            }
+            const rise = fxEase((t - 0.5) / 2.1);
+            const sy = base - rise * (base - H * 0.3), sx = cx + Math.sin(t * 2.6) * 14 * rise;
+            if (!s.wisps) s.wisps = [];
+            if (t > 0.5 && t < 3.2) for (let i = 0; i < 2; i++) s.wisps.push({ x: sx + fxRand(-10, 10), y: sy + fxRand(8, 26), vx: fxRand(-14, 14), vy: fxRand(10, 40), r: fxRand(2, 5), born: t });
+            s.wisps = s.wisps.filter(w => t - w.born < 1.2);
+            s.wisps.forEach(w => {
+                const a = 1 - (t - w.born) / 1.2;
+                ctx.fillStyle = `rgba(190, 240, 230, ${0.55 * a * fade})`;
+                ctx.beginPath(); ctx.arc(w.x + w.vx * (t - w.born), w.y + w.vy * (t - w.born), w.r * a + 1, 0, Math.PI * 2); ctx.fill();
+            });
+            if (t > 0.5) {
+                const sc = 0.6 + 0.4 * rise;
+                ctx.save();
+                ctx.shadowColor = 'rgba(170, 245, 232, 0.95)';
+                ctx.shadowBlur = 46 * fade;
+                const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, 60 * sc);
+                g.addColorStop(0, `rgba(255, 255, 255, ${0.95 * fade})`);
+                g.addColorStop(1, `rgba(150, 230, 220, ${0.6 * fade})`);
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(sx, sy - 26 * sc, 17 * sc, 0, Math.PI * 2); ctx.fill();          // 头
+                ctx.beginPath(); ctx.ellipse(sx, sy + 4 * sc, 13 * sc, 22 * sc, 0, 0, Math.PI * 2); ctx.fill();   // 身
+                ctx.restore();
+            }
+            const bk = (t - 2.7) / 0.9;
+            if (bk > 0 && bk < 1) {
+                ctx.strokeStyle = `rgba(210, 255, 246, ${0.9 * (1 - bk)})`;
+                ctx.lineWidth = 5 * (1 - bk) + 1;
+                ctx.beginPath(); ctx.arc(sx, H * 0.3, 40 + fxEase(bk) * Math.max(W, H) * 0.5, 0, Math.PI * 2); ctx.stroke();
+                ctx.fillStyle = `rgba(230, 255, 250, ${0.35 * (1 - bk)})`; ctx.fillRect(0, 0, W, H);
+            }
+        }
+
+        function fxDrawLaw(ctx, W, H, t, s) {
+            const cx = W / 2, cy = H * 0.32, R = Math.min(W, H) * 0.2;
+            const fade = t > 3.9 ? Math.max(0, (4.6 - t) / 0.7) : 1;
+            ctx.fillStyle = `rgba(8, 8, 14, ${0.72 * Math.min(1, t / 0.3) * fade})`;
+            ctx.fillRect(0, 0, W, H);
+            const flashes = [[0.12, 0.7], [0.85, 0.55], [1.5, 0.4]];
+            flashes.forEach(([t0, a]) => {
+                const k = (t - t0) / 0.35;
+                if (k > 0 && k < 1) { ctx.fillStyle = `rgba(230, 236, 255, ${a * (1 - k)})`; ctx.fillRect(0, 0, W, H); }
+            });
+            if (!s.bolts) s.bolts = flashes.map(([t0]) => ({ t0, list: Array.from({ length: 3 }, () => {
+                let x = fxRand(W * 0.15, W * 0.85), y = 0; const pts = [[x, y]];
+                const endY = fxRand(H * 0.55, H * 0.9);
+                while (y < endY) { y += fxRand(30, 70); x += fxRand(-40, 40); pts.push([x, y]); }
+                return pts;
+            }) }));
+            s.bolts.forEach(b => {
+                const k = (t - b.t0) / 0.28;
+                if (k <= 0 || k >= 1) return;
+                b.list.forEach(pts => {
+                    ctx.strokeStyle = `rgba(210, 220, 255, ${1 - k})`;
+                    ctx.lineWidth = 3;
+                    ctx.shadowColor = 'rgba(160, 180, 255, 0.9)'; ctx.shadowBlur = 18;
+                    ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke();
+                    ctx.shadowBlur = 0;
+                });
+            });
+            const grow = fxEase((t - 0.5) / 1.2);
+            if (grow > 0) {
+                const rr = R * grow;
+                ctx.strokeStyle = `rgba(200, 190, 230, ${0.55 * fade})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(cx, cy, rr * 0.62, 0, Math.PI * 2); ctx.stroke();
+                const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr * 0.9);
+                g.addColorStop(0, `rgba(230, 226, 255, ${0.35 * fade})`);
+                g.addColorStop(1, 'rgba(120, 110, 180, 0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rr * 0.9, 0, Math.PI * 2); ctx.fill();
+                ctx.font = `bold ${Math.round(Math.min(W, H) * 0.06)}px KaiTi, STKaiti, serif`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                LAW_RUNES.forEach(([ch, col], i) => {
+                    const a = (i / 8) * Math.PI * 2 + t * 0.9;
+                    ctx.save();
+                    ctx.shadowColor = col; ctx.shadowBlur = 16;
+                    ctx.fillStyle = col;
+                    ctx.globalAlpha = grow * fade;
+                    ctx.fillText(ch, cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+                    ctx.restore();
+                });
+            }
+            const bk = (t - 2.9) / 1.0;
+            if (bk > 0 && bk < 1) {
+                ctx.strokeStyle = `rgba(230, 226, 255, ${0.9 * (1 - bk)})`;
+                ctx.lineWidth = 6 * (1 - bk) + 1;
+                ctx.beginPath(); ctx.arc(cx, cy, R + fxEase(bk) * Math.max(W, H) * 0.6, 0, Math.PI * 2); ctx.stroke();
+            }
+            document.body.classList.toggle('fx-shake', t < 1.9);
+        }
+
+        const FX_DRAWERS = { minor: fxDrawMinor, qi: fxDrawQi, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw };
+
+        // 播放突破特效：newRealmIndex = 突破后的境界索引；major = 是否大境界突破
+        function playBreakthroughEffect(newRealmIndex, major) {
+            if (gameState.settings && gameState.settings.breakthroughFx === false) return;
+            stopBreakthroughFx();
+            const realmName = getRealmName(newRealmIndex);
+            let cfg = major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null;
+            if (cfg && cfg.kind === 'qi') cfg = { ...cfg, line: `${(SPIRIT_ROOT_EFFECTS[gameState.player.spiritRoot] || {}).name || '灵根'}觉醒，引气入体` };
+            const dur = major ? cfg.dur : 1.6;
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const el = document.createElement('div');
+            el.className = 'fx-overlay ' + (major ? 'fx-major fx-' + cfg.kind : 'fx-minor') + (reduce ? ' fx-reduced' : '');
+            el.setAttribute('aria-hidden', 'true');
+            el.innerHTML = (reduce ? '' : '<canvas class="fx-canvas"></canvas>') + (major
+                ? `<div class="fx-text"><div class="fx-title">${cfg.name.split('').join(' ')}</div><div class="fx-sub">${realmName} · ${cfg.line}</div><div class="fx-skip">点击任意处跳过</div></div>`
+                : `<div class="fx-text"><div class="fx-title">突 破</div><div class="fx-sub">${realmName}</div><div class="fx-seal">破</div></div>`);
+            document.body.appendChild(el);
+            fxState = { el, raf: 0, timer: 0, draw: null, dur };
+            if (major) el.addEventListener('click', stopBreakthroughFx);
+            if (reduce) {
+                fxState.timer = setTimeout(stopBreakthroughFx, major ? 2600 : 1600);
+                return;
+            }
+            const canvas = el.querySelector('canvas');
+            const dpr = Math.min(2, window.devicePixelRatio || 1);
+            const W = window.innerWidth, H = window.innerHeight;
+            canvas.width = W * dpr; canvas.height = H * dpr;
+            const ctx = canvas.getContext('2d');
+            const drawer = FX_DRAWERS[major ? cfg.kind : 'minor'];
+            const s = {};
+            fxState.draw = t => {
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, W, H);
+                ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic'; ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+                drawer(ctx, W, H, t, s);
+            };
+            const start = performance.now();
+            const frame = now => {
+                if (!fxState) return;
+                const t = (now - start) / 1000;
+                if (t >= dur) { stopBreakthroughFx(); return; }
+                fxState.draw(t);
+                fxState.raf = requestAnimationFrame(frame);
+            };
+            fxState.raf = requestAnimationFrame(frame);
+            // 页面在后台时 rAF 会被暂停，兜底：到点强制清理
+            fxState.timer = setTimeout(stopBreakthroughFx, (dur + 1) * 1000);
+        }
+
         function performBreakthrough() {
             const nextRealmIndex = gameState.player.realmIndex + 1;
             if (!GAME_CONFIG.realms[nextRealmIndex]) return;
+            const wasMajor = gameState.player.realmIndex % 4 === 0 && gameState.player.realmIndex > 0;   // 从大境界圆满突破
             gameState.player.realmIndex = nextRealmIndex;
             gameState.player.cultivationXP = 0;
 
@@ -5469,6 +5857,7 @@
             closeBreakthroughModal();
             updateUI();
             saveGame();
+            playBreakthroughEffect(nextRealmIndex, wasMajor || nextRealmIndex === 1);   // 凡人 → 练气也是「入道」大事件
         }
 
         function performMajorBreakthrough() {
@@ -5608,6 +5997,7 @@
                 maxOfflineHours: 24,
                 enableNotifications: true,
                 fontScale: 100,
+                breakthroughFx: true,
                 notificationSeconds: 2,
                 theme: 'dark'
             }, gameState.settings || {});

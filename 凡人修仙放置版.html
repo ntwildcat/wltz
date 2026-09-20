@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=9.2">
+    <link rel="stylesheet" href="style.css?v=9.8">
 
 </head>
 <body data-panel="cultivation">
@@ -350,7 +350,8 @@
                             </div>
 
                             <!-- 战斗日志 -->
-                            <div id="battleLog" class="battle-log"></div>
+                            <div class="battle-log-hint">战斗日志（保留最近 30 条，可上下滚动查看）</div>
+                            <div id="battleLog" class="battle-log" tabindex="0" aria-label="战斗日志，可上下滚动"></div>
 
                             <!-- 食物快捷栏与速度控制 -->
                             <div class="food-bar">
@@ -449,6 +450,13 @@
                                         <option value="115">大</option>
                                         <option value="130">特大</option>
                                     </select>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">突破特效:</span>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" id="breakthroughFx" checked onchange="updateSetting('breakthroughFx', this.checked)" style="width: 20px; height: 20px; cursor: pointer;">
+                                        <span>突破境界时播放特效</span>
+                                    </label>
                                 </div>
                                 <div class="stat-row">
                                     <label class="stat-label" for="notificationSeconds">通知停留时间:</label>
@@ -726,7 +734,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=9.2"></script>
+    <script src="game.js?v=9.8"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
