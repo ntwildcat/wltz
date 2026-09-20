@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=8.0">
+    <link rel="stylesheet" href="style.css?v=8.4">
 
 </head>
 <body data-panel="cultivation">
@@ -25,14 +25,11 @@
                 <button class="nav-btn" onclick="switchPanel('equipment')" style="width: 100%; padding: 10px; background: rgba(111,156,138,0.2); border: 1px solid #6f9c8a; border-radius: 4px; color: #dcd1b6; cursor: pointer; transition: all 0.3s;">
                     🎽 装备
                 </button>
-                <button class="nav-btn" onclick="switchPanel('shop')" style="width: 100%; padding: 10px; background: rgba(111,156,138,0.2); border: 1px solid #6f9c8a; border-radius: 4px; color: #dcd1b6; cursor: pointer; transition: all 0.3s;">
-                    🏪 商城
-                </button>
                 <button class="nav-btn" onclick="switchPanel('settings')" style="width: 100%; padding: 10px; background: rgba(111,156,138,0.2); border: 1px solid #6f9c8a; border-radius: 4px; color: #dcd1b6; cursor: pointer; transition: all 0.3s;">
                     ⚙️ 设置
                 </button>
             </div>
-            <div class="coin-display">
+            <div class="coin-display" onclick="switchPanel('shop')" role="button" tabindex="0" title="点击进入商城" aria-label="商城，当前灵石">
                 <div>💎 灵石</div>
                 <div id="coinAmount">100</div>
             </div>
@@ -687,7 +684,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=8.0"></script>
+    <script src="game.js?v=8.4"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

@@ -402,11 +402,11 @@
                 shenshi_map: { name: '神识地图', icon: '🗺️', type: 'material', sellPrice: 200 },
 
                 // 装备
-                sword: { name: '桃木剑', icon: '⚔️', type: 'weapon', sellPrice: 150, stats: { atk: 15 } },
-                ironarmor: { name: '铁甲', icon: '🛡️', type: 'armor', stats: { def: 10 } },
-                spiritsword: { name: '灵剑', icon: '⚡', type: 'weapon', stats: { atk: 40 } },
-                goldenarmor: { name: '金丹法袍', icon: '👔', type: 'armor', stats: { def: 25, hp: 50 } },
-                yuanyingsword: { name: '元婴灵剑', icon: '✨', type: 'weapon', stats: { atk: 80 } },
+                sword: { name: '桃木剑', icon: '⚔️', type: 'weapon', sellPrice: 60, stats: { atk: 15 } },
+                ironarmor: { name: '铁甲', icon: '🛡️', type: 'armor', sellPrice: 120, stats: { def: 10 } },
+                spiritsword: { name: '灵剑', icon: '⚡', type: 'weapon', sellPrice: 400, stats: { atk: 40 } },
+                goldenarmor: { name: '金丹法袍', icon: '👔', type: 'armor', sellPrice: 1200, stats: { def: 25, hp: 50 } },
+                yuanyingsword: { name: '元婴灵剑', icon: '✨', type: 'weapon', sellPrice: 4000, stats: { atk: 80 } },
 
                 // P6/P7 新丹药
                 spiritpill: { name: '聚灵丹（高级）', icon: '🔷', type: 'consumable' },
@@ -426,14 +426,14 @@
                 immortal_peach: { name: '蟠桃', icon: '🍑', type: 'food', sellPrice: 400 },
                 jade_nectar: { name: '琼浆玉液', icon: '🍶', type: 'food', sellPrice: 1200 },
                 // 炼器新增装备
-                spiritarmor: { name: '灵甲', icon: '🛡️', type: 'armor', stats: { def: 16, hp: 30 } },
-                goldensword: { name: '金丹剑', icon: '🗡️', type: 'weapon', stats: { atk: 62 } },
-                goldenpendant: { name: '金丹佩', icon: '📿', type: 'jewelry', stats: { spd: 6, hp: 40 } },
-                yuanyingarmor: { name: '元婴法衣', icon: '🥋', type: 'armor', stats: { def: 45, hp: 120 } },
-                yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', stats: { spd: 10, hp: 80 } },
-                huashensword: { name: '化神剑', icon: '🗡️', type: 'weapon', stats: { atk: 110 } },
-                huashenarmor: { name: '化神法衣', icon: '🥼', type: 'armor', stats: { def: 65, hp: 170 } },
-                huashenpendant: { name: '化神佩', icon: '📿', type: 'jewelry', stats: { spd: 14, hp: 110 } }
+                spiritarmor: { name: '灵甲', icon: '🛡️', type: 'armor', sellPrice: 160, stats: { def: 16, hp: 30 } },
+                goldensword: { name: '金丹剑', icon: '🗡️', type: 'weapon', sellPrice: 260, stats: { atk: 62 } },
+                goldenpendant: { name: '金丹佩', icon: '📿', type: 'jewelry', sellPrice: 300, stats: { spd: 6, hp: 40 } },
+                yuanyingarmor: { name: '元婴法衣', icon: '🥋', type: 'armor', sellPrice: 1100, stats: { def: 45, hp: 120 } },
+                yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', sellPrice: 700, stats: { spd: 10, hp: 80 } },
+                huashensword: { name: '化神剑', icon: '🗡️', type: 'weapon', sellPrice: 3500, stats: { atk: 110 } },
+                huashenarmor: { name: '化神法衣', icon: '🥼', type: 'armor', sellPrice: 4200, stats: { def: 65, hp: 170 } },
+                huashenpendant: { name: '化神佩', icon: '📿', type: 'jewelry', sellPrice: 2500, stats: { spd: 14, hp: 110 } }
             },
             shop: {
                 upgrades: [
@@ -3190,33 +3190,11 @@
 
                 const info = getSkillExpInfo(skillName);
                 const level = info.level;
-                const expPercent = info.percent;
                 item.title = `${skill.name} Lv.${level}：经验 ${info.exp} / ${info.need}，还差 ${info.remain} 升级`;
-
-                // 检查是否有已解锁的配方缺少材料（P2功能 - 材料不足红点）
-                let hasMaterialShortage = false;
-                if (skill.recipes) {
-                    Object.values(skill.recipes).forEach(recipe => {
-                        if (skill.level >= recipe.requiredLevel && recipe.requires) {
-                            Object.entries(recipe.requires).forEach(([itemId, qty]) => {
-                                const inventoryItem = gameState.player.inventory.find(i => i.id === itemId);
-                                if (!inventoryItem || inventoryItem.qty < qty) {
-                                    hasMaterialShortage = true;
-                                }
-                            });
-                        }
-                    });
-                }
-                const warningDot = hasMaterialShortage ? '<div style="position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #c4483a; border-radius: 50%; animation: pulse 1.5s infinite;"></div>' : '';
 
                 item.innerHTML = `
                     <div class="skill-name">${skill.icon} ${skill.name}</div>
                     <div class="skill-level">Lv.${level}</div>
-                    <div class="exp-bar">
-                        <div class="exp-fill" style="width: ${expPercent}%"></div>
-                    </div>
-                    <div class="skill-exp-mini">${info.exp}/${info.need}</div>
-                    ${warningDot}
                 `;
                 item.style.position = 'relative';
                 tree.appendChild(item);
