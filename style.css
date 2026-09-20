@@ -1807,3 +1807,8 @@ body[data-panel="shop"] .coin-display { border-color: var(--cinnabar-2) !importa
 .settings-hint { font-size: 0.8em; color: var(--text-l4); padding: 6px 2px 2px; line-height: 1.6; }
 
 #buyConfirmBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* 战斗日志：更高、可滚动、滚动不带动整页 */
+.battle-log { height: 170px; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.battle-log-hint { font-size: 0.75em; color: var(--text-l4); margin: 6px 0 4px; }
+.log-entry { padding: 2px 0; }

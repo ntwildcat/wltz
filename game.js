@@ -1527,7 +1527,7 @@
         // ==================== P1-1 战斗UI系统函数 ====================
 
         // P1-1 初始化战斗UI
-        function renderBattleUI() {
+        function renderBattleUI(keepLog = false) {
             const battleContainer = document.getElementById('battleContainer');
 
             // 隐藏所有面板，显示战斗UI
@@ -1539,8 +1539,8 @@
             updateBattleHP();
             updateFoodBar();
 
-            // 清空日志
-            document.getElementById('battleLog').innerHTML = '';
+            // 手动进入时清空日志；循环续战（通关后再进）保留最近 30 条
+            if (!keepLog) resetBattleLog(); else renderBattleLog(true);
 
             // 设置初始速度
             gameState.battleSpeed = 1;
@@ -1622,22 +1622,50 @@
         }
 
         // P1-1 添加战斗日志
+        // 战斗日志：一次循环战斗（从进入战斗区域 / 秘境到撤退或被击败）期间共用一份，保留最近 30 条，可上下滚动查看。
+        // 条目是字符串或 { text, cls }；普通战斗的 battle.log 直接指向这份数组（stepNormalBattle 往里 push 字符串）
+        const BATTLE_LOG_MAX = 30;
+        const battleLogEntries = [];
+        let battleLogRendered = '';
+
+        function trimBattleLog(arr = battleLogEntries) {
+            while (arr.length > BATTLE_LOG_MAX) arr.shift();
+        }
+
+        function battleLogClass(entry) {
+            if (typeof entry !== 'string') return entry.cls || 'info';
+            if (/^获得/.test(entry)) return 'heal';
+            if (/落空/.test(entry)) return 'miss';
+            if (/^玩家/.test(entry)) return 'player-hit';
+            if (/使用|恢复/.test(entry)) return 'heal';
+            if (/击败|战胜|遭遇|——/.test(entry)) return /遭遇|——/.test(entry) ? 'info' : 'victory';
+            return 'monster-hit';
+        }
+
+        // 重绘日志；用户往上翻看时保持滚动位置，停在底部时才自动跟随最新一条
+        function renderBattleLog(force = false) {
+            const el = document.getElementById('battleLog');
+            if (!el) return;
+            const last = battleLogEntries[battleLogEntries.length - 1];
+            const key = battleLogEntries.length + '|' + (last ? (typeof last === 'string' ? last : last.text) : '');
+            if (!force && key === battleLogRendered) return;
+            battleLogRendered = key;
+            const stick = el.scrollHeight - el.scrollTop - el.clientHeight < 28;
+            const prev = el.scrollTop;
+            el.innerHTML = battleLogEntries.map(e => `<div class="log-entry log-${battleLogClass(e)}">${typeof e === 'string' ? e : e.text}</div>`).join('');
+            el.scrollTop = stick ? el.scrollHeight : prev;
+        }
+
+        function resetBattleLog() {
+            battleLogEntries.length = 0;
+            renderBattleLog(true);
+        }
+
         function addBattleLog(msg, type = 'info') {
-            const battleLog = document.getElementById('battleLog');
-            const logEntry = document.createElement('div');
-            logEntry.className = 'log-entry log-' + type;
-
             const time = new Date().toLocaleTimeString('zh-CN', {hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'});
-            logEntry.textContent = `[${time}] ${msg}`;
-
-            battleLog.appendChild(logEntry);
-            battleLog.scrollTop = battleLog.scrollHeight;
-
-            // 限制日志条数
-            const entries = battleLog.querySelectorAll('.log-entry');
-            if (entries.length > 8) {
-                entries[0].remove();
-            }
+            battleLogEntries.push({ text: `[${time}] ${msg}`, cls: type });
+            trimBattleLog();
+            renderBattleLog();
         }
 
         // P1-1 设置战斗速度
@@ -1860,7 +1888,7 @@
                         battle.log.push(`${enemy.name}攻击落空`);
                     }
                 }
-                if (battle.log.length > 10) battle.log.shift();
+                trimBattleLog(battle.log);
             }
 
             // 战斗食物：生命低于阈值时自动进食（恢复战斗内的生命值）
@@ -1963,12 +1991,8 @@
             setText('monsterDef', battle.currentEnemy.def);
             setText('monsterSprite', battle.currentEnemy.icon || '👾');
 
-            // 更新战斗日志
-            const battleLog = document.getElementById('battleLog');
-            if (battleLog && battle.log) {
-                battleLog.innerHTML = battle.log.map(log => `<div class="log-entry">${log}</div>`).join('');
-                battleLog.scrollTop = battleLog.scrollHeight;
-            }
+            // 更新战斗日志（共用日志，仅在有新条目时重绘，保留用户的滚动位置）
+            renderBattleLog();
         }
 
         // 普通战斗完成处理
@@ -1987,9 +2011,13 @@
             // 给予奖励
             const won = battle.currentEnemy.currentHP <= 0;
             const auto = getAutoBattle();
+            battleLogEntries.push(won ? `🎉 战胜${battle.currentEnemy.name}` : (battle.playerHP.current <= 0 ? `💀 被${battle.currentEnemy.name}击败` : `⚔️ 未能击败${battle.currentEnemy.name}（超时）`));
+            trimBattleLog();
             if (won) {
                 const { coins, exp } = grantNormalBattleWin(areaKey);
                 auto.wins++; auto.coins += coins; auto.exp += exp;
+                battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验`);
+                trimBattleLog();
                 // 托管中不逐场弹胜利提示，统计显示在托管栏里
                 if (!auto.enabled) {
                     showNotification(`🎉 战胜${battle.currentEnemy.name}！
@@ -4525,7 +4553,10 @@
             gameState.battles.battleState = 'fighting';
             gameState.battles.playerAttackTimer = 0;
             gameState.battles.enemyAttackTimer = 0;
-            gameState.battles.log = [];
+            if (!auto) resetBattleLog();
+            gameState.battles.log = battleLogEntries;   // 整个循环战斗共用一份日志（最近 30 条）
+            battleLogEntries.push(`—— 遭遇 ${gameState.battles.currentEnemy.name} ——`);
+            trimBattleLog();
             gameState.battles.turnCount = 0;
             gameState.player.foodUseTimer = FOOD_CONFIG.autoEatConfig.cooldown;
             pickBestFood();
@@ -4609,7 +4640,7 @@
             updateUI();
 
             // P1-1 初始化战斗UI
-            renderBattleUI();
+            renderBattleUI(auto);
         }
 
         // ==================== UI更新 ====================
