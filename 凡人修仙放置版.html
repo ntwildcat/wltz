@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=5.8">
+    <link rel="stylesheet" href="style.css?v=5.9">
 
 </head>
 <body data-panel="cultivation">
@@ -36,7 +36,13 @@
             <div id="startScreen" class="modal show">
                 <div class="modal-content">
                     <div class="modal-title">⚡ 凡人修仙放置版 ⚡</div>
-                    <p style="color: #888; margin-bottom: 20px;">灵气苏醒，你的修仙之路即将开启</p>
+                    <!-- 存档选择：最多 3 个存档 -->
+                    <p id="slotHint" style="color: #888; margin-bottom: 20px;">选择一个存档，或新建角色（最多 3 个存档）</p>
+                    <div id="slotSelect" class="slot-select"></div>
+
+                    <div id="createSection" style="display: none;">
+                    <button class="btn btn-secondary" onclick="showSlotSelect()" style="margin-bottom: 12px; padding: 4px 12px;">← 返回存档选择</button>
+                    <p style="color: #888; margin-bottom: 20px;"><span id="createSlotLabel"></span> · 灵气苏醒，你的修仙之路即将开启</p>
 
                     <div class="create-form">
                         <div class="form-group">
@@ -80,6 +86,7 @@
                         <button class="btn" onclick="startGame()" style="width: 100%; margin-top: 20px;">
                             🌟 开始修行 🌟
                         </button>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -419,10 +426,12 @@
                             <!-- 存档管理 -->
                             <div class="stat-panel">
                                 <div class="stat-title">💾 存档管理</div>
+                                <div id="currentSlotLabel" style="color: #9ca69f; font-size: 0.85em; margin-bottom: 8px;"></div>
                                 <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <button class="btn" onclick="backToSlotSelect()">🔀 切换存档</button>
                                     <button class="btn" onclick="exportSave()">📥 导出存档</button>
                                     <button class="btn btn-secondary" onclick="importSave()">📤 导入存档</button>
-                                    <button class="btn btn-secondary" onclick="resetGame()">🔄 重新开始</button>
+                                    <button class="btn btn-secondary" onclick="resetGame()">🗑 删除当前存档</button>
                                 </div>
                             </div>
                         </div>
@@ -645,7 +654,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=5.8"></script>
+    <script src="game.js?v=5.9"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

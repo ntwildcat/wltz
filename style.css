@@ -1471,3 +1471,14 @@ display: none !important;
 .tutorial-actions { display: flex; justify-content: space-between; gap: 10px; }
 .tutorial-actions .btn { flex: 1; }
 .tutorial-skip { opacity: 0.6; }
+
+/* 存档选择 */
+.slot-select { display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
+.slot-card { position: relative; padding: 14px 16px; border: 1px solid var(--border-l3); border-radius: 8px; background: var(--bg-l3); cursor: pointer; text-align: left; transition: border-color 0.2s, transform 0.1s; }
+.slot-card:hover { border-color: var(--border-l1); }
+.slot-card.empty { border-style: dashed; opacity: 0.85; }
+.slot-title { font-size: 0.8em; color: var(--text-l4); margin-bottom: 4px; }
+.slot-name { color: var(--text-l1); font-weight: bold; margin-bottom: 4px; }
+.slot-info { color: var(--text-l3); font-size: 0.85em; }
+.slot-delete { position: absolute; top: 8px; right: 10px; background: transparent; border: none; cursor: pointer; font-size: 1.1em; opacity: 0.6; }
+.slot-delete:hover { opacity: 1; }
