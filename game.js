@@ -1899,10 +1899,18 @@
             updateUI();
             saveGame();
 
-            // 循环战斗：无论胜负，打完一场立刻在同一区域开下一场，直到玩家点击「撤退」才退出
-            // （连败停止只用于离线模拟，见 runOfflineAutoBattle）
+            // 循环战斗：打完一场立刻在同一区域开下一场，直到玩家点击「撤退」才退出；
+            // 但玩家被击败（生命归零）时循环结束，回到战斗界面，不能靠反复死亡赖在战斗里
             auto.streak = won ? 0 : auto.streak + 1;
             if (!won) auto.losses++;
+            const died = !won && battle.playerHP.current <= 0;
+            if (died) {
+                showNotification('💀 你被击败了，本轮循环战斗结束', '#c4483a');
+                switchPanel('battle');
+                switchBattleTab('areas');
+                renderAutoBattleBar();
+                return;
+            }
             enterBattleArea(areaKey, true);
         }
 
@@ -1969,6 +1977,7 @@
                         r.wins++; r.coins += g.coins; r.exp += g.exp; streak = 0;
                     } else {
                         r.losses++;
+                        if (battle.playerHP.current <= 0) { r.died = true; break; }   // 被击败：与在线一致，循环结束
                         if (++streak >= AUTO_BATTLE_MAX_LOSS_STREAK) { r.stopped = true; break; }
                     }
                 }
@@ -5555,8 +5564,9 @@
                     const mins = Math.max(1, Math.round(res.elapsed / 60));
                     const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验` +
                         (res.stopped ? `\n⚠️ 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，已停止（请检查装备与食物）` : '');
-                    showNotification(msg, res.stopped ? '#c98a3e' : '#6fa980');
-                    if (!res.stopped) enterBattleArea(savedAction.action, true);
+                    showNotification(msg + (res.died ? `
+💀 第 ${res.fights} 场被击败，循环战斗已结束（生命恢复至50%，请检查装备与食物）` : ''), (res.stopped || res.died) ? '#c98a3e' : '#6fa980');
+                    if (!res.stopped && !res.died) enterBattleArea(savedAction.action, true);
                     renderAutoBattleBar();
                     saveGame();
                     return;
