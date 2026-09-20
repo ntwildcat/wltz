@@ -1803,3 +1803,5 @@ body[data-panel="shop"] .coin-display { border-color: var(--cinnabar-2) !importa
 .bt-guide { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-l3); font-size: 0.85em; line-height: 1.7; color: var(--text-l3); text-align: left; }
 .bt-guide-title { color: var(--text-l2); margin-bottom: 4px; }
 .bt-guide-line { padding-left: 4px; }
+
+.settings-hint { font-size: 0.8em; color: var(--text-l4); padding: 6px 2px 2px; line-height: 1.6; }
