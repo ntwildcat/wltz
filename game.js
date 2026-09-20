@@ -735,8 +735,9 @@
             // P2功能：用户设置
             settings: {
                 maxOfflineHours: 24,           // 最多离线奖励小时数
-                enableNotifications: true,      // 启用通知
-                enableSoundEffects: false,      // 启用音效
+                enableNotifications: true,      // 启用通知（关闭后只显示失败 / 警告等重要提示）
+                fontScale: 100,                 // 字体大小（百分比：90 小 / 100 中 / 115 大 / 130 特大）
+                notificationSeconds: 2,         // 通知停留时间（秒）
                 theme: 'dark'                   // 主题（dark/light）
             }
         };
@@ -3211,30 +3212,36 @@
 
         function updateSetting(settingName, value) {
             // 转换值类型
-            if (settingName === 'maxOfflineHours') {
+            if (settingName === 'maxOfflineHours' || settingName === 'fontScale' || settingName === 'notificationSeconds') {
                 value = parseInt(value);
             }
             gameState.settings[settingName] = value;
             updateSettingDisplay(settingName);
+            if (settingName === 'fontScale') applyDisplaySettings();
             saveGame();
+            if (settingName === 'notificationSeconds') showNotification(`通知将停留 ${value} 秒`, '#b89a5b');
         }
 
         function updateSettingDisplay(settingName) {
             const settings = gameState.settings;
             if (settingName === 'enableNotifications') {
                 document.getElementById('notificationStatus').textContent = settings.enableNotifications ? '已启用' : '已禁用';
-            } else if (settingName === 'enableSoundEffects') {
-                document.getElementById('soundStatus').textContent = settings.enableSoundEffects ? '已启用' : '已禁用';
             }
+        }
+
+        // 显示设置：字体大小（缩放根字号，界面里以 em 为单位的文字随之缩放）
+        function applyDisplaySettings() {
+            const pct = (gameState.settings && gameState.settings.fontScale) || 100;
+            document.documentElement.style.fontSize = pct + '%';
         }
 
         function loadSettingsPanel() {
             const settings = gameState.settings;
             document.getElementById('maxOfflineHours').value = settings.maxOfflineHours;
             document.getElementById('enableNotifications').checked = settings.enableNotifications;
-            document.getElementById('enableSoundEffects').checked = settings.enableSoundEffects;
+            document.getElementById('fontScale').value = String(settings.fontScale || 100);
+            document.getElementById('notificationSeconds').value = String(settings.notificationSeconds || 2);
             updateSettingDisplay('enableNotifications');
-            updateSettingDisplay('enableSoundEffects');
         }
 
         function getRealmName(index) {
@@ -4666,7 +4673,14 @@
         }
 
         // 通知类型系统（P1功能）
+        // 通知关闭时仍要显示的「重要提示」：类型为 error / danger / warning，或使用了警示 / 错误色的通知
+        const IMPORTANT_NOTIFICATION_COLORS = ['#c4483a', '#c98a3e', '#ef4444', '#f59e0b', '#ff6b6b', '#f39c12'];
         function showNotification(message, color = '#6f9c8a', type = 'normal') {
+            const st = (gameState && gameState.settings) || {};
+            if (st.enableNotifications === false && !['error', 'danger', 'warning'].includes(type) &&
+                !IMPORTANT_NOTIFICATION_COLORS.includes(String(color).toLowerCase())) {
+                return;
+            }
             const notification = document.createElement('div');
             notification.className = 'notification';
             notification.style.setProperty('--accent', color);   // 颜色只用作左侧色条，底色由样式统一
@@ -4697,7 +4711,7 @@
             if (type !== 'error') {
                 setTimeout(() => {
                     if (notification.parentElement) notification.remove();
-                }, GAME_BALANCE.NOTIFICATION_DURATION);
+                }, ((gameState.settings && gameState.settings.notificationSeconds) || GAME_BALANCE.NOTIFICATION_DURATION / 1000) * 1000);
             }
         }
 
@@ -5495,14 +5509,15 @@
                 gameState.player.stats = { hp: 100, atk: 10, def: 5, spd: 10 };
             }
             // P2功能：用户设置初始化
-            if (!gameState.settings) {
-                gameState.settings = {
-                    maxOfflineHours: 24,
-                    enableNotifications: true,
-                    enableSoundEffects: false,
-                    theme: 'dark'
-                };
-            }
+            // 补全设置默认值（旧存档没有字体大小 / 通知停留时间；原「音效」设置从未有实际作用，已删除）
+            gameState.settings = Object.assign({
+                maxOfflineHours: 24,
+                enableNotifications: true,
+                fontScale: 100,
+                notificationSeconds: 2,
+                theme: 'dark'
+            }, gameState.settings || {});
+            delete gameState.settings.enableSoundEffects;
         }
 
         // ---- 多存档（最多 3 个槽位）----
@@ -5628,6 +5643,7 @@
             updateStatsDisplay();
             gameRunning = true;
             updateSlotLabel();
+            applyDisplaySettings();
 
             startAutoSave();
 

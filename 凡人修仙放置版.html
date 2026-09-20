@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=8.9">
+    <link rel="stylesheet" href="style.css?v=9.0">
 
 </head>
 <body data-panel="cultivation">
@@ -435,17 +435,29 @@
                                         <span id="notificationStatus">已启用</span>
                                     </label>
                                 </div>
+                                <div class="settings-hint">关闭后不再弹出获得材料、升级等日常提示，只保留失败、警告、被击败等重要提示。</div>
                             </div>
 
                             <!-- 显示设置 -->
                             <div class="stat-panel">
                                 <div class="stat-title">🎨 显示设置</div>
                                 <div class="stat-row">
-                                    <span class="stat-label">启用音效:</span>
-                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                        <input type="checkbox" id="enableSoundEffects" onchange="updateSetting('enableSoundEffects', this.checked)" style="width: 20px; height: 20px; cursor: pointer;">
-                                        <span id="soundStatus">已禁用</span>
-                                    </label>
+                                    <label class="stat-label" for="fontScale">字体大小:</label>
+                                    <select id="fontScale" name="fontScale" autocomplete="off" onchange="updateSetting('fontScale', this.value)">
+                                        <option value="90">小</option>
+                                        <option value="100">中（默认）</option>
+                                        <option value="115">大</option>
+                                        <option value="130">特大</option>
+                                    </select>
+                                </div>
+                                <div class="stat-row">
+                                    <label class="stat-label" for="notificationSeconds">通知停留时间:</label>
+                                    <select id="notificationSeconds" name="notificationSeconds" autocomplete="off" onchange="updateSetting('notificationSeconds', this.value)">
+                                        <option value="2">2 秒（默认）</option>
+                                        <option value="4">4 秒</option>
+                                        <option value="8">8 秒</option>
+                                        <option value="15">15 秒</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -688,7 +700,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=8.9"></script>
+    <script src="game.js?v=9.0"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
