@@ -1586,3 +1586,201 @@ button.modal-close { background: none; border: none; padding: 0 4px; line-height
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* ==========================================================================
+   美术主题：松烟墨案 · 铜器 · 朱印
+   松烟 #15140f  砚台 #1f1e18  旧宣 #dcd1b6  旧铜 #a68a52  铜绿 #6f9c8a  朱砂 #a83a2e
+   原则：低饱和颜料、不发光、不用渐变、方角；境界用朱砂印章做视觉重点，其余克制
+   ========================================================================== */
+:root {
+    --ink: #15140f;
+    --inkstone: #1f1e18;
+    --inkstone-2: #292720;
+    --paper: #dcd1b6;
+    --bronze: #a68a52;
+    --bronze-dim: #6b5d3f;
+    --patina: #6f9c8a;
+    --cinnabar: #a83a2e;
+    --cinnabar-2: #c4483a;
+
+    --bg-l1: #15140f;
+    --bg-l2: #1c1b15;
+    --bg-l3: #24231b;
+    --bg-l4: #2c2a21;
+    --bg-l5: #353227;
+    --border-l1: #a68a52;
+    --border-l2: #6f9c8a;
+    --border-l3: #5c5039;
+    --border-l4: #38352b;
+    --text-l1: #e3d8bd;
+    --text-l2: #b9a878;
+    --text-l3: #b3aa93;
+    --text-l4: #857d69;
+    --color-hp: #6f9c8a;
+    --color-warning: #c98a3e;
+    --color-danger: #c4483a;
+    --color-success: #6f9c8a;
+    --hp-full: #6f9c8a;
+    --hp-high: #8aa79a;
+    --hp-mid: #c98a3e;
+    --hp-low: #c4483a;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+    --shadow-md: 0 2px 6px rgba(0,0,0,0.5);
+    --shadow-lg: 0 4px 14px rgba(0,0,0,0.6);
+    --glow-gold: 0 0 0 transparent;
+    --glow-jade: 0 0 0 transparent;
+    --glow-danger: 0 0 0 transparent;
+    --radius-xs: 1px;
+    --radius-sm: 2px;
+    --radius-md: 3px;
+    --radius-lg: 4px;
+    --radius-xl: 6px;
+    --font-body: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+}
+
+/* 底：松烟 + 极淡纸纹 + 暗角 */
+body {
+    background-color: var(--ink);
+    background-image: radial-gradient(ellipse at 50% 30%, rgba(60, 52, 34, 0.35), transparent 70%);
+    background-attachment: fixed;
+}
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.86  0 0 0 0 0.8  0 0 0 0 0.68  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* 彩色 emoji → 褪色铜色单色 */
+.emo { filter: grayscale(1) sepia(0.75) saturate(1.3) brightness(0.92); opacity: 0.95; }
+
+/* 侧栏：暗铜细线，去掉内阴影 */
+.sidebar { background: var(--ink); border-right: 1px solid var(--bronze-dim); box-shadow: none; }
+.logo {
+    background: var(--cinnabar);
+    color: var(--paper);
+    border: none;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 2px rgba(220, 209, 182, 0.28);
+    font-family: var(--font-title);
+    font-size: 1.5em;
+    display: flex; align-items: center; justify-content: center;
+}
+.skill-item { background: var(--bg-l2); border: 1px solid var(--border-l4); border-radius: 2px; box-shadow: none; }
+.skill-item:hover { border-color: var(--bronze-dim); background: var(--bg-l3); }
+.skill-item.active { background: var(--bg-l3); border-color: var(--bronze-dim); box-shadow: inset 3px 0 0 var(--cinnabar); }
+.exp-fill { background: var(--bronze); }
+.nav-btn, .sidebar .nav-btn {
+    background: var(--bg-l2) !important;
+    border: 1px solid var(--border-l4) !important;
+    border-radius: 2px !important;
+    color: var(--text-l1) !important;
+}
+.nav-btn:hover { background: var(--bg-l3) !important; border-color: var(--bronze-dim) !important; }
+
+/* 顶栏：名字用楷体，境界做成朱砂印章 */
+.header { border-bottom: 1px solid var(--bronze-dim); }
+.header::after { display: none; }
+.info-label { color: var(--text-l4); letter-spacing: 0.08em; }
+.info-value { font-family: var(--font-title); color: var(--text-l1); }
+#realmDisplay {
+    display: inline-block;
+    background: var(--cinnabar);
+    color: var(--paper);
+    padding: 1px 12px 2px;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 2px rgba(220, 209, 182, 0.3);
+    transform: rotate(-1.5deg);
+    letter-spacing: 0.1em;
+}
+.progress-bar { background: #0e0d0a; border: 1px solid var(--bronze-dim); border-radius: 2px; box-shadow: none; }
+.progress-fill { background: var(--cinnabar-2); }
+.progress-fill span, #progressText { color: var(--paper); text-shadow: none; }
+
+/* 主面板：暗铜双线框，角上用小朱印点缀 */
+.main-panel { background: var(--bg-l1); border: 1px solid var(--bronze-dim); border-radius: 2px; box-shadow: inset 0 0 0 4px var(--ink), inset 0 0 0 5px var(--border-l3); }
+.main-panel::before, .main-panel::after { content: ''; width: 7px; height: 7px; background: var(--cinnabar); color: transparent; font-size: 0; transform: rotate(45deg); opacity: 0.9; }
+.side-panel, .stat-panel { background: var(--bg-l2); border: 1px solid var(--border-l3); border-radius: 2px; box-shadow: none; }
+.panel-title {
+    font-family: var(--font-title);
+    color: var(--text-l1);
+    font-size: 1.7em;
+    letter-spacing: 0.12em;
+    border-bottom: 1px solid var(--bronze-dim);
+    position: relative;
+}
+.panel-title::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 36px; height: 3px; background: var(--cinnabar); }
+.stat-title { font-family: var(--font-title); color: var(--text-l2); letter-spacing: 0.1em; border-bottom: 1px solid var(--border-l4); }
+.stat-row { border-bottom: 1px solid rgba(92, 80, 57, 0.35); }
+
+/* 卡片：扁平砚台色，无发光；悬停只变边线，选中用朱砂 */
+.action-item, .slot-card, .law-card, .equip-slot, .item-slot {
+    background: var(--bg-l2);
+    background-image: none;
+    border: 1px solid var(--border-l3);
+    border-radius: 2px;
+    box-shadow: none;
+}
+.action-item:hover, .slot-card:hover, .item-slot:hover { background: var(--bg-l3); border-color: var(--bronze); transform: none; box-shadow: none; }
+.action-item.active { background: var(--bg-l3); border-color: var(--cinnabar-2); box-shadow: inset 0 0 0 1px var(--cinnabar); }
+.action-item.disabled, .action-item.action-locked { opacity: 0.55; }
+.action-progress-fill, .skill-exp-fill, .mastery-fill, .pool-fill { background: var(--patina); background-image: none; }
+.action-progress-bar, .skill-exp-track, .mastery-track { background: #0e0d0a; border-color: var(--border-l3); border-radius: 1px; }
+.skill-exp-header { background: var(--bg-l2); border: 1px solid var(--border-l3); border-left: 3px solid var(--bronze); border-radius: 2px; box-shadow: none; }
+.recipe-icon { filter: none; }
+
+/* 按钮：朱印（主）/ 铜线（次），扁平无渐变 */
+.btn {
+    background: var(--cinnabar);
+    background-image: none;
+    color: var(--paper);
+    border: 1px solid #7d2a21;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 1px rgba(220, 209, 182, 0.18);
+    font-family: var(--font-title);
+    letter-spacing: 0.1em;
+}
+.btn:hover { background: var(--cinnabar-2); box-shadow: inset 0 0 0 1px rgba(220, 209, 182, 0.28); transform: none; }
+.btn-secondary { background: transparent; background-image: none; color: var(--text-l1); border: 1px solid var(--bronze-dim); box-shadow: none; }
+.btn-secondary:hover { background: var(--bg-l3); border-color: var(--bronze); }
+.infuse-btn, .clone-btn { border-radius: 2px; }
+
+/* 弹窗与通知 */
+.modal { background: rgba(10, 9, 6, 0.8); backdrop-filter: none; }
+.modal-content { background: var(--inkstone); border: 1px solid var(--bronze-dim); border-radius: 2px; box-shadow: inset 0 0 0 4px var(--inkstone), inset 0 0 0 5px var(--border-l3), var(--shadow-lg); }
+.modal-title { font-family: var(--font-title); color: var(--text-l1); letter-spacing: 0.15em; }
+.notification {
+    background: var(--inkstone-2) !important;
+    color: var(--text-l1) !important;
+    border: 1px solid var(--border-l3);
+    border-left: 4px solid var(--accent, var(--bronze));
+    border-radius: 2px;
+    font-weight: normal;
+    box-shadow: var(--shadow-lg);
+}
+.notification button { background: transparent !important; color: var(--text-l3) !important; border: 1px solid var(--border-l3) !important; border-radius: 2px !important; }
+
+/* 输入 */
+input, select { background: #0e0d0a; border: 1px solid var(--border-l3); border-radius: 2px; color: var(--text-l1); }
+input:focus, select:focus { border-color: var(--bronze); box-shadow: none; }
+
+/* 存档 / 装备 / 悟道 等新界面 */
+.slot-card.empty { border-style: dashed; }
+.equip-slot.empty, .equip-slot.locked { border-style: dashed; }
+.equip-summary { background: var(--bg-l2); border: 1px solid var(--border-l3); border-radius: 2px; }
+.law-resonant { color: var(--cinnabar-2); }
+.clone-bar, .auto-battle-bar { border-radius: 2px; }
+.clone-bar { background: var(--bg-l2); border-color: var(--border-l3); }
+.mobile-tab-item.active { box-shadow: inset 0 3px 0 var(--cinnabar); }
+.mobile-bottom-tabs { background: var(--ink) !important; border-top: 1px solid var(--bronze-dim) !important; }
+.mobile-skill-btn { border-radius: 2px; }
+.mobile-skill-btn.active { border-color: var(--cinnabar-2); }
+
+/* 滚动条：细、暗铜 */
+* { scrollbar-width: thin; scrollbar-color: var(--bronze-dim) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--bronze-dim); border-radius: 0; }
+::-webkit-scrollbar-track { background: transparent; }

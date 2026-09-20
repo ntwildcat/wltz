@@ -915,25 +915,25 @@
 
         // 让分身开始做某个配方（不指定槽位时用第一个空闲的分身）
         function assignClone(skill, key, slot = null) {
-            if (!isCloneUnlocked()) { showNotification('🔒 分身要到元婴初期才会出现', '#f59e0b'); return; }
-            if (!LIFE_SKILLS.includes(skill)) { showNotification('分身只能做生活技能的配方', '#f59e0b'); return; }
+            if (!isCloneUnlocked()) { showNotification('🔒 分身要到元婴初期才会出现', '#c98a3e'); return; }
+            if (!LIFE_SKILLS.includes(skill)) { showNotification('分身只能做生活技能的配方', '#c98a3e'); return; }
             const recipe = getAction(skill, key);
-            if (!recipe || !getRecipeUnlockState(skill, recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#f59e0b'); return; }
+            if (!recipe || !getRecipeUnlockState(skill, recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#c98a3e'); return; }
             const main = gameState.currentAction;
             if (main && main.skill === skill && main.action === key) {
-                showNotification('主角正在做这个配方，分身不能重复（请让分身做别的）', '#f59e0b');
+                showNotification('主角正在做这个配方，分身不能重复（请让分身做别的）', '#c98a3e');
                 return;
             }
-            if (findCloneFor(skill, key) >= 0) { showNotification('已有分身在做这个配方，不能重复', '#f59e0b'); return; }
-            if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#ef4444', 'error'); return; }
+            if (findCloneFor(skill, key) >= 0) { showNotification('已有分身在做这个配方，不能重复', '#c98a3e'); return; }
+            if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#c4483a', 'error'); return; }
             const clones = activeClones();
             if (slot === null) slot = clones.findIndex(c => !c.action);
-            if (slot < 0) { showNotification('分身都在忙，请先停止一个', '#f59e0b'); return; }
+            if (slot < 0) { showNotification('分身都在忙，请先停止一个', '#c98a3e'); return; }
             const c = clones[slot];
             const prev = c.action;
             c.action = { skill, action: key };
             c.progress = 0;
-            showNotification(`🌀 分身${slot + 1}开始：${recipe.name}`, '#c9a961');
+            showNotification(`🌀 分身${slot + 1}开始：${recipe.name}`, '#b89a5b');
             if (prev && prev.skill !== skill) generateRecipeList(prev.skill);
             generateRecipeList(skill);
             renderCloneBar();
@@ -946,7 +946,7 @@
             const prev = c.action;
             c.action = null;
             c.progress = 0;
-            if (!silent && prev) showNotification(`🌀 分身${slot + 1}已停止`, '#c9a961');
+            if (!silent && prev) showNotification(`🌀 分身${slot + 1}已停止`, '#b89a5b');
             if (prev) generateRecipeList(prev.skill);
             renderCloneBar();
         }
@@ -958,7 +958,7 @@
                 const action = getAction(c.action.skill, c.action.action);
                 if (!action || !action.output) { stopClone(slot, true); return; }
                 if (!cloneHasMaterials(action)) {
-                    showNotification(`🌀 分身${slot + 1}：${action.name}所需材料不足，已停止`, '#ef4444', 'error');
+                    showNotification(`🌀 分身${slot + 1}：${action.name}所需材料不足，已停止`, '#c4483a', 'error');
                     stopClone(slot, true);
                     return;
                 }
@@ -1085,7 +1085,7 @@
                         }
                     }
                     if (materialShortage) {
-                        showNotification(`${action.name}所需物品不足，已停止`, '#ef4444', 'error');
+                        showNotification(`${action.name}所需物品不足，已停止`, '#c4483a', 'error');
                         gameState.currentAction = null;
                         gameState.currentActionProgress = 0;
                         updateUI();
@@ -1322,7 +1322,7 @@
                                     `丢失修为: ${lostCultivation} (10%)\n` +
                                     `丢失食物: ${foodLost}份 (50%)\n` +
                                     `血量: ${gameState.player.stats.hp.current}/${gameState.player.stats.hp.max} (+50%)`;
-            showNotification(notificationText, '#ef4444', 'danger');
+            showNotification(notificationText, '#c4483a', 'danger');
 
             // === 更新全局死亡统计 ===
             updateGlobalDeathStats(lostCultivation, foodLost);
@@ -1503,10 +1503,10 @@
 
             if (damage < 0) {
                 floatDiv.textContent = damage;
-                floatDiv.style.color = '#ef4444';
+                floatDiv.style.color = '#c4483a';
             } else {
                 floatDiv.textContent = '+' + damage;
-                floatDiv.style.color = '#22c55e';
+                floatDiv.style.color = '#7fae9a';
             }
 
             // 随机X偏移
@@ -1590,11 +1590,11 @@
             const dialog = document.createElement('div');
             dialog.style.cssText = `
                 background: rgba(26,31,58,0.95);
-                border: 2px solid #16a34a;
+                border: 2px solid #6f9c8a;
                 border-radius: 8px;
                 padding: 30px;
                 text-align: center;
-                color: #e0e0e0;
+                color: #dcd1b6;
                 min-width: 300px;
             `;
 
@@ -1603,8 +1603,8 @@
                 <div style="display: flex; gap: 10px; justify-content: center;">
                     <button style="
                         padding: 10px 20px;
-                        background: #16a34a;
-                        border: 1px solid #16a34a;
+                        background: #6f9c8a;
+                        border: 1px solid #6f9c8a;
                         color: #fff;
                         border-radius: 4px;
                         cursor: pointer;
@@ -1630,10 +1630,10 @@
                 modal.remove();
                 if (isNormalBattle) {
                     stopAction();
-                    showNotification('已撤退', '#fbbf24');
+                    showNotification('已撤退', '#c2a25f');
                 } else {
                     resetBattleState('idle');
-                    showNotification('已撤退秘境', '#fbbf24');
+                    showNotification('已撤退秘境', '#c2a25f');
                     updateUI();
                 }
             };
@@ -1878,9 +1878,9 @@
 +${coins}灵石 +${exp}经验`, '#6fa980');
                 }
             } else if (battle.playerHP.current <= 0) {
-                showNotification(`💀 被${battle.currentEnemy.name}击败，重伤逃出${areaData.name}（血量恢复至50%）`, '#ef4444');
+                showNotification(`💀 被${battle.currentEnemy.name}击败，重伤逃出${areaData.name}（血量恢复至50%）`, '#c4483a');
             } else {
-                showNotification(`⚔️ 战斗失败，逃出${areaData.name}`, '#ef4444');
+                showNotification(`⚔️ 战斗失败，逃出${areaData.name}`, '#c4483a');
             }
 
             // 结算玩家HP：倒下则恢复至50%，否则保留战斗后的剩余血量
@@ -1900,7 +1900,7 @@
                 auto.streak = won ? 0 : auto.streak + 1;
                 if (!won) auto.losses++;
                 if (auto.streak >= AUTO_BATTLE_MAX_LOSS_STREAK) {
-                    showNotification(`🤖 自动战斗已停止：连续 ${auto.streak} 场未能取胜，请检查装备与食物`, '#f59e0b');
+                    showNotification(`🤖 自动战斗已停止：连续 ${auto.streak} 场未能取胜，请检查装备与食物`, '#c98a3e');
                     renderAutoBattleBar();
                 } else {
                     enterBattleArea(areaKey, true);
@@ -1936,7 +1936,7 @@
             auto.enabled = !auto.enabled;
             auto.streak = 0;
             // 打开托管时，若正好在打普通战斗，本场结束后就会自动续战
-            showNotification(auto.enabled ? '🤖 自动战斗已开启：打完一场自动续战，离线时也会继续' : '🤖 自动战斗已关闭', '#c9a961');
+            showNotification(auto.enabled ? '🤖 自动战斗已开启：打完一场自动续战，离线时也会继续' : '🤖 自动战斗已关闭', '#b89a5b');
             renderAutoBattleBar();
             saveGame();
         }
@@ -2052,7 +2052,7 @@
                 rewardMsg += `+ 战斗经验 x${rewards.skillExp}`;
             }
 
-            showNotification(rewardMsg.trim(), '#16a34a');
+            showNotification(rewardMsg.trim(), '#6f9c8a');
             updateUI();
             saveGame();
         }
@@ -2455,7 +2455,7 @@
                 const def = LAW_EFFECTS[id];
                 const isMs = LAW_MILESTONE_LEVELS.includes(after);
                 const msText = isMs ? '（里程碑：' + describeEffects(def.milestones[after]).join('、') + '）' : '';
-                showNotification(`${def.icon} ${def.name} 领悟到 Lv.${after}${msText}`, '#c9a961');
+                showNotification(`${def.icon} ${def.name} 领悟到 Lv.${after}${msText}`, '#b89a5b');
             }
             if (document.body.dataset.panel === 'wudao') generateLawList();
             return after >= cap;
@@ -2562,11 +2562,11 @@
             const art = CULTIVATION_ARTS[player.currentArt];
             let html = '';
             if (root) {
-                html += `<div><b style="color:#c9a961">${ROOT_ICONS[player.spiritRoot]} ${root.name}</b>：${describeEffects(root.effects).join(' · ')}</div>`;
+                html += `<div><b style="color:#b89a5b">${ROOT_ICONS[player.spiritRoot]} ${root.name}</b>：${describeEffects(root.effects).join(' · ')}</div>`;
             }
             if (art) {
                 const eff = describeEffects(art.effects);
-                html += `<div><b style="color:#60a5fa">📜 ${art.name}</b>（修炼×${art.speedMultiplier}）：${eff.length ? eff.join(' · ') : '无特殊效果'}</div>`;
+                html += `<div><b style="color:#7d9bb5">📜 ${art.name}</b>（修炼×${art.speedMultiplier}）：${eff.length ? eff.join(' · ') : '无特殊效果'}</div>`;
             }
             // 悟道：已领悟的法则合计
             const lawParts = LAW_IDS.filter(id => getLawInfo(id).level > 0).map(id => `${LAW_EFFECTS[id].icon}${LAW_EFFECTS[id].name.replace('之法则', '')}Lv.${getLawInfo(id).level}`);
@@ -2758,7 +2758,7 @@
             const info = getMasteryInfo(skillName, key);
             if (info.maxed) return;
             const amount = Math.min(Math.floor(store.pool || 0), info.need - info.exp);
-            if (amount <= 0) { showNotification('精通池是空的', '#c9a961'); return; }
+            if (amount <= 0) { showNotification('精通池是空的', '#b89a5b'); return; }
             store.pool -= amount;
             addMasteryExp(skillName, key, amount, true);
             if (typeof generateRecipeList === 'function') generateRecipeList(skillName);
@@ -2819,7 +2819,7 @@
                 store.pool = Math.min(cap, (store.pool || 0) + amount * MASTERY_POOL_RATE);
                 const rc = getMasteryPoolInfo(skillName).reached;
                 if (rc.length > poolBefore) {
-                    showNotification(`🎓 ${gameState.skills[skillName].name}精通池达到 ${Math.round(rc[rc.length - 1].at * 100)}%：${rc[rc.length - 1].desc}`, '#c9a961');
+                    showNotification(`🎓 ${gameState.skills[skillName].name}精通池达到 ${Math.round(rc[rc.length - 1].at * 100)}%：${rc[rc.length - 1].desc}`, '#b89a5b');
                 }
             }
             store.recipes[key] = (store.recipes[key] || 0) + amount;
@@ -2827,7 +2827,7 @@
             if (after > before) {
                 const name = (getAction(skillName, key) || {}).name || key;
                 const milestone = MASTERY_MILESTONES.includes(after) ? '（里程碑！）' : '';
-                showNotification(`🎓 ${name} 精通 Lv.${after}${milestone}`, '#c9a961');
+                showNotification(`🎓 ${name} 精通 Lv.${after}${milestone}`, '#b89a5b');
             }
         }
 
@@ -2882,7 +2882,7 @@
             if (!el || !el.title) return;
             const text = el.title.replace(/&#10;/g, '\n');
             e.stopPropagation();   // 点精通区域只看说明，不触发配方卡片的开始行动
-            showNotification(text, '#c9a961');
+            showNotification(text, '#b89a5b');
         }, true);
 
         // 增加技能经验并处理升级，在线结算与离线结算共用
@@ -2895,9 +2895,9 @@
                 skill.exp -= skillExpNeeded(skill.level);
                 skill.level++;
                 const effect = calculateSkillLevelEffect(skillName, skill.level);
-                showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#16a34a', 'normal');
+                showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#6f9c8a', 'normal');
                 const ms = LIFE_SKILLS.includes(skillName) && SKILL_MILESTONES.find(m => m.level === skill.level);
-                if (ms) showNotification(`🏅 ${skill.name}达到 Lv.${ms.level} 里程碑：${ms.desc}`, '#c9a961');
+                if (ms) showNotification(`🏅 ${skill.name}达到 Lv.${ms.level} 里程碑：${ms.desc}`, '#b89a5b');
             }
         }
 
@@ -2976,7 +2976,7 @@
 
             // 悟道：参悟一次增加对应法则的经验；到当前境界上限则停止
             if (act.skill === 'wudao' && addLawExp(actionKey, 1)) {
-                showNotification(`${LAW_EFFECTS[actionKey].name}已至当前境界的领悟上限，突破后可继续`, '#f59e0b');
+                showNotification(`${LAW_EFFECTS[actionKey].name}已至当前境界的领悟上限，突破后可继续`, '#c98a3e');
                 gameState.currentAction = null;
                 gameState.currentActionProgress = 0;
             }
@@ -2992,7 +2992,7 @@
                     gameState.player.cultivationXP = realmCapacity;
                     gameState.currentAction = null;
                     gameState.currentActionProgress = 0;
-                    showNotification(`修为已达 ${currentRealm.name} 上限，请进行突破`, '#fbbf24');
+                    showNotification(`修为已达 ${currentRealm.name} 上限，请进行突破`, '#c2a25f');
                 } else {
                     // 正常增加修为
                     gameState.player.cultivationXP += finalOutput.cultivation;
@@ -3207,7 +3207,7 @@
                         }
                     });
                 }
-                const warningDot = hasMaterialShortage ? '<div style="position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #ff6b6b; border-radius: 50%; animation: pulse 1.5s infinite;"></div>' : '';
+                const warningDot = hasMaterialShortage ? '<div style="position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #c4483a; border-radius: 50%; animation: pulse 1.5s infinite;"></div>' : '';
 
                 item.innerHTML = `
                     <div class="skill-name">${skill.icon} ${skill.name}</div>
@@ -3556,14 +3556,14 @@
                 // 不可用提示
                 let statusHint = '';
                 if (isDisabled) {
-                    statusHint = `<div style="color: #ff6b6b; font-size: 0.75em; margin-top: 5px;">🔒 需要${getRealmName(action.areaData.minLevel)}</div>`;
+                    statusHint = `<div style="color: #c4483a; font-size: 0.75em; margin-top: 5px;">🔒 需要${getRealmName(action.areaData.minLevel)}</div>`;
                 }
 
                 div.innerHTML = `
                     <div>
                         <div class="action-name">${action.name}${boosted}</div>
                         <div class="action-desc">${action.desc}</div>
-                        <div style="font-size: 0.75em; color: #fbbf24; margin-top: 3px;">克制倍数: ${counterMod.damage.toFixed(1)}×</div>
+                        <div style="font-size: 0.75em; color: #c2a25f; margin-top: 3px;">克制倍数: ${counterMod.damage.toFixed(1)}×</div>
                         <div class="recipe-req ${isDisabled ? 'unmet' : 'met'}">${isDisabled ? '✗' : '✓'} 境界要求：${getRealmName(action.areaData.minLevel)}</div>
                         ${isDisabled ? '' : (() => { const m = getMasteryInfo('battle', key); return `<div class="recipe-mastery" title="${describeMastery('battle', key)}">🎓 精通 <b>Lv.${m.level}</b>${m.maxed ? ' ✦满级' : ` · ${m.exp}/${m.need}`}<div class="mastery-track"><div class="mastery-fill" style="width: ${m.percent}%"></div></div></div>`; })()}
                         ${statusHint}
@@ -3586,7 +3586,7 @@
         function selectAction(skill, action) {
             // 凡人无法参与战斗
             if (gameState.player.realmIndex === 0 && skill === 'battle') {
-                showNotification('凡人无法参与战斗，请先突破到练气初期', '#f59e0b', 'warning');
+                showNotification('凡人无法参与战斗，请先突破到练气初期', '#c98a3e', 'warning');
                 return;
             }
 
@@ -3600,26 +3600,26 @@
                     const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
 
                     if (gameState.player.realmIndex < realmReq) {
-                        showNotification(`🔒 需要境界: ${getRealmName(realmReq)}`, '#f59e0b', 'normal');
+                        showNotification(`🔒 需要境界: ${getRealmName(realmReq)}`, '#c98a3e', 'normal');
                     } else if (currentArt && !currentArt.unlockedRecipes.includes(action)) {
-                        showNotification(`🔒 当前功法 ${currentArt.name} 不支持此配方`, '#f59e0b', 'normal');
+                        showNotification(`🔒 当前功法 ${currentArt.name} 不支持此配方`, '#c98a3e', 'normal');
                     }
                     return;
                 }
             } else if (skill === 'battle') {
                 // 战斗区域按境界解锁（与战斗列表的显示保持一致）
                 if (!isBattleAreaUnlocked(actionObj)) {
-                    showNotification(`🔒 ${actionObj.name}需要${getRealmName(actionObj.areaData.minLevel)}`, '#f59e0b', 'normal');
+                    showNotification(`🔒 ${actionObj.name}需要${getRealmName(actionObj.areaData.minLevel)}`, '#c98a3e', 'normal');
                     return;
                 }
             } else if (skill === 'wudao') {
                 // 悟道：化神初期起可参悟；法则到当前境界上限后不能继续
                 if (gameState.player.realmIndex < LAW_UNLOCK_REALM) {
-                    showNotification(`🔒 悟道需要${getRealmName(LAW_UNLOCK_REALM)}`, '#f59e0b', 'normal');
+                    showNotification(`🔒 悟道需要${getRealmName(LAW_UNLOCK_REALM)}`, '#c98a3e', 'normal');
                     return;
                 }
                 if (getLawInfo(action).level >= lawLevelCap()) {
-                    showNotification(`${LAW_EFFECTS[action].name}已至当前境界的领悟上限，突破后可继续`, '#f59e0b', 'normal');
+                    showNotification(`${LAW_EFFECTS[action].name}已至当前境界的领悟上限，突破后可继续`, '#c98a3e', 'normal');
                     return;
                 }
             } else if (actionObj.requiredLevel) {
@@ -3628,14 +3628,14 @@
                 const isActuallyUnlocked = currentLevel >= actionObj.requiredLevel;
 
                 if (!isActuallyUnlocked) {
-                    showNotification(`🔒 ${actionObj.name}需要等级 ${actionObj.requiredLevel}（当前 ${currentLevel}）`, '#f59e0b', 'normal');
+                    showNotification(`🔒 ${actionObj.name}需要等级 ${actionObj.requiredLevel}（当前 ${currentLevel}）`, '#c98a3e', 'normal');
                     return;
                 }
             }
 
             // 分身正在做的配方，主角不能重复做
             if (isCloneUnlocked() && findCloneFor(skill, action) >= 0) {
-                showNotification('分身正在做这个配方，主角不能重复（请让分身停下或选别的配方）', '#f59e0b');
+                showNotification('分身正在做这个配方，主角不能重复（请让分身停下或选别的配方）', '#c98a3e');
                 return;
             }
 
@@ -3650,7 +3650,7 @@
                     const actualQty = inventoryItem ? inventoryItem.qty : 0;
                     if (actualQty < requiredQty) {
                         const itemConfig = GAME_CONFIG.items[itemId];
-                        showNotification(`${itemConfig.name}不足（需要${requiredQty}，有${actualQty}）`, '#ff6b6b', 'error');
+                        showNotification(`${itemConfig.name}不足（需要${requiredQty}，有${actualQty}）`, '#c4483a', 'error');
                         return;
                     }
                 }
@@ -3738,18 +3738,18 @@
                 existing.qty += qty;
                 // 检查是否接近满载
                 if (inventoryCount >= maxCapacity * 0.9) {
-                    showNotification(`⚠️ 背包即将满满！(${inventoryCount}/${maxCapacity}) 建议购买背包扩展`, '#f39c12', 'warning');
+                    showNotification(`⚠️ 背包即将满满！(${inventoryCount}/${maxCapacity}) 建议购买背包扩展`, '#c98a3e', 'warning');
                 }
             } else {
                 // 检查是否有空间添加新物品
                 if (inventoryCount >= maxCapacity) {
-                    showNotification(`❌ 背包已满无法获取 ${itemName}！请扩展背包容量`, '#ef4444', 'error');
+                    showNotification(`❌ 背包已满无法获取 ${itemName}！请扩展背包容量`, '#c4483a', 'error');
                     return false; // 返回false表示失败
                 }
                 gameState.player.inventory.push({ id: itemId, qty });
                 // 检查是否接近满载
                 if (inventoryCount + 1 >= maxCapacity * 0.8) {
-                    showNotification(`⚠️ 背包容量即将满满！(${inventoryCount + 1}/${maxCapacity})`, '#f39c12', 'warning');
+                    showNotification(`⚠️ 背包容量即将满满！(${inventoryCount + 1}/${maxCapacity})`, '#c98a3e', 'warning');
                 }
             }
             return true; // 返回true表示成功
@@ -3816,7 +3816,7 @@
                 usages.unshift(specialUsages[itemId]);
             }
             if (isEquipmentItem(itemId)) {
-                usages.unshift(`<b style="color:#22c55e">装备属性：${formatItemStats(itemId) || '无'}</b>`);
+                usages.unshift(`<b style="color:#7fae9a">装备属性：${formatItemStats(itemId) || '无'}</b>`);
             }
             if (itemConfig.effect && itemConfig.effect.workSpeed) {
                 usages.unshift(`装备后工作速度 +${Math.round((1 / itemConfig.effect.workSpeed - 1) * 100)}%（生活技能与悟道耗时 -${Math.round((1 - itemConfig.effect.workSpeed) * 100)}%）`);
@@ -3833,7 +3833,7 @@
             // 装备对比：武器 / 护甲显示换上后的属性变化
             let comparisonHTML = '';
             if (itemConfig.stats && (itemConfig.type === 'weapon' || itemConfig.type === 'armor')) {
-                comparisonHTML = '<div style="margin-top: 10px; padding: 10px; background: rgba(22,163,74,0.1); border-radius: 5px;"><strong>与当前装备对比：</strong><br/>' + describeEquipDiff(itemId) + '</div>';
+                comparisonHTML = '<div style="margin-top: 10px; padding: 10px; background: rgba(111,156,138,0.1); border-radius: 5px;"><strong>与当前装备对比：</strong><br/>' + describeEquipDiff(itemId) + '</div>';
             }
 
             // P3优化：添加物品类别说明
@@ -3852,7 +3852,7 @@
             if (itemUsageEl) {
                 let categoryHint = categoryExplanations[itemConfig.type] || '';
                 if (categoryHint) {
-                    categoryHint = '<div style="margin-bottom: 10px; padding: 8px; background: rgba(100,100,100,0.2); border-radius: 3px; font-size: 0.85em; color: #c9a961;">' + categoryHint + '</div>';
+                    categoryHint = '<div style="margin-bottom: 10px; padding: 8px; background: rgba(100,100,100,0.2); border-radius: 3px; font-size: 0.85em; color: #b89a5b;">' + categoryHint + '</div>';
                 }
                 itemUsageEl.innerHTML = categoryHint + usageText + comparisonHTML;
             }
@@ -3959,7 +3959,7 @@
             if (qty <= 0 || !consumeItem(itemId, qty)) return;
             const gain = itemConfig.sellPrice * qty;
             gameState.player.coins += gain;
-            showNotification(`出售${itemConfig.name}×${qty} +${gain}灵石`, '#16a34a');
+            showNotification(`出售${itemConfig.name}×${qty} +${gain}灵石`, '#6f9c8a');
             updateUI();
             saveGame();
             const remaining = gameState.player.inventory.find(i => i.id === itemId);
@@ -4008,12 +4008,12 @@
             const cfg = GAME_CONFIG.items[itemId];
             if (!cfg || !EQUIP_TYPES.includes(cfg.type)) return false;
             const inv = gameState.player.inventory.find(i => i.id === itemId);
-            if (!inv || inv.qty < 1) { showNotification('背包里没有这件装备', '#f59e0b'); return false; }
+            if (!inv || inv.qty < 1) { showNotification('背包里没有这件装备', '#c98a3e'); return false; }
             const eq = gameState.player.equipment;
             if (cfg.type === 'jewelry') {
-                if ((eq.jewelry || []).includes(itemId)) { showNotification('已经佩戴同名饰品，不能重复', '#f59e0b'); return false; }
+                if ((eq.jewelry || []).includes(itemId)) { showNotification('已经佩戴同名饰品，不能重复', '#c98a3e'); return false; }
                 if ((eq.jewelry || []).length >= getJewelrySlots()) {
-                    showNotification(getJewelrySlots() < 2 ? '饰品栏位已满，请先卸下（第二饰品栏位可在商城购买）' : '饰品栏位已满，请先卸下一件', '#f59e0b');
+                    showNotification(getJewelrySlots() < 2 ? '饰品栏位已满，请先卸下（第二饰品栏位可在商城购买）' : '饰品栏位已满，请先卸下一件', '#c98a3e');
                     return false;
                 }
                 consumeItem(itemId, 1);
@@ -4029,7 +4029,7 @@
                     return false;
                 }
             }
-            showNotification(`已装备${cfg.name}`, '#16a34a');
+            showNotification(`已装备${cfg.name}`, '#6f9c8a');
             equipAfterChange();
             return true;
         }
@@ -4043,7 +4043,7 @@
             if (!addToInventory(itemId, 1)) return false;
             if (kind === 'jewelry') eq.jewelry = eq.jewelry.filter(id => id !== itemId);
             else eq[kind] = null;
-            showNotification(`已卸下${cfg.name}`, '#16a34a');
+            showNotification(`已卸下${cfg.name}`, '#6f9c8a');
             equipAfterChange();
             return true;
         }
@@ -4058,7 +4058,7 @@
             const out = [];
             keys.forEach(k => {
                 const d = ((cfg.stats || {})[k] || 0) - (cur[k] || 0);
-                if (d) out.push(`<span style="color:${d > 0 ? '#22c55e' : '#ef4444'}">${STAT_LABELS[k] || k}${d > 0 ? '+' : ''}${d}</span>`);
+                if (d) out.push(`<span style="color:${d > 0 ? '#7fae9a' : '#c4483a'}">${STAT_LABELS[k] || k}${d > 0 ? '+' : ''}${d}</span>`);
             });
             return out.length ? `（换上后 ${out.join(' ')}）` : '（属性相同）';
         }
@@ -4160,11 +4160,11 @@
                 const foodConfig = FOOD_CONFIG.foods[itemId];
                 if (!foodConfig) return;
                 if (gameState.player.realmIndex < foodConfig.minRealm) {
-                    showNotification(`${itemConfig.name}需要${getRealmName(foodConfig.minRealm)}才能食用`, '#f59e0b');
+                    showNotification(`${itemConfig.name}需要${getRealmName(foodConfig.minRealm)}才能食用`, '#c98a3e');
                     return;
                 }
                 gameState.player.foodSlot = itemId;
-                showNotification(`已设为战斗食物：${itemConfig.name}（生命低于50%时自动食用）`, '#16a34a');
+                showNotification(`已设为战斗食物：${itemConfig.name}（生命低于50%时自动食用）`, '#6f9c8a');
                 updateFoodBar();
                 closeItemDetail();
                 saveGame();
@@ -4174,20 +4174,20 @@
             if (itemType === 'use') {
                 if (itemId === 'tempered_essence') {
                     if ((gameState.player.temperLevel || 0) >= 3) {
-                        showNotification('装备已淬炼至最高3次', '#f59e0b');
+                        showNotification('装备已淬炼至最高3次', '#c98a3e');
                         return;
                     }
                     if (!consumeItem(itemId, 1)) return;
                     gameState.player.temperLevel = (gameState.player.temperLevel || 0) + 1;
-                    showNotification(`🔥 淬炼成功！装备属性 +${gameState.player.temperLevel * 10}%`, '#16a34a');
+                    showNotification(`🔥 淬炼成功！装备属性 +${gameState.player.temperLevel * 10}%`, '#6f9c8a');
                 } else if (itemId === 'shenshi_map') {
                     if (gameState.player.scoutBonus) {
-                        showNotification('神识地图效果已生效，通关下一个秘境后消耗', '#f59e0b');
+                        showNotification('神识地图效果已生效，通关下一个秘境后消耗', '#c98a3e');
                         return;
                     }
                     if (!consumeItem(itemId, 1)) return;
                     gameState.player.scoutBonus = true;
-                    showNotification('🗺️ 下次秘境掉落率 +30%', '#16a34a');
+                    showNotification('🗺️ 下次秘境掉落率 +30%', '#6f9c8a');
                 }
                 calculateStats();
                 updateUI();
@@ -4270,8 +4270,8 @@
             const dungeonContent = document.getElementById('battleContent-dungeons');
 
             if (tab === 'areas') {
-                areaBtn.style.color = '#fbbf24';
-                areaBtn.style.borderBottomColor = '#fbbf24';
+                areaBtn.style.color = '#c2a25f';
+                areaBtn.style.borderBottomColor = '#c2a25f';
                 dungeonBtn.style.color = '#666';
                 dungeonBtn.style.borderBottomColor = 'transparent';
                 areaContent.style.display = 'block';
@@ -4279,8 +4279,8 @@
             } else {
                 areaBtn.style.color = '#666';
                 areaBtn.style.borderBottomColor = 'transparent';
-                dungeonBtn.style.color = '#fbbf24';
-                dungeonBtn.style.borderBottomColor = '#fbbf24';
+                dungeonBtn.style.color = '#c2a25f';
+                dungeonBtn.style.borderBottomColor = '#c2a25f';
                 areaContent.style.display = 'none';
                 dungeonContent.style.display = 'block';
                 updateDungeonDisplay();
@@ -4300,7 +4300,7 @@
 
                 // 检查是否满足境界要求（仅基于最低境界索引）
                 const meetsRequirement = gameState.player.realmIndex >= dungeon.minRealmIndex;
-                const statusColor = record.completed ? '#16a34a' : meetsRequirement ? '#fbbf24' : '#666';
+                const statusColor = record.completed ? '#6f9c8a' : meetsRequirement ? '#c2a25f' : '#666';
                 const statusText = record.completed ? '✓ 已通关' : meetsRequirement ? '✓ 可进入' : '⛔ 境界不足';
 
                 const requiredRealmName = getRealmName(dungeon.minRealmIndex);
@@ -4312,7 +4312,7 @@
                     <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="enterDungeon('${dungeonId}')">
                         <span style="font-size: 24px;">${dungeon.icon}</span>
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; color: #fbbf24;">${dungeon.name}</div>
+                            <div style="font-weight: bold; color: #c2a25f;">${dungeon.name}</div>
                             <div style="font-size: 0.85em; color: #aaa;">${dungeon.desc}</div>
                             <div style="font-size: 0.75em; color: ${statusColor}; margin-top: 4px;">${statusText}</div>
                         </div>
@@ -4322,7 +4322,7 @@
                     if (meetsRequirement) {
                         enterDungeon(dungeonId);
                     } else {
-                        showNotification(`需要达到 ${requiredRealmName} 才能进入`, '#ef4444', 'error');
+                        showNotification(`需要达到 ${requiredRealmName} 才能进入`, '#c4483a', 'error');
                     }
                 };
                 container.appendChild(actionDiv);
@@ -4433,7 +4433,7 @@
             // 手动进入时重置本次托管统计；自动续战不弹进入提示，避免每场刷屏
             if (!auto) {
                 Object.assign(getAutoBattle(), { wins: 0, losses: 0, streak: 0, coins: 0, exp: 0 });
-                showNotification(`进入${areaData.name}！遇到${gameState.battles.currentEnemy.name}！`, '#c9a961');
+                showNotification(`进入${areaData.name}！遇到${gameState.battles.currentEnemy.name}！`, '#b89a5b');
             }
             updateNormalBattleUI();
             renderAutoBattleBar();
@@ -4446,7 +4446,7 @@
 
             // 凡人无法进入秘境
             if (gameState.player.realmIndex === 0) {
-                showNotification('凡人无法进入秘径，请先突破到练气初期', '#f59e0b', 'warning');
+                showNotification('凡人无法进入秘径，请先突破到练气初期', '#c98a3e', 'warning');
                 return;
             }
 
@@ -4454,7 +4454,7 @@
             if (gameState.player.realmIndex < dungeon.minRealmIndex) {
                 const currentRealm = getRealmName(gameState.player.realmIndex);
                 const requiredRealm = getRealmName(dungeon.minRealmIndex);
-                showNotification(`需要 ${requiredRealm} 才能进入（当前 ${currentRealm}）`, '#ef4444', 'error');
+                showNotification(`需要 ${requiredRealm} 才能进入（当前 ${currentRealm}）`, '#c4483a', 'error');
                 return;
             }
 
@@ -4492,7 +4492,7 @@
             };
             gameState.currentActionProgress = 0;
 
-            showNotification(`进入 ${dungeon.name}！`, '#fbbf24');
+            showNotification(`进入 ${dungeon.name}！`, '#c2a25f');
             updateActionDisplay();
             updateUI();
 
@@ -4520,10 +4520,10 @@
             if (getCloneSlotCount() >= 2 && !gameState.cloneUnlockNotified2) {
                 gameState.cloneUnlockNotified2 = true;
                 gameState.cloneUnlockNotified = true;
-                showNotification('🌀 化神境界——第二个分身解锁！现在可以同时让两个分身做事', '#c9a961');
+                showNotification('🌀 化神境界——第二个分身解锁！现在可以同时让两个分身做事', '#b89a5b');
             } else if (isCloneUnlocked() && !gameState.cloneUnlockNotified) {
                 gameState.cloneUnlockNotified = true;
-                showNotification('🌀 元婴出窍——分身解锁！它能在生活技能里与你并行做事（配方卡片上点「交给分身」）', '#c9a961');
+                showNotification('🌀 元婴出窍——分身解锁！它能在生活技能里与你并行做事（配方卡片上点「交给分身」）', '#b89a5b');
             }
             renderCloneBar();
             if (document.body.dataset.panel === 'equipment') renderEquipmentPanel();
@@ -4564,10 +4564,10 @@
         }
 
         // 通知类型系统（P1功能）
-        function showNotification(message, color = '#16a34a', type = 'normal') {
+        function showNotification(message, color = '#6f9c8a', type = 'normal') {
             const notification = document.createElement('div');
             notification.className = 'notification';
-            notification.style.background = color;
+            notification.style.setProperty('--accent', color);   // 颜色只用作左侧色条，底色由样式统一
             notification.style.minWidth = '300px';
 
             // 统一UI：所有通知都显示关闭按钮
@@ -4697,7 +4697,7 @@
             const typeNames = { material: '材料', ore: '矿石', consumable: '丹药', weapon: '装备', jewelry: '首饰' };
             Object.entries(byType).forEach(([type, items]) => {
                 const typeLabel = document.createElement('div');
-                typeLabel.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #16a34a; margin-top: 10px; margin-bottom: 5px;';
+                typeLabel.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #6f9c8a; margin-top: 10px; margin-bottom: 5px;';
                 typeLabel.textContent = typeNames[type] || type;
                 grid.appendChild(typeLabel);
 
@@ -4738,7 +4738,7 @@
             if (!item) return;
 
             if (item.type === 'unlock') {
-                showNotification('该功能尚未开放', '#f59e0b');
+                showNotification('该功能尚未开放', '#c98a3e');
                 return;
             }
 
@@ -4752,21 +4752,21 @@
 
             // 境界要求（商品显示与购买都要校验）
             if ((item.minRealmIndex || 0) > gameState.player.realmIndex) {
-                showNotification(`🔒 ${item.name}需要${getRealmName(item.minRealmIndex)}`, '#f59e0b');
+                showNotification(`🔒 ${item.name}需要${getRealmName(item.minRealmIndex)}`, '#c98a3e');
                 return;
             }
 
             // 永久升级特殊处理（P1功能）
             if (item.type === 'upgrade') {
                 if (gameState.player.boughtUpgrades.includes(itemId)) {
-                    showNotification(`已拥有此升级！`, '#fbbf24');
+                    showNotification(`已拥有此升级！`, '#c2a25f');
                     return;
                 }
             }
 
             // 检查灵石
             if (gameState.player.coins < price) {
-                showNotification(`灵石不足！需要${price}，拥有${gameState.player.coins}`, '#ff6b6b', 'error');
+                showNotification(`灵石不足！需要${price}，拥有${gameState.player.coins}`, '#c4483a', 'error');
                 return;
             }
 
@@ -4780,12 +4780,12 @@
 
                 if (itemId === 'inventory_slot') {
                     gameState.player.inventoryCapacity += 5;
-                    showNotification(`✨ 背包已扩展至${gameState.player.inventoryCapacity}格！`, '#16a34a');
+                    showNotification(`✨ 背包已扩展至${gameState.player.inventoryCapacity}格！`, '#6f9c8a');
                 } else if (itemId === 'farming_slot') {
                     gameState.player.farmingSlots += 1;
-                    showNotification(`✨ 灵田槽位增加1个！共${gameState.player.farmingSlots}个`, '#16a34a');
+                    showNotification(`✨ 灵田槽位增加1个！共${gameState.player.farmingSlots}个`, '#6f9c8a');
                 } else if (itemId === 'jewelry_slot2') {
-                    showNotification('✨ 已解锁第二个饰品栏位！去「装备」界面佩戴', '#16a34a');
+                    showNotification('✨ 已解锁第二个饰品栏位！去「装备」界面佩戴', '#6f9c8a');
                 }
             } else if (item.type === 'art') {
                 // 功法购买处理 - 记录拥有；只有比当前功法更快才自动装备
@@ -4799,13 +4799,13 @@
                     const speedBonus = ((art.speedMultiplier - 1) * 100).toFixed(0);
                     showNotification(
                         `✨ 已装备功法：${item.name}！\n修炼速度 ${art.speedMultiplier.toFixed(2)}x（提升${speedBonus}%）`,
-                        '#10b981',
+                        '#7fae9a',
                         'success'
                     );
                 } else {
                     showNotification(
                         `已习得${item.name}（${art?.speedMultiplier?.toFixed(2)}x），当前功法更快，未自动装备`,
-                        '#10b981',
+                        '#7fae9a',
                         'success'
                     );
                 }
@@ -4816,7 +4816,7 @@
             } else {
                 // 消耗品处理
                 addToInventory(itemId, 1);
-                showNotification(`购买成功：${item.name}`, '#16a34a');
+                showNotification(`购买成功：${item.name}`, '#6f9c8a');
             }
 
             updateUI();
@@ -4854,7 +4854,7 @@
                 if (visibleItems.length === 0) return; // 如果没有可见商品，跳过该分类
 
                 const title = document.createElement('div');
-                title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #16a34a; margin-top: 10px; margin-bottom: 5px;';
+                title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #6f9c8a; margin-top: 10px; margin-bottom: 5px;';
                 title.textContent = categoryNames[category] || category;
                 shopContainer.appendChild(title);
 
@@ -4878,7 +4878,7 @@
                     card.style.cssText = cardStyle;
 
                     if (!isBought && !isLocked) {
-                        card.onmouseover = () => card.style.borderColor = '#16a34a';
+                        card.onmouseover = () => card.style.borderColor = '#6f9c8a';
                         card.onmouseout = () => card.style.borderColor = '#555';
                     }
 
@@ -4886,7 +4886,7 @@
                         : isOwnedArt ? (gameState.player.currentArt === item.id ? '✓ 当前功法' : '已拥有 · 点击装备')
                         : isLocked ? `🔒 需要${getRealmName(item.minRealmIndex)}`
                         : `${item.price} 灵石`;
-                    const priceColor = isBought ? '#16a34a' : isLocked ? '#f59e0b' : '#fbbf24';
+                    const priceColor = isBought ? '#6f9c8a' : isLocked ? '#c98a3e' : '#c2a25f';
                     // 未拥有的功法同时显示价格与境界要求，方便对比规划
                     const artExtra = item.type === 'art' && !isOwnedArt
                         ? `<div style="font-size: 0.75em; color: #888; margin-top: 4px;">${isLocked ? item.price + ' 灵石' : '需要' + getRealmName(item.minRealmIndex) + '（已达成）'}</div>`
@@ -4894,14 +4894,14 @@
 
                     card.innerHTML = `
                         <div style="font-size: 24px; margin-bottom: 5px;">${item.icon}</div>
-                        <div style="font-weight: bold; color: #16a34a; margin-bottom: 3px;">${item.name}</div>
+                        <div style="font-weight: bold; color: #6f9c8a; margin-bottom: 3px;">${item.name}</div>
                         <div style="font-size: 0.8em; color: #888; margin-bottom: 8px;">${item.type === 'art' ? getArtShopDesc(item) : item.desc}</div>
                         <div style="color: ${priceColor}; font-weight: bold;">${priceDisplay}</div>
                         ${artExtra}
                     `;
 
                     if (isLocked) {
-                        card.onclick = () => showNotification(`🔒 ${item.name}需要${getRealmName(item.minRealmIndex)}`, '#f59e0b');
+                        card.onclick = () => showNotification(`🔒 ${item.name}需要${getRealmName(item.minRealmIndex)}`, '#c98a3e');
                     } else if (!isBought) {
                         card.onclick = () => buyItem(category, item.id);
                     }
@@ -5196,13 +5196,13 @@
 
             // 检查修为是否足够
             if (gameState.player.cultivationXP < currentRealm.nextReq) {
-                showNotification('修为不足，无法突破', '#f59e0b', 'warning');
+                showNotification('修为不足，无法突破', '#c98a3e', 'warning');
                 return;
             }
 
             // 已是最高境界，没有下一境界可突破
             if (!GAME_CONFIG.realms[realmIndex + 1]) {
-                showNotification('已至当前大道尽头，后续境界敬请期待', '#f59e0b', 'warning');
+                showNotification('已至当前大道尽头，后续境界敬请期待', '#c98a3e', 'warning');
                 closeBreakthroughModal();
                 return;
             }
@@ -5226,7 +5226,7 @@
             gameState.player.cultivationXP = 0;
 
             const newRealm = GAME_CONFIG.realms[nextRealmIndex];
-            showNotification(`突破成功！当前境界：${newRealm.name}`, '#16a34a', 'success');
+            showNotification(`突破成功！当前境界：${newRealm.name}`, '#6f9c8a', 'success');
 
             closeBreakthroughModal();
             updateUI();
@@ -5252,7 +5252,7 @@
             if (currentQty < requirement.qty) {
                 showNotification(
                     `突破需要 ${requirement.pillName} ×${requirement.qty}（当前 ${currentQty}）`,
-                    '#ef4444',
+                    '#c4483a',
                     'error'
                 );
                 return;
@@ -5269,7 +5269,7 @@
             performBreakthrough();
 
             // 额外通知：消耗了丹药
-            showNotification(`消耗了 ${requirement.pillName} ×${requirement.qty}`, '#3b82f6', 'info');
+            showNotification(`消耗了 ${requirement.pillName} ×${requirement.qty}`, '#7d9bb5', 'info');
         }
 
         // ==================== 存档系统 ====================
@@ -5282,7 +5282,7 @@
             } catch (e) {
                 console.error('Failed to save game:', e);
                 if (e.name === 'QuotaExceededError') {
-                    showNotification('📦 存储空间已满，无法保存存档', '#ff6b6b', 'error');
+                    showNotification('📦 存储空间已满，无法保存存档', '#c4483a', 'error');
                 } else if (e.name === 'SecurityError') {
                     showNotification('🔒 本地存储被禁用（在data: URL中）- 请下载HTML文件到本地打开', '#ff9800', 'error');
                 }
@@ -5562,7 +5562,7 @@
                     const mins = Math.max(1, Math.round(res.elapsed / 60));
                     const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验` +
                         (res.stopped ? `\n⚠️ 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，已停止（请检查装备与食物）` : '');
-                    showNotification(msg, res.stopped ? '#f59e0b' : '#6fa980');
+                    showNotification(msg, res.stopped ? '#c98a3e' : '#6fa980');
                     if (!res.stopped) enterBattleArea(savedAction.action, true);
                     renderAutoBattleBar();
                     saveGame();
@@ -5581,7 +5581,7 @@
                     if (battleContainer) battleContainer.classList.add('hidden');
                 }
                 gameState.lastActiveTime = now;
-                showNotification('⚔️ 上次的战斗因离开游戏而中断', '#f59e0b');
+                showNotification('⚔️ 上次的战斗因离开游戏而中断', '#c98a3e');
                 return;
             }
 
@@ -5736,10 +5736,10 @@
 
             // P2修复：显示超限警告
             if (exceedsLimit) {
-                content += `<div class="stat-row" style="background: rgba(239,68,68,0.1); border: 1px solid #ef4444; padding: 8px; margin: 5px 0;">
-                    <span class="stat-label" style="color: #ef4444;">⚠️ 离线超过${maxHours}小时上限</span>
+                content += `<div class="stat-row" style="background: rgba(196,72,58,0.1); border: 1px solid #c4483a; padding: 8px; margin: 5px 0;">
+                    <span class="stat-label" style="color: #c4483a;">⚠️ 离线超过${maxHours}小时上限</span>
                 </div>
-                <div class="stat-row" style="background: rgba(239,68,68,0.1); border: 1px solid #ef4444; padding: 8px; margin: 5px 0;">
+                <div class="stat-row" style="background: rgba(196,72,58,0.1); border: 1px solid #c4483a; padding: 8px; margin: 5px 0;">
                     <span class="stat-label" style="color: #999;">✗ 超时${wastedHours}小时，奖励已达上限</span>
                 </div>`;
             }
@@ -5760,10 +5760,10 @@
 
             // 显示修为溢出转灵石
             if (rewards.cultivationOverflow && rewards.cultivationOverflow > 0) {
-                content += `<div class="stat-row" style="background: rgba(245,158,11,0.1); border: 1px solid #f59e0b; padding: 8px; margin: 5px 0;">
+                content += `<div class="stat-row" style="background: rgba(201,138,62,0.1); border: 1px solid #c98a3e; padding: 8px; margin: 5px 0;">
                     <span class="stat-label">⚠️ 修为已达上限</span>
                 </div>
-                <div class="stat-row" style="background: rgba(245,158,11,0.1); border: 1px solid #f59e0b; padding: 8px; margin: 5px 0;">
+                <div class="stat-row" style="background: rgba(201,138,62,0.1); border: 1px solid #c98a3e; padding: 8px; margin: 5px 0;">
                     <span class="stat-label">溢出部分:</span>
                     <span class="stat-value">+${rewards.cultivationOverflow}修为 → +${rewards.overflowCoins}灵石</span>
                 </div>`;
@@ -5774,7 +5774,7 @@
                     <span class="stat-label" style="margin-bottom: 10px;">获得物品:</span>`;
                 rewards.items.forEach(item => {
                     const itemConfig = GAME_CONFIG.items[item.id];
-                    content += `<span style="color: #16a34a;">  ${itemConfig.icon} ${itemConfig.name} x${item.qty}</span>`;
+                    content += `<span style="color: #6f9c8a;">  ${itemConfig.icon} ${itemConfig.name} x${item.qty}</span>`;
                 });
                 content += `</div>`;
             }
@@ -5784,8 +5784,8 @@
             // 检测是否满足突破条件（P1功能）
             const realm = GAME_CONFIG.realms[gameState.player.realmIndex];
             if (gameState.player.cultivationXP >= realm.nextReq) {
-                content = `<div style="background: rgba(22,163,74,0.1); border: 2px solid #16a34a; border-radius: 4px; padding: 15px; margin-bottom: 15px;">
-                    <div style="color: #16a34a; font-weight: bold; margin-bottom: 10px;">✨ 你已准备好突破！</div>
+                content = `<div style="background: rgba(111,156,138,0.1); border: 2px solid #6f9c8a; border-radius: 4px; padding: 15px; margin-bottom: 15px;">
+                    <div style="color: #6f9c8a; font-weight: bold; margin-bottom: 10px;">✨ 你已准备好突破！</div>
                     <button class="btn" onclick="showBreakthroughModal(); closeOfflineModal()" style="width: 100%; margin-bottom: 10px;">🌟 前往突破 🌟</button>
                 </div>` + content;
             }
@@ -5816,7 +5816,7 @@
                 const itemDiv = document.createElement('div');
                 itemDiv.style.cssText = `
                     background: ${isCurrentArt ? 'rgba(34,197,94,0.2)' : 'rgba(59,130,246,0.1)'};
-                    border: 1px solid ${isCurrentArt ? '#22c55e' : '#3b82f6'};
+                    border: 1px solid ${isCurrentArt ? '#7fae9a' : '#7d9bb5'};
                     border-radius: 4px;
                     padding: 12px;
                     margin-bottom: 10px;
@@ -5828,14 +5828,14 @@
                 itemDiv.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: start; gap: 10px;">
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; color: #fbbf24; font-size: 1em;">${art.name}</div>
+                            <div style="font-weight: bold; color: #c2a25f; font-size: 1em;">${art.name}</div>
                             <div style="font-size: 0.85em; color: #aaa; margin-top: 4px;">${art.description}</div>
                             <div style="font-size: 0.8em; color: #888; margin-top: 6px;">
-                                修炼速度倍率：<span style="color: #60a5fa;">${art.speedMultiplier.toFixed(2)}x</span>
+                                修炼速度倍率：<span style="color: #7d9bb5;">${art.speedMultiplier.toFixed(2)}x</span>
                             </div>
                             ${describeEffects(art.effects).length ? `<div style="font-size: 0.8em; color: #6fa980; margin-top: 4px;">特效：${describeEffects(art.effects).join(' · ')}</div>` : ''}
                         </div>
-                        <div style="text-align: right; color: ${isCurrentArt ? '#22c55e' : '#888'}; font-size: 0.9em;">
+                        <div style="text-align: right; color: ${isCurrentArt ? '#7fae9a' : '#888'}; font-size: 0.9em;">
                             ${statusText}
                         </div>
                     </div>
@@ -5870,13 +5870,13 @@
 
         function switchCultivationArt(artKey) {
             if (!CULTIVATION_ARTS[artKey]) {
-                showNotification('❌ 功法不存在', '#ef4444', 'error');
+                showNotification('❌ 功法不存在', '#c4483a', 'error');
                 return;
             }
 
             // 检查该角色是否拥有这个功法（出身功法或商城购买）
             if (!(gameState.player.ownedArts || []).includes(artKey)) {
-                showNotification('🔒 你不拥有这个功法', '#f59e0b', 'normal');
+                showNotification('🔒 你不拥有这个功法', '#c98a3e', 'normal');
                 return;
             }
 
@@ -5890,7 +5890,7 @@
             calculateStats();   // 功法特效可能改变属性
             updateArtDisplay();
             updateCultivationRecipes();
-            showNotification(`✓ 已切换到 ${CULTIVATION_ARTS[artKey].name}`, '#22c55e', 'success');
+            showNotification(`✓ 已切换到 ${CULTIVATION_ARTS[artKey].name}`, '#7fae9a', 'success');
         }
 
         function updateArtDisplay() {
@@ -5900,8 +5900,8 @@
                 const artDisplayDiv = document.querySelector('#currentArtDisplay');
                 if (artDisplayDiv) {
                     artDisplayDiv.innerHTML = `
-                        <div style="color: #fbbf24; font-weight: bold;">${currentArt.name}</div>
-                        <div style="font-size: 0.8em; color: #aaa; margin-top: 4px;">速度倍率：<span style="color: #60a5fa;">${currentArt.speedMultiplier.toFixed(1)}x</span></div>
+                        <div style="color: #c2a25f; font-weight: bold;">${currentArt.name}</div>
+                        <div style="font-size: 0.8em; color: #aaa; margin-top: 4px;">速度倍率：<span style="color: #7d9bb5;">${currentArt.speedMultiplier.toFixed(1)}x</span></div>
                     `;
                 }
                 // 更新功法速度显示
@@ -6009,6 +6009,44 @@
             requestAnimationFrame(() => { clickablePending = false; enhanceClickables(); });
         }).observe(document.body, { childList: true, subtree: true });
         enhanceClickables();
+
+        // ==================== 美术：彩色 emoji 统一染成褪色铜色 ====================
+        // 把文字里的 emoji 包进 <span class="emo">，样式里用滤镜做成单色铜色，与整体色板一致
+        const EMOJI_TEST = /\p{Extended_Pictographic}/u;
+        const EMOJI_SPLIT = /(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*)/gu;
+        function tintEmoji(root) {
+            if (!root) return;
+            const skip = 'script, style, textarea, select, option, title, .emo';
+            const nodes = [];
+            if (root.nodeType === 3) {
+                nodes.push(root);
+            } else if (root.nodeType === 1) {
+                const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+                let n;
+                while ((n = walker.nextNode())) nodes.push(n);
+            }
+            nodes.forEach(node => {
+                const p = node.parentElement;
+                if (!p || !EMOJI_TEST.test(node.nodeValue) || p.closest(skip)) return;
+                const frag = document.createDocumentFragment();
+                node.nodeValue.split(EMOJI_SPLIT).forEach((part, i) => {
+                    if (!part) return;
+                    if (i % 2 === 1) {
+                        const span = document.createElement('span');
+                        span.className = 'emo';
+                        span.textContent = part;
+                        frag.appendChild(span);
+                    } else {
+                        frag.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.replaceWith(frag);
+            });
+        }
+        new MutationObserver(mutations => {
+            mutations.forEach(m => m.addedNodes.forEach(n => tintEmoji(n)));
+        }).observe(document.body, { childList: true, subtree: true });
+        tintEmoji(document.body);
 
         // ==================== 页面加载 ====================
         window.addEventListener('load', () => {
