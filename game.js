@@ -4571,10 +4571,13 @@
             notification.style.minWidth = '300px';
 
             // 统一UI：所有通知都显示关闭按钮
+            // 屏幕阅读器朗读区（aria-live）：同步一份纯文本
+            const liveRegion = document.getElementById('notificationLive');
+            if (liveRegion) liveRegion.textContent = String(message).replace(/<[^>]*>/g, ' ');
             notification.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px;">
                     <span>${message}</span>
-                    <button onclick="this.parentElement.parentElement.remove()" style="
+                    <button aria-label="关闭通知" onclick="this.parentElement.parentElement.remove()" style="
                         background: rgba(255,255,255,0.2);
                         border: none;
                         color: #fff;
@@ -5428,7 +5431,7 @@
                 html += `<div class="slot-card" onclick="openSlot(${n})">
                     <div class="slot-title">存档 ${n}</div>
                     ${info}
-                    <button class="slot-delete" onclick="event.stopPropagation(); deleteSlot(${n})" title="删除此存档">🗑</button>
+                    <button class="slot-delete" onclick="event.stopPropagation(); deleteSlot(${n})" title="删除此存档" aria-label="删除此存档">🗑</button>
                 </div>`;
             }
             box.innerHTML = html;
@@ -5980,6 +5983,32 @@
                 location.reload();
             }
         }
+
+        // ==================== 可访问性：可点击的卡片 / 标签也能用键盘操作 ====================
+        // 游戏里大量卡片是 <div onclick>：统一补上 role="button" 和 tabindex，Enter / 空格触发点击
+        const CLICKABLE_SELECTOR = '.action-item, .slot-card, .law-card, .item-slot, .shop-item, .mobile-tab-item, .logo, #breakThroughBtn';
+        function enhanceClickables(root = document) {
+            root.querySelectorAll(CLICKABLE_SELECTOR).forEach(el => {
+                if (el.tagName === 'BUTTON' || el.getAttribute('role')) return;
+                if (el.onclick || el.hasAttribute('onclick')) {
+                    el.setAttribute('role', 'button');
+                    el.tabIndex = 0;
+                }
+            });
+        }
+        document.addEventListener('keydown', e => {
+            if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[role="button"]')) {
+                e.preventDefault();
+                e.target.click();
+            }
+        });
+        let clickablePending = false;
+        new MutationObserver(mutations => {
+            if (clickablePending || !mutations.some(m => [...m.addedNodes].some(n => n.nodeType === 1))) return;
+            clickablePending = true;
+            requestAnimationFrame(() => { clickablePending = false; enhanceClickables(); });
+        }).observe(document.body, { childList: true, subtree: true });
+        enhanceClickables();
 
         // ==================== 页面加载 ====================
         window.addEventListener('load', () => {
