@@ -235,9 +235,7 @@
                         millet: { name: '种植灵米', desc: '食物', duration: 5, output: { items: [{ id: 'millet', qty: 1 }], skill: 'farming', exp: 10 }, requiredLevel: 1, unlocked: true },
                         grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 20 }, requiredLevel: 2, requires: { seed_cleangrass: 1 }, unlocked: false },
                         mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 70 }, requiredLevel: 5, requires: { seed_mushroom: 1 }, unlocked: false },
-                        spirit_fruit: { name: '种植灵果', desc: '中级材料 需灵果种子', duration: 120, output: { items: [{ id: 'spiritfruit', qty: 1 }], skill: 'farming', exp: 100 }, requiredLevel: 7, requires: { seed_spiritfruit: 1 }, unlocked: false },
                         tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 190 }, requiredLevel: 9, requires: { seed_tea: 1 }, unlocked: false },
-                        golden_grass: { name: '种植金灵草', desc: '高级材料 需金灵草种子', duration: 180, output: { items: [{ id: 'goldengrass', qty: 1 }], skill: 'farming', exp: 220 }, requiredLevel: 10, requires: { seed_goldengrass: 1 }, unlocked: false },
                         lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 12, requires: { seed_lotus: 1 }, unlocked: false }
                     },
                     actions: {}
@@ -272,6 +270,7 @@
                     exp: 0,
                     recipes: {
                         gather: { name: '凝聚丹火', desc: '从金丹中提取丹火', duration: 15, output: { items: [{ id: 'danhuo', qty: 1 }], skill: 'danhuo', exp: 30 }, requiredLevel: 1, unlocked: true },
+                        seed: { name: '培育丹火', desc: '以丹火种子培育，一次得到 4 份丹火（种子来自天劫之地）', duration: 20, output: { items: [{ id: 'danhuo', qty: 4 }], skill: 'danhuo', exp: 60 }, requiredLevel: 2, requires: { danhuo_seed: 1 }, unlocked: false },
                         temper: { name: '淬炼法器', desc: '用丹火强化装备', duration: 30, output: { items: [{ id: 'tempered_essence', qty: 1 }], skill: 'danhuo', exp: 90 }, requiredLevel: 3, requires: { danhuo: 3 }, unlocked: false },
                         golden_pill: { name: '炼制元婴丹', desc: '丹火 ×5 + 九叶莲 ×1 + 悟道茶 ×3（金丹圆满突破必需）', duration: 60, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'danhuo', exp: 300 }, requiredLevel: 6, requires: { danhuo: 5, lotus: 1, tea: 3 }, unlocked: false }
                     },
@@ -285,8 +284,8 @@
                     exp: 0,
                     recipes: {
                         gather: { name: '凝练神识', desc: '从元婴中提取神识', duration: 20, output: { items: [{ id: 'shenshi', qty: 1 }], skill: 'shenshi', exp: 40 }, requiredLevel: 1, unlocked: true },
-                        scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 120 }, requiredLevel: 3, requires: { shenshi: 2 }, unlocked: false },
-                        yuanying_pill: { name: '炼制元婴丹', desc: '元婴期突破辅助丹药', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'shenshi', exp: 300 }, requiredLevel: 6, requires: { shenshi: 8, tea: 5, lotus: 1 }, unlocked: false }
+                        seed: { name: '培育神识', desc: '以神识种子培育，一次得到 4 份神识（种子来自化神秘境）', duration: 25, output: { items: [{ id: 'shenshi', qty: 4 }], skill: 'shenshi', exp: 80 }, requiredLevel: 2, requires: { shenshi_seed: 1 }, unlocked: false },
+                        scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 120 }, requiredLevel: 3, requires: { shenshi: 2 }, unlocked: false }
                     },
                     actions: {}
                 }
@@ -350,8 +349,6 @@
                 immortalore: { name: '仙矿', icon: '✨', type: 'ore' },
 
                 // P6/P7 新作物
-                spiritfruit: { name: '灵果', icon: '🍎', type: 'material' },
-                goldengrass: { name: '金灵草', icon: '🌾', type: 'material' },
                 // 战斗食物（在炼丹中制作；在战斗中HP低于50%时自动食用）
                 millet_porridge: { name: '灵米粥', icon: '🍲', type: 'food', sellPrice: 20 },
                 herb_soup: { name: '灵草汤', icon: '🍜', type: 'food', sellPrice: 60 },
@@ -362,9 +359,7 @@
                 goldensword: { name: '金丹剑', icon: '🗡️', type: 'weapon', stats: { atk: 62 } },
                 goldenpendant: { name: '金丹佩', icon: '📿', type: 'jewelry', stats: { spd: 6, hp: 40 } },
                 yuanyingarmor: { name: '元婴法衣', icon: '🥋', type: 'armor', stats: { def: 45, hp: 120 } },
-                yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', stats: { spd: 10, hp: 80 } },
-                seed_spiritfruit: { name: '灵果种子', icon: '🌱', type: 'seed' },
-                seed_goldengrass: { name: '金灵草种子', icon: '🌿', type: 'seed' }
+                yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', stats: { spd: 10, hp: 80 } }
             },
             shop: {
                 upgrades: [
@@ -399,9 +394,6 @@
                     { id: 'fire_art', name: '焚天诀', icon: '🔥', price: 20000, desc: '修炼速度 ×1.8', minRealmIndex: 9, type: 'art' },
                     { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 30000, desc: '修炼速度 ×2.2', minRealmIndex: 11, type: 'art' },
                     { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' }
-                ],
-                special: [
-                    { id: 'clone_unlock', name: '分身解锁令', icon: '👥', price: 50000, desc: '分身系统尚未开放', minRealmIndex: 13, type: 'unlock' }
                 ]
             }
         };
@@ -544,10 +536,10 @@
             },
             forging: {
                 name: '炼器',
-                effectPer: 1,
+                effectPer: 0.5,
                 effectType: 'quality',
-                // 每级品质 +1%: 等级50 = 50%品质提升
-                formula: (level) => level
+                // 每级装备属性 +0.5%（对身上所有装备生效）: 等级21 = +10%
+                formula: (level) => 1 + (level - 1) * 0.005
             },
             farming: {
                 name: '灵田',
@@ -564,10 +556,10 @@
             },
             battle: {
                 name: '战斗',
-                effectPer: 2,
+                effectPer: 0.5,
                 effectType: 'damage',
-                // 每级伤害 +2%, 暴击 +0.5%
-                formula: (level) => 1 + (level - 1) * 0.02
+                // 每级伤害 +0.5%（普通战斗与秘境）
+                formula: (level) => 1 + (level - 1) * 0.005
             }
         };
 
@@ -790,6 +782,11 @@
         // P8 双向战斗系统：辅助函数
 
         // 计算玩家对怪物的伤害
+        // 战斗技能等级带来的伤害倍率（每级 +0.5%）
+        function getBattleSkillDmgMult() {
+            return SKILL_LEVEL_EFFECTS.battle.formula((gameState.skills.battle || {}).level || 1);
+        }
+
         function performPlayerAttack(monster) {
             const playerSPD = gameState.player.stats.spd || 50;
             const monsterSPD = monster.spd || 40;
@@ -810,6 +807,7 @@
                 let playerDmg = BATTLE_FORMULAS.calculateDamage({ atk: baseDmg }, { def: monster.def || 0 });
                 playerDmg = Math.floor(playerDmg * realmSuppression.dmgMod);
                 playerDmg = Math.floor(playerDmg * counterModifier.damage);
+                playerDmg = Math.floor(playerDmg * getBattleSkillDmgMult());   // 战斗技能等级加成
                 // 暴击（基础5%、×1.5，灵根/功法可提高）
                 const isCrit = Math.random() < BASE_CRIT.rate + getMod('crit');
                 if (isCrit) playerDmg = Math.floor(playerDmg * (BASE_CRIT.dmg + getMod('critDmg')));
@@ -1414,7 +1412,7 @@
 
                 const toEnemy = rollNormalAttack(playerStats, enemy, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm),
                     { hit: getMod('hit'), crit: BASE_CRIT.rate + getMod('crit'), critMult: BASE_CRIT.dmg + getMod('critDmg'),
-                      dmgMult: 1 + getMasteryBonus('battle', battle.currentArea).dmg });
+                      dmgMult: (1 + getMasteryBonus('battle', battle.currentArea).dmg) * getBattleSkillDmgMult() });
                 if (toEnemy.hit) {
                     enemy.currentHP -= toEnemy.dmg;
                     battle.log.push(`玩家${toEnemy.crit ? '暴击！' : ''}造成${toEnemy.dmg}点伤害`);
@@ -2142,7 +2140,9 @@
             } else {
                 // 灵根/功法的耗时特效（下限30%，避免叠加后过快）
                 const timeMod = Math.max(0.3, 1 + getSkillMod('time', skill) + getMasteryBonus(skill, recipeKey).time);
-                return duration * gameState.workSpeedMultiplier * timeMod;
+                // 灵田等级：每级耗时 -1%（SKILL_LEVEL_EFFECTS.farming）
+                const levelMod = skill === 'farming' ? SKILL_LEVEL_EFFECTS.farming.formula((gameState.skills.farming || {}).level || 1) : 1;
+                return duration * gameState.workSpeedMultiplier * timeMod * levelMod;
             }
         }
 
@@ -2492,7 +2492,7 @@
             } else if (effect.effectType === 'quantity') {
                 return `产量 +${Math.floor(multiplier - 1)}`;
             } else if (effect.effectType === 'quality') {
-                return `品质 +${Math.floor(multiplier)}%`;
+                return `装备属性 +${parseFloat(((multiplier - 1) * 100).toFixed(1))}%`;
             } else if (effect.effectType === 'speed') {
                 const speedup = Math.round((1 - multiplier) * 100);
                 return `速度 +${speedup}%`;
@@ -4280,7 +4280,8 @@
             const weapon = gameState.player.equipment.weapon;
             const armor = gameState.player.equipment.armor;
             const jewelry = gameState.player.equipment.jewelry;
-            const temperMult = 1 + 0.1 * (gameState.player.temperLevel || 0);
+            // 淬炼 +10%/次，炼器等级 +0.5%/级（SKILL_LEVEL_EFFECTS.forging）
+            const temperMult = (1 + 0.1 * (gameState.player.temperLevel || 0)) * SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1);
 
             if (weapon && GAME_CONFIG.items[weapon]?.stats) {
                 Object.entries(GAME_CONFIG.items[weapon].stats).forEach(([stat, value]) => {
