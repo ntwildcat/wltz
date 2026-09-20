@@ -447,7 +447,7 @@
                 ],
                 equipment: [
                     { id: 'sword', name: '桃木剑', icon: '⚔️', price: 150, desc: '攻击力+15', minRealmIndex: 0 },
-                    { id: 'jade', name: '灵玉', icon: '📿', price: 80, desc: '工作速度-5%', minRealmIndex: 0 },
+                    { id: 'jade', name: '灵玉', icon: '📿', price: 80, desc: '工作速度 +5%（生活技能耗时 -5%，需装备）', minRealmIndex: 0 },
                     { id: 'ironarmor', name: '铁甲', icon: '🛡️', price: 300, desc: '防御力+10', minRealmIndex: 5 },
                     { id: 'spiritsword', name: '灵剑', icon: '⚡', price: 1000, desc: '攻击力+40', minRealmIndex: 8 },
                     { id: 'goldenarmor', name: '金丹法袍', icon: '👔', price: 3000, desc: '防御力+25', minRealmIndex: 9 },
@@ -806,7 +806,6 @@
             // 根据出身给予初始物品和功法
             if (origin === 'orphan') {
                 gameState.player.equipment.jewelry.push('jade');
-                gameState.workSpeedMultiplier = 0.95;
                 gameState.player.currentArt = 'basic_art';  // 分配基础功法
             } else if (origin === 'disciple') {
                 gameState.player.equipment.weapon = 'sword';
@@ -2633,7 +2632,19 @@
 
         // 计算调整后的行动持续时间
         // 修炼：仅受功法速度倍率 = duration ÷ speedMultiplier
-        // 其他技能：仅受工作速度倍率 = duration × workSpeedMultiplier
+        // 工作速度倍率：来自已装备物品的 effect.workSpeed（如灵玉 0.95 = 生活技能与悟道耗时 -5%），同一件只算一次
+        function getWorkSpeedMultiplier() {
+            const eq = gameState.player.equipment || {};
+            const ids = new Set([eq.weapon, eq.armor, ...(eq.jewelry || [])].filter(Boolean));
+            let mult = 1;
+            ids.forEach(id => {
+                const ws = GAME_CONFIG.items[id]?.effect?.workSpeed;
+                if (ws) mult *= ws;
+            });
+            return mult;
+        }
+
+        // 其他技能：仅受工作速度倍率 = duration × getWorkSpeedMultiplier()
         function getAdjustedDuration(skill, duration, recipeKey = null) {
             if (skill === 'cultivation') {
                 const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
@@ -2647,7 +2658,7 @@
                 const timeMod = Math.max(0.3, 1 + getSkillMod('time', skill) + getMasteryBonus(skill, recipeKey).time);
                 // 灵田等级：每级耗时 -1%（SKILL_LEVEL_EFFECTS.farming）
                 const levelMod = skill === 'farming' ? SKILL_LEVEL_EFFECTS.farming.formula((gameState.skills.farming || {}).level || 1) : 1;
-                return duration * gameState.workSpeedMultiplier * timeMod * levelMod;
+                return duration * getWorkSpeedMultiplier() * timeMod * levelMod;
             }
         }
 
@@ -3244,8 +3255,9 @@
         /**
          * 计算配方效率（产出/周期）
          */
-        function calculateRecipeEfficiency(skillName, recipe) {
-            const duration = recipe.duration || 1;
+        function calculateRecipeEfficiency(skillName, recipe, recipeKey = null) {
+            // 用调整后的耗时（含装备 / 功法 / 精通等全部加成），让卡片上的效率与实际一致
+            const duration = getAdjustedDuration(skillName, recipe.duration || 1, recipeKey) || 1;
 
             // 修炼：修为/秒
             if (recipe.output && recipe.output.cultivation) {
@@ -3339,7 +3351,11 @@
             const unlockState = getRecipeUnlockState(skillName, recipe);
 
             // 2. 计算效率
-            const efficiency = calculateRecipeEfficiency(skillName, recipe);
+            const efficiency = calculateRecipeEfficiency(skillName, recipe, recipeKey);
+            // 卡片显示实际耗时（含装备、功法、精通等加成）；与基础耗时不同时附上基础值
+            const adjDur = getAdjustedDuration(skillName, recipe.duration, recipeKey);
+            const fmt = v => parseFloat(v.toFixed(v < 10 ? 2 : 1));
+            const timeText = Math.abs(adjDur - recipe.duration) > 0.005 ? `${fmt(adjDur)}s <small style="color:#888">基础 ${recipe.duration}s</small>` : `${recipe.duration}s`;
 
             // 3. 检查材料充足度
             const materials = checkMaterialAvailability(recipe);
@@ -3405,7 +3421,7 @@
                     <span class="recipe-icon">${unlockState.unlocked ? '🟢' : '⭕'}</span>
                     <span class="recipe-name">${recipe.name}</span>
                 </div>
-                <div class="recipe-time">⏱ ${recipe.duration}s</div>
+                <div class="recipe-time">⏱ ${timeText}</div>
                 ${reqHtml}
                 ${masteryHtml}
                 ${cloneHtml}
@@ -3784,6 +3800,9 @@
 
             if (specialUsages[itemId]) {
                 usages.unshift(specialUsages[itemId]);
+            }
+            if (itemConfig.effect && itemConfig.effect.workSpeed) {
+                usages.unshift(`装备后工作速度 +${Math.round((1 / itemConfig.effect.workSpeed - 1) * 100)}%（生活技能与悟道耗时 -${Math.round((1 - itemConfig.effect.workSpeed) * 100)}%）`);
             }
             if (FOOD_CONFIG.foods[itemId]) {
                 const food = FOOD_CONFIG.foods[itemId];
@@ -5094,6 +5113,7 @@
             // 版本迁移函数：自动更新旧数据以支持新配方
             if (!gameState.version) gameState.version = 0;
             invalidateLawTotals();   // 读档 / 导入后重新计算悟道法则加成
+            gameState.workSpeedMultiplier = 1;   // 旧版把孤儿的 5% 存在这里且与灵玉脱钩；现在只由装备的灵玉提供（getWorkSpeedMultiplier）
             if (gameState.tutorialSeen === undefined) gameState.tutorialSeen = true;   // 已有存档的玩家不再自动弹出引导
 
             const currentVersion = 2;  // P4：属性系统重写 + 初始化BugFix
