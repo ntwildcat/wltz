@@ -846,18 +846,37 @@
 
         // ==================== 游戏Tick系统 ====================
         // ==================== 分身系统 ====================
-        // 元婴初期起自带一个分身：主角之外并行做一件生活技能配方（不能修炼 / 战斗，不能与主角做同一个配方）。
+        // 元婴初期起自带第 1 个分身，化神初期起有第 2 个：主角之外并行做生活技能配方（不能修炼 / 战斗），
+        // 且任意两个行动（主角与各分身）不能做同一个配方。
         // 分身耗时 = 主角调整后耗时 × getCloneFactor()（基础 1.6，神识每级 -0.01，最低 1.2）；
         // 共用背包与材料，享受精通 / 特效等全部加成；离线也会结算。
-        const CLONE_UNLOCK_REALM = 13;   // 元婴初期
+        const CLONE_UNLOCK_REALMS = [13, 17];   // 第 1、2 个分身的解锁境界：元婴初期、化神初期
 
-        function isCloneUnlocked() {
-            return gameState.player.realmIndex >= CLONE_UNLOCK_REALM;
+        function getCloneSlotCount() {
+            return CLONE_UNLOCK_REALMS.filter(r => gameState.player.realmIndex >= r).length;
         }
 
-        function getClone() {
-            if (!gameState.clone) gameState.clone = { action: null, progress: 0 };
-            return gameState.clone;
+        function isCloneUnlocked() {
+            return getCloneSlotCount() > 0;
+        }
+
+        // 全部分身槽（数组恒有 CLONE_UNLOCK_REALMS.length 项，只有前 getCloneSlotCount() 个已解锁）；兼容 v6.2 的单分身存档
+        function getClones() {
+            if (!gameState.clones) {
+                gameState.clones = gameState.clone ? [gameState.clone] : [];
+                delete gameState.clone;
+            }
+            while (gameState.clones.length < CLONE_UNLOCK_REALMS.length) gameState.clones.push({ action: null, progress: 0 });
+            return gameState.clones;
+        }
+
+        function activeClones() {
+            return getClones().slice(0, getCloneSlotCount());
+        }
+
+        // 哪个分身槽在做这个配方（没有返回 -1）
+        function findCloneFor(skill, key) {
+            return activeClones().findIndex(c => c.action && c.action.skill === skill && c.action.action === key);
         }
 
         function getCloneFactor() {
@@ -876,8 +895,8 @@
             });
         }
 
-        // 让分身开始做某个配方
-        function assignClone(skill, key) {
+        // 让分身开始做某个配方（不指定槽位时用第一个空闲的分身）
+        function assignClone(skill, key, slot = null) {
             if (!isCloneUnlocked()) { showNotification('🔒 分身要到元婴初期才会出现', '#f59e0b'); return; }
             if (!LIFE_SKILLS.includes(skill)) { showNotification('分身只能做生活技能的配方', '#f59e0b'); return; }
             const recipe = getAction(skill, key);
@@ -887,47 +906,52 @@
                 showNotification('主角正在做这个配方，分身不能重复（请让分身做别的）', '#f59e0b');
                 return;
             }
+            if (findCloneFor(skill, key) >= 0) { showNotification('已有分身在做这个配方，不能重复', '#f59e0b'); return; }
             if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#ef4444', 'error'); return; }
-            const c = getClone();
+            const clones = activeClones();
+            if (slot === null) slot = clones.findIndex(c => !c.action);
+            if (slot < 0) { showNotification('分身都在忙，请先停止一个', '#f59e0b'); return; }
+            const c = clones[slot];
             const prev = c.action;
             c.action = { skill, action: key };
             c.progress = 0;
-            showNotification(`🌀 分身开始：${recipe.name}`, '#c9a961');
+            showNotification(`🌀 分身${slot + 1}开始：${recipe.name}`, '#c9a961');
             if (prev && prev.skill !== skill) generateRecipeList(prev.skill);
             generateRecipeList(skill);
             renderCloneBar();
             saveGame();
         }
 
-        function stopClone(silent = false) {
-            const c = getClone();
+        function stopClone(slot = 0, silent = false) {
+            const c = getClones()[slot];
+            if (!c) return;
             const prev = c.action;
             c.action = null;
             c.progress = 0;
-            if (!silent) showNotification('🌀 分身已停止', '#c9a961');
+            if (!silent && prev) showNotification(`🌀 分身${slot + 1}已停止`, '#c9a961');
             if (prev) generateRecipeList(prev.skill);
             renderCloneBar();
         }
 
-        // 每个游戏 tick（0.1 秒）推进分身的行动
+        // 每个游戏 tick（0.1 秒）推进每个分身的行动
         function tickClone() {
-            if (!isCloneUnlocked()) return;
-            const c = getClone();
-            if (!c.action) return;
-            const action = getAction(c.action.skill, c.action.action);
-            if (!action || !action.output) { stopClone(true); return; }
-            if (!cloneHasMaterials(action)) {
-                showNotification(`🌀 分身：${action.name}所需材料不足，已停止`, '#ef4444', 'error');
-                stopClone(true);
-                return;
-            }
-            c.progress += 0.1;
-            const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
-            if (c.progress >= duration) {
-                completeAction(c.action);
-                c.progress = 0;
-            }
-            tickCloneBar(duration);
+            activeClones().forEach((c, slot) => {
+                if (!c.action) return;
+                const action = getAction(c.action.skill, c.action.action);
+                if (!action || !action.output) { stopClone(slot, true); return; }
+                if (!cloneHasMaterials(action)) {
+                    showNotification(`🌀 分身${slot + 1}：${action.name}所需材料不足，已停止`, '#ef4444', 'error');
+                    stopClone(slot, true);
+                    return;
+                }
+                c.progress += 0.1;
+                const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
+                if (c.progress >= duration) {
+                    completeAction(c.action);
+                    c.progress = 0;
+                }
+                tickCloneBar(slot, duration);
+            });
         }
 
         // 分身状态条：整体重绘（分配 / 停止 / 解锁时）
@@ -936,25 +960,26 @@
             if (!bar) return;
             if (!isCloneUnlocked()) { bar.style.display = 'none'; return; }
             bar.style.display = 'block';
-            const c = getClone();
-            const action = c.action ? getAction(c.action.skill, c.action.action) : null;
             const factor = getCloneFactor();
-            if (action) {
-                bar.innerHTML = `<div class="clone-bar-top"><span>🌀 分身：<b>${action.name}</b></span><span id="cloneRemain"></span>
-                    <button class="btn btn-secondary clone-stop" onclick="stopClone()">停止</button></div>
-                    <div class="progress-bar" style="height: 6px;"><div id="cloneFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div>`;
-            } else {
-                bar.innerHTML = `<div class="clone-bar-top"><span>🌀 分身空闲</span><span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span></div>`;
-            }
+            const rows = activeClones().map((c, slot) => {
+                const action = c.action ? getAction(c.action.skill, c.action.action) : null;
+                if (action) {
+                    return `<div class="clone-row"><div class="clone-bar-top"><span>🌀 分身${slot + 1}：<b>${action.name}</b></span><span id="cloneRemain${slot}"></span>
+                        <button class="btn btn-secondary clone-stop" onclick="stopClone(${slot})">停止</button></div>
+                        <div class="progress-bar" style="height: 6px;"><div id="cloneFill${slot}" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div>`;
+                }
+                return `<div class="clone-row"><div class="clone-bar-top"><span>🌀 分身${slot + 1}空闲</span>${slot === 0 ? `<span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span>` : ''}</div></div>`;
+            });
+            bar.innerHTML = rows.join('');
         }
 
         // 分身状态条：每 tick 只更新进度
-        function tickCloneBar(duration) {
-            const c = getClone();
+        function tickCloneBar(slot, duration) {
+            const c = getClones()[slot];
             const pct = Math.min(100, (c.progress / duration) * 100);
-            const fill = document.getElementById('cloneFill');
+            const fill = document.getElementById('cloneFill' + slot);
             if (fill) fill.style.width = pct + '%';
-            const remain = document.getElementById('cloneRemain');
+            const remain = document.getElementById('cloneRemain' + slot);
             if (remain) remain.textContent = Math.max(0, duration - c.progress).toFixed(1) + 's';
             const card = document.getElementById('action-' + c.action.skill + '-' + c.action.action);
             const cardFill = card && card.querySelector('.action-progress-fill');
@@ -964,7 +989,11 @@
         // 分身离线结算：与主角的离线规则一致（材料限制、节省材料、产出翻倍、技能 / 精通经验），耗时按分身倍率
         function settleCloneOffline(offlineSeconds) {
             if (!isCloneUnlocked() || !(offlineSeconds >= 1)) return;
-            const c = getClone();
+            activeClones().forEach((c, slot) => settleOneClone(c, slot, offlineSeconds));
+            renderCloneBar();
+        }
+
+        function settleOneClone(c, slot, offlineSeconds) {
             if (!c.action) return;
             const { skill, action: key } = c.action;
             const action = getAction(skill, key);
@@ -996,12 +1025,10 @@
                 });
                 if (per.skill && per.exp) addSkillExp(per.skill, per.exp * n, key);
                 addMasteryExp(skill, key, action.duration * n);
-                showNotification(`🌀 分身离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
+                showNotification(`🌀 分身${slot + 1}离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
             }
-            if (ranOut) c.action = null;
+            if (ranOut) { c.action = null; generateRecipeList(skill); }
             c.progress = 0;
-            renderCloneBar();
-            if (!c.action) generateRecipeList(skill);
         }
 
         function startGameTick() {
@@ -3179,11 +3206,11 @@
             // 分身（元婴初期起）：把这个配方交给分身做
             let cloneHtml = '';
             if (LIFE_SKILLS.includes(skillName) && unlockState.unlocked && isCloneUnlocked()) {
-                const ca = getClone().action;
-                const cloneHere = ca && ca.skill === skillName && ca.action === recipeKey;
+                const cloneSlot = findCloneFor(skillName, recipeKey);
+                const cloneHere = cloneSlot >= 0;
                 if (cloneHere) className += ' clone-active';
                 cloneHtml = cloneHere
-                    ? `<button class="clone-btn on" onclick="event.stopPropagation(); stopClone()">🌀 分身进行中 · 点击停止</button>`
+                    ? `<button class="clone-btn on" onclick="event.stopPropagation(); stopClone(${cloneSlot})">🌀 分身${cloneSlot + 1}进行中 · 点击停止</button>`
                     : `<button class="clone-btn" onclick="event.stopPropagation(); assignClone('${skillName}', '${recipeKey}')">🌀 交给分身</button>`;
                 card.className = className;
             }
@@ -3382,8 +3409,7 @@
             }
 
             // 分身正在做的配方，主角不能重复做
-            const cloneAct = isCloneUnlocked() ? getClone().action : null;
-            if (cloneAct && cloneAct.skill === skill && cloneAct.action === action) {
+            if (isCloneUnlocked() && findCloneFor(skill, action) >= 0) {
                 showNotification('分身正在做这个配方，主角不能重复（请让分身停下或选别的配方）', '#f59e0b');
                 return;
             }
@@ -4106,7 +4132,11 @@
 
         // ==================== UI更新 ====================
         function updateUI() {
-            if (isCloneUnlocked() && !gameState.cloneUnlockNotified) {
+            if (getCloneSlotCount() >= 2 && !gameState.cloneUnlockNotified2) {
+                gameState.cloneUnlockNotified2 = true;
+                gameState.cloneUnlockNotified = true;
+                showNotification('🌀 化神境界——第二个分身解锁！现在可以同时让两个分身做事', '#c9a961');
+            } else if (isCloneUnlocked() && !gameState.cloneUnlockNotified) {
                 gameState.cloneUnlockNotified = true;
                 showNotification('🌀 元婴出窍——分身解锁！它能在生活技能里与你并行做事（配方卡片上点「交给分身」）', '#c9a961');
             }
