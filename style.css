@@ -1335,6 +1335,22 @@ flex: 0 0 auto !important;
 min-width: 0 !important;
     }
 
+    /* 名字过长时截断为省略号（最多占一行的 35%），境界不换行 */
+    .player-info .info-item:first-child {
+flex: 0 1 auto !important;
+max-width: 35% !important;
+    }
+
+    .player-info .info-value {
+white-space: nowrap !important;
+overflow: hidden !important;
+text-overflow: ellipsis !important;
+    }
+
+    .player-info .progress-bar {
+min-width: 80px !important;
+    }
+
     /* 修为进度占满剩余宽度 */
     .player-info .info-item:last-child {
 flex: 1 1 auto !important;

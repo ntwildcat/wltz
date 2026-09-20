@@ -3886,7 +3886,9 @@
         }
 
         function updatePlayerInfo() {
-            document.getElementById('playerNameDisplay').textContent = gameState.player.name || '-';
+            const nameEl = document.getElementById('playerNameDisplay');
+            nameEl.textContent = gameState.player.name || '-';
+            nameEl.title = gameState.player.name || '';   // 名字被截断时可悬停查看全名
             const realm = GAME_CONFIG.realms[gameState.player.realmIndex];
             document.getElementById('realmDisplay').textContent = realm.name;
             document.getElementById('nextBreakthrough').textContent = realm.nextReq;
