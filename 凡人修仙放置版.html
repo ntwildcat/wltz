@@ -17,7 +17,7 @@
             .skill-list { grid-template-columns: 1fr !important; }
         }
 
-        /* ========== 瀛椾綋瀹氫箟 ========== */
+        /* ========== 字体定义 ========== */
         /* @font-face {
             font-family: 'Ma Shan Zheng';
             src: url('fonts/MaShanZheng-Regular.woff2') format('woff2');
@@ -40,46 +40,46 @@
             font-display: swap;
         } */
 
-        /* ========== CSS 鍙橀噺绯荤粺 ========== */
+        /* ========== CSS 变量系统 ========== */
         :root {
-            /* 瀛椾綋鏍?*/
+            
             --font-title: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', serif;
             --font-body: 'STSong', 'Songti SC', 'SimSun', serif;
             --font-mono: 'Courier New', 'Consolas', monospace;
 
-            /* ========== 鑹插僵绯荤粺锛氭按澧ㄤ慨浠?========== */
-            /* L1锛氭繁搴曪紙5灞傝儗鏅級 */
-            --bg-l1: rgba(10, 12, 25, 0.95);      /* 鏈€娣卞簳 */
-            --bg-l2: rgba(25, 30, 50, 0.85);      /* 娣卞簳 */
+            /* --- */
+            
+            --bg-l1: rgba(10, 12, 25, 0.95);      /* 深底 */
+            --bg-l2: rgba(25, 30, 50, 0.85);      /* 深底 */
             --bg-l3: rgba(40, 45, 70, 0.75);      /* 涓簳 */
-            --bg-l4: rgba(50, 55, 80, 0.6);       /* 娴呭簳 */
-            --bg-l5: rgba(60, 65, 90, 0.5);       /* 鏈€娴呭簳 */
+            --bg-l4: rgba(50, 55, 80, 0.6);       /* 浅底 */
+            --bg-l5: rgba(60, 65, 90, 0.5);       /* 浅底 */
 
-            /* L1锛氳竟妗嗭紙4灞傦級 */
-            --border-l1: #c9a961;                 /* 鍙ら摐閲?*/
-            --border-l2: #6fa980;                 /* 闈掔帀 */
+            /* L1：边框（4层） */
+            --border-l1: #c9a961;                 
+            --border-l2: #6fa980;                 /* 青玉 */
             --border-l3: #8b7355;                 /* 鏆楁 */
-            --border-l4: #4a4a4a;                 /* 鐏?*/
+            --border-l4: #4a4a4a;                 
 
-            /* L2锛氭枃瀛楋紙4灞傦級 */
-            --text-l1: #e8d4b0;                   /* 閲戣壊锛圚1鏍囬锛?*/
-            --text-l2: #c9a961;                   /* 鍙ら摐锛圚2鏍囬锛?*/
-            --text-l3: #9ca69f;                   /* 鐏扮豢锛堟鏂囷級 */
-            --text-l4: #7a8274;                   /* 娣辩豢锛堣緟鍔╋級 */
+            /* L2：文字（4层） */
+            --text-l1: #e8d4b0;                   
+            --text-l2: #c9a961;                   
+            --text-l3: #9ca69f;                   
+            --text-l4: #7a8274;                   /* 深绿（辅助） */
 
-            /* 鐘舵€佽壊 */
+            /* 状色 */
             --color-hp: #2ecc71;                  /* HP缁?*/
-            --color-warning: #f39c12;             /* 璀﹀憡姗?*/
-            --color-danger: #e74c3c;              /* 鍗遍櫓绾?*/
-            --color-success: #27ae60;             /* 鎴愬姛娣辩豢 */
+            --color-warning: #f39c12;             
+            --color-danger: #e74c3c;              
+            --color-success: #27ae60;             /* 成功深绿 */
 
-            /* HP娓愬彉锛堜粠婊″埌绌猴級*/
+            /* HP渐变（从满到空）*/
             --hp-full: #2ecc71;
             --hp-high: #3498db;
             --hp-mid: #f39c12;
             --hp-low: #e74c3c;
 
-            /* 闃村奖鍜屽彂鍏?*/
+            
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
             --shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
@@ -87,7 +87,7 @@
             --glow-jade: 0 0 12px rgba(111,169,128,0.3);
             --glow-danger: 0 0 12px rgba(231,76,60,0.3);
 
-            /* 闂磋窛 */
+            /* 间距 */
             --spacing-xs: 4px;
             --spacing-sm: 8px;
             --spacing-md: 12px;
@@ -124,7 +124,7 @@
             height: 100vh;
         }
 
-        /* ========== 渚ц竟瀵艰埅鏍?========== */
+        /* --- */
         .sidebar {
             width: 80px;
             background: var(--bg-l1);
@@ -286,7 +286,7 @@
             font-weight: bold;
         }
 
-        /* ========== 涓诲唴瀹瑰尯 ========== */
+        /* ========== 主内容区 ========== */
         .main-content {
             flex: 1;
             display: flex;
@@ -361,7 +361,7 @@
             font-weight: bold;
         }
 
-        /* ========== 闈㈡澘鍖哄煙 ========== */
+        /* ========== 面板区域 ========== */
         .panel-container {
             display: grid;
             grid-template-columns: 1fr 350px;
@@ -715,7 +715,7 @@
             color: #fff;
         }
 
-        /* ========== 渚ц竟鏍忛潰鏉?========== */
+        /* --- */
         .side-panel {
             background: var(--bg-l2);
             border: 2px solid var(--border-l1);
@@ -862,7 +862,7 @@
             color: var(--text-l1);
         }
 
-        /* ========== 瑙掕壊鍒涘缓 ========== */
+        /* ========== 角色创建 ========== */
         .create-form {
             display: grid;
             gap: var(--spacing-lg);
@@ -895,7 +895,7 @@
             box-shadow: var(--glow-gold);
         }
 
-        /* ========== 鍏朵粬 ========== */
+        /* ========== 其他 ========== */
         .hidden {
             display: none !important;
         }
@@ -1028,7 +1028,7 @@
             }
         }
 
-        /* ==================== P1-1 鎴樻枟UI绯荤粺 ==================== */
+        /* ==================== P1-1 战斗UI系统 ==================== */
 
         .battle-container {
             display: flex;
@@ -1288,7 +1288,7 @@
         }
     
 
-/* ===== 鎵嬫満绔?UI 瀹屽叏閲嶈锛堝簳閮?Tab 鏂规锛?===== */
+
 @media (max-width: 768px) {
     /* 鍏ㄥ眬 */
     html, body {
@@ -1300,19 +1300,19 @@
         max-width: 100% !important;
     }
 
-    /* 涓诲鍣細鏀逛负绾靛悜 */
+    
     .container {
         flex-direction: column !important;
         height: 100vh !important;
         width: 100vw !important;
     }
 
-    /* 闅愯棌宸︿晶 sidebar */
+    /* 隐藏左侧 sidebar */
     .sidebar {
         display: none !important;
     }
 
-    /* 涓诲唴瀹瑰尯锛氬叏瀹斤紝搴曢儴鐣欑┖闂寸粰 Tab */
+    /* 主内容区：全宽，底部留空间给 Tab */
     .main-content {
         flex: 1 !important;
         width: 100vw !important;
@@ -1322,7 +1322,7 @@
         overflow-x: hidden !important;
     }
 
-    /* 澶撮儴淇℃伅绾靛悜鎺掑垪 */
+    /* 头部信息纵向排列 */
     .header {
         flex-direction: column !important;
         gap: 8px !important;
@@ -1336,24 +1336,24 @@
         align-items: flex-start !important;
     }
 
-    /* 闈㈡澘鍗曞垪 */
+    /* 面板单列 */
     .panel-container {
         grid-template-columns: 1fr !important;
         gap: 10px !important;
     }
 
-    /* 闈㈡澘鑷€傚簲 */
+    
     .main-panel, .side-panel {
         width: 100% !important;
         max-width: 100% !important;
     }
 
-    /* 鎶€鑳?琛屽姩鍒楄〃鍗曞垪 */
+    
     .skill-list, .action-list {
         grid-template-columns: 1fr !important;
     }
 
-    /* 澧炲ぇ瑙︽懜鐩爣 */
+    
     .action-item {
         min-height: 50px !important;
         padding: 12px !important;
@@ -1363,7 +1363,7 @@
         font-size: 16px !important;
     }
 
-    /* 闃叉瀛愬厓绱犳孩鍑?*/
+    
     .action-list, .skill-list {
         min-width: 0 !important;
     }
@@ -1372,7 +1372,7 @@
     }
 }
 
-/* 搴曢儴 Tab 鏍忥紙鍙湪鎵嬫満鏄剧ず锛?*/
+
 @media (max-width: 768px) {
     .mobile-bottom-tabs {
         position: fixed !important;
@@ -1414,7 +1414,7 @@
     }
 }
 
-/* 妗岄潰绔殣钘忓簳閮?Tab */
+
 @media (min-width: 769px) {
     .mobile-bottom-tabs {
         display: none !important;
@@ -4341,6 +4341,16 @@
                 `;
             });
         }
+
+        // 手机没有悬停：点击精通池 / 技能里程碑 / 配方精通区域时，把 title 提示内容以通知形式显示
+        document.addEventListener('click', e => {
+            if (e.target.closest('.infuse-btn')) return;
+            const el = e.target.closest('.skill-pool, .recipe-mastery');
+            if (!el || !el.title) return;
+            const text = el.title.replace(/&#10;/g, '\n');
+            e.stopPropagation();   // 点精通区域只看说明，不触发配方卡片的开始行动
+            showNotification(text, '#c9a961');
+        }, true);
 
         // 增加技能经验并处理升级，在线结算与离线结算共用
         function addSkillExp(skillName, exp, recipeKey = null) {
