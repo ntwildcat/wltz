@@ -3626,6 +3626,33 @@
             }
         }
 
+        // 战斗区域奖励说明：每场灵石 / 经验（含该区域精通加成）；战斗区域目前没有物品掉落
+        function areaRewardHtml(areaKey, action) {
+            const a = action.areaData;
+            const bonus = 1 + getMasteryBonus('battle', areaKey).reward;
+            const enemies = (BATTLE_ENEMY_CONFIGS[areaKey] || []).map(e => `${e.icon || ''}${e.name}`).join('、');
+            return `<div class="area-reward">
+                    <div>敌人：${enemies || '—'}</div>
+                    <div>每场奖励：💎 ${Math.round(a.coins * bonus)} 灵石 · ${Math.round(a.exp * bonus)} 战斗经验${bonus > 1 ? '（含精通加成）' : ''}</div>
+                    <div class="area-drops">掉落物：无（只获得灵石与经验）</div>
+                </div>`;
+        }
+
+        // 秘境奖励说明：固定掉落、随机掉落（含概率）、灵石与经验
+        function dungeonDropHtml(dungeon) {
+            const name = id => (GAME_CONFIG.items[id] || {}).name || id;
+            const qty = q => Array.isArray(q) ? (q[0] === q[1] ? q[0] : `${q[0]}–${q[1]}`) : q;
+            const r = dungeon.rewards || {};
+            const fixed = (r.fixed || []).map(d => `${name(d.id)}×${qty(d.qty)}（必掉）`);
+            const random = (r.random || []).map(d => `${name(d.id)}×${qty(d.qty)}（${Math.round((d.probability || 1) * 100)}%）`);
+            const coins = Array.isArray(r.coins) ? `${r.coins[0]}–${r.coins[1]} 灵石` : (r.coins ? `${r.coins} 灵石` : '');
+            const list = fixed.concat(random);
+            return `<div class="area-reward">
+                    <div class="area-drops">通关掉落：${list.length ? list.join('、') : '无物品'}</div>
+                    <div>另有：${coins}${r.skillExp ? ' · ' + r.skillExp + ' 战斗经验' : ''}（每只怪物还会掉灵石）</div>
+                </div>`;
+        }
+
         function generateBattleList() {
             const skill = gameState.skills.battle;
             const actionList = document.getElementById('battleActions');
@@ -3678,17 +3705,6 @@
                 div.className = className;
                 div.id = 'action-battle-' + key;
 
-                // 使用新的克制系统显示信息
-                // 这里假设战斗区域的敌人类型是'metal'，实际可能需要从action中获取
-                const battleEnemyType = 'metal'; // 或从真实敌人数据获取
-                const counterMod = COUNTER_SYSTEM.getCounterModifier(gameState.player.spiritRoot, battleEnemyType);
-                let boosted = '';
-                if (counterMod.damage > 1.0) {
-                    boosted = ' ⚡克制'; // 克制敌人
-                } else if (counterMod.damage < 1.0) {
-                    boosted = ' ⚠️被克'; // 被敌人克制
-                }
-
                 // 不可用提示
                 let statusHint = '';
                 if (isDisabled) {
@@ -3697,9 +3713,9 @@
 
                 div.innerHTML = `
                     <div>
-                        <div class="action-name">${action.name}${boosted}</div>
+                        <div class="action-name">${action.name}</div>
                         <div class="action-desc">${action.desc}</div>
-                        <div style="font-size: 0.75em; color: #c2a25f; margin-top: 3px;">克制倍数: ${counterMod.damage.toFixed(1)}×</div>
+                        ${areaRewardHtml(key, action)}
                         <div class="recipe-req ${isDisabled ? 'unmet' : 'met'}">${isDisabled ? '✗' : '✓'} 境界要求：${getRealmName(action.areaData.minLevel)}</div>
                         ${isDisabled ? '' : (() => { const m = getMasteryInfo('battle', key); return `<div class="recipe-mastery" title="${describeMastery('battle', key)}">🎓 精通 <b>Lv.${m.level}</b>${m.maxed ? ' ✦满级' : ` · ${m.exp}/${m.need}`}<div class="mastery-track"><div class="mastery-fill" style="width: ${m.percent}%"></div></div></div>`; })()}
                         ${statusHint}
@@ -4454,7 +4470,8 @@
                         <div style="flex: 1;">
                             <div style="font-weight: bold; color: #c2a25f;">${dungeon.name}</div>
                             <div style="font-size: 0.85em; color: #aaa;">${dungeon.desc}</div>
-                            <div style="font-size: 0.75em; color: ${statusColor}; margin-top: 4px;">${statusText}</div>
+                            <div style="font-size: 0.75em; color: ${statusColor}; margin-top: 4px;">${statusText} · 入口：${requiredRealmName}</div>
+                            ${dungeonDropHtml(dungeon)}
                         </div>
                     </div>
                 `;
