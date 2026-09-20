@@ -554,6 +554,13 @@
                 effectType: 'output',
                 formula: (level) => 1 + (level - 1) * 0.02
             },
+            shenshi: {
+                name: '神识',
+                effectPer: 1,
+                effectType: 'clone',
+                // 分身做事的耗时倍率：基础 ×1.6，神识每级 -0.01，最低 ×1.2（41 级达到）
+                formula: (level) => Math.max(1.2, 1.6 - (level - 1) * 0.01)
+            },
             battle: {
                 name: '战斗',
                 effectPer: 0.5,
@@ -768,8 +775,168 @@
         }
 
         // ==================== 游戏Tick系统 ====================
-        function startGameTick() {
-            tickInterval = setInterval(() => {
+        // ==================== 分身系统 ====================
+        // 元婴初期起自带一个分身：主角之外并行做一件生活技能配方（不能修炼 / 战斗，不能与主角做同一个配方）。
+        // 分身耗时 = 主角调整后耗时 × getCloneFactor()（基础 1.6，神识每级 -0.01，最低 1.2）；
+        // 共用背包与材料，享受精通 / 特效等全部加成；离线也会结算。
+        const CLONE_UNLOCK_REALM = 13;   // 元婴初期
+
+        function isCloneUnlocked() {
+            return gameState.player.realmIndex >= CLONE_UNLOCK_REALM;
+        }
+
+        function getClone() {
+            if (!gameState.clone) gameState.clone = { action: null, progress: 0 };
+            return gameState.clone;
+        }
+
+        function getCloneFactor() {
+            return SKILL_LEVEL_EFFECTS.shenshi.formula((gameState.skills.shenshi || {}).level || 1);
+        }
+
+        function getCloneDuration(skill, duration, key) {
+            return getAdjustedDuration(skill, duration, key) * getCloneFactor();
+        }
+
+        function cloneHasMaterials(action) {
+            if (!action.requires) return true;
+            return Object.entries(action.requires).every(([itemId, qty]) => {
+                const inv = gameState.player.inventory.find(i => i.id === itemId);
+                return inv && inv.qty >= qty;
+            });
+        }
+
+        // 让分身开始做某个配方
+        function assignClone(skill, key) {
+            if (!isCloneUnlocked()) { showNotification('🔒 分身要到元婴初期才会出现', '#f59e0b'); return; }
+            if (!LIFE_SKILLS.includes(skill)) { showNotification('分身只能做生活技能的配方', '#f59e0b'); return; }
+            const recipe = getAction(skill, key);
+            if (!recipe || !getRecipeUnlockState(skill, recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#f59e0b'); return; }
+            const main = gameState.currentAction;
+            if (main && main.skill === skill && main.action === key) {
+                showNotification('主角正在做这个配方，分身不能重复（请让分身做别的）', '#f59e0b');
+                return;
+            }
+            if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#ef4444', 'error'); return; }
+            const c = getClone();
+            const prev = c.action;
+            c.action = { skill, action: key };
+            c.progress = 0;
+            showNotification(`🌀 分身开始：${recipe.name}`, '#c9a961');
+            if (prev && prev.skill !== skill) generateRecipeList(prev.skill);
+            generateRecipeList(skill);
+            renderCloneBar();
+            saveGame();
+        }
+
+        function stopClone(silent = false) {
+            const c = getClone();
+            const prev = c.action;
+            c.action = null;
+            c.progress = 0;
+            if (!silent) showNotification('🌀 分身已停止', '#c9a961');
+            if (prev) generateRecipeList(prev.skill);
+            renderCloneBar();
+        }
+
+        // 每个游戏 tick（0.1 秒）推进分身的行动
+        function tickClone() {
+            if (!isCloneUnlocked()) return;
+            const c = getClone();
+            if (!c.action) return;
+            const action = getAction(c.action.skill, c.action.action);
+            if (!action || !action.output) { stopClone(true); return; }
+            if (!cloneHasMaterials(action)) {
+                showNotification(`🌀 分身：${action.name}所需材料不足，已停止`, '#ef4444', 'error');
+                stopClone(true);
+                return;
+            }
+            c.progress += 0.1;
+            const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
+            if (c.progress >= duration) {
+                completeAction(c.action);
+                c.progress = 0;
+            }
+            tickCloneBar(duration);
+        }
+
+        // 分身状态条：整体重绘（分配 / 停止 / 解锁时）
+        function renderCloneBar() {
+            const bar = document.getElementById('cloneBar');
+            if (!bar) return;
+            if (!isCloneUnlocked()) { bar.style.display = 'none'; return; }
+            bar.style.display = 'block';
+            const c = getClone();
+            const action = c.action ? getAction(c.action.skill, c.action.action) : null;
+            const factor = getCloneFactor();
+            if (action) {
+                bar.innerHTML = `<div class="clone-bar-top"><span>🌀 分身：<b>${action.name}</b></span><span id="cloneRemain"></span>
+                    <button class="btn btn-secondary clone-stop" onclick="stopClone()">停止</button></div>
+                    <div class="progress-bar" style="height: 6px;"><div id="cloneFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div>`;
+            } else {
+                bar.innerHTML = `<div class="clone-bar-top"><span>🌀 分身空闲</span><span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span></div>`;
+            }
+        }
+
+        // 分身状态条：每 tick 只更新进度
+        function tickCloneBar(duration) {
+            const c = getClone();
+            const pct = Math.min(100, (c.progress / duration) * 100);
+            const fill = document.getElementById('cloneFill');
+            if (fill) fill.style.width = pct + '%';
+            const remain = document.getElementById('cloneRemain');
+            if (remain) remain.textContent = Math.max(0, duration - c.progress).toFixed(1) + 's';
+            const card = document.getElementById('action-' + c.action.skill + '-' + c.action.action);
+            const cardFill = card && card.querySelector('.action-progress-fill');
+            if (cardFill) cardFill.style.width = pct + '%';
+        }
+
+        // 分身离线结算：与主角的离线规则一致（材料限制、节省材料、产出翻倍、技能 / 精通经验），耗时按分身倍率
+        function settleCloneOffline(offlineSeconds) {
+            if (!isCloneUnlocked() || !(offlineSeconds >= 1)) return;
+            const c = getClone();
+            if (!c.action) return;
+            const { skill, action: key } = c.action;
+            const action = getAction(skill, key);
+            if (!action || !action.output) { c.action = null; return; }
+            const budget = Math.min(offlineSeconds, (gameState.settings?.maxOfflineHours || 24) * 3600);
+            const duration = getCloneDuration(skill, action.duration, key);
+            if (!(duration > 0)) return;
+            let n = Math.floor(budget / duration);
+            let ranOut = false;
+            if (action.requires) {
+                Object.entries(action.requires).forEach(([itemId, qty]) => {
+                    const owned = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
+                    const affordable = Math.floor(owned / qty);
+                    if (affordable < n) { n = affordable; ranOut = true; }
+                });
+                const saveRate = Math.min(0.9, getSkillMod('save', skill) + getMasteryBonus(skill, key).save);
+                Object.entries(action.requires).forEach(([itemId, qty]) => {
+                    if (n > 0) consumeItem(itemId, Math.round(qty * n * (1 - saveRate)));
+                });
+            }
+            if (n > 0) {
+                const per = JSON.parse(JSON.stringify(action.output));
+                applySkillLevelBonus(skill, per);
+                const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double;
+                gameState.player.coins += (per.coins || 0) * n;
+                (per.items || []).forEach(item => {
+                    const qty = Math.floor(item.qty * n * (1 + doubleRate) + 1e-9);
+                    if (qty > 0) addToInventory(item.id, qty);
+                });
+                if (per.skill && per.exp) addSkillExp(per.skill, per.exp * n, key);
+                addMasteryExp(skill, key, action.duration * n);
+                showNotification(`🌀 分身离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
+            }
+            if (ranOut) c.action = null;
+            c.progress = 0;
+            renderCloneBar();
+            if (!c.action) generateRecipeList(skill);
+        }
+
+        function startGameTick() {
+            tickInterval = setInterval(() => {
+                tickClone();
                 if (!gameState.currentAction) return;
 
                 // 秘境战斗特殊处理
@@ -2429,14 +2596,14 @@
             }
         }
 
-        function completeAction() {
-            const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
+        function completeAction(act = gameState.currentAction) {
+            const action = getAction(act.skill, act.action);
             if (!action.output) return;
 
             // 消耗所需的材料（P2功能 - 材料消耗）；灵根/功法的「节省材料」特效有概率整次不消耗
-            const actionKey = gameState.currentAction.action;
-            const mastery = getMasteryBonus(gameState.currentAction.skill, actionKey);
-            const saveMaterials = action.requires && Math.random() < getSkillMod('save', gameState.currentAction.skill) + mastery.save;
+            const actionKey = act.action;
+            const mastery = getMasteryBonus(act.skill, actionKey);
+            const saveMaterials = action.requires && Math.random() < getSkillMod('save', act.skill) + mastery.save;
             if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980');
             if (action.requires && !saveMaterials) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
@@ -2453,10 +2620,10 @@
             let finalOutput = JSON.parse(JSON.stringify(action.output));
 
             // 应用技能等级效果
-            applySkillLevelBonus(gameState.currentAction.skill, finalOutput);
+            applySkillLevelBonus(act.skill, finalOutput);
 
             // 战斗特殊处理（掉落）
-            if (gameState.currentAction.skill === 'battle') {
+            if (act.skill === 'battle') {
                 const areaData = action.areaData;
 
                 // 战斗掉落：根据地区难度产出矿石
@@ -2477,7 +2644,7 @@
             }
 
             // 灵根/功法的「产出翻倍」特效
-            if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', gameState.currentAction.skill) + mastery.double) {
+            if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', act.skill) + mastery.double) {
                 finalOutput.items.forEach(item => { item.qty *= 2; });
                 showNotification('✨ 产出翻倍！', '#6fa980');
             }
@@ -2498,8 +2665,8 @@
             }
 
             // 配方精通经验（生活技能）
-            if (LIFE_SKILLS.includes(gameState.currentAction.skill)) {
-                addMasteryExp(gameState.currentAction.skill, actionKey, action.duration);
+            if (LIFE_SKILLS.includes(act.skill)) {
+                addMasteryExp(act.skill, actionKey, action.duration);
             }
 
             // 如果有修为产出（修炼/战斗）
@@ -2544,6 +2711,8 @@
             } else if (effect.effectType === 'damage') {
                 const percentage = Math.round((multiplier - 1) * 100);
                 return `伤害 +${percentage}%`;
+            } else if (effect.effectType === 'clone') {
+                return `分身耗时 ×${multiplier.toFixed(2)}`;
             }
             return '';
         }
@@ -2916,6 +3085,18 @@
                 </div>`;
             }
 
+            // 分身（元婴初期起）：把这个配方交给分身做
+            let cloneHtml = '';
+            if (LIFE_SKILLS.includes(skillName) && unlockState.unlocked && isCloneUnlocked()) {
+                const ca = getClone().action;
+                const cloneHere = ca && ca.skill === skillName && ca.action === recipeKey;
+                if (cloneHere) className += ' clone-active';
+                cloneHtml = cloneHere
+                    ? `<button class="clone-btn on" onclick="event.stopPropagation(); stopClone()">🌀 分身进行中 · 点击停止</button>`
+                    : `<button class="clone-btn" onclick="event.stopPropagation(); assignClone('${skillName}', '${recipeKey}')">🌀 交给分身</button>`;
+                card.className = className;
+            }
+
             card.innerHTML = `
                 <div class="recipe-header">
                     <span class="recipe-icon">${unlockState.unlocked ? '🟢' : '⭕'}</span>
@@ -2924,6 +3105,7 @@
                 <div class="recipe-time">⏱ ${recipe.duration}s</div>
                 ${reqHtml}
                 ${masteryHtml}
+                ${cloneHtml}
                 <div class="recipe-output">${outputStr}</div>
                 ${materialsHtml}
                 ${efficiencyStr}
@@ -3106,6 +3288,13 @@
                     showNotification(`🔒 ${actionObj.name}需要等级 ${actionObj.requiredLevel}（当前 ${currentLevel}）`, '#f59e0b', 'normal');
                     return;
                 }
+            }
+
+            // 分身正在做的配方，主角不能重复做
+            const cloneAct = isCloneUnlocked() ? getClone().action : null;
+            if (cloneAct && cloneAct.skill === skill && cloneAct.action === action) {
+                showNotification('分身正在做这个配方，主角不能重复（请让分身停下或选别的配方）', '#f59e0b');
+                return;
             }
 
             if (gameState.currentAction) {
@@ -3814,6 +4003,11 @@
 
         // ==================== UI更新 ====================
         function updateUI() {
+            if (isCloneUnlocked() && !gameState.cloneUnlockNotified) {
+                gameState.cloneUnlockNotified = true;
+                showNotification('🌀 元婴出窍——分身解锁！它能在生活技能里与你并行做事（配方卡片上点「交给分身」）', '#c9a961');
+            }
+            renderCloneBar();
             updatePlayerInfo();
             updateProgressBars();
             updateInventory();
@@ -4810,6 +5004,9 @@
             const lastActive = gameState.lastActiveTime;
             const offlineSeconds = (now - lastActive) / 1000;
 
+            // 分身的离线结算（与主角行动无关，先结算）
+            settleCloneOffline(offlineSeconds);
+
             // 战斗/秘境无法在离线时进行，重新打开页面时战斗界面已丢失，直接中断
             const savedAction = gameState.currentAction;
 
@@ -5280,6 +5477,7 @@
                 if (autoBattling && (Date.now() - gameState.lastActiveTime) >= 10000) {
                     handleOfflineTime(60);   // 自动战斗托管：后台期间按离线规则模拟战斗
                 } else if (action && (action.isBattle || action.isDungeon)) {
+                    settleCloneOffline((Date.now() - gameState.lastActiveTime) / 1000);   // 主角在战斗时，分身仍按离线结算
                     gameState.lastActiveTime = Date.now();
                 } else {
                     handleOfflineTime(60);
