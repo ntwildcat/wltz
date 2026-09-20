@@ -650,6 +650,45 @@
         let tickInterval = null;
 
         // ==================== 初始化和启动 ====================
+        // ==================== 新手引导 ====================
+        // 简短的玩法介绍：新角色创建后自动弹出一次，设置面板里可随时重看
+        const TUTORIAL_STEPS = [
+            { title: '🌄 欢迎来到凡人修仙', body: `你从一个凡人起步，目标是一步步修炼、突破境界，成为一方强者。<br/><br/>
+                这是一款<b>放置游戏</b>：点一个行动，它就会自动重复进行；<b>离开游戏也会继续</b>（默认最多结算 24 小时），回来时领取收益。` },
+            { title: '🧘 修炼与突破', body: `<b>修炼</b>获得修为，修为满了就可以<b>突破</b>到更高境界，属性会大幅提升，也会解锁新的配方、战斗区域和秘境。<br/><br/>
+                部分大境界的突破需要材料（筑基丹、金丹秘药、元婴丹），可以靠<b>炼丹</b>或<b>秘境掉落</b>获得——留意突破界面里的提示。` },
+            { title: '🔨 生活技能', body: `<b>采矿、灵田</b>产出材料，<b>炼丹、炼器</b>用材料制作丹药、食物和装备，后期还有<b>丹火、神识</b>。配方按技能等级解锁。<br/><br/>
+                每个配方做得越多，<b>🎓 精通</b>等级越高，会带来翻倍、省材料、缩短耗时等加成；把鼠标悬停（手机上点一下）可以看到详情。` },
+            { title: '⚔️ 战斗', body: `进入<b>战斗区域</b>打怪，获得灵石和经验，区域随境界解锁。战斗时生命低会自动吃你装备的<b>食物</b>（在炼丹里制作，背包里设为战斗食物）。<br/><br/>
+                <b>🤖 自动战斗</b>可以让你打完自动续战，离线也会继续。<b>秘境</b>是一次性挑战，掉落种子和突破材料，但失败会有损失，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
+            { title: '🏪 商城与小提示', body: `用灵石在<b>商城</b>买装备、材料、食物和功法；功法和灵根都有各自的特效，可以在修炼面板切换功法。<br/><br/>
+                💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份。这个介绍可以在<b>设置 → 玩法介绍</b>里随时重看。祝你道途顺遂！` }
+        ];
+        let tutorialStep = 0;
+
+        function showTutorial(step = 0) {
+            tutorialStep = Math.max(0, Math.min(TUTORIAL_STEPS.length - 1, step));
+            const t = TUTORIAL_STEPS[tutorialStep];
+            const last = tutorialStep === TUTORIAL_STEPS.length - 1;
+            document.getElementById('tutorialContent').innerHTML = `
+                <div class="tutorial-title">${t.title}</div>
+                <div class="tutorial-body">${t.body}</div>
+                <div class="tutorial-dots">${TUTORIAL_STEPS.map((_, i) => `<i class="${i === tutorialStep ? 'on' : ''}"></i>`).join('')}</div>
+                <div class="tutorial-actions">
+                    ${tutorialStep > 0 ? '<button class="btn" onclick="showTutorial(tutorialStep - 1)">上一步</button>' : '<button class="btn tutorial-skip" onclick="closeTutorial()">跳过</button>'}
+                    ${last ? '<button class="btn" onclick="closeTutorial()">开始修仙</button>' : '<button class="btn" onclick="showTutorial(tutorialStep + 1)">下一步</button>'}
+                </div>`;
+            document.getElementById('tutorialModal').classList.add('show');
+        }
+
+        function closeTutorial() {
+            document.getElementById('tutorialModal').classList.remove('show');
+            if (gameState && !gameState.tutorialSeen) {
+                gameState.tutorialSeen = true;
+                saveGame();
+            }
+        }
+
         function startGame() {
             const name = document.getElementById('playerName').value.trim();
             const origin = document.getElementById('playerOrigin').value;
@@ -703,10 +742,14 @@
             gameRunning = true;
 
             // 立即保存游戏（确保新创建的角色不会丢失）
+            gameState.tutorialSeen = false;
             saveGame();
 
             // 自动保存（每30秒）
             startAutoSave();
+
+            // 新手引导（只对新创建的角色自动弹出）
+            setTimeout(() => showTutorial(0), 300);
         }
 
         // 自动保存定时器只保留一个（重开新游戏时不会叠加）
@@ -4527,6 +4570,7 @@
         function migrateGameData() {
             // 版本迁移函数：自动更新旧数据以支持新配方
             if (!gameState.version) gameState.version = 0;
+            if (gameState.tutorialSeen === undefined) gameState.tutorialSeen = true;   // 已有存档的玩家不再自动弹出引导
 
             const currentVersion = 2;  // P4：属性系统重写 + 初始化BugFix
 
