@@ -438,7 +438,8 @@
             shop: {
                 upgrades: [
                     { id: 'inventory_slot', name: '背包扩展', icon: '📦', price: 100, desc: '+5格容量', type: 'upgrade', bought: false },
-                    { id: 'farming_slot', name: '灵田槽位', icon: '🌾', price: 500, desc: '+1种植槽', type: 'upgrade', bought: false }
+                    { id: 'farming_slot', name: '灵田槽位', icon: '🌾', price: 500, desc: '+1种植槽', type: 'upgrade', bought: false },
+                    { id: 'jewelry_slot2', name: '第二饰品栏位', icon: '💍', price: 8000, desc: '解锁第二个饰品栏位（可同时佩戴两件不同的饰品）', minRealmIndex: 9, type: 'upgrade', bought: false }
                 ],
                 food: [
                     { id: 'millet', name: '灵米', icon: '🌾', price: 10, desc: '普通食物' },
@@ -447,7 +448,6 @@
                 ],
                 equipment: [
                     { id: 'sword', name: '桃木剑', icon: '⚔️', price: 150, desc: '攻击力+15', minRealmIndex: 0 },
-                    { id: 'jade', name: '灵玉', icon: '📿', price: 80, desc: '工作速度-5%', minRealmIndex: 0 },
                     { id: 'ironarmor', name: '铁甲', icon: '🛡️', price: 300, desc: '防御力+10', minRealmIndex: 5 },
                     { id: 'spiritsword', name: '灵剑', icon: '⚡', price: 1000, desc: '攻击力+40', minRealmIndex: 8 },
                     { id: 'goldenarmor', name: '金丹法袍', icon: '👔', price: 3000, desc: '防御力+25', minRealmIndex: 9 },
@@ -806,7 +806,6 @@
             // 根据出身给予初始物品和功法
             if (origin === 'orphan') {
                 gameState.player.equipment.jewelry.push('jade');
-                gameState.workSpeedMultiplier = 0.95;
                 gameState.player.currentArt = 'basic_art';  // 分配基础功法
             } else if (origin === 'disciple') {
                 gameState.player.equipment.weapon = 'sword';
@@ -838,6 +837,7 @@
 
             // 立即保存游戏（确保新创建的角色不会丢失）
             gameState.tutorialSeen = false;
+            gameState.equipSlotsV2 = true;   // 新角色本来就是装备栏与背包分开，不需要迁移
             saveGame();
             updateSlotLabel();
 
@@ -2633,7 +2633,19 @@
 
         // 计算调整后的行动持续时间
         // 修炼：仅受功法速度倍率 = duration ÷ speedMultiplier
-        // 其他技能：仅受工作速度倍率 = duration × workSpeedMultiplier
+        // 工作速度倍率：来自已装备物品的 effect.workSpeed（如灵玉 0.95 = 生活技能与悟道耗时 -5%），同一件只算一次
+        function getWorkSpeedMultiplier() {
+            const eq = gameState.player.equipment || {};
+            const ids = new Set([eq.weapon, eq.armor, ...(eq.jewelry || [])].filter(Boolean));
+            let mult = 1;
+            ids.forEach(id => {
+                const ws = GAME_CONFIG.items[id]?.effect?.workSpeed;
+                if (ws) mult *= ws;
+            });
+            return mult;
+        }
+
+        // 其他技能：仅受工作速度倍率 = duration × getWorkSpeedMultiplier()
         function getAdjustedDuration(skill, duration, recipeKey = null) {
             if (skill === 'cultivation') {
                 const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
@@ -2647,7 +2659,7 @@
                 const timeMod = Math.max(0.3, 1 + getSkillMod('time', skill) + getMasteryBonus(skill, recipeKey).time);
                 // 灵田等级：每级耗时 -1%（SKILL_LEVEL_EFFECTS.farming）
                 const levelMod = skill === 'farming' ? SKILL_LEVEL_EFFECTS.farming.formula((gameState.skills.farming || {}).level || 1) : 1;
-                return duration * gameState.workSpeedMultiplier * timeMod * levelMod;
+                return duration * getWorkSpeedMultiplier() * timeMod * levelMod;
             }
         }
 
@@ -3078,6 +3090,8 @@
                 updateShop();
             } else if (panelName === 'inventory') {
                 updateInventory();
+            } else if (panelName === 'equipment') {
+                renderEquipmentPanel();
             } else if (panelName === 'settings') {
                 loadSettingsPanel();
             }
@@ -3145,10 +3159,16 @@
                 btn.onclick = () => switchPanel(skillName);
                 bar.appendChild(btn);
             });
+            // 手机顶部栏最前面的「装备」入口（放在最前，免得被挤到横向滚动的看不见处）
+            const eqBtn = document.createElement('button');
+            eqBtn.className = 'mobile-skill-btn' + (current === 'equipment' ? ' active' : '');
+            eqBtn.textContent = '🎽 装备';
+            eqBtn.onclick = () => switchPanel('equipment');
+            bar.insertBefore(eqBtn, bar.firstChild);
         }
 
         function syncMobileTab(panelName) {
-            const tabName = ['battle', 'shop', 'settings', 'inventory'].includes(panelName) ? panelName : 'cultivation';
+            const tabName = panelName === 'equipment' ? 'inventory' : (['battle', 'shop', 'settings', 'inventory'].includes(panelName) ? panelName : 'cultivation');
             document.querySelectorAll('.mobile-tab-item').forEach(tab => {
                 tab.classList.toggle('active', tab.dataset.tab === tabName);
             });
@@ -3244,8 +3264,9 @@
         /**
          * 计算配方效率（产出/周期）
          */
-        function calculateRecipeEfficiency(skillName, recipe) {
-            const duration = recipe.duration || 1;
+        function calculateRecipeEfficiency(skillName, recipe, recipeKey = null) {
+            // 用调整后的耗时（含装备 / 功法 / 精通等全部加成），让卡片上的效率与实际一致
+            const duration = getAdjustedDuration(skillName, recipe.duration || 1, recipeKey) || 1;
 
             // 修炼：修为/秒
             if (recipe.output && recipe.output.cultivation) {
@@ -3339,7 +3360,11 @@
             const unlockState = getRecipeUnlockState(skillName, recipe);
 
             // 2. 计算效率
-            const efficiency = calculateRecipeEfficiency(skillName, recipe);
+            const efficiency = calculateRecipeEfficiency(skillName, recipe, recipeKey);
+            // 卡片显示实际耗时（含装备、功法、精通等加成）；与基础耗时不同时附上基础值
+            const adjDur = getAdjustedDuration(skillName, recipe.duration, recipeKey);
+            const fmt = v => parseFloat(v.toFixed(v < 10 ? 2 : 1));
+            const timeText = Math.abs(adjDur - recipe.duration) > 0.005 ? `${fmt(adjDur)}s <small style="color:#888">基础 ${recipe.duration}s</small>` : `${recipe.duration}s`;
 
             // 3. 检查材料充足度
             const materials = checkMaterialAvailability(recipe);
@@ -3375,6 +3400,10 @@
             const reqHtml = `<div class="recipe-req ${unlockState.unlocked ? 'met' : 'unmet'}">${unlockState.unlocked ? '✓' : '✗'} ${reqText}</div>`;
 
             const outputStr = formatRecipeOutput(recipe.output || {});
+            // 产出是装备时直接显示属性，方便对比
+            const outEquip = ((recipe.output && recipe.output.items) || []).find(i => isEquipmentItem(i.id));
+            const equipStatsHtml = outEquip
+                ? `<div class="recipe-equip-stats" title="${GAME_CONFIG.items[outEquip.id].name}">${GAME_CONFIG.items[outEquip.id].icon} ${formatItemStats(outEquip.id)}</div>` : '';
             const efficiencyStr = efficiency > 0 ? `<div class="recipe-efficiency">效率: ${efficiency.toFixed(2)}/秒</div>` : '';
 
             // 配方精通（生活技能）：等级、进度条，悬停显示具体加成
@@ -3405,11 +3434,12 @@
                     <span class="recipe-icon">${unlockState.unlocked ? '🟢' : '⭕'}</span>
                     <span class="recipe-name">${recipe.name}</span>
                 </div>
-                <div class="recipe-time">⏱ ${recipe.duration}s</div>
+                <div class="recipe-time">⏱ ${timeText}</div>
                 ${reqHtml}
                 ${masteryHtml}
                 ${cloneHtml}
                 <div class="recipe-output">${outputStr}</div>
+                ${equipStatsHtml}
                 ${materialsHtml}
                 ${efficiencyStr}
                 ${lockHintHtml}
@@ -3785,6 +3815,12 @@
             if (specialUsages[itemId]) {
                 usages.unshift(specialUsages[itemId]);
             }
+            if (isEquipmentItem(itemId)) {
+                usages.unshift(`<b style="color:#22c55e">装备属性：${formatItemStats(itemId) || '无'}</b>`);
+            }
+            if (itemConfig.effect && itemConfig.effect.workSpeed) {
+                usages.unshift(`装备后工作速度 +${Math.round((1 / itemConfig.effect.workSpeed - 1) * 100)}%（生活技能与悟道耗时 -${Math.round((1 - itemConfig.effect.workSpeed) * 100)}%）`);
+            }
             if (FOOD_CONFIG.foods[itemId]) {
                 const food = FOOD_CONFIG.foods[itemId];
                 usages.unshift(`恢复${food.hpRestore}点生命 · 冷却${food.cooldown}秒 · 需要${getRealmName(food.minRealm)}`);
@@ -3794,31 +3830,10 @@
                 usageText = usages.join('<br/>');
             }
 
-            // P2功能：装备对比显示
+            // 装备对比：武器 / 护甲显示换上后的属性变化
             let comparisonHTML = '';
-            if (itemConfig.stats) {
-                const eq = gameState.player.equipment;
-                const currentEquip = itemConfig.type === 'weapon' ? eq.weapon
-                    : itemConfig.type === 'armor' ? eq.armor
-                    : eq.jewelry?.includes(itemId) ? itemId : null;
-
-                if (currentEquip && currentEquip !== itemId) {
-                    const currentStats = GAME_CONFIG.items[currentEquip]?.stats || {};
-                    comparisonHTML = '<div style="margin-top: 10px; padding: 10px; background: rgba(22,163,74,0.1); border-radius: 5px;"><strong>属性对比：</strong><br/>';
-
-                    Object.entries(itemConfig.stats).forEach(([stat, value]) => {
-                        const currentValue = currentStats[stat] || 0;
-                        const diff = value - currentValue;
-                        if (diff !== 0) {
-                            const color = diff > 0 ? '#22c55e' : '#ef4444';
-                            const sign = diff > 0 ? '+' : '';
-                            comparisonHTML += `<span style="color: ${color};">${stat}: ${sign}${diff}</span><br/>`;
-                        }
-                    });
-                    comparisonHTML += '</div>';
-                } else if (currentEquip === itemId) {
-                    comparisonHTML = '<div style="margin-top: 10px; color: #fbbf24;"><strong>已装备</strong></div>';
-                }
+            if (itemConfig.stats && (itemConfig.type === 'weapon' || itemConfig.type === 'armor')) {
+                comparisonHTML = '<div style="margin-top: 10px; padding: 10px; background: rgba(22,163,74,0.1); border-radius: 5px;"><strong>与当前装备对比：</strong><br/>' + describeEquipDiff(itemId) + '</div>';
             }
 
             // P3优化：添加物品类别说明
@@ -3846,7 +3861,7 @@
             const actionBtn = document.getElementById('itemActionBtn');
             if (actionBtn) {
                 if (itemConfig.type === 'weapon' || itemConfig.type === 'armor' || itemConfig.type === 'jewelry') {
-                    actionBtn.textContent = isItemEquipped(itemId) ? '卸下' : '装备';
+                    actionBtn.textContent = '装备';
                     actionBtn.style.display = 'block';
                     actionBtn.dataset.itemId = itemId;
                     actionBtn.dataset.itemType = itemConfig.type;
@@ -3872,16 +3887,23 @@
 
             const sellBtn = document.getElementById('itemSellBtn');
             const sellAllBtn = document.getElementById('itemSellAllBtn');
+            const qtyRow = document.getElementById('itemSellQtyRow');
             if (sellBtn && sellAllBtn) {
                 const sellable = getSellableQty(itemId);
                 if (itemConfig.sellPrice && sellable > 0) {
-                    sellBtn.textContent = `出售1个 (+${itemConfig.sellPrice})`;
+                    const input = document.getElementById('itemSellQty');
+                    input.max = sellable;
+                    input.value = 1;
+                    input.dataset.itemId = itemId;
+                    if (qtyRow) qtyRow.style.display = sellable > 1 ? 'flex' : 'none';
                     sellBtn.dataset.itemId = itemId;
                     sellBtn.style.display = 'block';
                     sellAllBtn.textContent = `全部出售 (+${itemConfig.sellPrice * sellable})`;
                     sellAllBtn.dataset.itemId = itemId;
                     sellAllBtn.style.display = sellable > 1 ? 'block' : 'none';
+                    updateSellQtyLabel();
                 } else {
+                    if (qtyRow) qtyRow.style.display = 'none';
                     sellBtn.style.display = 'none';
                     sellAllBtn.style.display = 'none';
                 }
@@ -3905,17 +3927,35 @@
         // 可出售数量：装备中的物品要留下1件
         function getSellableQty(itemId) {
             const inv = gameState.player.inventory.find(i => i.id === itemId);
-            if (!inv) return 0;
-            const eq = gameState.player.equipment;
-            const equipped = eq.weapon === itemId || eq.armor === itemId || (eq.jewelry || []).includes(itemId);
-            return equipped ? Math.max(0, inv.qty - 1) : inv.qty;
+            return inv ? inv.qty : 0;   // 装备与背包已分开，已装备的不在背包里
+        }
+
+        // 出售数量选择：+ / − / 最大 / 直接输入，按钮文字实时显示数量和收入
+        function changeSellQty(delta) {
+            const input = document.getElementById('itemSellQty');
+            const max = parseInt(input.max, 10) || 1;
+            const cur = parseInt(input.value, 10) || 1;
+            input.value = delta === 'max' ? max : Math.max(1, Math.min(max, cur + delta));
+            updateSellQtyLabel();
+        }
+
+        function updateSellQtyLabel() {
+            const input = document.getElementById('itemSellQty');
+            const sellBtn = document.getElementById('itemSellBtn');
+            const cfg = GAME_CONFIG.items[input.dataset.itemId];
+            if (!cfg || !sellBtn) return;
+            const max = parseInt(input.max, 10) || 1;
+            let q = parseInt(input.value, 10) || 1;
+            q = Math.max(1, Math.min(max, q));
+            sellBtn.textContent = `出售${q}个 (+${cfg.sellPrice * q})`;
         }
 
         function sellItem(all) {
             const itemId = document.getElementById(all ? 'itemSellAllBtn' : 'itemSellBtn').dataset.itemId;
             const itemConfig = GAME_CONFIG.items[itemId];
             if (!itemConfig || !itemConfig.sellPrice) return;
-            const qty = all ? getSellableQty(itemId) : Math.min(1, getSellableQty(itemId));
+            const sellable = getSellableQty(itemId);
+            const qty = all ? sellable : Math.max(1, Math.min(sellable, parseInt(document.getElementById('itemSellQty').value, 10) || 1));
             if (qty <= 0 || !consumeItem(itemId, qty)) return;
             const gain = itemConfig.sellPrice * qty;
             gameState.player.coins += gain;
@@ -3930,6 +3970,165 @@
             }
         }
 
+        // ==================== 装备系统 ====================
+        // 装备栏与背包分开：装备 = 把物品从背包挪到装备栏，卸下 = 放回背包，换装备时旧的自动回背包。
+        // 武器、护甲各 1 件；饰品初始 1 个栏位，商城购买「第二饰品栏位」（金丹初期起）后有 2 个，同名饰品不能重复佩戴。
+        const STAT_LABELS = { hp: '生命', atk: '攻击', def: '防御', spd: '速度' };
+        const EQUIP_TYPES = ['weapon', 'armor', 'jewelry'];
+        const EQUIP_TYPE_NAMES = { weapon: '武器', armor: '护甲', jewelry: '饰品' };
+
+        function isEquipmentItem(itemId) {
+            const cfg = GAME_CONFIG.items[itemId];
+            return !!cfg && EQUIP_TYPES.includes(cfg.type);
+        }
+
+        // 装备属性文字，如「攻击+40 · 生命+30」，带特殊效果（如灵玉的工作速度）
+        function formatItemStats(itemId) {
+            const cfg = GAME_CONFIG.items[itemId];
+            if (!cfg) return '';
+            const parts = [];
+            if (cfg.stats) Object.entries(cfg.stats).forEach(([k, v]) => parts.push(`${STAT_LABELS[k] || k}+${v}`));
+            if (cfg.effect && cfg.effect.workSpeed) parts.push(`工作速度 +${Math.round((1 / cfg.effect.workSpeed - 1) * 100)}%`);
+            return parts.join(' · ');
+        }
+
+        function getJewelrySlots() {
+            return 1 + ((gameState.player.boughtUpgrades || []).includes('jewelry_slot2') ? 1 : 0);
+        }
+
+        function equipAfterChange() {
+            calculateStats();
+            updateUI();
+            saveGame();
+            renderEquipmentPanel();
+        }
+
+        // 从背包装备（武器 / 护甲：替换并把旧的放回背包；饰品：需要有空栏位）
+        function equipFromBag(itemId) {
+            const cfg = GAME_CONFIG.items[itemId];
+            if (!cfg || !EQUIP_TYPES.includes(cfg.type)) return false;
+            const inv = gameState.player.inventory.find(i => i.id === itemId);
+            if (!inv || inv.qty < 1) { showNotification('背包里没有这件装备', '#f59e0b'); return false; }
+            const eq = gameState.player.equipment;
+            if (cfg.type === 'jewelry') {
+                if ((eq.jewelry || []).includes(itemId)) { showNotification('已经佩戴同名饰品，不能重复', '#f59e0b'); return false; }
+                if ((eq.jewelry || []).length >= getJewelrySlots()) {
+                    showNotification(getJewelrySlots() < 2 ? '饰品栏位已满，请先卸下（第二饰品栏位可在商城购买）' : '饰品栏位已满，请先卸下一件', '#f59e0b');
+                    return false;
+                }
+                consumeItem(itemId, 1);
+                eq.jewelry.push(itemId);
+            } else {
+                const old = eq[cfg.type];
+                consumeItem(itemId, 1);
+                eq[cfg.type] = itemId;
+                if (old && !addToInventory(old)) {
+                    // 背包放不下旧装备：回滚
+                    eq[cfg.type] = old;
+                    addToInventory(itemId, 1);
+                    return false;
+                }
+            }
+            showNotification(`已装备${cfg.name}`, '#16a34a');
+            equipAfterChange();
+            return true;
+        }
+
+        // 卸下装备放回背包（背包满则失败）
+        function unequipItem(kind, itemId) {
+            const eq = gameState.player.equipment;
+            const cfg = GAME_CONFIG.items[itemId];
+            if (!cfg) return false;
+            if (kind === 'jewelry' ? !(eq.jewelry || []).includes(itemId) : eq[kind] !== itemId) return false;
+            if (!addToInventory(itemId, 1)) return false;
+            if (kind === 'jewelry') eq.jewelry = eq.jewelry.filter(id => id !== itemId);
+            else eq[kind] = null;
+            showNotification(`已卸下${cfg.name}`, '#16a34a');
+            equipAfterChange();
+            return true;
+        }
+
+        // 换上 candidate 相对当前同槽装备的属性变化（武器 / 护甲），返回带颜色的 HTML；饰品直接显示属性
+        function describeEquipDiff(itemId) {
+            const cfg = GAME_CONFIG.items[itemId];
+            const eq = gameState.player.equipment;
+            if (cfg.type === 'jewelry') return '';
+            const cur = GAME_CONFIG.items[eq[cfg.type]]?.stats || {};
+            const keys = new Set([...Object.keys(cfg.stats || {}), ...Object.keys(cur)]);
+            const out = [];
+            keys.forEach(k => {
+                const d = ((cfg.stats || {})[k] || 0) - (cur[k] || 0);
+                if (d) out.push(`<span style="color:${d > 0 ? '#22c55e' : '#ef4444'}">${STAT_LABELS[k] || k}${d > 0 ? '+' : ''}${d}</span>`);
+            });
+            return out.length ? `（换上后 ${out.join(' ')}）` : '（属性相同）';
+        }
+
+        // 装备界面：三类装备栏 + 总属性 + 背包里可换的装备
+        function renderEquipmentPanel() {
+            const box = document.getElementById('equipmentContent');
+            if (!box) return;
+            const eq = gameState.player.equipment;
+            const stats = gameState.player.stats;
+            const slotCard = (kind, itemId, label) => {
+                if (!itemId) return `<div class="equip-slot empty"><div class="equip-slot-label">${label}</div><div class="equip-slot-empty">— 空 —</div></div>`;
+                const cfg = GAME_CONFIG.items[itemId];
+                return `<div class="equip-slot"><div class="equip-slot-label">${label}</div>
+                    <div class="equip-slot-name">${cfg.icon} ${cfg.name}</div>
+                    <div class="equip-slot-stats">${formatItemStats(itemId) || '无属性'}</div>
+                    <button class="btn btn-secondary equip-btn" onclick="unequipItem('${kind}', '${itemId}')">卸下</button></div>`;
+            };
+            let slots = slotCard('weapon', eq.weapon, '⚔️ 武器') + slotCard('armor', eq.armor, '🛡️ 护甲');
+            const jSlots = getJewelrySlots();
+            for (let i = 0; i < jSlots; i++) slots += slotCard('jewelry', (eq.jewelry || [])[i], `📿 饰品${jSlots > 1 ? i + 1 : ''}`);
+            if (jSlots < 2) {
+                const canBuy = gameState.player.realmIndex >= 9;
+                slots += `<div class="equip-slot locked"><div class="equip-slot-label">📿 饰品2</div>
+                    <div class="equip-slot-empty">🔒 第二饰品栏位</div>
+                    <div class="equip-slot-stats">${canBuy ? '可在商城购买（8000灵石）' : '金丹初期后可在商城购买'}</div>
+                    ${canBuy ? `<button class="btn btn-secondary equip-btn" onclick="switchPanel('shop')">去商城</button>` : ''}</div>`;
+            }
+            const temper = gameState.player.temperLevel || 0;
+            const forgeBonus = parseFloat(((SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1) - 1) * 100).toFixed(1));
+            const summary = `<div class="equip-summary">
+                <span>❤️ 生命 ${stats.hp.max}</span><span>⚔️ 攻击 ${stats.atk}</span><span>🛡️ 防御 ${stats.def}</span><span>💨 速度 ${stats.spd}</span>
+                <div class="equip-summary-sub">装备加成：淬炼 ${temper}/3（装备属性 +${temper * 10}%）${forgeBonus > 0 ? ` · 炼器等级（装备属性 +${forgeBonus}%）` : ''}</div></div>`;
+            // 背包里的装备
+            const bagItems = gameState.player.inventory.filter(i => isEquipmentItem(i.id));
+            let bag = '';
+            EQUIP_TYPES.forEach(type => {
+                const list = bagItems.filter(i => GAME_CONFIG.items[i.id].type === type);
+                if (!list.length) return;
+                bag += `<div class="equip-bag-title">${EQUIP_TYPE_NAMES[type]}（背包中）</div>` + list.map(i => {
+                    const cfg = GAME_CONFIG.items[i.id];
+                    return `<div class="equip-bag-row"><span class="equip-bag-name">${cfg.icon} ${cfg.name}${i.qty > 1 ? ' ×' + i.qty : ''}</span>
+                        <span class="equip-bag-stats">${formatItemStats(i.id)} ${describeEquipDiff(i.id)}</span>
+                        <button class="btn equip-btn" onclick="equipFromBag('${i.id}')">装备</button></div>`;
+                }).join('');
+            });
+            box.innerHTML = `<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（炼器可以打造，商城也有出售）</div>'}`;
+        }
+
+        // 旧存档迁移：装备曾同时保留在背包里，现在装备栏与背包分开。每件已装备的物品从背包扣掉 1 件；
+        // 已戴 ≥2 件饰品的老玩家自动送第二饰品栏位，超过 2 件的放回背包。
+        function migrateEquipmentSlots() {
+            if (gameState.equipSlotsV2 || !gameState.player) return;
+            const eq = gameState.player.equipment || (gameState.player.equipment = { weapon: null, armor: null, jewelry: [] });
+            if (!eq.jewelry) eq.jewelry = [];
+            const inv = gameState.player.inventory;
+            [eq.weapon, eq.armor, ...eq.jewelry].filter(Boolean).forEach(id => {
+                const it = inv.find(i => i.id === id);
+                if (it) { it.qty -= 1; if (it.qty <= 0) inv.splice(inv.indexOf(it), 1); }
+            });
+            if (!gameState.player.boughtUpgrades) gameState.player.boughtUpgrades = [];
+            if (eq.jewelry.length >= 2 && !gameState.player.boughtUpgrades.includes('jewelry_slot2')) gameState.player.boughtUpgrades.push('jewelry_slot2');
+            while (eq.jewelry.length > getJewelrySlots()) {
+                const id = eq.jewelry.pop();
+                const it = inv.find(i => i.id === id);
+                if (it) it.qty += 1; else inv.push({ id, qty: 1 });
+            }
+            gameState.equipSlotsV2 = true;
+        }
+
         function isItemEquipped(itemId) {
             const cfg = GAME_CONFIG.items[itemId];
             const eq = gameState.player.equipment;
@@ -3997,33 +4196,9 @@
                 return;
             }
 
-            const equipment = gameState.player.equipment;
-            if (isItemEquipped(itemId)) {
-                // 卸下装备
-                if (itemType === 'weapon') {
-                    equipment.weapon = null;
-                } else if (itemType === 'armor') {
-                    equipment.armor = null;
-                } else if (itemType === 'jewelry') {
-                    equipment.jewelry = equipment.jewelry.filter(id => id !== itemId);
-                }
-                showNotification(`已卸下${itemConfig.name}`, '#16a34a');
-            } else {
-                // 装备（武器、护甲各一件，首饰可多件）
-                if (itemType === 'weapon') {
-                    equipment.weapon = itemId;
-                } else if (itemType === 'armor') {
-                    equipment.armor = itemId;
-                } else if (itemType === 'jewelry' && !equipment.jewelry.includes(itemId)) {
-                    equipment.jewelry.push(itemId);
-                }
-                showNotification(`已装备${itemConfig.name}`, '#16a34a');
-            }
-
-            calculateStats();
-            updateUI();
+            // 装备与背包分开：从背包装备（旧的自动回背包）；卸下在「装备」界面进行
+            equipFromBag(itemId);
             closeItemDetail();
-            saveGame();
         }
 
         function initializeBattleActions() {
@@ -4326,6 +4501,21 @@
         }
 
         // ==================== UI更新 ====================
+        // 当前打开的配方 / 法则 / 战斗列表随数据实时刷新：突破后解锁的配方、技能升级后解锁的配方、
+        // 精通等级与进度、材料数量等，不用再切换面板才能看到变化
+        const RECIPE_PANELS = ['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi'];
+        function refreshVisiblePanelLists() {
+            const panel = document.body.dataset.panel;
+            if (RECIPE_PANELS.includes(panel)) {
+                generateRecipeList(panel);
+            } else if (panel === 'wudao') {
+                generateLawList();
+            } else if (panel === 'battle') {
+                const a = gameState.currentAction;
+                if (!(a && (a.isBattle || a.isDungeon))) generateBattleList();   // 战斗进行中不重绘，避免打断战斗界面
+            }
+        }
+
         function updateUI() {
             if (getCloneSlotCount() >= 2 && !gameState.cloneUnlockNotified2) {
                 gameState.cloneUnlockNotified2 = true;
@@ -4336,6 +4526,8 @@
                 showNotification('🌀 元婴出窍——分身解锁！它能在生活技能里与你并行做事（配方卡片上点「交给分身」）', '#c9a961');
             }
             renderCloneBar();
+            if (document.body.dataset.panel === 'equipment') renderEquipmentPanel();
+            refreshVisiblePanelLists();
             updatePlayerInfo();
             updateProgressBars();
             updateInventory();
@@ -4379,10 +4571,13 @@
             notification.style.minWidth = '300px';
 
             // 统一UI：所有通知都显示关闭按钮
+            // 屏幕阅读器朗读区（aria-live）：同步一份纯文本
+            const liveRegion = document.getElementById('notificationLive');
+            if (liveRegion) liveRegion.textContent = String(message).replace(/<[^>]*>/g, ' ');
             notification.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px;">
                     <span>${message}</span>
-                    <button onclick="this.parentElement.parentElement.remove()" style="
+                    <button aria-label="关闭通知" onclick="this.parentElement.parentElement.remove()" style="
                         background: rgba(255,255,255,0.2);
                         border: none;
                         color: #fff;
@@ -4514,8 +4709,10 @@
                     slot.innerHTML = `
                         <div class="item-icon">${itemConfig.icon}</div>
                         <div class="item-name">${itemConfig.name}</div>
+                        ${isEquipmentItem(item.id) ? `<div class="item-stats">${formatItemStats(item.id)}</div>` : ''}
                         <div class="item-qty">×${item.qty}</div>
                     `;
+                    if (isEquipmentItem(item.id)) slot.title = `${itemConfig.name}：${formatItemStats(item.id)}（点击查看 / 装备）`;
                     // 点击物品显示详情（P1功能）
                     slot.onclick = () => showItemDetail(item.id, item.qty);
                     grid.appendChild(slot);
@@ -4587,6 +4784,8 @@
                 } else if (itemId === 'farming_slot') {
                     gameState.player.farmingSlots += 1;
                     showNotification(`✨ 灵田槽位增加1个！共${gameState.player.farmingSlots}个`, '#16a34a');
+                } else if (itemId === 'jewelry_slot2') {
+                    showNotification('✨ 已解锁第二个饰品栏位！去「装备」界面佩戴', '#16a34a');
                 }
             } else if (item.type === 'art') {
                 // 功法购买处理 - 记录拥有；只有比当前功法更快才自动装备
@@ -5094,6 +5293,8 @@
             // 版本迁移函数：自动更新旧数据以支持新配方
             if (!gameState.version) gameState.version = 0;
             invalidateLawTotals();   // 读档 / 导入后重新计算悟道法则加成
+            gameState.workSpeedMultiplier = 1;   // 旧版把孤儿的 5% 存在这里且与灵玉脱钩；现在只由装备的灵玉提供（getWorkSpeedMultiplier）
+            migrateEquipmentSlots();
             if (gameState.tutorialSeen === undefined) gameState.tutorialSeen = true;   // 已有存档的玩家不再自动弹出引导
 
             const currentVersion = 2;  // P4：属性系统重写 + 初始化BugFix
@@ -5230,7 +5431,7 @@
                 html += `<div class="slot-card" onclick="openSlot(${n})">
                     <div class="slot-title">存档 ${n}</div>
                     ${info}
-                    <button class="slot-delete" onclick="event.stopPropagation(); deleteSlot(${n})" title="删除此存档">🗑</button>
+                    <button class="slot-delete" onclick="event.stopPropagation(); deleteSlot(${n})" title="删除此存档" aria-label="删除此存档">🗑</button>
                 </div>`;
             }
             box.innerHTML = html;
@@ -5782,6 +5983,32 @@
                 location.reload();
             }
         }
+
+        // ==================== 可访问性：可点击的卡片 / 标签也能用键盘操作 ====================
+        // 游戏里大量卡片是 <div onclick>：统一补上 role="button" 和 tabindex，Enter / 空格触发点击
+        const CLICKABLE_SELECTOR = '.action-item, .slot-card, .law-card, .item-slot, .shop-item, .mobile-tab-item, .logo, #breakThroughBtn';
+        function enhanceClickables(root = document) {
+            root.querySelectorAll(CLICKABLE_SELECTOR).forEach(el => {
+                if (el.tagName === 'BUTTON' || el.getAttribute('role')) return;
+                if (el.onclick || el.hasAttribute('onclick')) {
+                    el.setAttribute('role', 'button');
+                    el.tabIndex = 0;
+                }
+            });
+        }
+        document.addEventListener('keydown', e => {
+            if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[role="button"]')) {
+                e.preventDefault();
+                e.target.click();
+            }
+        });
+        let clickablePending = false;
+        new MutationObserver(mutations => {
+            if (clickablePending || !mutations.some(m => [...m.addedNodes].some(n => n.nodeType === 1))) return;
+            clickablePending = true;
+            requestAnimationFrame(() => { clickablePending = false; enhanceClickables(); });
+        }).observe(document.body, { childList: true, subtree: true });
+        enhanceClickables();
 
         // ==================== 页面加载 ====================
         window.addEventListener('load', () => {

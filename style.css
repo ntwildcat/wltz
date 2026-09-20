@@ -164,7 +164,7 @@ body {
     justify-content: center;
     font-size: 24px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
     border: 2px solid transparent;
     position: relative;
 }
@@ -212,7 +212,7 @@ body {
     border: 1px solid var(--border-l3);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
     text-align: center;
     font-size: 0.8em;
     position: relative;
@@ -410,7 +410,7 @@ body {
     cursor: pointer;
     text-align: center;
     font-size: 0.9em;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
 }
 
 .skill-tab:hover {
@@ -437,7 +437,7 @@ body {
     border: 1px solid var(--border-l3);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -480,7 +480,7 @@ body {
     border: 1px solid var(--border-l3);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
     margin-bottom: var(--spacing-md);
     display: flex;
     align-items: center;
@@ -688,7 +688,7 @@ body {
     border-radius: var(--radius-md);
     cursor: pointer;
     font-weight: bold;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
     margin-top: var(--spacing-md);
     box-shadow: var(--glow-gold);
 }
@@ -772,7 +772,7 @@ body {
     font-size: 0.7em;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
 }
 
 .item-slot:hover {
@@ -1250,7 +1250,7 @@ input:focus, select:focus {
     color: var(--text-l4);
     cursor: pointer;
     font-weight: bold;
-    transition: all 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
 }
 .speed-btn:hover {
     background: var(--bg-l2);
@@ -1272,7 +1272,7 @@ input:focus, select:focus {
     color: var(--color-danger);
     cursor: pointer;
     font-weight: bold;
-    transition: all 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
 }
 .btn-retreat:hover {
     background: rgba(231,76,60,0.2);
@@ -1425,7 +1425,7 @@ cursor: pointer !important;
 color: var(--text-l4) !important;
 font-size: 12px !important;
 gap: 4px !important;
-transition: all 0.2s !important;
+transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s !important;
     }
     
     .mobile-tab-item:hover, .mobile-tab-item.active {
@@ -1535,3 +1535,54 @@ display: none !important;
 .law-next { font-size: 0.72em; color: var(--text-l4); margin-top: 4px; line-height: 1.5; }
 .law-resonant { font-size: 0.7em; color: #c084fc; margin-left: 6px; }
 .law-capped { opacity: 0.85; }
+
+/* 装备界面 */
+.equip-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.equip-slot { padding: 10px; border: 1px solid var(--border-l2); border-radius: 8px; background: var(--bg-l3); text-align: center; }
+.equip-slot.empty, .equip-slot.locked { border-style: dashed; border-color: var(--border-l4); opacity: 0.85; }
+.equip-slot-label { font-size: 0.75em; color: var(--text-l4); margin-bottom: 4px; }
+.equip-slot-name { color: var(--text-l1); font-weight: bold; margin-bottom: 4px; }
+.equip-slot-stats { font-size: 0.8em; color: var(--border-l2); line-height: 1.5; margin-bottom: 6px; }
+.equip-slot-empty { color: var(--text-l4); padding: 8px 0; }
+.equip-btn { padding: 2px 12px; font-size: 0.85em; }
+.equip-summary { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 10px 12px; border: 1px solid var(--border-l3); border-radius: 8px; margin-bottom: 14px; color: var(--text-l1); }
+.equip-summary-sub { flex-basis: 100%; font-size: 0.8em; color: var(--text-l4); }
+.equip-bag-title { font-size: 0.85em; color: var(--border-l1); margin: 10px 0 4px; }
+.equip-bag-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 6px 8px; border-bottom: 1px solid var(--border-l4); }
+.equip-bag-name { color: var(--text-l1); min-width: 110px; }
+.equip-bag-stats { flex: 1 1 160px; font-size: 0.82em; color: var(--text-l3); }
+.equip-empty-hint { color: var(--text-l4); font-size: 0.85em; padding: 10px 0; }
+.item-stats { font-size: 0.65em; color: var(--border-l2); line-height: 1.3; }
+.recipe-equip-stats { font-size: 0.78em; color: var(--border-l2); margin: 2px 0 4px; }
+.inventory-hint { font-size: 0.82em; color: var(--text-l4); margin-bottom: 10px; }
+.inventory-hint a { color: var(--border-l1); }
+.sell-qty-row { flex: 1 1 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.sell-qty-row input { width: 64px; text-align: center; padding: 4px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-l2); color: #fff; border-radius: 4px; }
+.sell-qty-row .btn { padding: 2px 10px; }
+
+/* ===== 可访问性与交互细节（网页界面规范审查后补充） ===== */
+:root { color-scheme: dark; }
+html { -webkit-tap-highlight-color: rgba(201, 169, 97, 0.18); }
+body { font-variant-numeric: tabular-nums; }
+button, [role="button"], a, input, select, .action-item, .slot-card, .law-card, .item-slot, .mobile-tab-item { touch-action: manipulation; }
+/* 键盘焦点可见（不影响鼠标点击） */
+button:focus-visible, [role="button"]:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible,
+.action-item:focus-visible, .slot-card:focus-visible, .law-card:focus-visible, .item-slot:focus-visible, .mobile-tab-item:focus-visible {
+    outline: 2px solid var(--border-l1);
+    outline-offset: 2px;
+}
+.nav-btn:hover { background: rgba(22, 163, 74, 0.4) !important; }
+button.modal-close { background: none; border: none; padding: 0 4px; line-height: 1; font-family: inherit; }
+.modal, .modal-content { overscroll-behavior: contain; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; left: 8px; top: -60px; z-index: 10000; padding: 8px 14px; background: var(--bg-l1); color: var(--text-l1); border: 1px solid var(--border-l1); border-radius: 6px; }
+.skip-link:focus { top: 8px; }
+/* 手机底部标签栏与刘海屏 / 手势条的安全区 */
+@media (max-width: 768px) {
+    .mobile-bottom-tabs { height: calc(70px + env(safe-area-inset-bottom)) !important; padding-bottom: env(safe-area-inset-bottom) !important; box-sizing: border-box !important; }
+    .main-content { padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important; }
+}
+/* 尊重「减少动态效果」系统设置 */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
