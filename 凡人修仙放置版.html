@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=9.4">
+    <link rel="stylesheet" href="style.css?v=9.6">
 
 </head>
 <body data-panel="cultivation">
@@ -452,6 +452,13 @@
                                     </select>
                                 </div>
                                 <div class="stat-row">
+                                    <span class="stat-label">突破特效:</span>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" id="breakthroughFx" checked onchange="updateSetting('breakthroughFx', this.checked)" style="width: 20px; height: 20px; cursor: pointer;">
+                                        <span>突破境界时播放特效</span>
+                                    </label>
+                                </div>
+                                <div class="stat-row">
                                     <label class="stat-label" for="notificationSeconds">通知停留时间:</label>
                                     <select id="notificationSeconds" name="notificationSeconds" autocomplete="off" onchange="updateSetting('notificationSeconds', this.value)">
                                         <option value="2">2 秒（默认）</option>
@@ -727,7 +734,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=9.4"></script>
+    <script src="game.js?v=9.6"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

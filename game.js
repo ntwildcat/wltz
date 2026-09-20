@@ -737,6 +737,7 @@
                 maxOfflineHours: 24,           // 最多离线奖励小时数
                 enableNotifications: true,      // 启用通知（关闭后只显示失败 / 警告等重要提示）
                 fontScale: 100,                 // 字体大小（百分比：90 小 / 100 中 / 115 大 / 130 特大）
+                breakthroughFx: true,           // 突破特效
                 notificationSeconds: 2,         // 通知停留时间（秒）
                 theme: 'dark'                   // 主题（dark/light）
             }
@@ -3268,6 +3269,7 @@
             document.getElementById('maxOfflineHours').value = settings.maxOfflineHours;
             document.getElementById('enableNotifications').checked = settings.enableNotifications;
             document.getElementById('fontScale').value = String(settings.fontScale || 100);
+            document.getElementById('breakthroughFx').checked = settings.breakthroughFx !== false;
             document.getElementById('notificationSeconds').value = String(settings.notificationSeconds || 2);
             updateSettingDisplay('enableNotifications');
         }
@@ -5505,9 +5507,294 @@
             }
         }
 
+        // ==================== 突破特效 ====================
+        // 小境界：一圈铜色涟漪加火花 + 朱印「破」，约 1.6 秒，不挡操作。
+        // 大境界：每个境界有自己的特效（约 4 秒，点击可跳过）：
+        //   筑基 = 地脉升起（大地色石柱自下而上拔起、尘土飞扬、震动）
+        //   金丹 = 金丹凝结（金色光点旋转汇聚成丹，光环扩散）
+        //   元婴 = 元神出窍（青白色婴儿元神从丹田升起，拖出光带）
+        //   化神 = 天地法则（雷霆劈落、八种法则符文环绕旋转、屏幕震动）
+        // 用 canvas 绘制，不依赖外部资源；尊重「减少动态效果」；设置里可关闭。
+        const BREAKTHROUGH_FX = {
+            5:  { name: '筑基', line: '根基已成，百脉皆通', kind: 'foundation', dur: 4.2 },
+            9:  { name: '金丹', line: '丹成九转，金光内蕴', kind: 'core', dur: 4.2 },
+            13: { name: '元婴', line: '元神出窍，神游太虚', kind: 'nascent', dur: 4.4 },
+            17: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 }
+        };
+        const LAW_RUNES = [['金', '#d8c078'], ['木', '#7fae9a'], ['水', '#7d9bb5'], ['火', '#d9614f'], ['土', '#b08d5a'], ['风', '#b7c9c2'], ['雷', '#b39ddb'], ['冰', '#a8d8e8']];
+        let fxState = null;
+
+        function stopBreakthroughFx() {
+            if (!fxState) return;
+            cancelAnimationFrame(fxState.raf);
+            clearTimeout(fxState.timer);
+            fxState.el.remove();
+            document.body.classList.remove('fx-shake');
+            fxState = null;
+        }
+
+        const fxEase = t => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+        const fxRand = (a, b) => a + Math.random() * (b - a);
+
+        // ---- 各特效的绘制函数：draw(ctx, W, H, t, s)，t 为秒，s 为该特效的持久状态 ----
+        function fxDrawMinor(ctx, W, H, t, s) {
+            const cx = W / 2, cy = H * 0.42;
+            const p = Math.min(1, t / 1.3);
+            for (let k = 0; k < 2; k++) {
+                const pk = Math.min(1, Math.max(0, (t - k * 0.22) / 1.1));
+                if (pk <= 0) continue;
+                ctx.strokeStyle = `rgba(194, 162, 95, ${0.65 * (1 - pk)})`;
+                ctx.lineWidth = 3 - k;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 30 + fxEase(pk) * Math.min(W, H) * 0.3, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            if (!s.sparks) s.sparks = Array.from({ length: 18 }, () => ({ a: fxRand(0, 6.28), v: fxRand(0.6, 1.3), r: fxRand(1.5, 3) }));
+            s.sparks.forEach(sp => {
+                const d = 30 + fxEase(p) * Math.min(W, H) * 0.26 * sp.v;
+                ctx.fillStyle = `rgba(232, 212, 160, ${0.9 * (1 - p)})`;
+                ctx.beginPath();
+                ctx.arc(cx + Math.cos(sp.a) * d, cy + Math.sin(sp.a) * d, sp.r * (1 - p * 0.5), 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function fxDrawFoundation(ctx, W, H, t, s) {
+            const fade = Math.min(1, t / 0.5) * (t > 3.5 ? Math.max(0, (4.2 - t) / 0.7) : 1);
+            ctx.fillStyle = `rgba(14, 12, 8, ${0.6 * fade})`;
+            ctx.fillRect(0, 0, W, H);
+            if (!s.pillars) {
+                const n = Math.max(7, Math.round(W / 150));
+                s.pillars = Array.from({ length: n }, (_, i) => ({ x: (i + 0.5) * W / n, w: W / n * 0.62, h: fxRand(0.32, 0.72) * H, d: 0.12 * i + fxRand(0, 0.15) }));
+                s.dust = Array.from({ length: 90 }, () => ({ x: fxRand(0, W), y: fxRand(H * 0.5, H), v: fxRand(20, 70), r: fxRand(1, 3), d: fxRand(0, 2) }));
+            }
+            s.pillars.forEach(p => {
+                const k = fxEase((t - 0.25 - p.d) / 0.95);
+                if (k <= 0) return;
+                const h = p.h * k, x = p.x - p.w / 2, y = H - h;
+                const g = ctx.createLinearGradient(0, y, 0, H);
+                g.addColorStop(0, `rgba(146, 116, 70, ${0.92 * fade})`);
+                g.addColorStop(1, `rgba(52, 42, 28, ${0.92 * fade})`);
+                ctx.fillStyle = g;
+                ctx.fillRect(x, y, p.w, h);
+                ctx.fillStyle = `rgba(232, 212, 160, ${0.85 * fade})`;
+                ctx.fillRect(x, y, p.w, 4);
+                ctx.strokeStyle = `rgba(20, 16, 10, ${0.5 * fade})`;
+                for (let yy = y + 26; yy < H; yy += 26) { ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + p.w, yy); ctx.stroke(); }
+            });
+            s.dust.forEach(d => {
+                if (t < d.d) return;
+                const y = d.y - (t - d.d) * d.v;
+                ctx.fillStyle = `rgba(200, 176, 120, ${0.5 * fade * Math.max(0, 1 - (t - d.d) / 2.6)})`;
+                ctx.beginPath(); ctx.arc(d.x, y, d.r, 0, Math.PI * 2); ctx.fill();
+            });
+            const ln = fxEase((t - 1.6) / 0.9);
+            if (ln > 0) {
+                ctx.strokeStyle = `rgba(232, 212, 160, ${0.8 * fade})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(W / 2 - ln * W / 2, H * 0.62); ctx.lineTo(W / 2 + ln * W / 2, H * 0.62); ctx.stroke();
+            }
+            document.body.classList.toggle('fx-shake', t > 0.3 && t < 1.6);
+        }
+
+        function fxDrawCore(ctx, W, H, t, s) {
+            const cx = W / 2, cy = H * 0.32, R = Math.max(W, H) * 0.55;
+            const fade = t > 3.6 ? Math.max(0, (4.2 - t) / 0.6) : 1;
+            ctx.fillStyle = `rgba(12, 10, 6, ${0.55 * Math.min(1, t / 0.4) * fade})`;
+            ctx.fillRect(0, 0, W, H);
+            if (!s.pts) s.pts = Array.from({ length: 170 }, () => ({ a: fxRand(0, 6.28), d: fxRand(0.35, 1) * R, w: fxRand(1.2, 3.2), r: fxRand(1.2, 2.8) }));
+            const conv = fxEase(t / 1.7);
+            s.pts.forEach(p => {
+                const dist = p.d * (1 - conv), ang = p.a + conv * p.w * 2.4;
+                const x = cx + Math.cos(ang) * dist, y = cy + Math.sin(ang) * dist;
+                ctx.fillStyle = `rgba(232, 204, 120, ${0.9 * fade * (t < 1.9 ? 1 : Math.max(0, 1 - (t - 1.9) / 0.4))})`;
+                ctx.beginPath(); ctx.arc(x, y, p.r, 0, Math.PI * 2); ctx.fill();
+            });
+            const orb = fxEase((t - 1.2) / 0.9);
+            if (orb > 0) {
+                const rr = 26 + orb * 62 + Math.sin(t * 9) * 3 * orb;
+                const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr * 2.2);
+                g.addColorStop(0, `rgba(255, 246, 214, ${0.95 * fade})`);
+                g.addColorStop(0.35, `rgba(240, 200, 100, ${0.85 * fade})`);
+                g.addColorStop(1, 'rgba(200, 150, 60, 0)');
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(cx, cy, rr * 2.2, 0, Math.PI * 2); ctx.fill();
+            }
+            [2.0, 2.45, 2.9].forEach((t0, i) => {
+                const k = (t - t0) / 1.1;
+                if (k <= 0 || k >= 1) return;
+                ctx.strokeStyle = `rgba(232, 204, 120, ${0.7 * (1 - k) * fade})`;
+                ctx.lineWidth = 4 - i;
+                ctx.beginPath(); ctx.arc(cx, cy, 60 + fxEase(k) * Math.max(W, H) * 0.42, 0, Math.PI * 2); ctx.stroke();
+            });
+            if (t > 2.0) {
+                if (!s.spark) s.spark = Array.from({ length: 40 }, () => ({ a: fxRand(0, 6.28), v: fxRand(0.2, 0.8), r: fxRand(1.5, 3.5) }));
+                s.spark.forEach(sp => {
+                    const k = Math.min(1, (t - 2.0) / 1.6);
+                    ctx.fillStyle = `rgba(255, 236, 170, ${0.9 * (1 - k) * fade})`;
+                    ctx.beginPath(); ctx.arc(cx + Math.cos(sp.a) * fxEase(k) * R * sp.v, cy + Math.sin(sp.a) * fxEase(k) * R * sp.v, sp.r, 0, Math.PI * 2); ctx.fill();
+                });
+            }
+        }
+
+        function fxDrawNascent(ctx, W, H, t, s) {
+            const cx = W / 2, base = H * 0.86;
+            const fade = t > 3.7 ? Math.max(0, (4.4 - t) / 0.7) : 1;
+            const bg = ctx.createRadialGradient(cx, H * 0.5, 0, cx, H * 0.5, Math.max(W, H) * 0.7);
+            bg.addColorStop(0, `rgba(20, 44, 46, ${0.55 * fade * Math.min(1, t / 0.5)})`);
+            bg.addColorStop(1, `rgba(6, 12, 14, ${0.85 * fade * Math.min(1, t / 0.5)})`);
+            ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+            for (let k = 0; k < 3; k++) {
+                const pk = (t - k * 0.35) / 1.5;
+                if (pk <= 0 || pk >= 1) continue;
+                ctx.strokeStyle = `rgba(160, 226, 216, ${0.6 * (1 - pk) * fade})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.ellipse(cx, base, 30 + pk * 160, 8 + pk * 34, 0, 0, Math.PI * 2); ctx.stroke();
+            }
+            const rise = fxEase((t - 0.5) / 2.1);
+            const sy = base - rise * (base - H * 0.3), sx = cx + Math.sin(t * 2.6) * 14 * rise;
+            if (!s.wisps) s.wisps = [];
+            if (t > 0.5 && t < 3.2) for (let i = 0; i < 2; i++) s.wisps.push({ x: sx + fxRand(-10, 10), y: sy + fxRand(8, 26), vx: fxRand(-14, 14), vy: fxRand(10, 40), r: fxRand(2, 5), born: t });
+            s.wisps = s.wisps.filter(w => t - w.born < 1.2);
+            s.wisps.forEach(w => {
+                const a = 1 - (t - w.born) / 1.2;
+                ctx.fillStyle = `rgba(190, 240, 230, ${0.55 * a * fade})`;
+                ctx.beginPath(); ctx.arc(w.x + w.vx * (t - w.born), w.y + w.vy * (t - w.born), w.r * a + 1, 0, Math.PI * 2); ctx.fill();
+            });
+            if (t > 0.5) {
+                const sc = 0.6 + 0.4 * rise;
+                ctx.save();
+                ctx.shadowColor = 'rgba(170, 245, 232, 0.95)';
+                ctx.shadowBlur = 46 * fade;
+                const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, 60 * sc);
+                g.addColorStop(0, `rgba(255, 255, 255, ${0.95 * fade})`);
+                g.addColorStop(1, `rgba(150, 230, 220, ${0.6 * fade})`);
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(sx, sy - 26 * sc, 17 * sc, 0, Math.PI * 2); ctx.fill();          // 头
+                ctx.beginPath(); ctx.ellipse(sx, sy + 4 * sc, 13 * sc, 22 * sc, 0, 0, Math.PI * 2); ctx.fill();   // 身
+                ctx.restore();
+            }
+            const bk = (t - 2.7) / 0.9;
+            if (bk > 0 && bk < 1) {
+                ctx.strokeStyle = `rgba(210, 255, 246, ${0.9 * (1 - bk)})`;
+                ctx.lineWidth = 5 * (1 - bk) + 1;
+                ctx.beginPath(); ctx.arc(sx, H * 0.3, 40 + fxEase(bk) * Math.max(W, H) * 0.5, 0, Math.PI * 2); ctx.stroke();
+                ctx.fillStyle = `rgba(230, 255, 250, ${0.35 * (1 - bk)})`; ctx.fillRect(0, 0, W, H);
+            }
+        }
+
+        function fxDrawLaw(ctx, W, H, t, s) {
+            const cx = W / 2, cy = H * 0.32, R = Math.min(W, H) * 0.2;
+            const fade = t > 3.9 ? Math.max(0, (4.6 - t) / 0.7) : 1;
+            ctx.fillStyle = `rgba(8, 8, 14, ${0.72 * Math.min(1, t / 0.3) * fade})`;
+            ctx.fillRect(0, 0, W, H);
+            const flashes = [[0.12, 0.7], [0.85, 0.55], [1.5, 0.4]];
+            flashes.forEach(([t0, a]) => {
+                const k = (t - t0) / 0.35;
+                if (k > 0 && k < 1) { ctx.fillStyle = `rgba(230, 236, 255, ${a * (1 - k)})`; ctx.fillRect(0, 0, W, H); }
+            });
+            if (!s.bolts) s.bolts = flashes.map(([t0]) => ({ t0, list: Array.from({ length: 3 }, () => {
+                let x = fxRand(W * 0.15, W * 0.85), y = 0; const pts = [[x, y]];
+                const endY = fxRand(H * 0.55, H * 0.9);
+                while (y < endY) { y += fxRand(30, 70); x += fxRand(-40, 40); pts.push([x, y]); }
+                return pts;
+            }) }));
+            s.bolts.forEach(b => {
+                const k = (t - b.t0) / 0.28;
+                if (k <= 0 || k >= 1) return;
+                b.list.forEach(pts => {
+                    ctx.strokeStyle = `rgba(210, 220, 255, ${1 - k})`;
+                    ctx.lineWidth = 3;
+                    ctx.shadowColor = 'rgba(160, 180, 255, 0.9)'; ctx.shadowBlur = 18;
+                    ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke();
+                    ctx.shadowBlur = 0;
+                });
+            });
+            const grow = fxEase((t - 0.5) / 1.2);
+            if (grow > 0) {
+                const rr = R * grow;
+                ctx.strokeStyle = `rgba(200, 190, 230, ${0.55 * fade})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(cx, cy, rr * 0.62, 0, Math.PI * 2); ctx.stroke();
+                const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr * 0.9);
+                g.addColorStop(0, `rgba(230, 226, 255, ${0.35 * fade})`);
+                g.addColorStop(1, 'rgba(120, 110, 180, 0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rr * 0.9, 0, Math.PI * 2); ctx.fill();
+                ctx.font = `bold ${Math.round(Math.min(W, H) * 0.06)}px KaiTi, STKaiti, serif`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                LAW_RUNES.forEach(([ch, col], i) => {
+                    const a = (i / 8) * Math.PI * 2 + t * 0.9;
+                    ctx.save();
+                    ctx.shadowColor = col; ctx.shadowBlur = 16;
+                    ctx.fillStyle = col;
+                    ctx.globalAlpha = grow * fade;
+                    ctx.fillText(ch, cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+                    ctx.restore();
+                });
+            }
+            const bk = (t - 2.9) / 1.0;
+            if (bk > 0 && bk < 1) {
+                ctx.strokeStyle = `rgba(230, 226, 255, ${0.9 * (1 - bk)})`;
+                ctx.lineWidth = 6 * (1 - bk) + 1;
+                ctx.beginPath(); ctx.arc(cx, cy, R + fxEase(bk) * Math.max(W, H) * 0.6, 0, Math.PI * 2); ctx.stroke();
+            }
+            document.body.classList.toggle('fx-shake', t < 1.9);
+        }
+
+        const FX_DRAWERS = { minor: fxDrawMinor, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw };
+
+        // 播放突破特效：newRealmIndex = 突破后的境界索引；major = 是否大境界突破
+        function playBreakthroughEffect(newRealmIndex, major) {
+            if (gameState.settings && gameState.settings.breakthroughFx === false) return;
+            stopBreakthroughFx();
+            const realmName = getRealmName(newRealmIndex);
+            const cfg = major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null;
+            const dur = major ? cfg.dur : 1.6;
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const el = document.createElement('div');
+            el.className = 'fx-overlay ' + (major ? 'fx-major fx-' + cfg.kind : 'fx-minor') + (reduce ? ' fx-reduced' : '');
+            el.setAttribute('aria-hidden', 'true');
+            el.innerHTML = (reduce ? '' : '<canvas class="fx-canvas"></canvas>') + (major
+                ? `<div class="fx-text"><div class="fx-title">${cfg.name.split('').join(' ')}</div><div class="fx-sub">${realmName} · ${cfg.line}</div><div class="fx-skip">点击任意处跳过</div></div>`
+                : `<div class="fx-text"><div class="fx-title">突 破</div><div class="fx-sub">${realmName}</div><div class="fx-seal">破</div></div>`);
+            document.body.appendChild(el);
+            fxState = { el, raf: 0, timer: 0, draw: null, dur };
+            if (major) el.addEventListener('click', stopBreakthroughFx);
+            if (reduce) {
+                fxState.timer = setTimeout(stopBreakthroughFx, major ? 2600 : 1600);
+                return;
+            }
+            const canvas = el.querySelector('canvas');
+            const dpr = Math.min(2, window.devicePixelRatio || 1);
+            const W = window.innerWidth, H = window.innerHeight;
+            canvas.width = W * dpr; canvas.height = H * dpr;
+            const ctx = canvas.getContext('2d');
+            const drawer = FX_DRAWERS[major ? cfg.kind : 'minor'];
+            const s = {};
+            fxState.draw = t => {
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, W, H);
+                ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic'; ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+                drawer(ctx, W, H, t, s);
+            };
+            const start = performance.now();
+            const frame = now => {
+                if (!fxState) return;
+                const t = (now - start) / 1000;
+                if (t >= dur) { stopBreakthroughFx(); return; }
+                fxState.draw(t);
+                fxState.raf = requestAnimationFrame(frame);
+            };
+            fxState.raf = requestAnimationFrame(frame);
+            // 页面在后台时 rAF 会被暂停，兜底：到点强制清理
+            fxState.timer = setTimeout(stopBreakthroughFx, (dur + 1) * 1000);
+        }
+
         function performBreakthrough() {
             const nextRealmIndex = gameState.player.realmIndex + 1;
             if (!GAME_CONFIG.realms[nextRealmIndex]) return;
+            const wasMajor = gameState.player.realmIndex % 4 === 0 && gameState.player.realmIndex > 0;   // 从大境界圆满突破
             gameState.player.realmIndex = nextRealmIndex;
             gameState.player.cultivationXP = 0;
 
@@ -5517,6 +5804,7 @@
             closeBreakthroughModal();
             updateUI();
             saveGame();
+            playBreakthroughEffect(nextRealmIndex, wasMajor);
         }
 
         function performMajorBreakthrough() {
@@ -5656,6 +5944,7 @@
                 maxOfflineHours: 24,
                 enableNotifications: true,
                 fontScale: 100,
+                breakthroughFx: true,
                 notificationSeconds: 2,
                 theme: 'dark'
             }, gameState.settings || {});
