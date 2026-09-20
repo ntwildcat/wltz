@@ -2572,9 +2572,6 @@
                         item.qty += bonusQty;
                     });
                 }
-            } else if (effect.effectType === 'speed' && output.duration) {
-                // 速度加成：持续时间减少
-                output.duration = Math.max(1, Math.round(output.duration * multiplier));
             } else if (effect.effectType === 'output' && output.items) {
                 // 采矿等输出加成
                 output.items.forEach(item => {
@@ -4779,6 +4776,9 @@
             updateSlotLabel();
 
             startAutoSave();
+
+            // 新角色看引导时刷新了页面：引导还没看完，继续弹出
+            if (gameState.tutorialSeen === false) setTimeout(() => showTutorial(0), 300);
         }
 
         function updateSlotLabel() {
