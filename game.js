@@ -21,7 +21,12 @@
                 { name: '元婴初期', nextReq: 58000, baseStats: { hp: 800, atk: 80, def: 40, spd: 30 }, bonusPerLevel: { atk: 4.0, def: 0.8, spd: 0.6 } },      // 100 × 13^2.5 ≈ 58000
                 { name: '元婴中期', nextReq: 70000, baseStats: { hp: 900, atk: 90, def: 45, spd: 33 }, bonusPerLevel: { atk: 4.4, def: 0.88, spd: 0.66 } },    // 100 × 14^2.5 ≈ 70000
                 { name: '元婴后期', nextReq: 83000, baseStats: { hp: 1000, atk: 100, def: 50, spd: 36 }, bonusPerLevel: { atk: 5.0, def: 1.0, spd: 0.72 } },   // 100 × 15^2.5 ≈ 83000
-                { name: '元婴圆满', nextReq: 98000, baseStats: { hp: 1150, atk: 115, def: 58, spd: 40 }, bonusPerLevel: { atk: 5.6, def: 1.12, spd: 0.8 } }   // 100 × 16^2.5 ≈ 98000
+                { name: '元婴圆满', nextReq: 98000, baseStats: { hp: 1150, atk: 115, def: 58, spd: 40 }, bonusPerLevel: { atk: 5.6, def: 1.12, spd: 0.8 } },  // 100 × 16^2.5 ≈ 98000
+                // P9 化神期扩展（索引17-20，大阶段突破点；属性由 P4 公式按境界索引自动延伸）
+                { name: '化神初期', nextReq: 116000 },   // 沿曲线 100 × n^2.5，取整
+                { name: '化神中期', nextReq: 136000 },
+                { name: '化神后期', nextReq: 158000 },
+                { name: '化神圆满', nextReq: 182000 }
             ],
             // P2功能：秘境系统
             dungeons: {
@@ -139,7 +144,7 @@
                 // P7 元婴期秘境：化神秘境
                 huashenRealm: {
                     id: 'huashenRealm',
-                    name: '化神秘境',
+                    name: '元婴秘境',
                     desc: '元神试炼·通关掉落元婴丹材料',
                     icon: '🌌',
                     minRealmIndex: 12,                      // 最低金丹圆满：这里掉落突破元婴所需的元婴丹，必须在突破前就能进入
@@ -164,6 +169,35 @@
                         coins: [8000, 15000],
                         skillExp: 250
                     }
+                },
+                // P9 化神期秘境：太虚幻境（入口元婴圆满；这里掉落突破化神所需的化神丹，必须在突破前就能进入）
+                taixuDream: {
+                    id: 'taixuDream',
+                    name: '太虚幻境',
+                    desc: '虚实交织的幻境·通关掉落化神丹材料',
+                    icon: '🌠',
+                    minRealmIndex: 16,                      // 最低元婴圆满
+                    baseRealmIndex: 17,                     // 怪物境界为化神初期
+                    recommendedLevel: '元婴圆满~化神中期',
+                    monsters: [
+                        { name: '幻境行者', type: '风', hp: 20600, atk: 150, spd: 70, def: 50, attackSpeed: 2.0, drop: 'coins', dropQty: 800 },
+                        { name: '虚实道人', type: '水', hp: 24720, atk: 165, spd: 65, def: 55, attackSpeed: 2.1, drop: 'coins', dropQty: 900 },
+                        { name: '万象傀儡', type: '雷', hp: 22660, atk: 170, spd: 60, def: 65, attackSpeed: 2.2, drop: 'coins', dropQty: 1000 },
+                        { name: '心魔化身', type: '无', hp: 26780, atk: 180, spd: 75, def: 60, attackSpeed: 1.9, drop: 'coins', dropQty: 1100 },
+                        { name: '太虚道主', type: '无', hp: 51500, atk: 220, spd: 70, def: 70, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 4000 }
+                    ],
+                    rewards: {
+                        fixed: [
+                            { id: 'seed_daofruit', qty: [2, 4] }
+                        ],
+                        random: [
+                            { id: 'huashenpill', qty: 1, probability: 0.35 },
+                            { id: 'lotus', qty: [3, 5], probability: 1 },
+                            { id: 'immortalore', qty: [3, 6], probability: 1 }
+                        ],
+                        coins: [15000, 30000],
+                        skillExp: 400
+                    }
                 }
             },
             skills: {
@@ -185,7 +219,11 @@
                         // P7 元婴期配方
                         yuanying_nurture: { name: '元婴温养', desc: '元婴初期主力', duration: 45, output: { cultivation: 800, skill: 'cultivation', exp: 200 }, requiredRealmIndex: 13, unlocked: false },
                         soul_travel: { name: '元神出窍', desc: '元婴中期高产', duration: 60, output: { cultivation: 1400, skill: 'cultivation', exp: 280 }, requiredRealmIndex: 14, unlocked: false },
-                        yuanying_dao: { name: '元婴合道', desc: '元婴期最终法', duration: 120, output: { cultivation: 3500, skill: 'cultivation', exp: 450 }, requiredRealmIndex: 15, unlocked: false }
+                        yuanying_dao: { name: '元婴合道', desc: '元婴期最终法', duration: 120, output: { cultivation: 3500, skill: 'cultivation', exp: 450 }, requiredRealmIndex: 15, unlocked: false },
+                        // P9 化神期配方
+                        huashen_ning: { name: '化神凝元', desc: '化神初期主力', duration: 60, output: { cultivation: 2400, skill: 'cultivation', exp: 500 }, requiredRealmIndex: 17, unlocked: false },
+                        yuanshen_huaxu: { name: '元神化虚', desc: '化神中期高产', duration: 80, output: { cultivation: 4200, skill: 'cultivation', exp: 650 }, requiredRealmIndex: 18, unlocked: false },
+                        tiandi_gongming: { name: '天地共鸣', desc: '化神期最终法', duration: 150, output: { cultivation: 9000, skill: 'cultivation', exp: 900 }, requiredRealmIndex: 19, unlocked: false }
                     },
                     actions: {}
                 },
@@ -202,7 +240,9 @@
                         golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 灵矿石 ×2（筑基圆满突破必需）', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 8, requires: { mushroom: 3, crystal: 1, spiritore: 2 }, unlocked: false },
                         mushroom_stew: { name: '灵芝羹', desc: '灵芝 ×2 + 灵米 ×2（战斗食物：恢复500生命）', duration: 30, output: { items: [{ id: 'mushroom_stew', qty: 2 }], skill: 'alchemy', exp: 240 }, requiredLevel: 9, requires: { mushroom: 2, millet: 2 }, unlocked: false },
                         yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2（金丹圆满突破必需）', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 400 }, requiredLevel: 12, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false },
-                        immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 14, requires: { tea: 3, mushroom: 2 }, unlocked: false }
+                        huashen_pill_alchemy: { name: '化神丹', desc: '九叶莲 ×5 + 悟道茶 ×8 + 仙矿 ×2（元婴圆满突破必需）', duration: 120, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'alchemy', exp: 700 }, requiredLevel: 17, requires: { lotus: 5, tea: 8, immortalore: 2 }, unlocked: false },
+                        immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 14, requires: { tea: 3, mushroom: 2 }, unlocked: false },
+                        jade_nectar: { name: '琼浆玉液', desc: '悟道果 ×2 + 悟道茶 ×3（战斗食物：恢复2000生命，冷却更短）', duration: 80, output: { items: [{ id: 'jade_nectar', qty: 2 }], skill: 'alchemy', exp: 900 }, requiredLevel: 19, requires: { daofruit: 2, tea: 3 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -222,7 +262,10 @@
                         golden_pendant: { name: '金丹佩', desc: '灵晶 ×1 + 玄晶 ×3', duration: 50, output: { items: [{ id: 'goldenpendant', qty: 1 }], skill: 'forging', exp: 300 }, requiredLevel: 12, requires: { spiritcrystal: 1, crystal: 3 }, unlocked: false },
                         yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 500 }, requiredLevel: 15, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
                         yuanying_armor: { name: '元婴法衣', desc: '灵晶 ×4 + 玄晶 ×4', duration: 90, output: { items: [{ id: 'yuanyingarmor', qty: 1 }], skill: 'forging', exp: 560 }, requiredLevel: 16, requires: { spiritcrystal: 4, crystal: 4 }, unlocked: false },
-                        yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 17, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false }
+                        yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 17, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false },
+                        huashen_sword: { name: '化神剑', desc: '混沌石 ×3 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashensword', qty: 1 }], skill: 'forging', exp: 800 }, requiredLevel: 19, requires: { chaosstone: 3, immortalore: 2 }, unlocked: false },
+                        huashen_armor: { name: '化神法衣', desc: '混沌石 ×4 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashenarmor', qty: 1 }], skill: 'forging', exp: 880 }, requiredLevel: 20, requires: { chaosstone: 4, immortalore: 2 }, unlocked: false },
+                        huashen_pendant: { name: '化神佩', desc: '混沌石 ×2 + 灵晶 ×3', duration: 100, output: { items: [{ id: 'huashenpendant', qty: 1 }], skill: 'forging', exp: 950 }, requiredLevel: 21, requires: { chaosstone: 2, spiritcrystal: 3 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -236,7 +279,8 @@
                         grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 20 }, requiredLevel: 2, requires: { seed_cleangrass: 1 }, unlocked: false },
                         mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 70 }, requiredLevel: 5, requires: { seed_mushroom: 1 }, unlocked: false },
                         tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 190 }, requiredLevel: 9, requires: { seed_tea: 1 }, unlocked: false },
-                        lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 12, requires: { seed_lotus: 1 }, unlocked: false }
+                        lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 12, requires: { seed_lotus: 1 }, unlocked: false },
+                        daofruit: { name: '种植悟道果', desc: '化神材料 需悟道果种子（太虚幻境掉落）', duration: 480, output: { items: [{ id: 'daofruit', qty: 1 }], skill: 'farming', exp: 600 }, requiredLevel: 16, requires: { seed_daofruit: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -251,7 +295,8 @@
                         spiritore: { name: '采灵矿', desc: '产出灵矿石', duration: 12, output: { items: [{ id: 'spiritore', qty: 1 }], skill: 'mining', exp: 60 }, requiredLevel: 6, unlocked: false },
                         crystal: { name: '采玄晶', desc: '产出玄晶', duration: 20, output: { items: [{ id: 'crystal', qty: 1 }], skill: 'mining', exp: 110 }, requiredLevel: 8, unlocked: false },
                         spiritcrystal: { name: '采灵晶', desc: '产出灵晶', duration: 25, output: { items: [{ id: 'spiritcrystal', qty: 1 }], skill: 'mining', exp: 220 }, requiredLevel: 12, unlocked: false },
-                        immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 330 }, requiredLevel: 15, unlocked: false }
+                        immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 330 }, requiredLevel: 15, unlocked: false },
+                        chaosstone: { name: '采混沌石', desc: '产出混沌石', duration: 50, output: { items: [{ id: 'chaosstone', qty: 1 }], skill: 'mining', exp: 600 }, requiredLevel: 18, unlocked: false }
                     },
                     actions: {}
                 },
@@ -272,7 +317,26 @@
                         gather: { name: '凝聚丹火', desc: '从金丹中提取丹火', duration: 15, output: { items: [{ id: 'danhuo', qty: 1 }], skill: 'danhuo', exp: 30 }, requiredLevel: 1, unlocked: true },
                         seed: { name: '培育丹火', desc: '以丹火种子培育，一次得到 4 份丹火（种子来自天劫之地）', duration: 20, output: { items: [{ id: 'danhuo', qty: 4 }], skill: 'danhuo', exp: 60 }, requiredLevel: 2, requires: { danhuo_seed: 1 }, unlocked: false },
                         temper: { name: '淬炼法器', desc: '用丹火强化装备', duration: 30, output: { items: [{ id: 'tempered_essence', qty: 1 }], skill: 'danhuo', exp: 90 }, requiredLevel: 3, requires: { danhuo: 3 }, unlocked: false },
-                        golden_pill: { name: '炼制元婴丹', desc: '丹火 ×5 + 九叶莲 ×1 + 悟道茶 ×3（金丹圆满突破必需）', duration: 60, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'danhuo', exp: 300 }, requiredLevel: 6, requires: { danhuo: 5, lotus: 1, tea: 3 }, unlocked: false }
+                        golden_pill: { name: '炼制元婴丹', desc: '丹火 ×5 + 九叶莲 ×1 + 悟道茶 ×3（金丹圆满突破必需）', duration: 60, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'danhuo', exp: 300 }, requiredLevel: 6, requires: { danhuo: 5, lotus: 1, tea: 3 }, unlocked: false },
+                        huashen_pill_fire: { name: '炼制化神丹', desc: '丹火 ×8 + 九叶莲 ×2 + 悟道茶 ×4（元婴圆满突破必需）', duration: 90, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'danhuo', exp: 500 }, requiredLevel: 10, requires: { danhuo: 8, lotus: 2, tea: 4 }, unlocked: false }
+                    },
+                    actions: {}
+                },
+                // P9 悟道技能（化神期新技能）：八种法则，每种一个「参悟」行动，法则等级见 LAW_EFFECTS
+                wudao: {
+                    name: '悟道',
+                    icon: '☯️',
+                    level: 1,
+                    exp: 0,
+                    recipes: {
+                        metal: { name: '参悟金之法则', desc: '锋锐与杀伐之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        wood: { name: '参悟木之法则', desc: '生机与繁育之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        water: { name: '参悟水之法则', desc: '滋养与流转之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        fire: { name: '参悟火之法则', desc: '焚灭与淬炼之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        earth: { name: '参悟土之法则', desc: '厚重与承载之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        wind: { name: '参悟风之法则', desc: '迅捷与自在之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        thunder: { name: '参悟雷之法则', desc: '雷霆与天罚之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false },
+                        ice: { name: '参悟冰之法则', desc: '寒凝与静守之道', duration: 30, output: { skill: 'wudao', exp: 20 }, requiredLevel: 1, unlocked: false }
                     },
                     actions: {}
                 },
@@ -284,8 +348,10 @@
                     exp: 0,
                     recipes: {
                         gather: { name: '凝练神识', desc: '从元婴中提取神识', duration: 20, output: { items: [{ id: 'shenshi', qty: 1 }], skill: 'shenshi', exp: 40 }, requiredLevel: 1, unlocked: true },
-                        seed: { name: '培育神识', desc: '以神识种子培育，一次得到 4 份神识（种子来自化神秘境）', duration: 25, output: { items: [{ id: 'shenshi', qty: 4 }], skill: 'shenshi', exp: 80 }, requiredLevel: 2, requires: { shenshi_seed: 1 }, unlocked: false },
-                        scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 120 }, requiredLevel: 3, requires: { shenshi: 2 }, unlocked: false }
+                        seed: { name: '培育神识', desc: '以神识种子培育，一次得到 4 份神识（种子来自元婴秘境）', duration: 25, output: { items: [{ id: 'shenshi', qty: 4 }], skill: 'shenshi', exp: 80 }, requiredLevel: 2, requires: { shenshi_seed: 1 }, unlocked: false },
+                        huashen_pill: { name: '炼制化神丹', desc: '神识 ×12 + 悟道茶 ×5 + 九叶莲 ×3（元婴圆满突破必需）', duration: 100, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'shenshi', exp: 400 }, requiredLevel: 8, requires: { shenshi: 12, tea: 5, lotus: 3 }, unlocked: false },
+                        scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 120 }, requiredLevel: 3, requires: { shenshi: 2 }, unlocked: false },
+                        meditate: { name: '神识入定', desc: '悟道果 ×1 → 神识 ×3', duration: 60, output: { items: [{ id: 'shenshi', qty: 3 }], skill: 'shenshi', exp: 260 }, requiredLevel: 10, requires: { daofruit: 1 }, unlocked: false }
                     },
                     actions: {}
                 }
@@ -332,6 +398,7 @@
                 shenshi: { name: '神识', icon: '👁️', type: 'material', sellPrice: 2000 },
                 shenshi_seed: { name: '神识种子', icon: '👁️', type: 'seed', sellPrice: 100 },
                 yuanyingpill: { name: '元婴丹', icon: '⭕', type: 'breakthrough_material' },
+                huashenpill: { name: '化神丹', icon: '🔮', type: 'breakthrough_material' },  // P9 突破材料
                 shenshi_map: { name: '神识地图', icon: '🗺️', type: 'material', sellPrice: 200 },
 
                 // 装备
@@ -347,6 +414,9 @@
                 // P6/P7 新矿石和种子
                 spiritcrystal: { name: '灵晶', icon: '🔹', type: 'ore' },
                 immortalore: { name: '仙矿', icon: '✨', type: 'ore' },
+                chaosstone: { name: '混沌石', icon: '🌑', type: 'ore' },
+                daofruit: { name: '悟道果', icon: '🍇', type: 'material', sellPrice: 600 },
+                seed_daofruit: { name: '悟道果种子', icon: '🌰', type: 'seed', sellPrice: 300 },
 
                 // P6/P7 新作物
                 // 战斗食物（在炼丹中制作；在战斗中HP低于50%时自动食用）
@@ -354,12 +424,16 @@
                 herb_soup: { name: '灵草汤', icon: '🍜', type: 'food', sellPrice: 60 },
                 mushroom_stew: { name: '灵芝羹', icon: '🥣', type: 'food', sellPrice: 150 },
                 immortal_peach: { name: '蟠桃', icon: '🍑', type: 'food', sellPrice: 400 },
+                jade_nectar: { name: '琼浆玉液', icon: '🍶', type: 'food', sellPrice: 1200 },
                 // 炼器新增装备
                 spiritarmor: { name: '灵甲', icon: '🛡️', type: 'armor', stats: { def: 16, hp: 30 } },
                 goldensword: { name: '金丹剑', icon: '🗡️', type: 'weapon', stats: { atk: 62 } },
                 goldenpendant: { name: '金丹佩', icon: '📿', type: 'jewelry', stats: { spd: 6, hp: 40 } },
                 yuanyingarmor: { name: '元婴法衣', icon: '🥋', type: 'armor', stats: { def: 45, hp: 120 } },
-                yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', stats: { spd: 10, hp: 80 } }
+                yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', stats: { spd: 10, hp: 80 } },
+                huashensword: { name: '化神剑', icon: '🗡️', type: 'weapon', stats: { atk: 110 } },
+                huashenarmor: { name: '化神法衣', icon: '🥼', type: 'armor', stats: { def: 65, hp: 170 } },
+                huashenpendant: { name: '化神佩', icon: '📿', type: 'jewelry', stats: { spd: 14, hp: 110 } }
             },
             shop: {
                 upgrades: [
@@ -393,7 +467,9 @@
                     { id: 'golden_art', name: '金丹大道', icon: '📜', price: 10000, desc: '修炼速度 ×1.5', minRealmIndex: 8, type: 'art' },
                     { id: 'fire_art', name: '焚天诀', icon: '🔥', price: 20000, desc: '修炼速度 ×1.8', minRealmIndex: 9, type: 'art' },
                     { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 30000, desc: '修炼速度 ×2.2', minRealmIndex: 11, type: 'art' },
-                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' }
+                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' },
+                { id: 'huashen_art', name: '化神真经', icon: '📖', price: 120000, desc: '修炼速度 ×3.4', minRealmIndex: 17, type: 'art' },
+                { id: 'primordial_art', name: '太初混元诀', icon: '☯️', price: 300000, desc: '修炼速度 ×4.2', minRealmIndex: 19, type: 'art' }
                 ]
             }
         };
@@ -440,6 +516,16 @@
                     cooldown: 5.0,
                     minRealm: 13,             // 元婴初期
                     description: '传说中的仙果，完全恢复生命值'
+                },
+                // 化神期食物：恢复量更大、冷却更短
+                jade_nectar: {
+                    id: 'jade_nectar',
+                    name: '琼浆玉液',
+                    icon: '🍶',
+                    hpRestore: 2000,          // 恢复HP
+                    cooldown: 3.0,
+                    minRealm: 17,             // 化神初期
+                    description: '化神修士的琼浆，饮下瞬间生机勃发，冷却比蟠桃更短'
                 }
             },
             // 默认食物配置
@@ -461,7 +547,8 @@
             mysteriousForest: 0.54,
             ancientRuin: 0.416,
             tribulationGround: 0.1365,
-            huashenRealm: 0.0636
+            huashenRealm: 0.0636,
+            taixuDream: 0.03
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -478,7 +565,8 @@
         const P4_AREA_SCALE = {
             forest: { hp: 1.071, atk: 1.071 }, mountain: { hp: 1.056, atk: 1.117 }, deepMountain: { hp: 0.876, atk: 1.079 },
             swamp: { hp: 0.978, atk: 1.206 }, abyss: { hp: 0.775, atk: 1.104 }, goldenPlains: { hp: 0.572, atk: 0.735 },
-            tribulationGround: { hp: 0.424, atk: 0.654 }, voidSea: { hp: 0.15, atk: 0.497 }, abyssRuins: { hp: 0.047, atk: 0.353 }
+            tribulationGround: { hp: 0.424, atk: 0.654 }, voidSea: { hp: 0.15, atk: 0.497 }, abyssRuins: { hp: 0.047, atk: 0.353 },
+            chaosWastes: { hp: 0.037, atk: 0.18 }, nineNether: { hp: 0.0175, atk: 0.14 }
         };
 
         const BATTLE_FORMULAS = {
@@ -775,168 +863,195 @@
         }
 
         // ==================== 游戏Tick系统 ====================
-        // ==================== 分身系统 ====================
-        // 元婴初期起自带一个分身：主角之外并行做一件生活技能配方（不能修炼 / 战斗，不能与主角做同一个配方）。
-        // 分身耗时 = 主角调整后耗时 × getCloneFactor()（基础 1.6，神识每级 -0.01，最低 1.2）；
-        // 共用背包与材料，享受精通 / 特效等全部加成；离线也会结算。
-        const CLONE_UNLOCK_REALM = 13;   // 元婴初期
-
-        function isCloneUnlocked() {
-            return gameState.player.realmIndex >= CLONE_UNLOCK_REALM;
-        }
-
-        function getClone() {
-            if (!gameState.clone) gameState.clone = { action: null, progress: 0 };
-            return gameState.clone;
-        }
-
-        function getCloneFactor() {
-            return SKILL_LEVEL_EFFECTS.shenshi.formula((gameState.skills.shenshi || {}).level || 1);
-        }
-
-        function getCloneDuration(skill, duration, key) {
-            return getAdjustedDuration(skill, duration, key) * getCloneFactor();
-        }
-
-        function cloneHasMaterials(action) {
-            if (!action.requires) return true;
-            return Object.entries(action.requires).every(([itemId, qty]) => {
-                const inv = gameState.player.inventory.find(i => i.id === itemId);
-                return inv && inv.qty >= qty;
-            });
-        }
-
-        // 让分身开始做某个配方
-        function assignClone(skill, key) {
-            if (!isCloneUnlocked()) { showNotification('🔒 分身要到元婴初期才会出现', '#f59e0b'); return; }
-            if (!LIFE_SKILLS.includes(skill)) { showNotification('分身只能做生活技能的配方', '#f59e0b'); return; }
-            const recipe = getAction(skill, key);
-            if (!recipe || !getRecipeUnlockState(skill, recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#f59e0b'); return; }
-            const main = gameState.currentAction;
-            if (main && main.skill === skill && main.action === key) {
-                showNotification('主角正在做这个配方，分身不能重复（请让分身做别的）', '#f59e0b');
-                return;
-            }
-            if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#ef4444', 'error'); return; }
-            const c = getClone();
-            const prev = c.action;
-            c.action = { skill, action: key };
-            c.progress = 0;
-            showNotification(`🌀 分身开始：${recipe.name}`, '#c9a961');
-            if (prev && prev.skill !== skill) generateRecipeList(prev.skill);
-            generateRecipeList(skill);
-            renderCloneBar();
-            saveGame();
-        }
-
-        function stopClone(silent = false) {
-            const c = getClone();
-            const prev = c.action;
-            c.action = null;
-            c.progress = 0;
-            if (!silent) showNotification('🌀 分身已停止', '#c9a961');
-            if (prev) generateRecipeList(prev.skill);
-            renderCloneBar();
-        }
-
-        // 每个游戏 tick（0.1 秒）推进分身的行动
-        function tickClone() {
-            if (!isCloneUnlocked()) return;
-            const c = getClone();
-            if (!c.action) return;
-            const action = getAction(c.action.skill, c.action.action);
-            if (!action || !action.output) { stopClone(true); return; }
-            if (!cloneHasMaterials(action)) {
-                showNotification(`🌀 分身：${action.name}所需材料不足，已停止`, '#ef4444', 'error');
-                stopClone(true);
-                return;
-            }
-            c.progress += 0.1;
-            const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
-            if (c.progress >= duration) {
-                completeAction(c.action);
-                c.progress = 0;
-            }
-            tickCloneBar(duration);
-        }
-
-        // 分身状态条：整体重绘（分配 / 停止 / 解锁时）
-        function renderCloneBar() {
-            const bar = document.getElementById('cloneBar');
-            if (!bar) return;
-            if (!isCloneUnlocked()) { bar.style.display = 'none'; return; }
-            bar.style.display = 'block';
-            const c = getClone();
-            const action = c.action ? getAction(c.action.skill, c.action.action) : null;
-            const factor = getCloneFactor();
-            if (action) {
-                bar.innerHTML = `<div class="clone-bar-top"><span>🌀 分身：<b>${action.name}</b></span><span id="cloneRemain"></span>
-                    <button class="btn btn-secondary clone-stop" onclick="stopClone()">停止</button></div>
-                    <div class="progress-bar" style="height: 6px;"><div id="cloneFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div>`;
-            } else {
-                bar.innerHTML = `<div class="clone-bar-top"><span>🌀 分身空闲</span><span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span></div>`;
-            }
-        }
-
-        // 分身状态条：每 tick 只更新进度
-        function tickCloneBar(duration) {
-            const c = getClone();
-            const pct = Math.min(100, (c.progress / duration) * 100);
-            const fill = document.getElementById('cloneFill');
-            if (fill) fill.style.width = pct + '%';
-            const remain = document.getElementById('cloneRemain');
-            if (remain) remain.textContent = Math.max(0, duration - c.progress).toFixed(1) + 's';
-            const card = document.getElementById('action-' + c.action.skill + '-' + c.action.action);
-            const cardFill = card && card.querySelector('.action-progress-fill');
-            if (cardFill) cardFill.style.width = pct + '%';
-        }
-
-        // 分身离线结算：与主角的离线规则一致（材料限制、节省材料、产出翻倍、技能 / 精通经验），耗时按分身倍率
-        function settleCloneOffline(offlineSeconds) {
-            if (!isCloneUnlocked() || !(offlineSeconds >= 1)) return;
-            const c = getClone();
-            if (!c.action) return;
-            const { skill, action: key } = c.action;
-            const action = getAction(skill, key);
-            if (!action || !action.output) { c.action = null; return; }
-            const budget = Math.min(offlineSeconds, (gameState.settings?.maxOfflineHours || 24) * 3600);
-            const duration = getCloneDuration(skill, action.duration, key);
-            if (!(duration > 0)) return;
-            let n = Math.floor(budget / duration);
-            let ranOut = false;
-            if (action.requires) {
-                Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    const owned = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
-                    const affordable = Math.floor(owned / qty);
-                    if (affordable < n) { n = affordable; ranOut = true; }
-                });
-                const saveRate = Math.min(0.9, getSkillMod('save', skill) + getMasteryBonus(skill, key).save);
-                Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    if (n > 0) consumeItem(itemId, Math.round(qty * n * (1 - saveRate)));
-                });
-            }
-            if (n > 0) {
-                const per = JSON.parse(JSON.stringify(action.output));
-                applySkillLevelBonus(skill, per);
-                const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double;
-                gameState.player.coins += (per.coins || 0) * n;
-                (per.items || []).forEach(item => {
-                    const qty = Math.floor(item.qty * n * (1 + doubleRate) + 1e-9);
-                    if (qty > 0) addToInventory(item.id, qty);
-                });
-                if (per.skill && per.exp) addSkillExp(per.skill, per.exp * n, key);
-                addMasteryExp(skill, key, action.duration * n);
-                showNotification(`🌀 分身离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
-            }
-            if (ranOut) c.action = null;
-            c.progress = 0;
-            renderCloneBar();
-            if (!c.action) generateRecipeList(skill);
-        }
-
-        function startGameTick() {
-            tickInterval = setInterval(() => {
-                tickClone();
+        // ==================== 分身系统 ====================
+        // 元婴初期起自带第 1 个分身，化神初期起有第 2 个：主角之外并行做生活技能配方（不能修炼 / 战斗），
+        // 且任意两个行动（主角与各分身）不能做同一个配方。
+        // 分身耗时 = 主角调整后耗时 × getCloneFactor()（基础 1.6，神识每级 -0.01，最低 1.2）；
+        // 共用背包与材料，享受精通 / 特效等全部加成；离线也会结算。
+        const CLONE_UNLOCK_REALMS = [13, 17];   // 第 1、2 个分身的解锁境界：元婴初期、化神初期
+
+        function getCloneSlotCount() {
+            return CLONE_UNLOCK_REALMS.filter(r => gameState.player.realmIndex >= r).length;
+        }
+
+        function isCloneUnlocked() {
+            return getCloneSlotCount() > 0;
+        }
+
+        // 全部分身槽（数组恒有 CLONE_UNLOCK_REALMS.length 项，只有前 getCloneSlotCount() 个已解锁）；兼容 v6.2 的单分身存档
+        function getClones() {
+            if (!gameState.clones) {
+                gameState.clones = gameState.clone ? [gameState.clone] : [];
+                delete gameState.clone;
+            }
+            while (gameState.clones.length < CLONE_UNLOCK_REALMS.length) gameState.clones.push({ action: null, progress: 0 });
+            return gameState.clones;
+        }
+
+        function activeClones() {
+            return getClones().slice(0, getCloneSlotCount());
+        }
+
+        // 哪个分身槽在做这个配方（没有返回 -1）
+        function findCloneFor(skill, key) {
+            return activeClones().findIndex(c => c.action && c.action.skill === skill && c.action.action === key);
+        }
+
+        function getCloneFactor() {
+            return SKILL_LEVEL_EFFECTS.shenshi.formula((gameState.skills.shenshi || {}).level || 1) / (1 + getMod('cloneSpeed'));
+        }
+
+        function getCloneDuration(skill, duration, key) {
+            return getAdjustedDuration(skill, duration, key) * getCloneFactor();
+        }
+
+        function cloneHasMaterials(action) {
+            if (!action.requires) return true;
+            return Object.entries(action.requires).every(([itemId, qty]) => {
+                const inv = gameState.player.inventory.find(i => i.id === itemId);
+                return inv && inv.qty >= qty;
+            });
+        }
+
+        // 让分身开始做某个配方（不指定槽位时用第一个空闲的分身）
+        function assignClone(skill, key, slot = null) {
+            if (!isCloneUnlocked()) { showNotification('🔒 分身要到元婴初期才会出现', '#f59e0b'); return; }
+            if (!LIFE_SKILLS.includes(skill)) { showNotification('分身只能做生活技能的配方', '#f59e0b'); return; }
+            const recipe = getAction(skill, key);
+            if (!recipe || !getRecipeUnlockState(skill, recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#f59e0b'); return; }
+            const main = gameState.currentAction;
+            if (main && main.skill === skill && main.action === key) {
+                showNotification('主角正在做这个配方，分身不能重复（请让分身做别的）', '#f59e0b');
+                return;
+            }
+            if (findCloneFor(skill, key) >= 0) { showNotification('已有分身在做这个配方，不能重复', '#f59e0b'); return; }
+            if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#ef4444', 'error'); return; }
+            const clones = activeClones();
+            if (slot === null) slot = clones.findIndex(c => !c.action);
+            if (slot < 0) { showNotification('分身都在忙，请先停止一个', '#f59e0b'); return; }
+            const c = clones[slot];
+            const prev = c.action;
+            c.action = { skill, action: key };
+            c.progress = 0;
+            showNotification(`🌀 分身${slot + 1}开始：${recipe.name}`, '#c9a961');
+            if (prev && prev.skill !== skill) generateRecipeList(prev.skill);
+            generateRecipeList(skill);
+            renderCloneBar();
+            saveGame();
+        }
+
+        function stopClone(slot = 0, silent = false) {
+            const c = getClones()[slot];
+            if (!c) return;
+            const prev = c.action;
+            c.action = null;
+            c.progress = 0;
+            if (!silent && prev) showNotification(`🌀 分身${slot + 1}已停止`, '#c9a961');
+            if (prev) generateRecipeList(prev.skill);
+            renderCloneBar();
+        }
+
+        // 每个游戏 tick（0.1 秒）推进每个分身的行动
+        function tickClone() {
+            activeClones().forEach((c, slot) => {
+                if (!c.action) return;
+                const action = getAction(c.action.skill, c.action.action);
+                if (!action || !action.output) { stopClone(slot, true); return; }
+                if (!cloneHasMaterials(action)) {
+                    showNotification(`🌀 分身${slot + 1}：${action.name}所需材料不足，已停止`, '#ef4444', 'error');
+                    stopClone(slot, true);
+                    return;
+                }
+                c.progress += 0.1;
+                const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
+                if (c.progress >= duration) {
+                    completeAction(c.action);
+                    c.progress = 0;
+                }
+                tickCloneBar(slot, duration);
+            });
+        }
+
+        // 分身状态条：整体重绘（分配 / 停止 / 解锁时）
+        function renderCloneBar() {
+            const bar = document.getElementById('cloneBar');
+            if (!bar) return;
+            if (!isCloneUnlocked()) { bar.style.display = 'none'; return; }
+            bar.style.display = 'block';
+            const factor = getCloneFactor();
+            const rows = activeClones().map((c, slot) => {
+                const action = c.action ? getAction(c.action.skill, c.action.action) : null;
+                if (action) {
+                    return `<div class="clone-row"><div class="clone-bar-top"><span>🌀 分身${slot + 1}：<b>${action.name}</b></span><span id="cloneRemain${slot}"></span>
+                        <button class="btn btn-secondary clone-stop" onclick="stopClone(${slot})">停止</button></div>
+                        <div class="progress-bar" style="height: 6px;"><div id="cloneFill${slot}" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div>`;
+                }
+                return `<div class="clone-row"><div class="clone-bar-top"><span>🌀 分身${slot + 1}空闲</span>${slot === 0 ? `<span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span>` : ''}</div></div>`;
+            });
+            bar.innerHTML = rows.join('');
+        }
+
+        // 分身状态条：每 tick 只更新进度
+        function tickCloneBar(slot, duration) {
+            const c = getClones()[slot];
+            const pct = Math.min(100, (c.progress / duration) * 100);
+            const fill = document.getElementById('cloneFill' + slot);
+            if (fill) fill.style.width = pct + '%';
+            const remain = document.getElementById('cloneRemain' + slot);
+            if (remain) remain.textContent = Math.max(0, duration - c.progress).toFixed(1) + 's';
+            const card = document.getElementById('action-' + c.action.skill + '-' + c.action.action);
+            const cardFill = card && card.querySelector('.action-progress-fill');
+            if (cardFill) cardFill.style.width = pct + '%';
+        }
+
+        // 分身离线结算：与主角的离线规则一致（材料限制、节省材料、产出翻倍、技能 / 精通经验），耗时按分身倍率
+        function settleCloneOffline(offlineSeconds) {
+            if (!isCloneUnlocked() || !(offlineSeconds >= 1)) return;
+            activeClones().forEach((c, slot) => settleOneClone(c, slot, offlineSeconds));
+            renderCloneBar();
+        }
+
+        function settleOneClone(c, slot, offlineSeconds) {
+            if (!c.action) return;
+            const { skill, action: key } = c.action;
+            const action = getAction(skill, key);
+            if (!action || !action.output) { c.action = null; return; }
+            const budget = Math.min(offlineSeconds, (gameState.settings?.maxOfflineHours || 24) * 3600);
+            const duration = getCloneDuration(skill, action.duration, key);
+            if (!(duration > 0)) return;
+            let n = Math.floor(budget / duration);
+            let ranOut = false;
+            if (action.requires) {
+                Object.entries(action.requires).forEach(([itemId, qty]) => {
+                    const owned = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
+                    const affordable = Math.floor(owned / qty);
+                    if (affordable < n) { n = affordable; ranOut = true; }
+                });
+                const saveRate = Math.min(0.9, getSkillMod('save', skill) + getMasteryBonus(skill, key).save);
+                Object.entries(action.requires).forEach(([itemId, qty]) => {
+                    if (n > 0) consumeItem(itemId, Math.round(qty * n * (1 - saveRate)));
+                });
+            }
+            if (n > 0) {
+                const per = JSON.parse(JSON.stringify(action.output));
+                applySkillLevelBonus(skill, per);
+                const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double;
+                gameState.player.coins += (per.coins || 0) * n;
+                (per.items || []).forEach(item => {
+                    const qty = Math.floor(item.qty * n * (1 + doubleRate) + 1e-9);
+                    if (qty > 0) addToInventory(item.id, qty);
+                });
+                if (per.skill && per.exp) addSkillExp(per.skill, per.exp * n, key);
+                addMasteryExp(skill, key, action.duration * n);
+                showNotification(`🌀 分身${slot + 1}离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
+            }
+            if (ranOut) { c.action = null; generateRecipeList(skill); }
+            c.progress = 0;
+        }
+
+        function startGameTick() {
+            tickInterval = setInterval(() => {
+                tickClone();
                 if (!gameState.currentAction) return;
 
                 // 秘境战斗特殊处理
@@ -1858,7 +1973,7 @@
                     do {
                         stepNormalBattle(battle);
                     } while (battle.currentEnemy.currentHP > 0 && battle.playerHP.current > 0 && battle.turnCount < 10);
-                    elapsed += battle.turnCount / AUTO_BATTLE_OFFLINE_EFFICIENCY;   // 每场按 1/0.8 倍时间计，等价于离线只有 80% 效率
+                    elapsed += battle.turnCount / Math.min(1, AUTO_BATTLE_OFFLINE_EFFICIENCY + getMod('autoOffline'));   // 每场按 1/效率 倍时间计（基础 0.8，悟道·冰之法则可提高）
                     r.fights++;
                     const won = battle.currentEnemy.currentHP <= 0;
                     hp.current = battle.playerHP.current <= 0 ? Math.floor(hp.max * 0.5) : Math.min(hp.max, battle.playerHP.current);
@@ -2009,7 +2124,8 @@
         const MAJOR_BREAKTHROUGH_PILLS = {
             4: { pillId: 'pill', pillName: '筑基丹', qty: 1 },   // 练气巅峰(索引4)→筑基初期(索引5)
             8: { pillId: 'goldenpill', pillName: '金丹秘药', qty: 1 },  // P6 筑基圆满(索引8)→金丹初期(索引9)
-            12: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 }  // P7 金丹圆满(索引12)→元婴初期(索引13)
+            12: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 },  // P7 金丹圆满(索引12)→元婴初期(索引13)
+            16: { pillId: 'huashenpill', pillName: '化神丹', qty: 1 }   // P9 元婴圆满(索引16)→化神初期(索引17)
         };
 
         // 功法系统（绑定到角色出身，影响修炼速度）
@@ -2107,6 +2223,26 @@
                 speedMultiplier: 2.8,               // 修炼速度快180%
                 effects: { 'exp:shenshi': 0.30, 'time:shenshi': -0.15, dropPct: 0.10 },  // 特效
                 description: '太虚宗门不传之秘，以元神直接吞吐天地灵气，修炼极快，神识修行事半功倍。',
+                origin: null
+            },
+            // P9 化神期功法
+            huashen_art: {
+                id: 'huashen_art',
+                name: '化神真经',
+                tier: 7,
+                speedMultiplier: 3.4,               // 修炼速度快240%
+                effects: { atkPct: 0.10, critDmg: 0.15, 'exp:life': 0.10 },  // 特效
+                description: '化神修士的根本大典，神魂与法力合一，出手凌厉，修行万事皆顺。',
+                origin: null
+            },
+            // 化神期高阶功法（稀有）
+            primordial_art: {
+                id: 'primordial_art',
+                name: '太初混元诀',
+                tier: 8,
+                speedMultiplier: 4.2,               // 修炼速度快320%
+                effects: { hpPct: 0.12, defPct: 0.10, 'time:life': -0.08 },  // 特效
+                description: '相传自太初而来的混元之法，肉身与元神浑然一体，修行与劳作皆事半功倍。',
                 origin: null
             }
         };
@@ -2210,9 +2346,158 @@
             wind:    { name: '风灵根', effects: { spdPct: 0.10, dodge: 0.07, 'time:life': -0.06 } }
         };
 
-        const EFFECT_SKILL_NAMES = { cultivation: '修炼', alchemy: '炼丹', forging: '炼器', farming: '灵田', mining: '采矿', danhuo: '丹火', shenshi: '神识', battle: '战斗', life: '所有生活技能' };
+        const EFFECT_SKILL_NAMES = { cultivation: '修炼', alchemy: '炼丹', forging: '炼器', farming: '灵田', mining: '采矿', danhuo: '丹火', shenshi: '神识', battle: '战斗', wudao: '悟道', life: '所有生活技能' };
 
-        // 当前灵根 + 当前功法提供的某项特效总和
+        // ==================== 悟道：八种法则 ====================
+        // 化神初期起可用。每种法则有独立的领悟等级（累计经验推算，不单独存等级），效果 = 每级效果 × 等级 + 各里程碑加成，
+        // 通过 getMod() 统一接入战斗 / 生活技能 / 全局加成。等级上限随境界提高（化神初期 10，每高一个境界 +5，最高 30）。
+        // 与自身灵根同名的法则，参悟速度 +50%。
+        const LAW_IDS = ['metal', 'wood', 'water', 'fire', 'earth', 'wind', 'thunder', 'ice'];
+        const LAW_MAX_LEVEL = 30;
+        const LAW_UNLOCK_REALM = 17;            // 化神初期
+        const LAW_EXP_PER_COMPLETION = 12;      // 每次参悟获得的法则经验
+        const LAW_RESONANCE_BONUS = 0.5;        // 与灵根同名的法则，经验 +50%
+        const LAW_MILESTONE_LEVELS = [5, 10, 15, 20, 25];
+
+        const LAW_EFFECTS = {
+            metal:   { name: '金之法则', icon: '🟡', perLevel: { atkPct: 0.004 },
+                       milestones: { 5: { crit: 0.02 }, 10: { 'save:forging': 0.03 }, 15: { crit: 0.02 }, 20: { 'save:forging': 0.03 }, 25: { critDmg: 0.10 } } },
+            wood:    { name: '木之法则', icon: '🟢', perLevel: { hpPct: 0.004 },
+                       milestones: { 5: { regen: 0.0005 }, 10: { 'double:farming': 0.03 }, 15: { regen: 0.0005 }, 20: { 'double:farming': 0.03 }, 25: { cloneSpeed: 0.08 } } },
+            water:   { name: '水之法则', icon: '🔵', perLevel: { foodPct: 0.006 },
+                       milestones: { 5: { regen: 0.0005 }, 10: { 'exp:alchemy': 0.05 }, 15: { 'save:alchemy': 0.03 }, 20: { 'exp:alchemy': 0.05 }, 25: { 'save:alchemy': 0.03 } } },
+            fire:    { name: '火之法则', icon: '🔴', perLevel: { critDmg: 0.006 },
+                       milestones: { 5: { atkPct: 0.02 }, 10: { 'time:danhuo': -0.04 }, 15: { atkPct: 0.02 }, 20: { 'time:alchemy': -0.04 }, 25: { 'time:danhuo': -0.04 } } },
+            earth:   { name: '土之法则', icon: '🟤', perLevel: { defPct: 0.006 },
+                       milestones: { 5: { hpPct: 0.02 }, 10: { 'double:mining': 0.03 }, 15: { hpPct: 0.02 }, 20: { 'double:mining': 0.03 }, 25: { 'exp:mining': 0.10 } } },
+            wind:    { name: '风之法则', icon: '🌪️', perLevel: { spdPct: 0.004 },
+                       milestones: { 5: { dodge: 0.02 }, 10: { 'time:life': -0.02 }, 15: { dodge: 0.02 }, 20: { 'time:life': -0.02 }, 25: { 'time:life': -0.02 } } },
+            thunder: { name: '雷之法则', icon: '🟣', perLevel: { crit: 0.002 },
+                       milestones: { 5: { hit: 0.02 }, 10: { 'exp:shenshi': 0.06 }, 15: { dropPct: 0.05 }, 20: { 'exp:shenshi': 0.06 }, 25: { dropPct: 0.05 } } },
+            ice:     { name: '冰之法则', icon: '❄️', perLevel: { dodge: 0.003 },
+                       milestones: { 5: { defPct: 0.02 }, 10: { cultSpeed: 0.05 }, 15: { autoOffline: 0.03 }, 20: { cultSpeed: 0.05 }, 25: { autoOffline: 0.04 } } }
+        };
+
+        // 升到 level 级所需的累计法则经验（level 级 = 从 level-1 升上来所需 lawNeed(level)）
+        function lawNeed(level) { return Math.round(25 * Math.pow(level, 1.5)); }
+        function lawCumulative(level) {
+            let sum = 0;
+            for (let l = 1; l <= level; l++) sum += lawNeed(l);
+            return sum;
+        }
+
+        // 当前境界允许领悟到的最高等级（未到化神初期为 0）
+        function lawLevelCap() {
+            const realm = gameState.player.realmIndex;
+            if (realm < LAW_UNLOCK_REALM) return 0;
+            return Math.min(LAW_MAX_LEVEL, 10 + 5 * (realm - LAW_UNLOCK_REALM));
+        }
+
+        function getLawStore() {
+            if (!gameState.laws) gameState.laws = {};
+            return gameState.laws;
+        }
+
+        function getLawInfo(id) {
+            let exp = Math.floor(getLawStore()[id] || 0);
+            let level = 0;
+            while (level < LAW_MAX_LEVEL && exp >= lawNeed(level + 1)) {
+                exp -= lawNeed(level + 1);
+                level++;
+            }
+            const maxed = level >= LAW_MAX_LEVEL;
+            const need = maxed ? 0 : lawNeed(level + 1);
+            return { level, exp: maxed ? 0 : exp, need, percent: maxed ? 100 : (exp / need) * 100, maxed };
+        }
+
+        // 某个法则在指定等级下的全部效果
+        function getLawEffectsAt(id, level) {
+            const def = LAW_EFFECTS[id];
+            const total = {};
+            if (!def || level <= 0) return total;
+            const add = (eff, mult) => Object.entries(eff).forEach(([k, v]) => { total[k] = (total[k] || 0) + v * mult; });
+            add(def.perLevel, level);
+            Object.entries(def.milestones).forEach(([lv, eff]) => { if (level >= Number(lv)) add(eff, 1); });
+            return total;
+        }
+
+        // 全部法则的加成合计（带缓存；法则升级或读档时失效）
+        let lawTotalsCache = null;
+        function invalidateLawTotals() { lawTotalsCache = null; }
+        function getLawTotals() {
+            if (!lawTotalsCache) {
+                lawTotalsCache = {};
+                LAW_IDS.forEach(id => {
+                    Object.entries(getLawEffectsAt(id, getLawInfo(id).level)).forEach(([k, v]) => {
+                        lawTotalsCache[k] = (lawTotalsCache[k] || 0) + v;
+                    });
+                });
+            }
+            return lawTotalsCache;
+        }
+
+        function isLawResonant(id) {
+            return gameState.player.spiritRoot === id;
+        }
+
+        // 参悟获得法则经验；返回是否已到当前境界的领悟上限
+        function addLawExp(id, completions = 1) {
+            if (!LAW_EFFECTS[id]) return false;
+            const cap = lawLevelCap();
+            const store = getLawStore();
+            const before = getLawInfo(id).level;
+            const mult = 1 + getSkillMod('exp', 'wudao') + (isLawResonant(id) ? LAW_RESONANCE_BONUS : 0);
+            const capExp = lawCumulative(cap);
+            store[id] = Math.min(capExp, (store[id] || 0) + LAW_EXP_PER_COMPLETION * completions * mult);
+            const after = getLawInfo(id).level;
+            if (after > before) {
+                invalidateLawTotals();
+                const def = LAW_EFFECTS[id];
+                const isMs = LAW_MILESTONE_LEVELS.includes(after);
+                const msText = isMs ? '（里程碑：' + describeEffects(def.milestones[after]).join('、') + '）' : '';
+                showNotification(`${def.icon} ${def.name} 领悟到 Lv.${after}${msText}`, '#c9a961');
+            }
+            if (document.body.dataset.panel === 'wudao') generateLawList();
+            return after >= cap;
+        }
+
+        function describeLawNext(id) {
+            const { level } = getLawInfo(id);
+            const next = LAW_MILESTONE_LEVELS.find(m => m > level);
+            if (!next) return '';
+            return `下一里程碑 Lv.${next}：${describeEffects(LAW_EFFECTS[id].milestones[next]).join('、')}`;
+        }
+
+        // 悟道面板：八种法则卡片
+        function generateLawList() {
+            const list = document.getElementById('wudaoActions');
+            if (!list) return;
+            const cap = lawLevelCap();
+            const cur = gameState.currentAction;
+            list.innerHTML = '';
+            LAW_IDS.forEach(id => {
+                const def = LAW_EFFECTS[id];
+                const info = getLawInfo(id);
+                const eff = describeEffects(getLawEffectsAt(id, info.level));
+                const atCap = info.level >= cap;
+                const active = cur && cur.skill === 'wudao' && cur.action === id;
+                const card = document.createElement('div');
+                card.className = 'action-item law-card' + (active ? ' active' : '') + (atCap ? ' law-capped' : '');
+                card.id = 'action-wudao-' + id;
+                card.innerHTML = `
+                    <div class="recipe-header"><span class="recipe-icon">${def.icon}</span><span class="recipe-name">${def.name}</span>${isLawResonant(id) ? '<span class="law-resonant" title="与你的灵根相合：参悟速度 +50%">✦ 灵根相合</span>' : ''}</div>
+                    <div class="law-level">Lv.${info.level} <small>/ ${cap}</small></div>
+                    <div class="mastery-track"><div class="mastery-fill" style="width: ${info.percent}%"></div></div>
+                    <div class="law-exp">${atCap ? '已至当前境界上限，突破后可继续领悟' : `${info.exp} / ${info.need}`}</div>
+                    <div class="law-effects">${eff.length ? eff.join(' · ') : '尚未领悟'}</div>
+                    <div class="law-next">${describeLawNext(id)}</div>
+                    <div class="action-progress-bar ${active ? 'active' : ''}"><div class="action-progress-fill" style="width: 0%"></div></div>`;
+                card.onclick = () => selectAction('wudao', id);
+                list.appendChild(card);
+            });
+        }
+
+        // 当前灵根 + 当前功法 + 悟道法则提供的某项特效总和
         function getMod(key) {
             const player = gameState && gameState.player;
             if (!player) return 0;
@@ -2221,6 +2506,7 @@
             if (rootEffects && rootEffects[key]) total += rootEffects[key];
             const artEffects = CULTIVATION_ARTS[player.currentArt]?.effects;
             if (artEffects && artEffects[key]) total += artEffects[key];
+            total += getLawTotals()[key] || 0;
             return total;
         }
 
@@ -2250,7 +2536,8 @@
             const fixed = {
                 atkPct: v => `攻击 ${sign(v)}`, hpPct: v => `生命 ${sign(v)}`, defPct: v => `防御 ${sign(v)}`, spdPct: v => `速度 ${sign(v)}`,
                 hit: v => `命中 ${sign(v)}`, crit: v => `暴击率 ${sign(v)}`, critDmg: v => `暴击伤害 ${sign(v)}`, dodge: v => `闪避 ${sign(v)}`,
-                foodPct: v => `食物恢复 ${sign(v)}`, dropPct: v => `秘境掉落 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
+                foodPct: v => `食物恢复 ${sign(v)}`, dropPct: v => `秘境掉落 ${sign(v)}`,
+                cultSpeed: v => `修炼速度 ${sign(v)}`, cloneSpeed: v => `分身速度 ${sign(v)}`, autoOffline: v => `离线自动战斗效率 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
             };
             return Object.entries(effects).map(([key, v]) => {
                 if (fixed[key]) return fixed[key](v);
@@ -2280,6 +2567,11 @@
             if (art) {
                 const eff = describeEffects(art.effects);
                 html += `<div><b style="color:#60a5fa">📜 ${art.name}</b>（修炼×${art.speedMultiplier}）：${eff.length ? eff.join(' · ') : '无特殊效果'}</div>`;
+            }
+            // 悟道：已领悟的法则合计
+            const lawParts = LAW_IDS.filter(id => getLawInfo(id).level > 0).map(id => `${LAW_EFFECTS[id].icon}${LAW_EFFECTS[id].name.replace('之法则', '')}Lv.${getLawInfo(id).level}`);
+            if (lawParts.length) {
+                html += `<div><b style="color:#c084fc">☯️ 悟道</b>：${lawParts.join(' ')}</div>`;
             }
             el.innerHTML = html || '无';
         }
@@ -2345,10 +2637,11 @@
         function getAdjustedDuration(skill, duration, recipeKey = null) {
             if (skill === 'cultivation') {
                 const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
+                const cultMult = 1 + getMod('cultSpeed');   // 悟道法则的修炼速度加成
                 if (currentArt) {
-                    return duration / currentArt.speedMultiplier; // 倍率越高，持续时间越短
+                    return duration / (currentArt.speedMultiplier * cultMult); // 倍率越高，持续时间越短
                 }
-                return duration;
+                return duration / cultMult;
             } else {
                 // 灵根/功法的耗时特效（下限30%，避免叠加后过快）
                 const timeMod = Math.max(0.3, 1 + getSkillMod('time', skill) + getMasteryBonus(skill, recipeKey).time);
@@ -2669,6 +2962,13 @@
                 addMasteryExp(act.skill, actionKey, action.duration);
             }
 
+            // 悟道：参悟一次增加对应法则的经验；到当前境界上限则停止
+            if (act.skill === 'wudao' && addLawExp(actionKey, 1)) {
+                showNotification(`${LAW_EFFECTS[actionKey].name}已至当前境界的领悟上限，突破后可继续`, '#f59e0b');
+                gameState.currentAction = null;
+                gameState.currentActionProgress = 0;
+            }
+
             // 如果有修为产出（修炼/战斗）
             if (finalOutput.cultivation) {
                 const currentRealm = GAME_CONFIG.realms[gameState.player.realmIndex];
@@ -2763,13 +3063,15 @@
             renderMobileSkillBar();
 
             // 只有技能相关面板才更新技能树高亮
-            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi'].includes(panelName)) {
+            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi', 'wudao'].includes(panelName)) {
                 updateSkillTree(panelName);
             }
 
             // 生成配方/技能列表
             if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi'].includes(panelName)) {
                 generateRecipeList(panelName);
+            } else if (panelName === 'wudao') {
+                generateLawList();
             } else if (panelName === 'battle') {
                 generateBattleList();
             } else if (panelName === 'shop') {
@@ -2824,6 +3126,7 @@
             const realmIdx = gameState.player.realmIndex;
             if (realmIdx >= 9) skills.push('danhuo');
             if (realmIdx >= 13) skills.push('shenshi');
+            if (realmIdx >= LAW_UNLOCK_REALM) skills.push('wudao');
             return skills.filter(name => gameState.skills[name]);
         }
 
@@ -3088,11 +3391,11 @@
             // 分身（元婴初期起）：把这个配方交给分身做
             let cloneHtml = '';
             if (LIFE_SKILLS.includes(skillName) && unlockState.unlocked && isCloneUnlocked()) {
-                const ca = getClone().action;
-                const cloneHere = ca && ca.skill === skillName && ca.action === recipeKey;
+                const cloneSlot = findCloneFor(skillName, recipeKey);
+                const cloneHere = cloneSlot >= 0;
                 if (cloneHere) className += ' clone-active';
                 cloneHtml = cloneHere
-                    ? `<button class="clone-btn on" onclick="event.stopPropagation(); stopClone()">🌀 分身进行中 · 点击停止</button>`
+                    ? `<button class="clone-btn on" onclick="event.stopPropagation(); stopClone(${cloneSlot})">🌀 分身${cloneSlot + 1}进行中 · 点击停止</button>`
                     : `<button class="clone-btn" onclick="event.stopPropagation(); assignClone('${skillName}', '${recipeKey}')">🌀 交给分身</button>`;
                 card.className = className;
             }
@@ -3279,6 +3582,16 @@
                     showNotification(`🔒 ${actionObj.name}需要${getRealmName(actionObj.areaData.minLevel)}`, '#f59e0b', 'normal');
                     return;
                 }
+            } else if (skill === 'wudao') {
+                // 悟道：化神初期起可参悟；法则到当前境界上限后不能继续
+                if (gameState.player.realmIndex < LAW_UNLOCK_REALM) {
+                    showNotification(`🔒 悟道需要${getRealmName(LAW_UNLOCK_REALM)}`, '#f59e0b', 'normal');
+                    return;
+                }
+                if (getLawInfo(action).level >= lawLevelCap()) {
+                    showNotification(`${LAW_EFFECTS[action].name}已至当前境界的领悟上限，突破后可继续`, '#f59e0b', 'normal');
+                    return;
+                }
             } else if (actionObj.requiredLevel) {
                 // 其他技能使用等级检查
                 const currentLevel = gameState.skills[skill].level;
@@ -3291,8 +3604,7 @@
             }
 
             // 分身正在做的配方，主角不能重复做
-            const cloneAct = isCloneUnlocked() ? getClone().action : null;
-            if (cloneAct && cloneAct.skill === skill && cloneAct.action === action) {
+            if (isCloneUnlocked() && findCloneFor(skill, action) >= 0) {
                 showNotification('分身正在做这个配方，主角不能重复（请让分身停下或选别的配方）', '#f59e0b');
                 return;
             }
@@ -3726,7 +4038,10 @@
                 tribulationGround: { name: '天劫之地', desc: '雷劫试炼', minLevel: 10, maxLevel: 11, enemies: ['thunder-demon', 'tribulation-spirit'], coins: 800, exp: 350 },
                 // P7 元婴期新增
                 voidSea: { name: '虚空之海', desc: '元婴修士的试炼场', minLevel: 13, maxLevel: 14, enemies: ['void-creature', 'soul-devourer'], coins: 1000, exp: 400 },
-                abyssRuins: { name: '深渊遗迹', desc: '极端危险的废墟', minLevel: 15, maxLevel: 16, enemies: ['abyss-lord', 'ancient-god'], coins: 2000, exp: 800 }
+                abyssRuins: { name: '深渊遗迹', desc: '极端危险的废墟', minLevel: 15, maxLevel: 16, enemies: ['abyss-lord', 'ancient-god'], coins: 2000, exp: 800 },
+                // P9 化神期新增
+                chaosWastes: { name: '混沌荒原', desc: '化神修士的试炼场', minLevel: 17, maxLevel: 18, enemies: ['chaos-beast', 'void-walker'], coins: 4000, exp: 1600 },
+                nineNether: { name: '九幽冥渊', desc: '幽冥深处的绝地', minLevel: 19, maxLevel: 20, enemies: ['nether-lord', 'ghost-emperor'], coins: 8000, exp: 3200 }
             };
 
             const actions = {};
@@ -3840,63 +4155,72 @@
         }
 
         // 进入普通战斗区域（扩展P1-1 UI到所有5个区域）
-        // 各战斗区域的敌人模板（按区域难度）；实际血量 / 攻击再乘 P4_AREA_SCALE
-        const BATTLE_ENEMY_CONFIGS = {
-                forest: [
-                    { name: '野狼', hp: 25, atk: 8, def: 2, spd: 45, icon: '🐺' },
-                    { name: '野猪', hp: 35, atk: 10, def: 4, spd: 35, icon: '🐗' }
-                ],
-                mountain: [
-                    { name: '虎妖', hp: 50, atk: 15, def: 5, spd: 40, icon: '🐯' },
-                    { name: '熊妖', hp: 60, atk: 12, def: 8, spd: 30, icon: '🐻' }
-                ],
-                deepMountain: [
-                    { name: '恶魔', hp: 80, atk: 20, def: 8, spd: 35, icon: '👹' },
-                    { name: '灵兽', hp: 90, atk: 18, def: 10, spd: 40, icon: '✨' }
-                ],
-                swamp: [
-                    { name: '毒兽', hp: 70, atk: 16, def: 6, spd: 38, icon: '🐢' },
-                    { name: '蛇妖', hp: 75, atk: 18, def: 5, spd: 50, icon: '🐍' }
-                ],
-                abyss: [
-                    { name: '魔王', hp: 120, atk: 25, def: 12, spd: 40, icon: '👿' },
-                    { name: '深渊生物', hp: 110, atk: 22, def: 10, spd: 35, icon: '🌀' }
-                ],
-                // P6 金丹期敌人
-                goldenPlains: [
-                    { name: '金甲兽', hp: 200, atk: 40, def: 15, spd: 30, icon: '🦁' },
-                    { name: '灵狼', hp: 150, atk: 45, def: 10, spd: 50, icon: '🐺' }
-                ],
-                tribulationGround: [
-                    { name: '雷劫残魂', hp: 250, atk: 50, def: 18, spd: 35, icon: '⚡' },
-                    { name: '天雷傀儡', hp: 280, atk: 55, def: 20, spd: 30, icon: '🤖' }
-                ],
-                // P7 元婴期敌人
-                voidSea: [
-                    { name: '虚空生物', hp: 800, atk: 80, def: 30, spd: 40, icon: '🌀' },
-                    { name: '噬魂者', hp: 700, atk: 90, def: 25, spd: 55, icon: '👻' }
-                ],
-                abyssRuins: [
-                    { name: '深渊领主', hp: 2000, atk: 120, def: 50, spd: 35, icon: '👿' },
-                    { name: '古神残影', hp: 2500, atk: 150, def: 60, spd: 30, icon: '🌑' }
-                ]
-            };
-
-        // 按区域随机生成一个敌人（在线战斗与离线自动战斗共用）
-        function createAreaEnemy(areaKey) {
-            const areaEnemies = BATTLE_ENEMY_CONFIGS[areaKey] || BATTLE_ENEMY_CONFIGS.forest;
-            const enemyTemplate = areaEnemies[Math.floor(Math.random() * areaEnemies.length)];
-            // P4 平衡层：按区域系数缩放敌人血量与攻击（见 P4_AREA_SCALE）
-            const areaScale = P4_AREA_SCALE[areaKey] || { hp: 1, atk: 1 };
-            const scaledHP = Math.max(1, Math.round(enemyTemplate.hp * areaScale.hp));
-            return {
-                ...enemyTemplate,
-                hp: scaledHP,
-                atk: Math.max(1, Math.round(enemyTemplate.atk * areaScale.atk)),
-                currentHP: scaledHP
-            };
-        }
-
+        // 各战斗区域的敌人模板（按区域难度）；实际血量 / 攻击再乘 P4_AREA_SCALE
+        const BATTLE_ENEMY_CONFIGS = {
+                forest: [
+                    { name: '野狼', hp: 25, atk: 8, def: 2, spd: 45, icon: '🐺' },
+                    { name: '野猪', hp: 35, atk: 10, def: 4, spd: 35, icon: '🐗' }
+                ],
+                mountain: [
+                    { name: '虎妖', hp: 50, atk: 15, def: 5, spd: 40, icon: '🐯' },
+                    { name: '熊妖', hp: 60, atk: 12, def: 8, spd: 30, icon: '🐻' }
+                ],
+                deepMountain: [
+                    { name: '恶魔', hp: 80, atk: 20, def: 8, spd: 35, icon: '👹' },
+                    { name: '灵兽', hp: 90, atk: 18, def: 10, spd: 40, icon: '✨' }
+                ],
+                swamp: [
+                    { name: '毒兽', hp: 70, atk: 16, def: 6, spd: 38, icon: '🐢' },
+                    { name: '蛇妖', hp: 75, atk: 18, def: 5, spd: 50, icon: '🐍' }
+                ],
+                abyss: [
+                    { name: '魔王', hp: 120, atk: 25, def: 12, spd: 40, icon: '👿' },
+                    { name: '深渊生物', hp: 110, atk: 22, def: 10, spd: 35, icon: '🌀' }
+                ],
+                // P6 金丹期敌人
+                goldenPlains: [
+                    { name: '金甲兽', hp: 200, atk: 40, def: 15, spd: 30, icon: '🦁' },
+                    { name: '灵狼', hp: 150, atk: 45, def: 10, spd: 50, icon: '🐺' }
+                ],
+                tribulationGround: [
+                    { name: '雷劫残魂', hp: 250, atk: 50, def: 18, spd: 35, icon: '⚡' },
+                    { name: '天雷傀儡', hp: 280, atk: 55, def: 20, spd: 30, icon: '🤖' }
+                ],
+                // P7 元婴期敌人
+                voidSea: [
+                    { name: '虚空生物', hp: 800, atk: 80, def: 30, spd: 40, icon: '🌀' },
+                    { name: '噬魂者', hp: 700, atk: 90, def: 25, spd: 55, icon: '👻' }
+                ],
+                abyssRuins: [
+                    { name: '深渊领主', hp: 2000, atk: 120, def: 50, spd: 35, icon: '👿' },
+                    { name: '古神残影', hp: 2500, atk: 150, def: 60, spd: 30, icon: '🌑' }
+                ],
+                // P9 化神期敌人
+                chaosWastes: [
+                    { name: '混沌兽', hp: 3000, atk: 200, def: 80, spd: 40, icon: '🐲' },
+                    { name: '虚空行者', hp: 2600, atk: 230, def: 70, spd: 55, icon: '🌀' }
+                ],
+                nineNether: [
+                    { name: '九幽魔君', hp: 6000, atk: 320, def: 120, spd: 45, icon: '😈' },
+                    { name: '幽冥鬼帝', hp: 5200, atk: 350, def: 110, spd: 55, icon: '💀' }
+                ]
+            };
+
+        // 按区域随机生成一个敌人（在线战斗与离线自动战斗共用）
+        function createAreaEnemy(areaKey) {
+            const areaEnemies = BATTLE_ENEMY_CONFIGS[areaKey] || BATTLE_ENEMY_CONFIGS.forest;
+            const enemyTemplate = areaEnemies[Math.floor(Math.random() * areaEnemies.length)];
+            // P4 平衡层：按区域系数缩放敌人血量与攻击（见 P4_AREA_SCALE）
+            const areaScale = P4_AREA_SCALE[areaKey] || { hp: 1, atk: 1 };
+            const scaledHP = Math.max(1, Math.round(enemyTemplate.hp * areaScale.hp));
+            return {
+                ...enemyTemplate,
+                hp: scaledHP,
+                atk: Math.max(1, Math.round(enemyTemplate.atk * areaScale.atk)),
+                currentHP: scaledHP
+            };
+        }
+
         function enterBattleArea(areaKey, auto = false) {
             const action = getAction('battle', areaKey);
             const areaData = action.areaData;
@@ -4003,7 +4327,11 @@
 
         // ==================== UI更新 ====================
         function updateUI() {
-            if (isCloneUnlocked() && !gameState.cloneUnlockNotified) {
+            if (getCloneSlotCount() >= 2 && !gameState.cloneUnlockNotified2) {
+                gameState.cloneUnlockNotified2 = true;
+                gameState.cloneUnlockNotified = true;
+                showNotification('🌀 化神境界——第二个分身解锁！现在可以同时让两个分身做事', '#c9a961');
+            } else if (isCloneUnlocked() && !gameState.cloneUnlockNotified) {
                 gameState.cloneUnlockNotified = true;
                 showNotification('🌀 元婴出窍——分身解锁！它能在生活技能里与你并行做事（配方卡片上点「交给分身」）', '#c9a961');
             }
@@ -4765,6 +5093,7 @@
         function migrateGameData() {
             // 版本迁移函数：自动更新旧数据以支持新配方
             if (!gameState.version) gameState.version = 0;
+            invalidateLawTotals();   // 读档 / 导入后重新计算悟道法则加成
             if (gameState.tutorialSeen === undefined) gameState.tutorialSeen = true;   // 已有存档的玩家不再自动弹出引导
 
             const currentVersion = 2;  // P4：属性系统重写 + 初始化BugFix
@@ -5169,6 +5498,10 @@
             // 离线期间的配方精通经验（按完成次数 × 配方基础耗时）
             if (LIFE_SKILLS.includes(savedAction.skill) && completions > 0) {
                 addMasteryExp(savedAction.skill, savedAction.action, action.duration * completions);
+            }
+            // 离线期间的悟道：按完成次数增加法则经验，到上限则停止
+            if (savedAction.skill === 'wudao' && completions > 0 && addLawExp(savedAction.action, completions)) {
+                gameState.currentAction = null;
             }
 
             gameState.lastActiveTime = now;

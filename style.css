@@ -1523,3 +1523,15 @@ display: none !important;
 .clone-btn { margin: 3px 0 6px; font-size: 0.8em; padding: 2px 10px; border-radius: 10px; border: 1px solid var(--border-l2); background: transparent; color: var(--border-l2); cursor: pointer; }
 .clone-btn:hover, .clone-btn.on { background: rgba(111, 169, 128, 0.2); }
 .action-item.clone-active { box-shadow: inset 0 0 0 1px var(--border-l2); }
+.clone-row + .clone-row { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-l4); }
+
+/* 悟道 */
+.law-intro { font-size: 0.85em; color: var(--text-l4); margin: 6px 0 12px; line-height: 1.7; }
+.law-card { text-align: center; }
+.law-level { font-size: 1.2em; font-weight: bold; color: var(--text-l1); margin: 4px 0; }
+.law-level small { color: var(--text-l4); font-weight: normal; }
+.law-exp { font-size: 0.75em; color: var(--text-l4); margin: 3px 0 6px; }
+.law-effects { font-size: 0.8em; color: var(--border-l2); line-height: 1.6; min-height: 1.6em; }
+.law-next { font-size: 0.72em; color: var(--text-l4); margin-top: 4px; line-height: 1.5; }
+.law-resonant { font-size: 0.7em; color: #c084fc; margin-left: 6px; }
+.law-capped { opacity: 0.85; }
