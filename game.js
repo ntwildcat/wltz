@@ -755,7 +755,7 @@
             { title: '🔨 生活技能', body: `<b>采矿、灵田</b>产出材料，<b>炼丹、炼器</b>用材料制作丹药、食物和装备，后期还有<b>丹火、神识</b>。配方按技能等级解锁。<br/><br/>
                 每个配方做得越多，<b>🎓 精通</b>等级越高，会带来翻倍、省材料、缩短耗时等加成；把鼠标悬停（手机上点一下）可以看到详情。` },
             { title: '⚔️ 战斗', body: `进入<b>战斗区域</b>打怪，获得灵石和经验，区域随境界解锁。战斗时生命低会自动吃你装备的<b>食物</b>（在炼丹里制作，背包里设为战斗食物）。<br/><br/>
-                <b>🤖 自动战斗</b>可以让你打完自动续战，离线也会继续。<b>秘境</b>是一次性挑战，掉落种子和突破材料，但失败会有损失，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
+                <b>🔁 循环战斗</b>：进入战斗区域后会一直打下去，点「撤退」才退出，离线也会继续。<b>秘境</b>是一次性挑战，掉落种子和突破材料，但失败会有损失，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
             { title: '🏪 商城与小提示', body: `用灵石在<b>商城</b>买装备、材料、食物和功法；功法和灵根都有各自的特效，可以在修炼面板切换功法。<br/><br/>
                 💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份。这个介绍可以在<b>设置 → 玩法介绍</b>里随时重看。祝你道途顺遂！` }
         ];
@@ -1631,10 +1631,14 @@
                 if (isNormalBattle) {
                     stopAction();
                     showNotification('已撤退', '#c2a25f');
+                    switchPanel('battle');
+                    switchBattleTab('areas');
                 } else {
                     resetBattleState('idle');
                     showNotification('已撤退秘境', '#c2a25f');
                     updateUI();
+                    switchPanel('battle');
+                    switchBattleTab('dungeons');
                 }
             };
             buttons[1].onclick = () => {
@@ -1895,17 +1899,11 @@
             updateUI();
             saveGame();
 
-            // 自动战斗托管：胜利清零连败计数，连败 3 场则停下；否则立刻续战同一区域
-            if (auto.enabled) {
-                auto.streak = won ? 0 : auto.streak + 1;
-                if (!won) auto.losses++;
-                if (auto.streak >= AUTO_BATTLE_MAX_LOSS_STREAK) {
-                    showNotification(`🤖 自动战斗已停止：连续 ${auto.streak} 场未能取胜，请检查装备与食物`, '#c98a3e');
-                    renderAutoBattleBar();
-                } else {
-                    enterBattleArea(areaKey, true);
-                }
-            }
+            // 循环战斗：无论胜负，打完一场立刻在同一区域开下一场，直到玩家点击「撤退」才退出
+            // （连败停止只用于离线模拟，见 runOfflineAutoBattle）
+            auto.streak = won ? 0 : auto.streak + 1;
+            if (!won) auto.losses++;
+            enterBattleArea(areaKey, true);
         }
 
         // 一场普通战斗取胜的奖励：精通加成后的灵石 / 经验，并获得该区域精通经验（每胜一场 10）
@@ -1926,19 +1924,10 @@
 
         function getAutoBattle() {
             if (!gameState.autoBattle) {
-                gameState.autoBattle = { enabled: false, wins: 0, losses: 0, streak: 0, coins: 0, exp: 0 };
+                gameState.autoBattle = { enabled: true, wins: 0, losses: 0, streak: 0, coins: 0, exp: 0 };
             }
+            gameState.autoBattle.enabled = true;   // 循环战斗是默认行为（旧存档里可能存着 false）
             return gameState.autoBattle;
-        }
-
-        function toggleAutoBattle() {
-            const auto = getAutoBattle();
-            auto.enabled = !auto.enabled;
-            auto.streak = 0;
-            // 打开托管时，若正好在打普通战斗，本场结束后就会自动续战
-            showNotification(auto.enabled ? '🤖 自动战斗已开启：打完一场自动续战，离线时也会继续' : '🤖 自动战斗已关闭', '#b89a5b');
-            renderAutoBattleBar();
-            saveGame();
         }
 
         function renderAutoBattleBar() {
@@ -1946,12 +1935,10 @@
             const fighting = !!(gameState.currentAction && gameState.currentAction.isBattle);
             const stats = (auto.wins + auto.losses) > 0
                 ? ` · 本次 胜${auto.wins} 负${auto.losses} · +${auto.coins}灵石 +${auto.exp}经验` : '';
-            const html = `<button class="auto-battle-btn ${auto.enabled ? 'on' : ''}" onclick="toggleAutoBattle()">🤖 自动战斗：${auto.enabled ? '开' : '关'}</button>` +
-                `<span class="auto-battle-stat">${auto.enabled ? (fighting ? '托管中' : '未在战斗，进入区域后开始') : '开启后打完自动续战，离线也会继续（消耗食物，连败 3 场自动停止）'}${stats}</span>`;
             const bar = document.getElementById('autoBattleBar');
-            if (bar) bar.innerHTML = html;
+            if (bar) bar.innerHTML = `<span class="auto-battle-stat">🔁 进入战斗区域后会一直循环战斗，点击「撤退」才会退出；离线也会继续（消耗食物，离线时连败 3 场自动停止）${fighting ? stats : ''}</span>`;
             const st = document.getElementById('autoBattleStatus');
-            if (st) st.textContent = auto.enabled ? `🤖 托管中 胜${auto.wins} 负${auto.losses}` : '';
+            if (st) st.textContent = fighting ? `🔁 循环战斗 胜${auto.wins} 负${auto.losses}` : '';
         }
 
         // 离线自动战斗：用与在线完全相同的战斗规则无头模拟（真实消耗食物、真实胜负、真实奖励）
