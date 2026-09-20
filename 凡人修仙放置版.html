@@ -4195,10 +4195,24 @@
             return { exp, cap, percent, reached: MASTERY_POOL_CHECKPOINTS.filter(c => percent >= c.at) };
         }
 
+        // ---- 技能等级里程碑（第一层）：生活技能自身等级达到 10/20/30/50 时，全部配方获得加成 ----
+        const SKILL_MILESTONES = [
+            { level: 10, exp: 0.05, desc: '技能经验 +5%' },
+            { level: 20, time: -0.03, desc: '全部配方耗时 -3%' },
+            { level: 30, main: 0.03, desc: '全部配方产出翻倍/节省材料 +3%' },
+            { level: 50, time: -0.03, main: 0.03, desc: '耗时 -3%、翻倍/节省 +3%' }
+        ];
+
+        function getSkillMilestones(skillName) {
+            const level = (gameState.skills[skillName] || {}).level || 1;
+            return { reached: SKILL_MILESTONES.filter(m => level >= m.level), next: SKILL_MILESTONES.find(m => level < m.level) };
+        }
+
+        // 技能层面的加成 = 精通池检查点 + 技能等级里程碑（对该技能所有配方生效）
         function getMasteryPoolBonus(skillName) {
             const b = { main: 0, time: 0, exp: 0 };
             if (!LIFE_SKILLS.includes(skillName)) return b;
-            getMasteryPoolInfo(skillName).reached.forEach(c => {
+            getMasteryPoolInfo(skillName).reached.concat(getSkillMilestones(skillName).reached).forEach(c => {
                 b.main += c.main || 0; b.time += c.time || 0; b.exp += c.exp || 0;
             });
             return b;
@@ -4314,6 +4328,11 @@
                     <div class="skill-exp-track"><div class="skill-exp-fill" style="width: ${info.percent}%"></div></div>
                     <div class="skill-exp-text">经验 ${info.exp} / ${info.need} · 还差 <b>${info.remain}</b> 升到 Lv.${info.level + 1}</div>
                     ${LIFE_SKILLS.includes(skillName) ? (() => {
+                        const sm = getSkillMilestones(skillName);
+                        const tipM = SKILL_MILESTONES.map(m => `${info.level >= m.level ? '✓' : '○'} Lv.${m.level}：${m.desc}`).join('&#10;');
+                        return `<div class="skill-pool" title="${tipM}">🏅 技能里程碑 ${sm.reached.length}/${SKILL_MILESTONES.length}${sm.next ? ` · 下一个 Lv.${sm.next.level}：${sm.next.desc}` : ' · 已全部达成'}</div>`;
+                    })() : ''}
+                    ${LIFE_SKILLS.includes(skillName) ? (() => {
                         const pi = getMasteryPoolInfo(skillName);
                         const tip = MASTERY_POOL_CHECKPOINTS.map(c => `${pi.percent >= c.at ? '✓' : '○'} ${Math.round(c.at * 100)}%：${c.desc}`).join('&#10;');
                         return `<div class="skill-pool" title="${tip}">🎓 精通池 ${pi.exp}/${pi.cap}（${(pi.percent * 100).toFixed(1)}%）
@@ -4334,6 +4353,8 @@
                 skill.level++;
                 const effect = calculateSkillLevelEffect(skillName, skill.level);
                 showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#16a34a', 'normal');
+                const ms = LIFE_SKILLS.includes(skillName) && SKILL_MILESTONES.find(m => m.level === skill.level);
+                if (ms) showNotification(`🏅 ${skill.name}达到 Lv.${ms.level} 里程碑：${ms.desc}`, '#c9a961');
             }
         }
 
