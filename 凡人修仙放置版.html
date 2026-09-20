@@ -642,6 +642,10 @@
         .recipe-req { font-size: 0.75em; margin-bottom: var(--spacing-xs); }
         .recipe-req.met { color: var(--color-hp); }
         .recipe-req.unmet { color: var(--color-warning); }
+        .recipe-mastery { font-size: 0.72em; color: var(--text-l4); margin: 2px 0 6px; }
+        .recipe-mastery b { color: var(--border-l1); }
+        .mastery-track { height: 4px; background: var(--bg-l1); border-radius: 2px; overflow: hidden; margin: 3px auto 0; max-width: 140px; }
+        .mastery-fill { height: 100%; background: linear-gradient(90deg, var(--border-l2), var(--border-l1)); transition: width 0.3s; }
 
         .action-item.recipe-materials-lack {
             opacity: 0.75;
@@ -2852,7 +2856,7 @@
                 }
 
                 gameState.currentActionProgress += 0.1;
-                const adjustedDuration = getAdjustedDuration(gameState.currentAction.skill, action.duration);
+                const adjustedDuration = getAdjustedDuration(gameState.currentAction.skill, action.duration, gameState.currentAction.action);
 
                 if (gameState.currentActionProgress >= adjustedDuration) {
                     completeAction();
@@ -3490,7 +3494,8 @@
                 const playerStats = gameState.player.stats;
 
                 const toEnemy = rollNormalAttack(playerStats, enemy, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm),
-                    { hit: getMod('hit'), crit: BASE_CRIT.rate + getMod('crit'), critMult: BASE_CRIT.dmg + getMod('critDmg') });
+                    { hit: getMod('hit'), crit: BASE_CRIT.rate + getMod('crit'), critMult: BASE_CRIT.dmg + getMod('critDmg'),
+                      dmgMult: 1 + getMasteryBonus('battle', battle.currentArea).dmg });
                 if (toEnemy.hit) {
                     enemy.currentHP -= toEnemy.dmg;
                     battle.log.push(`玩家${toEnemy.crit ? '暴击！' : ''}造成${toEnemy.dmg}点伤害`);
@@ -3530,7 +3535,7 @@
             hitChance = hitChance * (1 - Math.min(0.6, mods.dodge || 0)) + (mods.hit || 0);
             hitChance = Math.max(0.05, Math.min(Math.min(0.99, 0.95 + (mods.hit || 0)), hitChance));
             if (Math.random() >= hitChance) return { hit: false, dmg: 0, crit: false };
-            let dmg = Math.floor(BATTLE_FORMULAS.calculateDamage({ atk: attacker.atk }, { def: defender.def }) * suppression.dmgMod);
+            let dmg = Math.floor(BATTLE_FORMULAS.calculateDamage({ atk: attacker.atk }, { def: defender.def }) * suppression.dmgMod * (mods.dmgMult || 1));
             const crit = mods.crit ? Math.random() < mods.crit : false;
             if (crit) dmg = Math.floor(dmg * (mods.critMult || BASE_CRIT.dmg));
             return { hit: true, dmg: Math.max(1, dmg), crit };
@@ -3613,10 +3618,16 @@
             // 给予奖励
             const won = battle.currentEnemy.currentHP <= 0;
             if (won) {
-                gameState.player.coins += areaData.coins;
-                addSkillExp('battle', areaData.exp);
+                // 战斗区域精通：灵石与经验加成，并获得精通经验（每胜一场 10）
+                const reward = 1 + getMasteryBonus('battle', areaKey).reward;
+                const coins = Math.round(areaData.coins * reward);
+                const exp = Math.round(areaData.exp * reward);
+                gameState.player.coins += coins;
+                addSkillExp('battle', exp);
+                addMasteryExp('battle', areaKey, 10);
 
-                showNotification(`🎉 战胜${battle.currentEnemy.name}！\n+${areaData.coins}灵石 +${areaData.exp}经验`, '#6fa980');
+                showNotification(`🎉 战胜${battle.currentEnemy.name}！
++${coins}灵石 +${exp}经验`, '#6fa980');
             } else if (battle.playerHP.current <= 0) {
                 showNotification(`💀 被${battle.currentEnemy.name}击败，重伤逃出${areaData.name}（血量恢复至50%）`, '#ef4444');
             } else {
@@ -4099,7 +4110,7 @@
         // 计算调整后的行动持续时间
         // 修炼：仅受功法速度倍率 = duration ÷ speedMultiplier
         // 其他技能：仅受工作速度倍率 = duration × workSpeedMultiplier
-        function getAdjustedDuration(skill, duration) {
+        function getAdjustedDuration(skill, duration, recipeKey = null) {
             if (skill === 'cultivation') {
                 const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
                 if (currentArt) {
@@ -4108,7 +4119,7 @@
                 return duration;
             } else {
                 // 灵根/功法的耗时特效（下限30%，避免叠加后过快）
-                const timeMod = Math.max(0.3, 1 + getSkillMod('time', skill));
+                const timeMod = Math.max(0.3, 1 + getSkillMod('time', skill) + getMasteryBonus(skill, recipeKey).time);
                 return duration * gameState.workSpeedMultiplier * timeMod;
             }
         }
@@ -4116,6 +4127,93 @@
         // 获取灵根克制的目标
         function getCounteredType(spiritRoot) {
             return COUNTER_RELATIONS[spiritRoot];
+        }
+
+        // ==================== 配方精通系统 ====================
+        // 每个配方（六个生活技能）/ 战斗区域有独立的精通等级 1~20，精通经验 = 每次完成的配方基础耗时秒数（战斗区域每胜一场 10）。
+        //   生活技能：每级 +0.75% 翻倍产出（采矿/灵田）或节省材料（炼丹/炼器/丹火/神识）；
+        //             5/10/15/20 级各 -3% 耗时；20 级该配方获得的技能经验 +10%
+        //   战斗区域：每级 +1% 灵石与经验；5/10/15/20 级各 +2% 伤害
+        // 修炼不设精通（修炼由境界和功法驱动，不能打乱主线节奏）。精通数据存在 gameState.skills[技能].mastery。
+        const MASTERY_MAX_LEVEL = 20;
+        const MASTERY_MILESTONES = [5, 10, 15, 20];
+        const MASTERY_DOUBLE_SKILLS = ['mining', 'farming'];
+
+        // 升到下一级所需精通经验
+        function masteryNeed(level) {
+            return Math.round(12 * Math.pow(level, 1.4));
+        }
+
+        function getMasteryStore(skillName) {
+            const skill = gameState.skills[skillName];
+            if (!skill) return null;
+            if (!skill.mastery) skill.mastery = { recipes: {}, pool: 0 };
+            return skill.mastery;
+        }
+
+        // 精通进度：由累计精通经验推算等级（不单独存等级，避免数据不一致）
+        function getMasteryInfo(skillName, key) {
+            const store = getMasteryStore(skillName);
+            let exp = Math.floor((store && store.recipes[key]) || 0);
+            let level = 1;
+            while (level < MASTERY_MAX_LEVEL && exp >= masteryNeed(level)) {
+                exp -= masteryNeed(level);
+                level++;
+            }
+            const maxed = level >= MASTERY_MAX_LEVEL;
+            const need = maxed ? 0 : masteryNeed(level);
+            return { level, exp: maxed ? 0 : exp, need, percent: maxed ? 100 : (exp / need) * 100, maxed };
+        }
+
+        // 精通带来的加成（double/save 为概率，time 为耗时变化，exp 为技能经验加成，dmg 为战斗伤害，reward 为战斗奖励）
+        function getMasteryBonus(skillName, key) {
+            const none = { double: 0, save: 0, time: 0, exp: 0, dmg: 0, reward: 0 };
+            if (!key) return none;
+            const { level } = getMasteryInfo(skillName, key);
+            const steps = level - 1;
+            const tiers = MASTERY_MILESTONES.filter(t => level >= t).length;
+            if (skillName === 'battle') return { ...none, reward: 0.01 * steps, dmg: 0.02 * tiers };
+            if (!LIFE_SKILLS.includes(skillName)) return none;
+            const perLevel = 0.0075 * steps;
+            const isDouble = MASTERY_DOUBLE_SKILLS.includes(skillName);
+            return {
+                ...none,
+                double: isDouble ? perLevel : 0,
+                save: isDouble ? 0 : perLevel,
+                time: -0.03 * tiers,
+                exp: level >= MASTERY_MAX_LEVEL ? 0.10 : 0
+            };
+        }
+
+        // 精通加成的文字说明（用于悬停提示）
+        function describeMastery(skillName, key) {
+            const b = getMasteryBonus(skillName, key);
+            const pct = v => parseFloat((v * 100).toFixed(2)) + '%';
+            const lines = [];
+            if (b.double) lines.push(`产出翻倍 +${pct(b.double)}`);
+            if (b.save) lines.push(`节省材料 +${pct(b.save)}`);
+            if (b.time) lines.push(`耗时 ${pct(b.time)}`);
+            if (b.exp) lines.push(`技能经验 +${pct(b.exp)}`);
+            if (b.reward) lines.push(`灵石与经验 +${pct(b.reward)}`);
+            if (b.dmg) lines.push(`伤害 +${pct(b.dmg)}`);
+            const { level } = getMasteryInfo(skillName, key);
+            const next = MASTERY_MILESTONES.find(t => t > level);
+            if (next) lines.push(`下一个里程碑：Lv.${next}`);
+            return lines.length ? lines.join('；') : '暂无加成';
+        }
+
+        // 增加配方精通经验；升级时提示
+        function addMasteryExp(skillName, key, amount) {
+            const store = getMasteryStore(skillName);
+            if (!store || !key || !(amount > 0)) return;
+            const before = getMasteryInfo(skillName, key).level;
+            store.recipes[key] = (store.recipes[key] || 0) + amount;
+            const after = getMasteryInfo(skillName, key).level;
+            if (after > before) {
+                const name = (getAction(skillName, key) || {}).name || key;
+                const milestone = MASTERY_MILESTONES.includes(after) ? '（里程碑！）' : '';
+                showNotification(`🎓 ${name} 精通 Lv.${after}${milestone}`, '#c9a961');
+            }
         }
 
         // 升到下一级所需经验（指数级: 100 × level^1.8）
@@ -4152,10 +4250,11 @@
         }
 
         // 增加技能经验并处理升级，在线结算与离线结算共用
-        function addSkillExp(skillName, exp) {
+        function addSkillExp(skillName, exp, recipeKey = null) {
             const skill = gameState.skills[skillName];
             if (!skill) return;
-            skill.exp += Math.round(exp * (1 + getSkillMod('exp', skillName)));   // 灵根/功法的经验特效
+            // 灵根/功法的经验特效 + 该配方的精通经验加成
+            skill.exp += Math.round(exp * (1 + getSkillMod('exp', skillName) + getMasteryBonus(skillName, recipeKey).exp));
             while (skill.exp >= skillExpNeeded(skill.level)) {
                 skill.exp -= skillExpNeeded(skill.level);
                 skill.level++;
@@ -4169,7 +4268,9 @@
             if (!action.output) return;
 
             // 消耗所需的材料（P2功能 - 材料消耗）；灵根/功法的「节省材料」特效有概率整次不消耗
-            const saveMaterials = action.requires && Math.random() < getSkillMod('save', gameState.currentAction.skill);
+            const actionKey = gameState.currentAction.action;
+            const mastery = getMasteryBonus(gameState.currentAction.skill, actionKey);
+            const saveMaterials = action.requires && Math.random() < getSkillMod('save', gameState.currentAction.skill) + mastery.save;
             if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980');
             if (action.requires && !saveMaterials) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
@@ -4210,7 +4311,7 @@
             }
 
             // 灵根/功法的「产出翻倍」特效
-            if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', gameState.currentAction.skill)) {
+            if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', gameState.currentAction.skill) + mastery.double) {
                 finalOutput.items.forEach(item => { item.qty *= 2; });
                 showNotification('✨ 产出翻倍！', '#6fa980');
             }
@@ -4227,7 +4328,12 @@
 
             // 处理技能经验
             if (finalOutput.skill && finalOutput.exp) {
-                addSkillExp(finalOutput.skill, finalOutput.exp);
+                addSkillExp(finalOutput.skill, finalOutput.exp, actionKey);
+            }
+
+            // 配方精通经验（生活技能）
+            if (LIFE_SKILLS.includes(gameState.currentAction.skill)) {
+                addMasteryExp(gameState.currentAction.skill, actionKey, action.duration);
             }
 
             // 如果有修为产出（修炼/战斗）
@@ -4635,6 +4741,16 @@
             const outputStr = formatRecipeOutput(recipe.output || {});
             const efficiencyStr = efficiency > 0 ? `<div class="recipe-efficiency">效率: ${efficiency.toFixed(2)}/秒</div>` : '';
 
+            // 配方精通（生活技能）：等级、进度条，悬停显示具体加成
+            let masteryHtml = '';
+            if (LIFE_SKILLS.includes(skillName) && unlockState.unlocked) {
+                const m = getMasteryInfo(skillName, recipeKey);
+                masteryHtml = `<div class="recipe-mastery" title="${describeMastery(skillName, recipeKey)}">
+                    🎓 精通 <b>Lv.${m.level}</b>${m.maxed ? ' ✦满级' : ` · ${m.exp}/${m.need}`}
+                    <div class="mastery-track"><div class="mastery-fill" style="width: ${m.percent}%"></div></div>
+                </div>`;
+            }
+
             card.innerHTML = `
                 <div class="recipe-header">
                     <span class="recipe-icon">${unlockState.unlocked ? '🟢' : '⭕'}</span>
@@ -4642,6 +4758,7 @@
                 </div>
                 <div class="recipe-time">⏱ ${recipe.duration}s</div>
                 ${reqHtml}
+                ${masteryHtml}
                 <div class="recipe-output">${outputStr}</div>
                 ${materialsHtml}
                 ${efficiencyStr}
@@ -4768,6 +4885,7 @@
                         <div class="action-desc">${action.desc}</div>
                         <div style="font-size: 0.75em; color: #fbbf24; margin-top: 3px;">克制倍数: ${counterMod.damage.toFixed(1)}×</div>
                         <div class="recipe-req ${isDisabled ? 'unmet' : 'met'}">${isDisabled ? '✗' : '✓'} 境界要求：${getRealmName(action.areaData.minLevel)}</div>
+                        ${isDisabled ? '' : (() => { const m = getMasteryInfo('battle', key); return `<div class="recipe-mastery" title="${describeMastery('battle', key)}">🎓 精通 <b>Lv.${m.level}</b>${m.maxed ? ' ✦满级' : ` · ${m.exp}/${m.need}`}<div class="mastery-track"><div class="mastery-fill" style="width: ${m.percent}%"></div></div></div>`; })()}
                         ${statusHint}
                     </div>
                     <div class="action-progress-bar ${isActive ? 'active' : ''}">
@@ -5633,7 +5751,7 @@
 
             if (gameState.currentAction) {
                 const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
-                const duration = getAdjustedDuration(gameState.currentAction.skill, action.duration);
+                const duration = getAdjustedDuration(gameState.currentAction.skill, action.duration, gameState.currentAction.action);
                 const progress = Math.min((gameState.currentActionProgress / duration) * 100, 100);
                 document.getElementById('activeProgress').textContent = Math.round(progress) + '%';
 
@@ -6094,7 +6212,7 @@
                 const outputLabel = document.querySelector('[id*="activeOutput"]')?.parentElement?.querySelector('span:first-child');
 
                 // 计算实际持续时间（修炼和其他技能使用不同倍率）
-                const adjustedDuration = getAdjustedDuration(gameState.currentAction.skill, action.duration);
+                const adjustedDuration = getAdjustedDuration(gameState.currentAction.skill, action.duration, gameState.currentAction.action);
 
                 if (action.output.cultivation) {
                     if (outputLabel) outputLabel.textContent = '获得修为:';
@@ -6304,6 +6422,7 @@
                 } else if (GAME_CONFIG.skills[skillName].recipes) {
                     gameState.skills[skillName].recipes = JSON.parse(JSON.stringify(GAME_CONFIG.skills[skillName].recipes));
                 }
+                if (!gameState.skills[skillName].mastery) gameState.skills[skillName].mastery = { recipes: {}, pool: 0 };
             });
             Object.keys(GAME_CONFIG.dungeons).forEach(dungeonId => {
                 if (!gameState.dungeons[dungeonId]) gameState.dungeons[dungeonId] = { completed: false };
@@ -6438,7 +6557,7 @@
                 return;
             }
             // 应用工作速度和功法倍率（修炼特殊处理）
-            const duration = getAdjustedDuration(gameState.currentAction.skill, action.duration);
+            const duration = getAdjustedDuration(gameState.currentAction.skill, action.duration, gameState.currentAction.action);
             if (!(duration > 0)) {
                 gameState.lastActiveTime = now;
                 return;
@@ -6457,7 +6576,7 @@
                     }
                 });
                 // 「节省材料」特效：按概率折算实际消耗（库存判断仍按全额，偏保守）
-                const saveRate = Math.min(0.9, getSkillMod('save', savedAction.skill));
+                const saveRate = Math.min(0.9, getSkillMod('save', savedAction.skill) + getMasteryBonus(savedAction.skill, savedAction.action).save);
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
                     if (completions > 0) consumeItem(itemId, Math.round(qty * completions * (1 - saveRate)));
                 });
@@ -6477,7 +6596,7 @@
             offlineRewards.coins = (perAction.coins || 0) * completions;
             offlineRewards.cultivation = (perAction.cultivation || 0) * completions;
             // 「产出翻倍」特效：按概率折算（期望值）
-            const doubleRate = getSkillMod('double', savedAction.skill);
+            const doubleRate = getSkillMod('double', savedAction.skill) + getMasteryBonus(savedAction.skill, savedAction.action).double;
             (perAction.items || []).forEach(item => {
                 offlineRewards.items.push({ id: item.id, qty: Math.floor(item.qty * completions * (1 + doubleRate) + 1e-9) });
             });
@@ -6527,8 +6646,12 @@
 
             offlineRewards.items.forEach(item => addToInventory(item.id, item.qty));
             Object.entries(offlineRewards.skillExp).forEach(([skill, exp]) => {
-                addSkillExp(skill, exp);
+                addSkillExp(skill, exp, savedAction.action);
             });
+            // 离线期间的配方精通经验（按完成次数 × 配方基础耗时）
+            if (LIFE_SKILLS.includes(savedAction.skill) && completions > 0) {
+                addMasteryExp(savedAction.skill, savedAction.action, action.duration * completions);
+            }
 
             gameState.lastActiveTime = now;
 
