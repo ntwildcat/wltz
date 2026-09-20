@@ -187,7 +187,9 @@
                         { name: '太虚道主', type: '无', hp: 51500, atk: 220, spd: 70, def: 70, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 4000 }
                     ],
                     rewards: {
-                        fixed: [],
+                        fixed: [
+                            { id: 'seed_daofruit', qty: [2, 4] }
+                        ],
                         random: [
                             { id: 'huashenpill', qty: 1, probability: 0.35 },
                             { id: 'lotus', qty: [3, 5], probability: 1 },
@@ -217,7 +219,11 @@
                         // P7 元婴期配方
                         yuanying_nurture: { name: '元婴温养', desc: '元婴初期主力', duration: 45, output: { cultivation: 800, skill: 'cultivation', exp: 200 }, requiredRealmIndex: 13, unlocked: false },
                         soul_travel: { name: '元神出窍', desc: '元婴中期高产', duration: 60, output: { cultivation: 1400, skill: 'cultivation', exp: 280 }, requiredRealmIndex: 14, unlocked: false },
-                        yuanying_dao: { name: '元婴合道', desc: '元婴期最终法', duration: 120, output: { cultivation: 3500, skill: 'cultivation', exp: 450 }, requiredRealmIndex: 15, unlocked: false }
+                        yuanying_dao: { name: '元婴合道', desc: '元婴期最终法', duration: 120, output: { cultivation: 3500, skill: 'cultivation', exp: 450 }, requiredRealmIndex: 15, unlocked: false },
+                        // P9 化神期配方
+                        huashen_ning: { name: '化神凝元', desc: '化神初期主力', duration: 60, output: { cultivation: 2400, skill: 'cultivation', exp: 500 }, requiredRealmIndex: 17, unlocked: false },
+                        yuanshen_huaxu: { name: '元神化虚', desc: '化神中期高产', duration: 80, output: { cultivation: 4200, skill: 'cultivation', exp: 650 }, requiredRealmIndex: 18, unlocked: false },
+                        tiandi_gongming: { name: '天地共鸣', desc: '化神期最终法', duration: 150, output: { cultivation: 9000, skill: 'cultivation', exp: 900 }, requiredRealmIndex: 19, unlocked: false }
                     },
                     actions: {}
                 },
@@ -235,7 +241,8 @@
                         mushroom_stew: { name: '灵芝羹', desc: '灵芝 ×2 + 灵米 ×2（战斗食物：恢复500生命）', duration: 30, output: { items: [{ id: 'mushroom_stew', qty: 2 }], skill: 'alchemy', exp: 240 }, requiredLevel: 9, requires: { mushroom: 2, millet: 2 }, unlocked: false },
                         yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2（金丹圆满突破必需）', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 400 }, requiredLevel: 12, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false },
                         huashen_pill_alchemy: { name: '化神丹', desc: '九叶莲 ×5 + 悟道茶 ×8 + 仙矿 ×2（元婴圆满突破必需）', duration: 120, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'alchemy', exp: 700 }, requiredLevel: 17, requires: { lotus: 5, tea: 8, immortalore: 2 }, unlocked: false },
-                        immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 14, requires: { tea: 3, mushroom: 2 }, unlocked: false }
+                        immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 14, requires: { tea: 3, mushroom: 2 }, unlocked: false },
+                        jade_nectar: { name: '琼浆玉液', desc: '悟道果 ×2 + 悟道茶 ×3（战斗食物：恢复2000生命，冷却更短）', duration: 80, output: { items: [{ id: 'jade_nectar', qty: 2 }], skill: 'alchemy', exp: 900 }, requiredLevel: 19, requires: { daofruit: 2, tea: 3 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -255,7 +262,10 @@
                         golden_pendant: { name: '金丹佩', desc: '灵晶 ×1 + 玄晶 ×3', duration: 50, output: { items: [{ id: 'goldenpendant', qty: 1 }], skill: 'forging', exp: 300 }, requiredLevel: 12, requires: { spiritcrystal: 1, crystal: 3 }, unlocked: false },
                         yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 500 }, requiredLevel: 15, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
                         yuanying_armor: { name: '元婴法衣', desc: '灵晶 ×4 + 玄晶 ×4', duration: 90, output: { items: [{ id: 'yuanyingarmor', qty: 1 }], skill: 'forging', exp: 560 }, requiredLevel: 16, requires: { spiritcrystal: 4, crystal: 4 }, unlocked: false },
-                        yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 17, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false }
+                        yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 17, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false },
+                        huashen_sword: { name: '化神剑', desc: '混沌石 ×3 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashensword', qty: 1 }], skill: 'forging', exp: 800 }, requiredLevel: 19, requires: { chaosstone: 3, immortalore: 2 }, unlocked: false },
+                        huashen_armor: { name: '化神法衣', desc: '混沌石 ×4 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashenarmor', qty: 1 }], skill: 'forging', exp: 880 }, requiredLevel: 20, requires: { chaosstone: 4, immortalore: 2 }, unlocked: false },
+                        huashen_pendant: { name: '化神佩', desc: '混沌石 ×2 + 灵晶 ×3', duration: 100, output: { items: [{ id: 'huashenpendant', qty: 1 }], skill: 'forging', exp: 950 }, requiredLevel: 21, requires: { chaosstone: 2, spiritcrystal: 3 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -269,7 +279,8 @@
                         grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 20 }, requiredLevel: 2, requires: { seed_cleangrass: 1 }, unlocked: false },
                         mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 70 }, requiredLevel: 5, requires: { seed_mushroom: 1 }, unlocked: false },
                         tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 190 }, requiredLevel: 9, requires: { seed_tea: 1 }, unlocked: false },
-                        lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 12, requires: { seed_lotus: 1 }, unlocked: false }
+                        lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 12, requires: { seed_lotus: 1 }, unlocked: false },
+                        daofruit: { name: '种植悟道果', desc: '化神材料 需悟道果种子（太虚幻境掉落）', duration: 480, output: { items: [{ id: 'daofruit', qty: 1 }], skill: 'farming', exp: 600 }, requiredLevel: 16, requires: { seed_daofruit: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -284,7 +295,8 @@
                         spiritore: { name: '采灵矿', desc: '产出灵矿石', duration: 12, output: { items: [{ id: 'spiritore', qty: 1 }], skill: 'mining', exp: 60 }, requiredLevel: 6, unlocked: false },
                         crystal: { name: '采玄晶', desc: '产出玄晶', duration: 20, output: { items: [{ id: 'crystal', qty: 1 }], skill: 'mining', exp: 110 }, requiredLevel: 8, unlocked: false },
                         spiritcrystal: { name: '采灵晶', desc: '产出灵晶', duration: 25, output: { items: [{ id: 'spiritcrystal', qty: 1 }], skill: 'mining', exp: 220 }, requiredLevel: 12, unlocked: false },
-                        immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 330 }, requiredLevel: 15, unlocked: false }
+                        immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 330 }, requiredLevel: 15, unlocked: false },
+                        chaosstone: { name: '采混沌石', desc: '产出混沌石', duration: 50, output: { items: [{ id: 'chaosstone', qty: 1 }], skill: 'mining', exp: 600 }, requiredLevel: 18, unlocked: false }
                     },
                     actions: {}
                 },
@@ -305,7 +317,8 @@
                         gather: { name: '凝聚丹火', desc: '从金丹中提取丹火', duration: 15, output: { items: [{ id: 'danhuo', qty: 1 }], skill: 'danhuo', exp: 30 }, requiredLevel: 1, unlocked: true },
                         seed: { name: '培育丹火', desc: '以丹火种子培育，一次得到 4 份丹火（种子来自天劫之地）', duration: 20, output: { items: [{ id: 'danhuo', qty: 4 }], skill: 'danhuo', exp: 60 }, requiredLevel: 2, requires: { danhuo_seed: 1 }, unlocked: false },
                         temper: { name: '淬炼法器', desc: '用丹火强化装备', duration: 30, output: { items: [{ id: 'tempered_essence', qty: 1 }], skill: 'danhuo', exp: 90 }, requiredLevel: 3, requires: { danhuo: 3 }, unlocked: false },
-                        golden_pill: { name: '炼制元婴丹', desc: '丹火 ×5 + 九叶莲 ×1 + 悟道茶 ×3（金丹圆满突破必需）', duration: 60, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'danhuo', exp: 300 }, requiredLevel: 6, requires: { danhuo: 5, lotus: 1, tea: 3 }, unlocked: false }
+                        golden_pill: { name: '炼制元婴丹', desc: '丹火 ×5 + 九叶莲 ×1 + 悟道茶 ×3（金丹圆满突破必需）', duration: 60, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'danhuo', exp: 300 }, requiredLevel: 6, requires: { danhuo: 5, lotus: 1, tea: 3 }, unlocked: false },
+                        huashen_pill_fire: { name: '炼制化神丹', desc: '丹火 ×8 + 九叶莲 ×2 + 悟道茶 ×4（元婴圆满突破必需）', duration: 90, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'danhuo', exp: 500 }, requiredLevel: 10, requires: { danhuo: 8, lotus: 2, tea: 4 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -319,7 +332,8 @@
                         gather: { name: '凝练神识', desc: '从元婴中提取神识', duration: 20, output: { items: [{ id: 'shenshi', qty: 1 }], skill: 'shenshi', exp: 40 }, requiredLevel: 1, unlocked: true },
                         seed: { name: '培育神识', desc: '以神识种子培育，一次得到 4 份神识（种子来自化神秘境）', duration: 25, output: { items: [{ id: 'shenshi', qty: 4 }], skill: 'shenshi', exp: 80 }, requiredLevel: 2, requires: { shenshi_seed: 1 }, unlocked: false },
                         huashen_pill: { name: '炼制化神丹', desc: '神识 ×12 + 悟道茶 ×5 + 九叶莲 ×3（元婴圆满突破必需）', duration: 100, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'shenshi', exp: 400 }, requiredLevel: 8, requires: { shenshi: 12, tea: 5, lotus: 3 }, unlocked: false },
-                        scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 120 }, requiredLevel: 3, requires: { shenshi: 2 }, unlocked: false }
+                        scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 120 }, requiredLevel: 3, requires: { shenshi: 2 }, unlocked: false },
+                        meditate: { name: '神识入定', desc: '悟道果 ×1 → 神识 ×3', duration: 60, output: { items: [{ id: 'shenshi', qty: 3 }], skill: 'shenshi', exp: 260 }, requiredLevel: 10, requires: { daofruit: 1 }, unlocked: false }
                     },
                     actions: {}
                 }
@@ -382,6 +396,9 @@
                 // P6/P7 新矿石和种子
                 spiritcrystal: { name: '灵晶', icon: '🔹', type: 'ore' },
                 immortalore: { name: '仙矿', icon: '✨', type: 'ore' },
+                chaosstone: { name: '混沌石', icon: '🌑', type: 'ore' },
+                daofruit: { name: '悟道果', icon: '🍇', type: 'material', sellPrice: 600 },
+                seed_daofruit: { name: '悟道果种子', icon: '🌰', type: 'seed', sellPrice: 300 },
 
                 // P6/P7 新作物
                 // 战斗食物（在炼丹中制作；在战斗中HP低于50%时自动食用）
@@ -389,12 +406,16 @@
                 herb_soup: { name: '灵草汤', icon: '🍜', type: 'food', sellPrice: 60 },
                 mushroom_stew: { name: '灵芝羹', icon: '🥣', type: 'food', sellPrice: 150 },
                 immortal_peach: { name: '蟠桃', icon: '🍑', type: 'food', sellPrice: 400 },
+                jade_nectar: { name: '琼浆玉液', icon: '🍶', type: 'food', sellPrice: 1200 },
                 // 炼器新增装备
                 spiritarmor: { name: '灵甲', icon: '🛡️', type: 'armor', stats: { def: 16, hp: 30 } },
                 goldensword: { name: '金丹剑', icon: '🗡️', type: 'weapon', stats: { atk: 62 } },
                 goldenpendant: { name: '金丹佩', icon: '📿', type: 'jewelry', stats: { spd: 6, hp: 40 } },
                 yuanyingarmor: { name: '元婴法衣', icon: '🥋', type: 'armor', stats: { def: 45, hp: 120 } },
-                yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', stats: { spd: 10, hp: 80 } }
+                yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', stats: { spd: 10, hp: 80 } },
+                huashensword: { name: '化神剑', icon: '🗡️', type: 'weapon', stats: { atk: 110 } },
+                huashenarmor: { name: '化神法衣', icon: '🥼', type: 'armor', stats: { def: 65, hp: 170 } },
+                huashenpendant: { name: '化神佩', icon: '📿', type: 'jewelry', stats: { spd: 14, hp: 110 } }
             },
             shop: {
                 upgrades: [
@@ -428,7 +449,9 @@
                     { id: 'golden_art', name: '金丹大道', icon: '📜', price: 10000, desc: '修炼速度 ×1.5', minRealmIndex: 8, type: 'art' },
                     { id: 'fire_art', name: '焚天诀', icon: '🔥', price: 20000, desc: '修炼速度 ×1.8', minRealmIndex: 9, type: 'art' },
                     { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 30000, desc: '修炼速度 ×2.2', minRealmIndex: 11, type: 'art' },
-                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' }
+                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' },
+                { id: 'huashen_art', name: '化神真经', icon: '📖', price: 120000, desc: '修炼速度 ×3.4', minRealmIndex: 17, type: 'art' },
+                { id: 'primordial_art', name: '太初混元诀', icon: '☯️', price: 300000, desc: '修炼速度 ×4.2', minRealmIndex: 19, type: 'art' }
                 ]
             }
         };
@@ -475,6 +498,16 @@
                     cooldown: 5.0,
                     minRealm: 13,             // 元婴初期
                     description: '传说中的仙果，完全恢复生命值'
+                },
+                // 化神期食物：恢复量更大、冷却更短
+                jade_nectar: {
+                    id: 'jade_nectar',
+                    name: '琼浆玉液',
+                    icon: '🍶',
+                    hpRestore: 2000,          // 恢复HP
+                    cooldown: 3.0,
+                    minRealm: 17,             // 化神初期
+                    description: '化神修士的琼浆，饮下瞬间生机勃发，冷却比蟠桃更短'
                 }
             },
             // 默认食物配置
@@ -2145,6 +2178,26 @@
                 speedMultiplier: 2.8,               // 修炼速度快180%
                 effects: { 'exp:shenshi': 0.30, 'time:shenshi': -0.15, dropPct: 0.10 },  // 特效
                 description: '太虚宗门不传之秘，以元神直接吞吐天地灵气，修炼极快，神识修行事半功倍。',
+                origin: null
+            },
+            // P9 化神期功法
+            huashen_art: {
+                id: 'huashen_art',
+                name: '化神真经',
+                tier: 7,
+                speedMultiplier: 3.4,               // 修炼速度快240%
+                effects: { atkPct: 0.10, critDmg: 0.15, 'exp:life': 0.10 },  // 特效
+                description: '化神修士的根本大典，神魂与法力合一，出手凌厉，修行万事皆顺。',
+                origin: null
+            },
+            // 化神期高阶功法（稀有）
+            primordial_art: {
+                id: 'primordial_art',
+                name: '太初混元诀',
+                tier: 8,
+                speedMultiplier: 4.2,               // 修炼速度快320%
+                effects: { hpPct: 0.12, defPct: 0.10, 'time:life': -0.08 },  // 特效
+                description: '相传自太初而来的混元之法，肉身与元神浑然一体，修行与劳作皆事半功倍。',
                 origin: null
             }
         };
