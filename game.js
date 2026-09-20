@@ -3190,29 +3190,11 @@
 
                 const info = getSkillExpInfo(skillName);
                 const level = info.level;
-                const expPercent = info.percent;
                 item.title = `${skill.name} Lv.${level}：经验 ${info.exp} / ${info.need}，还差 ${info.remain} 升级`;
-
-                // 检查是否有已解锁的配方缺少材料（P2功能 - 材料不足红点）
-                let hasMaterialShortage = false;
-                if (skill.recipes) {
-                    Object.values(skill.recipes).forEach(recipe => {
-                        if (skill.level >= recipe.requiredLevel && recipe.requires) {
-                            Object.entries(recipe.requires).forEach(([itemId, qty]) => {
-                                const inventoryItem = gameState.player.inventory.find(i => i.id === itemId);
-                                if (!inventoryItem || inventoryItem.qty < qty) {
-                                    hasMaterialShortage = true;
-                                }
-                            });
-                        }
-                    });
-                }
-                const warningDot = hasMaterialShortage ? '<div style="position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #c4483a; border-radius: 50%; animation: pulse 1.5s infinite;"></div>' : '';
 
                 item.innerHTML = `
                     <div class="skill-name">${skill.icon} ${skill.name}</div>
                     <div class="skill-level">Lv.${level}</div>
-                    ${warningDot}
                 `;
                 item.style.position = 'relative';
                 tree.appendChild(item);
