@@ -1315,7 +1315,7 @@ overflow-y: auto !important;
 overflow-x: hidden !important;
     }
 
-    /* 头部信息纵向排列 */
+    /* 头部信息：外层纵向（信息行 + 突破按钮），信息行内 姓名 / 境界 / 修为进度 三块水平排列 */
     .header {
 flex-direction: column !important;
 gap: 8px !important;
@@ -1324,9 +1324,24 @@ margin-bottom: 10px !important;
     }
 
     .player-info {
-flex-direction: column !important;
-gap: 8px !important;
+flex-direction: row !important;
+gap: 16px !important;
 align-items: flex-start !important;
+width: 100% !important;
+    }
+
+    .player-info .info-item {
+flex: 0 0 auto !important;
+min-width: 0 !important;
+    }
+
+    /* 修为进度占满剩余宽度 */
+    .player-info .info-item:last-child {
+flex: 1 1 auto !important;
+    }
+
+    .player-info .progress-bar {
+width: 100% !important;
     }
 
     /* 面板单列 */
