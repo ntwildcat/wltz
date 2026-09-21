@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=12.4">
+    <link rel="stylesheet" href="style.css?v=12.8">
 
 </head>
 <body data-panel="cultivation">
@@ -32,6 +32,14 @@
             <div class="coin-display" onclick="switchPanel('shop')" role="button" tabindex="0" title="点击进入商城" aria-label="商城，当前灵石">
                 <div><span data-ico="coin">💎</span> 灵石</div>
                 <div id="coinAmount">100</div>
+            </div>
+            <div class="coin-display cur-display" data-cur="danhuo" style="display: none;" onclick="switchPanel('danhuo')" role="button" tabindex="0" title="丹火：点击进入丹火（淬炼装备、强化灵根）">
+                <div><span data-ico="danhuo">🔥</span> 丹火</div>
+                <div class="cur-amount">0</div>
+            </div>
+            <div class="coin-display cur-display" data-cur="shenshi" style="display: none;" onclick="switchPanel('shenshi')" role="button" tabindex="0" title="神识：点击进入神识（分身强化、专注、感应）">
+                <div><span data-ico="shenshi">👁️</span> 神识</div>
+                <div class="cur-amount">0</div>
             </div>
         </div>
 
@@ -118,8 +126,16 @@
                             </div>
                         </div>
                     </div>
+                    <div class="mobile-coins">
                     <div class="mobile-coin" onclick="switchPanel('shop')" role="button" tabindex="0" aria-label="灵石，点击进入商城">
                         <span data-ico="coin">💎</span> 灵石 <b id="mobileCoinAmount">0</b>
+                    </div>
+                    <div class="mobile-coin mobile-cur" data-cur="danhuo" style="display: none;" onclick="switchPanel('danhuo')" role="button" tabindex="0" aria-label="丹火">
+                        <span data-ico="danhuo">🔥</span> 丹火 <b class="cur-amount">0</b>
+                    </div>
+                    <div class="mobile-coin mobile-cur" data-cur="shenshi" style="display: none;" onclick="switchPanel('shenshi')" role="button" tabindex="0" aria-label="神识">
+                        <span data-ico="shenshi">👁️</span> 神识 <b class="cur-amount">0</b>
+                    </div>
                     </div>
                     <div id="breakThroughBtn" class="btn btn-secondary" onclick="showBreakthroughModal()" style="display: none;">
                         ✨ 尝试突破 ✨
@@ -225,6 +241,7 @@
                             <div class="panel-title">🧪 炼丹</div>
                             <div class="skill-exp-header" data-skill="alchemy"></div>
                             <div class="skill-list" id="alchemySkills"></div>
+                            <div id="alchemyBoostBar" class="boost-bar" style="display: none;"></div>
                             <div class="action-list" id="alchemyActions"></div>
                             <div class="action-detail" id="action-detail-alchemy"></div>
                         </div>
@@ -260,6 +277,7 @@
                         <div id="panel-danhuo" class="panel-content hidden">
                             <div class="panel-title">🔥 丹火</div>
                             <div class="skill-exp-header" data-skill="danhuo"></div>
+                            <div id="danhuoUses" class="skill-uses"></div>
                             <div class="action-list" id="danhuoActions"></div>
                             <div class="action-detail" id="action-detail-danhuo"></div>
                         </div>
@@ -268,6 +286,7 @@
                         <div id="panel-shenshi" class="panel-content hidden">
                             <div class="panel-title">👁️ 神识</div>
                             <div class="skill-exp-header" data-skill="shenshi"></div>
+                            <div id="shenshiUses" class="skill-uses"></div>
                             <div class="action-list" id="shenshiActions"></div>
                             <div class="action-detail" id="action-detail-shenshi"></div>
                         </div>
@@ -750,7 +769,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=12.4"></script>
+    <script src="game.js?v=12.8"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

@@ -1927,3 +1927,29 @@ body.fx-shake .container { animation: fxShake 0.12s linear infinite; }
 .quest-skip-link { margin-left: 0; }
 .quest-head .quest-list-link:first-of-type { margin-left: auto; }
 .quest-skip-btn { opacity: 0.85; }
+
+/* 丹火 / 神识：货币条与用途面板 */
+.cur-display { margin-top: 6px; }
+.mobile-cur { margin-left: 6px; }
+.skill-uses { margin: 0 0 14px; }
+.use-balance { padding: 8px 12px; border: 1px solid var(--border-l3); background: var(--bg-l3); margin-bottom: 10px; color: var(--text-l2); }
+.use-balance b { color: var(--text-l1); font-size: 1.15em; margin: 0 6px 0 4px; }
+.use-balance small { display: block; margin-top: 4px; color: var(--text-l4); font-size: 0.8em; line-height: 1.6; }
+.use-card { border: 1px solid var(--border-l3); background: var(--bg-l3); margin-bottom: 10px; padding: 8px 12px; }
+.use-title { font-weight: bold; color: var(--text-l1); margin-bottom: 6px; }
+.use-title small { display: block; font-weight: normal; color: var(--text-l4); font-size: 0.8em; line-height: 1.6; margin-top: 2px; }
+.use-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--border-l3); }
+.use-row:first-of-type { border-top: none; }
+.use-main { flex: 1; min-width: 0; }
+.use-lv { color: var(--text-l3); font-size: 0.85em; margin-left: 6px; }
+.use-effect { color: var(--text-l4); font-size: 0.82em; line-height: 1.6; }
+.use-btn { flex: none; padding: 4px 14px; white-space: nowrap; }
+.use-max { flex: none; color: var(--patina); font-size: 0.85em; }
+.boost-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0 0 12px; padding: 8px 12px; border: 1px solid var(--border-l3); background: var(--bg-l3); font-size: 0.85em; }
+.boost-toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-l1); font-weight: bold; }
+.boost-desc { color: var(--text-l4); flex: 1 1 260px; }
+.boost-bal { color: var(--text-l2); }
+@media (max-width: 768px) { .use-row { flex-wrap: wrap; } .use-btn { width: 100%; min-height: 38px; } }
+
+.mobile-coins { display: none; }
+@media (max-width: 768px) { .mobile-coins { display: flex; flex-wrap: wrap; gap: 6px; } .mobile-coins .mobile-cur { margin-left: 0; } }
