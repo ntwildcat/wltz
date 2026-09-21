@@ -1847,3 +1847,9 @@ body.fx-shake .container { animation: fxShake 0.12s linear infinite; }
 .fx-replay-btn { margin-top: 0; padding: 6px 14px; display: inline-flex; flex-direction: column; align-items: center; line-height: 1.3; }
 .fx-replay-btn small { font-size: 0.7em; color: var(--text-l4); font-family: var(--font-body); letter-spacing: 0; }
 .fx-foundation .fx-text { top: 24%; }
+
+/* 物品图标（手绘 SVG）：文字行内 1.2em，背包格与详情里更大 */
+.ico { width: 1.2em; height: 1.2em; vertical-align: -0.22em; flex: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,.45)); }
+.item-icon .ico { width: 2.1em; height: 2.1em; }
+#itemIcon .ico, #buyIcon .ico { width: 1.1em; height: 1.1em; }
+.food-icon .ico { width: 1.3em; height: 1.3em; }
