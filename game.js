@@ -1149,13 +1149,14 @@
                 applySkillLevelBonus(skill, per);
                 const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double;
                 gameState.player.coins += (per.coins || 0) * n;
+                const lost = [];
                 (per.items || []).forEach(item => {
                     const qty = Math.floor(item.qty * n * (1 + doubleRate) + 1e-9);
-                    if (qty > 0) addToInventory(item.id, qty);
+                    if (qty > 0 && !addToInventory(item.id, qty, true)) lost.push(`${GAME_CONFIG.items[item.id].name}×${qty}`);
                 });
                 if (per.skill && per.exp) addSkillExp(per.skill, per.exp * n, key);
                 addMasteryExp(skill, key, action.duration * n);
-                showNotification(`🌀 ${label}离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
+                showNotification(`🌀 ${label}离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}${lost.length ? `\n❌ 背包已满，${lost.join('、')} 未能获得` : ''}`, lost.length ? '#c98a3e' : '#6fa980');
             }
             if (ranOut) { c.action = null; generateRecipeList(skill); }
             c.progress = 0;
@@ -6352,6 +6353,8 @@
             const wasMajor = gameState.player.realmIndex % 4 === 0 && gameState.player.realmIndex > 0;   // 从大境界圆满突破
             gameState.player.realmIndex = nextRealmIndex;
             gameState.player.cultivationXP = 0;
+            calculateStats();
+            if (gameState.player.stats.hp && gameState.player.stats.hp.max) gameState.player.stats.hp.current = gameState.player.stats.hp.max;   // 突破后气血充盈
 
             const newRealm = GAME_CONFIG.realms[nextRealmIndex];
             showNotification(`突破成功！当前境界：${newRealm.name}`, '#6f9c8a', 'success');
@@ -6482,6 +6485,17 @@
                 const originArt = gameState.player.origin === 'disciple' ? 'advanced_art' : 'basic_art';
                 gameState.player.ownedArts = [...new Set([originArt, gameState.player.currentArt])];
             }
+            // 清理配置里已不存在的物品（旧版本删除过物品时，存档里残留的条目会让背包渲染报错）
+            if (Array.isArray(gameState.player.inventory)) {
+                gameState.player.inventory = gameState.player.inventory.filter(i => i && GAME_CONFIG.items[i.id] && i.qty > 0);
+            }
+            if (gameState.player.equipment) {
+                const eq = gameState.player.equipment;
+                if (eq.weapon && !GAME_CONFIG.items[eq.weapon]) eq.weapon = null;
+                if (eq.armor && !GAME_CONFIG.items[eq.armor]) eq.armor = null;
+                if (Array.isArray(eq.jewelry)) eq.jewelry = eq.jewelry.filter(id => GAME_CONFIG.items[id]);
+            }
+            if (gameState.player.foodSlot && !FOOD_CONFIG.foods[gameState.player.foodSlot]) gameState.player.foodSlot = null;
             if (gameState.player.temperLevel === undefined) gameState.player.temperLevel = 0;
             if (gameState.player.scoutBonus === undefined) gameState.player.scoutBonus = false;
 
