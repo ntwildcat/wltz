@@ -448,13 +448,6 @@
                     { id: 'cleangrass', name: '清灵草', icon: '🍃', price: 25, desc: '炼丹材料' },
                     { id: 'mushroom', name: '灵芝', icon: '🍄', price: 50, desc: '高级材料' }
                 ],
-                equipment: [
-                    { id: 'sword', name: '桃木剑', icon: '⚔️', price: 150, desc: '攻击力+15', minRealmIndex: 0 },
-                    { id: 'ironarmor', name: '铁甲', icon: '🛡️', price: 300, desc: '防御力+10', minRealmIndex: 5 },
-                    { id: 'spiritsword', name: '灵剑', icon: '⚡', price: 1000, desc: '攻击力+40', minRealmIndex: 8 },
-                    { id: 'goldenarmor', name: '金丹法袍', icon: '👔', price: 3000, desc: '防御力+25', minRealmIndex: 9 },
-                    { id: 'yuanyingsword', name: '元婴灵剑', icon: '✨', price: 10000, desc: '攻击力+80', minRealmIndex: 13 }
-                ],
                 materials: [
                     { id: 'spiritore', name: '灵矿石', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5 },
                     { id: 'crystal', name: '玄晶', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
@@ -868,7 +861,7 @@
                 每个配方做得越多，<b>🎓 精通</b>等级越高，会带来翻倍、省材料、缩短耗时等加成；把鼠标悬停（手机上点一下）可以看到详情。` },
             { title: '⚔️ 战斗', body: `进入<b>战斗区域</b>打怪，获得灵石和经验，区域随境界解锁。战斗时生命低会自动吃你装备的<b>食物</b>（在炼丹里制作，背包里设为战斗食物）。<br/><br/>
                 <b>🔁 循环战斗</b>：进入战斗区域后会一直打下去，点「撤退」才退出，离线也会继续。<b>秘境</b>同样会一直循环挑战，掉落种子和突破材料，但被击败会损失修为和食物，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
-            { title: '🏪 商城与小提示', body: `用灵石在<b>商城</b>买装备、材料、食物和功法；功法和灵根都有各自的特效，可以在修炼面板切换功法。<br/><br/>
+            { title: '🏪 商城与小提示', body: `用灵石在<b>商城</b>买材料、食物和功法（装备只能在炼器里打造）；功法和灵根都有各自的特效，可以在修炼面板切换功法。<br/><br/>
                 💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份。这个介绍可以在<b>设置 → 玩法介绍</b>里随时重看。祝你道途顺遂！` }
         ];
         let tutorialStep = 0;
@@ -4526,7 +4519,7 @@
                         <button class="btn equip-btn" onclick="equipFromBag('${i.id}')">装备</button></div>`;
                 }).join('');
             });
-            box.innerHTML = `<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（炼器可以打造，商城也有出售）</div>'}`;
+            box.innerHTML = `<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（可以在炼器里打造）</div>'}`;
         }
 
         // 旧存档迁移：装备曾同时保留在背包里，现在装备栏与背包分开。每件已装备的物品从背包扣掉 1 件；
@@ -5490,7 +5483,6 @@
                 upgrades: '⭐ 永久升级',
                 food: '🌾 食物',
                 pills: '💊 丹药',
-                equipment: '⚔️ 装备',
                 materials: '🪨 材料',
                 arts: '📜 功法',
                 special: '✨ 特殊'
