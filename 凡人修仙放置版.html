@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=11.9">
+    <link rel="stylesheet" href="style.css?v=12.0">
 
 </head>
 <body data-panel="cultivation">
@@ -480,8 +480,9 @@
                                 <div id="currentSlotLabel" style="color: #9ca69f; font-size: 0.85em; margin-bottom: 8px;"></div>
                                 <div style="display: flex; flex-direction: column; gap: 10px;">
                                     <button class="btn" onclick="backToSlotSelect()">🔀 切换存档</button>
-                                    <button class="btn" onclick="exportSave()">📥 导出存档</button>
-                                    <button class="btn btn-secondary" onclick="importSave()">📤 导入存档</button>
+                                    <button class="btn" onclick="exportSave()">📥 导出存档（下载文件）</button>
+                                    <button class="btn btn-secondary" onclick="importSave()">📤 导入存档（选择文件）</button>
+                                    <input type="file" id="importSaveFile" accept=".txt,.json,text/plain" style="display:none" onchange="onImportFileChosen(this)" aria-label="选择存档文件">
                                     <button class="btn btn-secondary" onclick="resetGame()">🗑 删除当前存档</button>
                                 </div>
                             </div>
@@ -739,7 +740,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=11.9"></script>
+    <script src="game.js?v=12.0"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

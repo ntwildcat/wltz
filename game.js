@@ -862,7 +862,7 @@
             { title: '⚔️ 战斗', body: `进入<b>战斗区域</b>打怪，获得灵石和经验，区域随境界解锁。战斗时生命低会自动吃你装备的<b>食物</b>（在炼丹里制作，背包里设为战斗食物）。<br/><br/>
                 <b>🔁 循环战斗</b>：进入战斗区域后会一直打下去，点「撤退」才退出，离线也会继续。<b>秘境</b>同样会一直循环挑战，掉落种子和突破材料，但被击败会损失修为和食物，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
             { title: '🏪 商城与小提示', body: `用灵石在<b>商城</b>买材料、食物和功法（装备只能在炼器里打造）；功法和灵根都有各自的特效，可以在修炼面板切换功法。<br/><br/>
-                💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份。这个介绍可以在<b>设置 → 玩法介绍</b>里随时重看。祝你道途顺遂！` }
+                💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份（会下载一个存档文件，需要时用「导入存档」选择它）。这个介绍可以在<b>设置 → 玩法介绍</b>里随时重看。祝你道途顺遂！` }
         ];
         let tutorialStep = 0;
 
@@ -7079,33 +7079,51 @@
             return new TextDecoder().decode(Uint8Array.from(binary, c => c.charCodeAt(0)));
         }
 
+        // 导出：直接下载一个存档文件（内容仍是原来的存档代码格式，所以旧的存档代码也能导入）
         function exportSave() {
             saveGame();
             const code = encodeSave(JSON.stringify(gameState));
-            const fallback = () => prompt('自动复制失败，请手动复制存档代码:', code);
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(code).then(
-                    () => alert('存档已复制到剪贴板！'),
-                    fallback
-                );
-            } else {
-                fallback();
-            }
+            const d = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            const name = `凡人修仙存档_${currentSlot ? '槽' + currentSlot + '_' : ''}${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}.txt`;
+            const url = URL.createObjectURL(new Blob([code], { type: 'text/plain;charset=utf-8' }));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = name;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
+        // 导入：选择之前导出的存档文件（也兼容旧版复制出来的存档代码保存成的文本文件）
         function importSave() {
-            const input = prompt('请粘贴存档代码:');
-            if (!input) return;
+            const input = document.getElementById('importSaveFile');
+            input.value = '';
+            input.click();
+        }
+
+        function onImportFileChosen(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => importSaveText(String(reader.result || ''));
+            reader.onerror = () => alert('读取存档文件失败！');
+            reader.readAsText(file);
+        }
+
+        function importSaveText(text) {
+            if (!text.trim()) return;
 
             let loaded;
             try {
-                loaded = JSON.parse(decodeSave(input));
+                loaded = JSON.parse(decodeSave(text));
             } catch (e) {
-                alert('存档代码无效！');
+                alert('存档文件无效！');
                 return;
             }
             if (!loaded || !loaded.player || !loaded.skills || !loaded.player.name) {
-                alert('存档代码无效：缺少角色数据！');
+                alert('存档文件无效：缺少角色数据！');
                 return;
             }
 
@@ -7125,7 +7143,7 @@
             updateStatsDisplay();
             saveGame();
             updateSlotLabel();
-            alert('存档导入成功！（已覆盖当前存档）');
+            alert('存档导入成功！（已覆盖当前存档）');   // 导入的存档文件会覆盖当前槽位
         }
 
         // 删除当前存档并回到存档选择界面
