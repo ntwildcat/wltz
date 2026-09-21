@@ -1940,12 +1940,14 @@
                     showNotification('已撤退', '#c2a25f');
                     switchPanel('battle');
                     switchBattleTab('areas');
+                    scrollMainToTop();
                 } else {
                     resetBattleState('idle');
                     showNotification('已撤退秘境', '#c2a25f');
                     updateUI();
                     switchPanel('battle');
                     switchBattleTab('dungeons');
+                    scrollMainToTop();
                 }
             };
             buttons[1].onclick = () => {
@@ -4995,6 +4997,7 @@
             updateNormalBattleUI();
             renderAutoBattleBar();
             updateUI();
+            if (!auto) scrollBattleIntoView();
         }
 
         // 进入秘境
@@ -5782,6 +5785,20 @@
             document.getElementById('coinAmount').textContent = gameState.player.coins;
             const shopCoin = document.getElementById('shopCoin');
             if (shopCoin) shopCoin.textContent = gameState.player.coins;
+            const mobileCoin = document.getElementById('mobileCoinAmount');
+            if (mobileCoin) mobileCoin.textContent = gameState.player.coins;
+        }
+
+        // 手动进入战斗后把战斗界面滚到可见处（手机上战斗区域列表很长，战斗界面在最底下，点进去看不到任何变化）；
+        // 撤退 / 被击败回到列表时滚回顶部
+        function scrollBattleIntoView() {
+            const el = document.getElementById('battleContainer');
+            if (el && !el.classList.contains('hidden')) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        function scrollMainToTop() {
+            const main = document.getElementById('main');
+            if (main && main.scrollTo) main.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // ==================== 突破系统 ====================

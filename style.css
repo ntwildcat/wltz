@@ -1886,3 +1886,17 @@ body.fx-shake .container { animation: fxShake 0.12s linear infinite; }
 .hp-restore-bar .btn { padding: 2px 10px; font-size: 0.95em; }
 .hp-restore-bar .btn:disabled { opacity: .45; cursor: not-allowed; }
 .hp-restore-bar .hp-rest-hint { color: var(--text-l4); font-size: 0.9em; margin-left: auto; }
+
+/* 手机端补齐：灵石显示、战斗食物栏换行（原先 4x 速度按钮被挤出屏幕、自动食用文字被挤成竖排） */
+.mobile-coin { display: none; }
+@media (max-width: 768px) {
+    .mobile-coin { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 4px 12px; border: 1px solid var(--border-l3); background: var(--bg-l3); color: var(--text-l2); font-size: 0.9em; cursor: pointer; }
+    .mobile-coin b { color: var(--text-l1); }
+    .food-bar { flex-wrap: wrap !important; gap: 8px 12px !important; }
+    .food-bar .food-slot { flex: 1 1 100% !important; }
+    .auto-eat-toggle { white-space: nowrap !important; flex: none !important; }
+    .auto-eat-toggle input { width: 20px !important; height: 20px !important; }
+    .food-bar > div[style*="margin-left"] { display: none !important; }
+    .battle-speed-control { margin-left: auto !important; flex: none !important; }
+    .speed-btn { min-height: 36px !important; min-width: 40px !important; }
+}
