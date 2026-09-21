@@ -893,7 +893,7 @@
         // ==================== 新手任务 ====================
         // 一串连续的小任务，带新玩家把每个基础玩法（六个基础技能、出售 / 购买、装备、战斗、秘境）都用一遍；每个任务完成后
         // 点「领取奖励」得灵石（个别送物品），全部做完再告诉玩家游戏目标。进度靠 gameState.tally（累计事件计数）和当前状态判断，
-        // 存档字段：gameState.quests = { index: 当前第几个任务, done: 是否全部完成, goalShown: 是否看过游戏目标 }。
+        // 存档字段：gameState.quests = { index: 当前第几个任务, done: 是否结束, goalShown: 是否看过游戏目标, skipped: 是否被玩家跳过（跳过没有任何奖励） }。
         // 老存档（境界已超过练气初期）迁移时直接标记为已完成，不再显示任务条。
         const NEWBIE_QUESTS = [
             { title: '吐纳灵气', panel: 'cultivation', target: ['cultivation', 'basic'],
@@ -1012,6 +1012,7 @@
                     <span class="quest-tag">📜 新手任务 ${state.index + 1}/${NEWBIE_QUESTS.length}</span>
                     <b class="quest-title">${quest.title}</b>
                     <button type="button" class="quest-list-link" onclick="showQuestList()">全部任务</button>
+                    <button type="button" class="quest-list-link quest-skip-link" onclick="skipQuests()">我是老玩家，跳过</button>
                 </div>
                 <div class="quest-desc">${quest.desc}</div>
                 <div class="quest-foot">
@@ -1053,18 +1054,34 @@
             saveGame();
         }
 
+        // 老玩家跳过新手任务：之后不再有任务条，也拿不到任何任务奖励（包括已完成但没领取的、桃木剑和最终奖励）
+        function skipQuests() {
+            const state = getQuestState();
+            if (state.done) return;
+            const ok = confirm('确定跳过新手任务吗？\n\n跳过后不会再有任务提示，也拿不到任何任务奖励（灵石、桃木剑等），包括已经完成但还没领取的。\n之后仍可以在「设置 → 玩法介绍」里查看任务列表和游戏目标。');
+            if (!ok) return;
+            state.done = true;
+            state.skipped = true;
+            state.index = NEWBIE_QUESTS.length;
+            closeTutorial();
+            updateUI();
+            refreshVisiblePanelLists();
+            saveGame();
+            showNotification('已跳过新手任务（没有奖励）。游戏目标可在「设置 → 玩法介绍 → 新手任务」里查看。', '#b89a5b');
+        }
+
         // 全部任务列表（已完成 / 当前 / 未开始）
         function showQuestList() {
             const state = getQuestState();
             const rows = NEWBIE_QUESTS.map((q, i) => {
-                const mark = i < state.index || state.done ? '✅' : (i === state.index ? '👉' : '⚪');
+                const mark = state.skipped ? '⏭' : (i < state.index || state.done ? '✅' : (i === state.index ? '👉' : '⚪'));
                 return `<div class="quest-row${i === state.index && !state.done ? ' current' : ''}"><span>${mark} ${i + 1}. ${q.title}</span><small>${questRewardText(q.reward)}</small></div>`;
             }).join('');
             document.getElementById('tutorialContent').innerHTML = `
                 <div class="tutorial-title">📜 新手任务</div>
                 <div class="tutorial-body quest-list">${rows}
-                    <div class="quest-row final"><span>🎁 全部完成</span><small>${COIN_ICON} ${NEWBIE_FINAL_REWARD} 灵石 + 游戏目标介绍</small></div></div>
-                <div class="tutorial-actions"><button class="btn" onclick="closeTutorial()">关闭</button>${state.done ? '<button class="btn btn-secondary" onclick="showQuestGoal(false)">查看游戏目标</button>' : ''}</div>`;
+                    <div class="quest-row final"><span>🎁 全部完成</span><small>${state.skipped ? '已跳过，没有奖励' : `${COIN_ICON} ${NEWBIE_FINAL_REWARD} 灵石 + 游戏目标介绍`}</small></div></div>
+                <div class="tutorial-actions"><button class="btn" onclick="closeTutorial()">关闭</button>${state.done ? '<button class="btn btn-secondary" onclick="showQuestGoal(false)">查看游戏目标</button>' : '<button class="btn btn-secondary quest-skip-btn" onclick="skipQuests()">我是老玩家，跳过任务</button>'}</div>`;
             document.getElementById('tutorialModal').classList.add('show');
         }
 
