@@ -133,11 +133,11 @@
                             { id: 'danhuo_seed', qty: [2, 4] }
                         ],
                         random: [
-                            { id: 'goldenpill', qty: 1, probability: 0.4 },
                             { id: 'crystal', qty: [3, 5], probability: 1 },
                             { id: 'spiritore', qty: [5, 8], probability: 1 }
                         ],
                         coins: [550, 1030],
+                        danhuo: [40, 80],
                         skillExp: 150
                     }
                 },
@@ -162,11 +162,12 @@
                             { id: 'shenshi_seed', qty: [3, 6] }
                         ],
                         random: [
-                            { id: 'yuanyingpill', qty: 1, probability: 0.35 },
                             { id: 'lotus', qty: [2, 4], probability: 1 },
                             { id: 'crystal', qty: [5, 10], probability: 1 }
                         ],
                         coins: [1400, 2500],
+                        danhuo: [60, 120],
+                        shenshi: [30, 60],
                         skillExp: 250
                     }
                 },
@@ -191,11 +192,12 @@
                             { id: 'seed_daofruit', qty: [2, 4] }
                         ],
                         random: [
-                            { id: 'huashenpill', qty: 1, probability: 0.35 },
                             { id: 'lotus', qty: [3, 5], probability: 1 },
                             { id: 'immortalore', qty: [3, 6], probability: 1 }
                         ],
                         coins: [2700, 5100],
+                        danhuo: [100, 200],
+                        shenshi: [80, 160],
                         skillExp: 400
                     }
                 }
@@ -315,11 +317,10 @@
                     level: 1,
                     exp: 0,
                     recipes: {
-                        gather: { name: '凝聚丹火', desc: '从金丹中提取丹火', duration: 15, output: { items: [{ id: 'danhuo', qty: 1 }], skill: 'danhuo', exp: 30 }, requiredLevel: 1, unlocked: true },
-                        seed: { name: '培育丹火', desc: '以丹火种子培育，一次得到 4 份丹火（种子来自天劫之地）', duration: 20, output: { items: [{ id: 'danhuo', qty: 4 }], skill: 'danhuo', exp: 60 }, requiredLevel: 2, requires: { danhuo_seed: 1 }, unlocked: false },
-                        temper: { name: '淬炼法器', desc: '用丹火强化装备', duration: 30, output: { items: [{ id: 'tempered_essence', qty: 1 }], skill: 'danhuo', exp: 90 }, requiredLevel: 3, requires: { danhuo: 3 }, unlocked: false },
-                        golden_pill: { name: '炼制元婴丹', desc: '丹火 ×5 + 九叶莲 ×1 + 悟道茶 ×3（金丹圆满突破必需）', duration: 60, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'danhuo', exp: 300 }, requiredLevel: 6, requires: { danhuo: 5, lotus: 1, tea: 3 }, unlocked: false },
-                        huashen_pill_fire: { name: '炼制化神丹', desc: '丹火 ×8 + 九叶莲 ×2 + 悟道茶 ×4（元婴圆满突破必需）', duration: 90, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'danhuo', exp: 500 }, requiredLevel: 10, requires: { danhuo: 8, lotus: 2, tea: 4 }, unlocked: false }
+                        gather: { name: '凝聚丹火', desc: '从金丹中提取丹火（货币：淬炼装备、强化灵根）', duration: 15, output: { danhuo: 5, skill: 'danhuo', exp: 30 }, requiredLevel: 1, unlocked: true },
+                        seed: { name: '培育丹火', desc: '以丹火种子培育，一次得到 25 丹火（种子来自天劫之地）', duration: 20, output: { danhuo: 25, skill: 'danhuo', exp: 60 }, requiredLevel: 2, requires: { danhuo_seed: 1 }, unlocked: false },
+                        refine: { name: '提炼丹火', desc: '更高效的提炼：耗时翻倍，产出更多', duration: 30, output: { danhuo: 13, skill: 'danhuo', exp: 110 }, requiredLevel: 6, unlocked: false },
+                        condense: { name: '凝练丹火', desc: '炼火成髓：丹火技能的顶级提取法', duration: 60, output: { danhuo: 30, skill: 'danhuo', exp: 260 }, requiredLevel: 12, unlocked: false }
                     },
                     actions: {}
                 },
@@ -348,11 +349,11 @@
                     level: 1,
                     exp: 0,
                     recipes: {
-                        gather: { name: '凝练神识', desc: '从元婴中提取神识', duration: 20, output: { items: [{ id: 'shenshi', qty: 1 }], skill: 'shenshi', exp: 40 }, requiredLevel: 1, unlocked: true },
-                        seed: { name: '培育神识', desc: '以神识种子培育，一次得到 4 份神识（种子来自元婴秘境）', duration: 25, output: { items: [{ id: 'shenshi', qty: 4 }], skill: 'shenshi', exp: 80 }, requiredLevel: 2, requires: { shenshi_seed: 1 }, unlocked: false },
-                        huashen_pill: { name: '炼制化神丹', desc: '神识 ×12 + 悟道茶 ×5 + 九叶莲 ×3（元婴圆满突破必需）', duration: 100, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'shenshi', exp: 400 }, requiredLevel: 8, requires: { shenshi: 12, tea: 5, lotus: 3 }, unlocked: false },
-                        scout: { name: '神识探查', desc: '用神识探查秘境，提升掉落率', duration: 40, output: { items: [{ id: 'shenshi_map', qty: 1 }], skill: 'shenshi', exp: 120 }, requiredLevel: 3, requires: { shenshi: 2 }, unlocked: false },
-                        meditate: { name: '神识入定', desc: '悟道果 ×1 → 神识 ×3', duration: 60, output: { items: [{ id: 'shenshi', qty: 3 }], skill: 'shenshi', exp: 260 }, requiredLevel: 10, requires: { daofruit: 1 }, unlocked: false }
+                        gather: { name: '凝练神识', desc: '从元婴中提取神识（货币：分身强化、专注、神识感应）', duration: 20, output: { shenshi: 4, skill: 'shenshi', exp: 40 }, requiredLevel: 1, unlocked: true },
+                        seed: { name: '培育神识', desc: '以神识种子培育，一次得到 20 神识（种子来自元婴秘境）', duration: 25, output: { shenshi: 20, skill: 'shenshi', exp: 80 }, requiredLevel: 2, requires: { shenshi_seed: 1 }, unlocked: false },
+                        refine: { name: '提炼神识', desc: '更高效的提炼：耗时翻倍，产出更多', duration: 40, output: { shenshi: 10, skill: 'shenshi', exp: 150 }, requiredLevel: 5, unlocked: false },
+                        meditate: { name: '神识入定', desc: '悟道果 ×1 → 神识 ×15', duration: 60, output: { shenshi: 15, skill: 'shenshi', exp: 260 }, requiredLevel: 10, requires: { daofruit: 1 }, unlocked: false },
+                        deep: { name: '深度入定', desc: '神识技能的顶级提取法', duration: 90, output: { shenshi: 28, skill: 'shenshi', exp: 420 }, requiredLevel: 15, unlocked: false }
                     },
                     actions: {}
                 }
@@ -391,16 +392,12 @@
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', sellPrice: 80, effect: { workSpeed: 0.95 } },
 
                 // P6 丹火相关物品
-                danhuo: { name: '丹火', icon: '🔥', type: 'material', sellPrice: 60 },
                 danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed', sellPrice: 50 },
-                tempered_essence: { name: '淬炼精华', icon: '✨', type: 'material', sellPrice: 100 },
 
                 // P7 神识相关物品
-                shenshi: { name: '神识', icon: '👁️', type: 'material', sellPrice: 120 },
                 shenshi_seed: { name: '神识种子', icon: '👁️', type: 'seed', sellPrice: 100 },
                 yuanyingpill: { name: '元婴丹', icon: '⭕', type: 'breakthrough_material' },
                 huashenpill: { name: '化神丹', icon: '🔮', type: 'breakthrough_material' },  // P9 突破材料
-                shenshi_map: { name: '神识地图', icon: '🗺️', type: 'material', sellPrice: 200 },
 
                 // 装备
                 sword: { name: '桃木剑', icon: '⚔️', type: 'weapon', sellPrice: 60, stats: { atk: 15 } },
@@ -592,9 +589,7 @@
                 spiritpill: svg(pill('#3f74c0', '#bfdcff', '<circle cx="16" cy="16" r="5" stroke="#dbeaff" stroke-width="1"/><circle cx="16" cy="16" r="2" fill="#dbeaff" stroke="none"/>', `<circle cx="16" cy="16" r="12.5" stroke="#7fb0ff" stroke-width="1.2" opacity=".7"/>${sparkle(26, 6, 2.2)}`)),
                 // —— 丹火 / 神识 / 精华 ——
                 danhuo: svg(`<path d="M16 2Q22 10 24 16Q27 24 20 29Q16 31 12 29Q5 24 8 16Q9 12 12 9Q12 13 14 14Q13 8 16 2Z" fill="#e8642a"/><path d="M16 14Q20 19 19 23Q18 27 16 27Q13 27 13 23Q13 19 16 14Z" fill="#ffc94a"/><path d="M16 21Q17.5 23 16 26Q14.5 23 16 21Z" fill="#fff4c4" stroke="none"/>`),
-                tempered_essence: svg(`<path d="M16 3Q24 14 24 20Q24 27 16 28Q8 27 8 20Q8 14 16 3Z" fill="#f0d68a"/><path d="M12 19Q12 23 15 25" stroke="#fff" stroke-width="1.4" opacity=".8"/>${sparkle(24, 8, 2.4)}${sparkle(7, 12, 2)}<path d="M13 3H19" stroke="#a58a55" stroke-width="1.6"/>`),
                 shenshi: svg(`<path d="M2 16Q16 3 30 16Q16 29 2 16Z" fill="#e6e0f8"/><circle cx="16" cy="16" r="6" fill="#6a48b0"/><circle cx="16" cy="16" r="2.6" fill="#1c1430"/><circle cx="14" cy="14" r="1.2" fill="#fff" stroke="none"/><path d="M16 1V5M6 5L8 8M26 5L24 8" stroke="#b7a0f0" stroke-width="1.3"/>`),
-                shenshi_map: svg(`<path d="M5 6H27V26H5Z" fill="#dccb9a"/><path d="M5 6L4 8V27H26L27 26M5 6H27" stroke-width="1.1"/><path d="M8 20Q12 12 16 17T24 10" stroke="#a8483a" stroke-width="1.3" stroke-dasharray="2 2"/><circle cx="24" cy="10" r="2" fill="#a8483a" stroke="none"/><path d="M9 11L11 9M20 22L22 24M20 24L22 22" stroke="#7a6a4a" stroke-width="1"/>`),
                 // —— 食物 ——
                 millet_porridge: svg(`${steam('#f0e8d0')}${bowl('#f0e0a8')}<g fill="#c9a45a" stroke="none"><circle cx="12" cy="15" r=".9"/><circle cx="16" cy="14.5" r=".9"/><circle cx="20" cy="15.2" r=".9"/></g>`),
                 herb_soup: svg(`${steam('#d6f0c8')}${bowl('#8ab86a')}${leaf(11, 15, -20, 5, '#3f7a3f')}${leaf(19, 15.5, -160, 5, '#3f7a3f')}`),
@@ -625,10 +620,275 @@
         const QI_ICON = icoSvg(`<circle cx="16" cy="16" r="13" fill="#3a2e14"/><path d="M16 4A12 12 0 0 1 28 16A8.5 8.5 0 0 1 16 24.5A5 5 0 0 1 11 16A2.8 2.8 0 0 1 16 13.5" stroke="#f3d36a" stroke-width="2.4"/><circle cx="16" cy="16" r="1.7" fill="#fff4c4" stroke="none"/>${icoSparkle(6, 7, 2.2)}${icoSparkle(27, 27, 2)}`);
         const COIN_ICON = ITEM_ICONS.spiritstone;
 
+        // ==================== 丹火 / 神识：独立货币与用途（v6.51 重构） ====================
+        // 丹火（金丹起）与神识（元婴起）不再是背包物品，而是像灵石一样的数值（player.danhuo / player.shenshi），不能出售。
+        // 产出：各自技能的配方、战斗区域胜利、秘境通关；消耗：
+        //   丹火 —— 淬炼装备（武器 / 护甲 / 饰品各自 0–10 级，每级 +4% 该部位属性）、强化灵根（0–10 级，灵根特效 ×(1+5%×级)）、炼丹助炼（提高翻倍产出概率）
+        //   神识 —— 分身强化（更快、更容易翻倍）、专注（生活技能耗时 -1.5%/级）、神识感应（暴击 / 闪避 +1%/级）、神识探查（下次秘境掉落 ×1.5）
+        // 突破丹药只能在炼丹里制作（丹火 / 神识只可选择性「助炼」，不是炼制路径）。
+        const DANHUO_ICON = ITEM_ICONS.danhuo;
+        const SHENSHI_ICON = ITEM_ICONS.shenshi;
+        const TEMPER_MAX = 10, TEMPER_PER_LEVEL = 0.04;
+        const TEMPER_SLOTS = [{ key: 'weapon', name: '武器', icon: '⚔️' }, { key: 'armor', name: '护甲', icon: '🛡️' }, { key: 'jewelry', name: '饰品', icon: '📿' }];
+        const ROOT_MAX = 10, ROOT_PER_LEVEL = 0.05;
+        const DANHUO_BOOST_DOUBLE = 0.25;        // 炼丹助炼：额外翻倍概率
+        const SCOUT_COST = 60, SCOUT_MULT = 1.5;  // 神识探查：花费与下次秘境掉落倍率
+        const SHEN_UPGRADES = {
+            clone: { name: '分身强化', icon: '🌀', max: 10, base: 20, desc: '分身耗时 -3%/级（最快与主角持平），分身产出翻倍概率 +2%/级' },
+            focus: { name: '专注', icon: '⏱', max: 10, base: 24, desc: '生活技能与悟道耗时 -1.5%/级（最多 -15%）' },
+            sense: { name: '神识感应', icon: '👁️', max: 10, base: 24, desc: '战斗暴击率 +1%/级、闪避 +1%/级' }
+        };
+
+        function temperCost(level) { return Math.round(25 * Math.pow(level + 1, 1.5)); }
+        function rootCost(level) { return Math.round(30 * Math.pow(level + 1, 1.5)); }
+        function shenCost(kind, level) { return Math.round(SHEN_UPGRADES[kind].base * Math.pow(level + 1, 1.5)); }
+        // 炼丹助炼每次消耗的丹火：按配方基础耗时折算（8 秒的灵米粥 1 个，2 分钟的化神丹 8 个）
+        function boostCost(action) { return Math.max(1, Math.ceil((action.duration || 0) / 15)); }
+
+        // 玩家身上的丹火 / 神识 / 各项强化等级；旧存档与新角色都从这里补全默认值
+        function ensureCurrencyState() {
+            const P = gameState.player;
+            if (typeof P.danhuo !== 'number') P.danhuo = 0;
+            if (typeof P.shenshi !== 'number') P.shenshi = 0;
+            if (!P.temper) P.temper = { weapon: 0, armor: 0, jewelry: 0 };
+            if (typeof P.rootLevel !== 'number') P.rootLevel = 0;
+            if (!P.shen) P.shen = { clone: 0, focus: 0, sense: 0 };
+            if (P.alchemyBoost === undefined) P.alchemyBoost = false;
+            return P;
+        }
+        function getTemper(slot) { return ((gameState.player.temper || {})[slot]) || 0; }
+        function getRootLevel() { return gameState.player.rootLevel || 0; }
+        function getShenLevel(kind) { return ((gameState.player.shen || {})[kind]) || 0; }
+        function isDanhuoUnlocked() { return gameState.player.realmIndex >= 9; }
+        function isShenshiUnlocked() { return gameState.player.realmIndex >= 13; }
+
+        // 灵根特效经强化后的实际数值（getMod 和界面都用它）
+        function getRootEffectsScaled() {
+            const root = SPIRIT_ROOT_EFFECTS[gameState.player.spiritRoot];
+            if (!root) return {};
+            const scale = 1 + ROOT_PER_LEVEL * getRootLevel();
+            const out = {};
+            Object.entries(root.effects).forEach(([k, v]) => { out[k] = v * scale; });
+            return out;
+        }
+
+        function spendNotify(kind, need) {
+            const have = gameState.player[kind];
+            showNotification(`${kind === 'danhuo' ? '丹火' : '神识'}不足：需要 ${need}，现有 ${have}`, '#c4483a', 'error');
+        }
+
+        function afterCurrencySpend() {
+            calculateStats();
+            updateUI();
+            renderSkillUses();
+            saveGame();
+        }
+
+        // 淬炼装备：按部位（武器 / 护甲 / 饰品）独立，装备换了淬炼等级保留
+        function upgradeTemper(slot) {
+            const P = ensureCurrencyState();
+            const lv = getTemper(slot);
+            if (lv >= TEMPER_MAX) { showNotification('这个部位已淬炼至最高级', '#c98a3e'); return; }
+            const cost = temperCost(lv);
+            if (P.danhuo < cost) { spendNotify('danhuo', cost); return; }
+            P.danhuo -= cost;
+            P.temper[slot] = lv + 1;
+            showNotification(`🔥 淬炼成功！${TEMPER_SLOTS.find(s => s.key === slot).name}属性 +${Math.round((lv + 1) * TEMPER_PER_LEVEL * 100)}%`, '#6f9c8a');
+            afterCurrencySpend();
+        }
+
+        // 强化灵根：灵根自带的全部特效整体放大
+        function upgradeRoot() {
+            const P = ensureCurrencyState();
+            const lv = getRootLevel();
+            if (lv >= ROOT_MAX) { showNotification('灵根已强化至最高级', '#c98a3e'); return; }
+            const cost = rootCost(lv);
+            if (P.danhuo < cost) { spendNotify('danhuo', cost); return; }
+            P.danhuo -= cost;
+            P.rootLevel = lv + 1;
+            showNotification(`🌱 灵根强化成功！灵根特效 +${Math.round((lv + 1) * ROOT_PER_LEVEL * 100)}%`, '#6f9c8a');
+            afterCurrencySpend();
+        }
+
+        function toggleAlchemyBoost() {
+            const P = ensureCurrencyState();
+            P.alchemyBoost = !P.alchemyBoost;
+            showNotification(P.alchemyBoost ? '🔥 已开启丹火助炼：炼丹时消耗丹火，产出翻倍概率 +25%' : '已关闭丹火助炼', '#b89a5b');
+            renderAlchemyBoostBar();
+            renderSkillUses();
+            saveGame();
+        }
+
+        // 神识强化（分身强化 / 专注 / 神识感应）
+        function upgradeShen(kind) {
+            const P = ensureCurrencyState();
+            const u = SHEN_UPGRADES[kind];
+            if (!u) return;
+            const lv = getShenLevel(kind);
+            if (lv >= u.max) { showNotification(`${u.name}已至最高级`, '#c98a3e'); return; }
+            const cost = shenCost(kind, lv);
+            if (P.shenshi < cost) { spendNotify('shenshi', cost); return; }
+            P.shenshi -= cost;
+            P.shen[kind] = lv + 1;
+            showNotification(`👁️ ${u.name} Lv.${lv + 1}`, '#6f9c8a');
+            afterCurrencySpend();
+        }
+
+        // 神识探查：花神识，让下一次通关秘境的随机掉落率 ×1.5
+        function castScout() {
+            const P = ensureCurrencyState();
+            if (P.scoutBonus) { showNotification('神识探查已生效，通关下一个秘境后消耗', '#c98a3e'); return; }
+            if (P.shenshi < SCOUT_COST) { spendNotify('shenshi', SCOUT_COST); return; }
+            P.shenshi -= SCOUT_COST;
+            P.scoutBonus = true;
+            showNotification('🔍 神识探查：下次通关秘境，随机掉落率 +50%', '#6fa980');
+            updateUI();
+            renderSkillUses();
+            saveGame();
+        }
+
+        // 炼丹助炼（联机结算：批量 n 次，用于离线 / 分身离线）：返回额外的翻倍概率并扣除丹火
+        function applyAlchemyBoostBatch(skill, action, n) {
+            const P = gameState.player;
+            if (skill !== 'alchemy' || !P.alchemyBoost || !(n > 0)) return 0;
+            const cost = boostCost(action);
+            const boosted = Math.min(n, Math.floor((P.danhuo || 0) / cost));
+            if (boosted <= 0) return 0;
+            P.danhuo -= boosted * cost;
+            return DANHUO_BOOST_DOUBLE * boosted / n;
+        }
+
+        // 分身产出翻倍概率加成（分身强化）
+        function getCloneDoubleBonus() { return 0.02 * getShenLevel('clone'); }
+
+        // 丹火 / 神识产出
+        function addCurrency(output) {
+            const P = ensureCurrencyState();
+            if (output.danhuo) P.danhuo += output.danhuo;
+            if (output.shenshi) P.shenshi += output.shenshi;
+        }
+
+        // 战斗区域胜利掉落的丹火 / 神识（金丹级战斗区域起掉丹火，元婴级起掉神识；乘该区域精通的奖励加成）
+        const BATTLE_CURRENCY = {
+            goldenPlains:      { danhuo: [1, 2] },
+            tribulationGround: { danhuo: [2, 3] },
+            voidSea:           { danhuo: [2, 4], shenshi: [1, 2] },
+            abyssRuins:        { danhuo: [3, 5], shenshi: [2, 3] },
+            chaosWastes:       { danhuo: [4, 6], shenshi: [3, 4] },
+            nineNether:        { danhuo: [5, 8], shenshi: [4, 6] }
+        };
+        function rollAreaCurrency(areaKey, bonus) {
+            const cfg = BATTLE_CURRENCY[areaKey] || {};
+            const got = { danhuo: 0, shenshi: 0 };
+            Object.entries(cfg).forEach(([kind, [lo, hi]]) => {
+                got[kind] = Math.max(1, Math.round((lo + Math.floor(Math.random() * (hi - lo + 1))) * bonus));
+            });
+            addCurrency(got);
+            return got;
+        }
+        function areaCurrencyText(areaKey, bonus) {
+            const cfg = BATTLE_CURRENCY[areaKey];
+            if (!cfg) return '';
+            return Object.entries(cfg).map(([kind, [lo, hi]]) => {
+                const a = Math.max(1, Math.round(lo * bonus)), b = Math.max(1, Math.round(hi * bonus));
+                return `${kind === 'danhuo' ? DANHUO_ICON : SHENSHI_ICON} ${a === b ? a : a + '–' + b} ${kind === 'danhuo' ? '丹火' : '神识'}`;
+            }).join(' · ');
+        }
+
+
+        // ---- 丹火 / 神识：界面 ----
+        // 顶部货币条：丹火（金丹起）、神识（元婴起）；桌面在侧栏灵石下面，手机在头部灵石条旁
+        function updateCurrencyChips() {
+            const P = gameState.player;
+            const show = { danhuo: isDanhuoUnlocked(), shenshi: isShenshiUnlocked() };
+            ['danhuo', 'shenshi'].forEach(kind => {
+                const val = Math.floor(P[kind] || 0);
+                document.querySelectorAll(`[data-cur="${kind}"]`).forEach(el => {
+                    el.style.display = show[kind] ? '' : 'none';
+                    const amount = el.querySelector('.cur-amount');
+                    if (amount) amount.textContent = val;
+                });
+            });
+        }
+
+        // 炼丹面板顶部的「丹火助炼」开关
+        function renderAlchemyBoostBar() {
+            const el = document.getElementById('alchemyBoostBar');
+            if (!el) return;
+            if (!isDanhuoUnlocked()) { el.style.display = 'none'; return; }
+            const P = ensureCurrencyState();
+            el.style.display = '';
+            el.innerHTML = `<label class="boost-toggle"><input type="checkbox" ${P.alchemyBoost ? 'checked' : ''} onchange="toggleAlchemyBoost()"><span>🔥 丹火助炼</span></label>
+                <span class="boost-desc">开启后每次炼丹消耗丹火（按配方耗时折算：8 秒的 1 个，2 分钟的 8 个），产出翻倍概率 +25%；丹火不够时自动不助炼</span>
+                <span class="boost-bal">${DANHUO_ICON} ${Math.floor(P.danhuo)} 丹火</span>`;
+        }
+
+        function useRow(name, lvText, effectText, cost, currency, onclick, maxed) {
+            const P = gameState.player;
+            const affordable = P[currency] >= cost;
+            const icon = currency === 'danhuo' ? DANHUO_ICON : SHENSHI_ICON;
+            return `<div class="use-row">
+                <div class="use-main"><b>${name}</b> <span class="use-lv">${lvText}</span><div class="use-effect">${effectText}</div></div>
+                ${maxed ? '<span class="use-max">已满级</span>'
+                    : `<button type="button" class="btn ${affordable ? '' : 'btn-secondary'} use-btn" onclick="${onclick}">${affordable ? '升级' : '不足'} ${icon}${cost}</button>`}
+            </div>`;
+        }
+
+        function renderDanhuoUses() {
+            const el = document.getElementById('danhuoUses');
+            if (!el) return;
+            const P = ensureCurrencyState();
+            const forgeLv = (gameState.skills.forging || {}).level || 1;
+            const temperRows = TEMPER_SLOTS.map(s => {
+                const lv = getTemper(s.key);
+                const maxed = lv >= TEMPER_MAX;
+                const cur = Math.round(lv * TEMPER_PER_LEVEL * 100);
+                return useRow(`${s.icon} ${s.name}`, `淬炼 Lv.${lv}/${TEMPER_MAX}`, `该部位装备属性 +${cur}%${maxed ? '' : ` → +${cur + Math.round(TEMPER_PER_LEVEL * 100)}%`}`, temperCost(lv), 'danhuo', `upgradeTemper('${s.key}')`, maxed);
+            }).join('');
+            const rlv = getRootLevel();
+            const root = SPIRIT_ROOT_EFFECTS[P.spiritRoot];
+            const rootEff = describeEffects(getRootEffectsScaled()).join(' · ');
+            const rootRow = root ? useRow(`${ROOT_ICONS[P.spiritRoot]} ${root.name}`, `强化 Lv.${rlv}/${ROOT_MAX}`, `灵根特效整体 +${Math.round(rlv * ROOT_PER_LEVEL * 100)}%${rlv >= ROOT_MAX ? '' : ` → +${Math.round((rlv + 1) * ROOT_PER_LEVEL * 100)}%`}<br/>${rootEff}`, rootCost(rlv), 'danhuo', 'upgradeRoot()', rlv >= ROOT_MAX) : '';
+            el.innerHTML = `
+                <div class="use-balance">${DANHUO_ICON} 丹火 <b>${Math.floor(P.danhuo)}</b><small>产出：凝聚丹火 / 培育丹火（本页配方）· 金丹级战斗区域胜利 · 秘境通关。丹火不能出售，只用来变强。</small></div>
+                <div class="use-card"><div class="use-title">🔨 淬炼台 <small>联动炼器：武器 / 护甲 / 饰品各自淬炼，每级 +${Math.round(TEMPER_PER_LEVEL * 100)}% 该部位装备属性；换装备后等级保留，与炼器等级加成（当前 Lv.${forgeLv}）相乘</small></div>${temperRows}</div>
+                <div class="use-card"><div class="use-title">🌱 强化灵根 <small>联动战斗：灵根自带的全部特效（攻击、暴击、耗时、翻倍……）整体放大，每级 +${Math.round(ROOT_PER_LEVEL * 100)}%</small></div>${rootRow}</div>
+                <div class="use-card"><div class="use-title">⚗️ 炼丹助炼 <small>联动炼丹：在炼丹页开启，每次炼丹消耗丹火，产出翻倍概率 +25%（当前${P.alchemyBoost ? '已开启' : '未开启'}）</small></div>
+                    <div class="use-row"><div class="use-main"><div class="use-effect">突破丹药只能在炼丹里制作（炼丹等级 + 普通材料），丹火只是助炼的选择，不是炼制路径。</div></div>
+                    <button type="button" class="btn btn-secondary use-btn" onclick="toggleAlchemyBoost()">${P.alchemyBoost ? '关闭助炼' : '开启助炼'}</button></div></div>`;
+        }
+
+        function renderShenshiUses() {
+            const el = document.getElementById('shenshiUses');
+            if (!el) return;
+            const P = ensureCurrencyState();
+            const rows = Object.entries(SHEN_UPGRADES).map(([kind, u]) => {
+                const lv = getShenLevel(kind);
+                const maxed = lv >= u.max;
+                return useRow(`${u.icon} ${u.name}`, `Lv.${lv}/${u.max}`, u.desc, shenCost(kind, lv), 'shenshi', `upgradeShen('${kind}')`, maxed);
+            }).join('');
+            const scoutOn = !!P.scoutBonus;
+            el.innerHTML = `
+                <div class="use-balance">${SHENSHI_ICON} 神识 <b>${Math.floor(P.shenshi)}</b><small>产出：凝练神识 / 培育神识 / 神识入定（本页配方）· 元婴级战斗区域胜利 · 秘境通关。神识不能出售，只用来变强。</small></div>
+                <div class="use-card"><div class="use-title">🌀 神识强化 <small>联动分身、工作速度与战斗</small></div>${rows}</div>
+                <div class="use-card"><div class="use-title">🔍 神识探查 <small>联动秘境：花 ${SCOUT_COST} 神识，下一次通关秘境的随机掉落率 ×${SCOUT_MULT}（通关后消耗）</small></div>
+                    <div class="use-row"><div class="use-main"><div class="use-effect">${scoutOn ? '✅ 已生效，通关下一个秘境后消耗' : '尚未使用'}</div></div>
+                    <button type="button" class="btn ${scoutOn || P.shenshi < SCOUT_COST ? 'btn-secondary' : ''} use-btn" onclick="castScout()">${scoutOn ? '已生效' : `探查 ${SHENSHI_ICON}${SCOUT_COST}`}</button></div></div>`;
+        }
+
+        // 当前打开的是丹火 / 神识 / 炼丹面板时刷新对应的「用途」区
+        function renderSkillUses() {
+            const panel = document.body.dataset.panel;
+            if (panel === 'danhuo') renderDanhuoUses();
+            else if (panel === 'shenshi') renderShenshiUses();
+            else if (panel === 'alchemy') renderAlchemyBoostBar();
+        }
+
+
         // 静态页面里的图标占位：<span data-ico="qi|coin">emoji</span>，加载时换成手绘图标
         function fillIconSlots(root = document) {
             root.querySelectorAll('[data-ico]').forEach(el => {
-                const icon = { qi: QI_ICON, coin: COIN_ICON }[el.dataset.ico];
+                const icon = { qi: QI_ICON, coin: COIN_ICON, danhuo: DANHUO_ICON, shenshi: SHENSHI_ICON }[el.dataset.ico];
                 if (icon) el.innerHTML = icon;
             });
         }
@@ -779,7 +1039,13 @@
                 inventoryCapacity: 50,
                 farmingSlots: 1,
                 boughtUpgrades: [],  // 已购买的永久升级ID列表
-                temperLevel: 0,      // 丹火淬炼次数（最多3次，每次装备属性+10%）
+                temperLevel: 0,      // （旧）全局淬炼次数，v6.51 起改为 temper（按部位），读档时迁移
+                danhuo: 0,           // 丹火（货币，金丹起）
+                shenshi: 0,          // 神识（货币，元婴起）
+                temper: { weapon: 0, armor: 0, jewelry: 0 },   // 淬炼等级（按部位，0–10）
+                rootLevel: 0,        // 灵根强化等级（0–10）
+                shen: { clone: 0, focus: 0, sense: 0 },        // 神识强化等级（各 0–10）
+                alchemyBoost: false, // 炼丹助炼开关
                 scoutBonus: false,   // 神识探查：下次秘境掉落率+30%
                 // P2功能：属性系统
                 stats: {
@@ -858,7 +1124,7 @@
                 📜 别担心不知道做什么：关掉这个介绍后，屏幕上方有一串<b>新手任务</b>，跟着做一遍就熟悉了，每个任务还有灵石奖励。` },
             { title: '🧘 修炼与突破', body: `<b>修炼</b>获得修为，修为满了就可以<b>突破</b>到更高境界，属性会大幅提升，也会解锁新的配方、战斗区域和秘境。<br/><br/>
                 部分大境界的突破需要材料（筑基丹、金丹秘药、元婴丹），可以靠<b>炼丹</b>或<b>秘境掉落</b>获得——留意突破界面里的提示。` },
-            { title: '🔨 生活技能', body: `<b>采矿、灵田</b>产出材料，<b>炼丹、炼器</b>用材料制作丹药、食物和装备，后期还有<b>丹火、神识</b>。配方按技能等级解锁。<br/><br/>
+            { title: '🔨 生活技能', body: `<b>采矿、灵田</b>产出材料，<b>炼丹、炼器</b>用材料制作丹药、食物和装备，后期还有<b>丹火、神识</b>（它们产出的是货币，用来淬炼装备、强化灵根和分身）。配方按技能等级解锁。<br/><br/>
                 每个配方做得越多，<b>🎓 精通</b>等级越高，会带来翻倍、省材料、缩短耗时等加成；把鼠标悬停（手机上点一下）可以看到详情。` },
             { title: '⚔️ 战斗', body: `进入<b>战斗区域</b>打怪，获得灵石和经验，区域随境界解锁。战斗时生命低会自动吃你装备的<b>食物</b>（在炼丹里制作，背包里设为战斗食物）。<br/><br/>
                 <b>🔁 循环战斗</b>：进入战斗区域后会一直打下去，点「撤退」才退出，离线也会继续。<b>秘境</b>同样会一直循环挑战，掉落种子和突破材料，但被击败会损失修为和食物，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
@@ -1099,7 +1365,7 @@
                     路上你会：<br/>
                     ・每个大境界（练气→筑基→金丹→元婴→化神）的突破需要<b>突破丹药</b>，靠炼丹或秘境掉落<br/>
                     ・用<b>炼器</b>打造更好的装备，带足<b>食物</b>挑战更深的秘境，拿材料和种子<br/>
-                    ・金丹后解锁<b>丹火</b>，元婴后解锁<b>神识</b>和<b>分身</b>，化神后解锁<b>悟道</b><br/>
+                    ・金丹后解锁<b>丹火</b>（货币：淬炼装备、强化灵根、助炼丹药），元婴后解锁<b>神识</b>（货币：强化分身、加快生活技能、增强战斗感知）和<b>分身</b>，化神后解锁<b>悟道</b><br/>
                     ・学更强的功法、提高精通，让一切越来越快——离线也在成长<br/><br/>
                     不用着急，放置游戏，慢慢来。这份任务和玩法介绍都可以在<b>设置</b>里重新查看。
                 </div>
@@ -1223,7 +1489,8 @@
         }
 
         function getCloneFactor() {
-            return SKILL_LEVEL_EFFECTS.shenshi.formula((gameState.skills.shenshi || {}).level || 1) / (1 + getMod('cloneSpeed'));
+            const base = SKILL_LEVEL_EFFECTS.shenshi.formula((gameState.skills.shenshi || {}).level || 1) / (1 + getMod('cloneSpeed'));
+            return Math.max(1.0, base * (1 - 0.03 * getShenLevel('clone')));   // 神识「分身强化」：-3%/级，最快与主角持平
         }
 
         function getCloneDuration(skill, duration, key) {
@@ -1290,7 +1557,7 @@
                 c.progress += 0.1;
                 const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
                 if (c.progress >= duration) {
-                    completeAction(c.action);
+                    completeAction(c.action, { double: getCloneDoubleBonus() });
                     c.progress = 0;
                 }
                 tickCloneBar(slot, duration);
@@ -1360,8 +1627,10 @@
             if (n > 0) {
                 const per = JSON.parse(JSON.stringify(action.output));
                 applySkillLevelBonus(skill, per);
-                const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double;
+                const isClone = durationFn === getCloneDuration;
+                const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double + (isClone ? getCloneDoubleBonus() : 0) + applyAlchemyBoostBatch(skill, action, n);
                 gameState.player.coins += (per.coins || 0) * n;
+                addCurrency({ danhuo: (per.danhuo || 0) * n, shenshi: (per.shenshi || 0) * n });
                 const lost = [];
                 (per.items || []).forEach(item => {
                     const qty = Math.floor(item.qty * n * (1 + doubleRate) + 1e-9);
@@ -2415,9 +2684,9 @@
             battleLogEntries.push(won ? `🎉 战胜${battle.currentEnemy.name}` : (battle.playerHP.current <= 0 ? `💀 被${battle.currentEnemy.name}击败` : `⚔️ 未能击败${battle.currentEnemy.name}（超时）`));
             trimBattleLog();
             if (won) {
-                const { coins, exp, items, lost } = grantNormalBattleWin(areaKey);
+                const { coins, exp, items, lost, danhuo, shenshi } = grantNormalBattleWin(areaKey);
                 auto.wins++; auto.coins += coins; auto.exp += exp;
-                battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验`);
+                battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验${danhuo ? `、${danhuo} 丹火` : ''}${shenshi ? `、${shenshi} 神识` : ''}`);
                 if (items.length) battleLogEntries.push(`🎁 掉落：${formatDropList(items)}`);
                 if (lost.length) {
                     battleLogEntries.push(`❌ 背包已满，${formatDropList(lost)} 未能获得`);
@@ -2471,7 +2740,7 @@
             swamp:             [{ id: 'cleangrass', p: 0.20, qty: [1, 2] }, { id: 'mushroom', p: 0.12, qty: 1 }, { id: 'spiritore', p: 0.08, qty: 1 }, { id: 'seed_tea', p: 0.03, qty: 1 }],
             abyss:             [{ id: 'spiritore', p: 0.20, qty: [1, 2] }, { id: 'crystal', p: 0.06, qty: 1 }, { id: 'seed_mushroom', p: 0.03, qty: 1 }],
             goldenPlains:      [{ id: 'spiritore', p: 0.25, qty: [1, 2] }, { id: 'crystal', p: 0.12, qty: 1 }, { id: 'tea', p: 0.08, qty: 1 }, { id: 'spiritcrystal', p: 0.04, qty: 1 }],
-            tribulationGround: [{ id: 'crystal', p: 0.15, qty: 1 }, { id: 'spiritcrystal', p: 0.08, qty: 1 }, { id: 'tempered_essence', p: 0.03, qty: 1 }, { id: 'danhuo_seed', p: 0.015, qty: 1 }],
+            tribulationGround: [{ id: 'crystal', p: 0.15, qty: 1 }, { id: 'spiritcrystal', p: 0.08, qty: 1 }, { id: 'danhuo_seed', p: 0.015, qty: 1 }],
             voidSea:           [{ id: 'crystal', p: 0.12, qty: 1 }, { id: 'spiritcrystal', p: 0.12, qty: 1 }, { id: 'immortalore', p: 0.02, qty: 1 }, { id: 'shenshi_seed', p: 0.015, qty: 1 }],
             abyssRuins:        [{ id: 'spiritcrystal', p: 0.15, qty: [1, 2] }, { id: 'immortalore', p: 0.05, qty: 1 }, { id: 'daofruit', p: 0.02, qty: 1 }],
             chaosWastes:       [{ id: 'immortalore', p: 0.10, qty: 1 }, { id: 'chaosstone', p: 0.04, qty: 1 }, { id: 'seed_daofruit', p: 0.02, qty: 1 }],
@@ -2512,8 +2781,9 @@
             addSkillExp('battle', exp);
             addMasteryExp('battle', areaKey, 10);
             const { got, lost } = rollAreaDrops(areaKey, reward);
+            const currency = rollAreaCurrency(areaKey, reward);
             trackQuest('battleWin');
-            return { coins, exp, items: got, lost };
+            return { coins, exp, items: got, lost, danhuo: currency.danhuo, shenshi: currency.shenshi };
         }
 
         // 把若干次掉落合并成 { id: 数量 }
@@ -2557,7 +2827,7 @@
             const savedSpeed = gameState.battleSpeed;
             const savedTimer = gameState.player.foodUseTimer;
             gameState.battleSpeed = 5;
-            const r = { fights: 0, wins: 0, losses: 0, coins: 0, exp: 0, stopped: false, drops: {}, lostDrops: {} };
+            const r = { fights: 0, wins: 0, losses: 0, coins: 0, exp: 0, stopped: false, drops: {}, lostDrops: {}, danhuo: 0, shenshi: 0 };
             let elapsed = 0, streak = 0;
             try {
                 while (elapsed < budgetSeconds && r.fights < 20000) {
@@ -2576,6 +2846,7 @@
                         const g = grantNormalBattleWin(areaKey);
                         r.wins++; r.coins += g.coins; r.exp += g.exp; streak = 0;
                         mergeDrops(r.drops, g.items); mergeDrops(r.lostDrops, g.lost);
+                        r.danhuo += g.danhuo; r.shenshi += g.shenshi;
                     } else {
                         r.losses++;
                         if (battle.playerHP.current <= 0) { r.died = true; break; }   // 被击败：与在线一致，循环结束
@@ -2622,10 +2893,10 @@
             }
 
             // 随机掉落（神识地图：本次秘境掉落率×1.3，用后消耗）
-            const scoutMult = (gameState.player.scoutBonus ? 1.3 : 1) * (1 + getMod('dropPct'));
+            const scoutMult = (gameState.player.scoutBonus ? SCOUT_MULT : 1) * (1 + getMod('dropPct'));
             if (gameState.player.scoutBonus) {
                 gameState.player.scoutBonus = false;
-                rewardMsg += '🗺️ 神识地图生效：掉落率+30%\n';
+                rewardMsg += '🔍 神识探查生效：掉落率+50%\n';
             }
             if (rewards.random) {
                 rewards.random.forEach(drop => {
@@ -2646,6 +2917,15 @@
                 gameState.player.coins += coins;
                 rewardMsg += `+ ${coins} 灵石\n`;
             }
+
+            // 通关丹火 / 神识（金丹级以上秘境）
+            [['danhuo', '丹火'], ['shenshi', '神识']].forEach(([kind, label]) => {
+                const range = rewards[kind];
+                if (!range) return;
+                const amount = Array.isArray(range) ? range[0] + Math.floor(Math.random() * (range[1] - range[0] + 1)) : range;
+                addCurrency({ [kind]: amount });
+                rewardMsg += `+ ${amount} ${label}\n`;
+            });
 
             // 战斗技能经验：走统一的 addSkillExp（此前手写升级循环，绕过了经验加成与升级提示）
             if (rewards.skillExp) {
@@ -3108,7 +3388,8 @@
             if (!player) return 0;
             let total = 0;
             const rootEffects = SPIRIT_ROOT_EFFECTS[player.spiritRoot]?.effects;
-            if (rootEffects && rootEffects[key]) total += rootEffects[key];
+            if (rootEffects && rootEffects[key]) total += rootEffects[key] * (1 + ROOT_PER_LEVEL * (player.rootLevel || 0));   // 丹火强化灵根
+            if (key === 'crit' || key === 'dodge') total += 0.01 * ((player.shen && player.shen.sense) || 0);   // 神识感应
             const artEffects = CULTIVATION_ARTS[player.currentArt]?.effects;
             if (artEffects && artEffects[key]) total += artEffects[key];
             total += getLawTotals()[key] || 0;
@@ -3167,7 +3448,7 @@
             const art = CULTIVATION_ARTS[player.currentArt];
             let html = '';
             if (root) {
-                html += `<div><b style="color:#b89a5b">${ROOT_ICONS[player.spiritRoot]} ${root.name}</b>：${describeEffects(root.effects).join(' · ')}</div>`;
+                html += `<div><b style="color:#b89a5b">${ROOT_ICONS[player.spiritRoot]} ${root.name}${getRootLevel() ? ' · 强化 Lv.' + getRootLevel() : ''}</b>：${describeEffects(getRootEffectsScaled()).join(' · ')}</div>`;
             }
             if (art) {
                 const eff = describeEffects(art.effects);
@@ -3247,7 +3528,7 @@
                 const ws = GAME_CONFIG.items[id]?.effect?.workSpeed;
                 if (ws) mult *= ws;
             });
-            return mult;
+            return mult * (1 - 0.015 * getShenLevel('focus'));   // 神识「专注」：生活技能 / 悟道耗时 -1.5%/级
         }
 
         // 其他技能：仅受工作速度倍率 = duration × getWorkSpeedMultiplier()
@@ -3506,9 +3787,19 @@
             }
         }
 
-        function completeAction(act = gameState.currentAction) {
+        function completeAction(act = gameState.currentAction, bonus = {}) {
             const action = getAction(act.skill, act.action);
             if (!action.output) return;
+
+            // 丹火助炼：炼丹时消耗丹火，提高翻倍产出概率（丹火不够时自动不助炼）
+            let boostDouble = 0;
+            if (act.skill === 'alchemy' && gameState.player.alchemyBoost) {
+                const cost = boostCost(action);
+                if ((gameState.player.danhuo || 0) >= cost) {
+                    gameState.player.danhuo -= cost;
+                    boostDouble = DANHUO_BOOST_DOUBLE;
+                }
+            }
 
             // 消耗所需的材料（P2功能 - 材料消耗）；灵根/功法的「节省材料」特效有概率整次不消耗
             const actionKey = act.action;
@@ -3554,7 +3845,7 @@
             }
 
             // 灵根/功法的「产出翻倍」特效
-            if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', act.skill) + mastery.double) {
+            if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', act.skill) + mastery.double + boostDouble + (bonus.double || 0)) {
                 finalOutput.items.forEach(item => { item.qty *= 2; });
                 showNotification('✨ 产出翻倍！', '#6fa980');
             }
@@ -3568,6 +3859,7 @@
                     if (item.qty > 0) addToInventory(item.id, item.qty);
                 });
             }
+            if (finalOutput.danhuo || finalOutput.shenshi) addCurrency(finalOutput);
 
             // 处理技能经验
             if (finalOutput.skill && finalOutput.exp) {
@@ -3637,6 +3929,13 @@
 
         // 应用技能等级加成到产出
         function applySkillLevelBonus(skillName, output) {
+            // 丹火 / 神识产出：技能每级 +2%
+            if ((skillName === 'danhuo' || skillName === 'shenshi') && (output.danhuo || output.shenshi)) {
+                const m = 1 + ((gameState.skills[skillName] || {}).level - 1 || 0) * 0.02;
+                if (output.danhuo) output.danhuo = Math.floor(output.danhuo * m);
+                if (output.shenshi) output.shenshi = Math.floor(output.shenshi * m);
+                return;
+            }
             const skill = gameState.skills[skillName];
             const effect = SKILL_LEVEL_EFFECTS[skillName];
 
@@ -3908,6 +4207,12 @@
             if (output.coins) {
                 parts.push(`${COIN_ICON} +${output.coins}`);
             }
+            if (output.danhuo) {
+                parts.push(`${DANHUO_ICON} +${output.danhuo}丹火`);
+            }
+            if (output.shenshi) {
+                parts.push(`${SHENSHI_ICON} +${output.shenshi}神识`);
+            }
             if (output.exp) {
                 parts.push(`+${output.exp}exp`);
             }
@@ -3949,6 +4254,8 @@
             if (first) return first.icon;
             if (out.cultivation) return QI_ICON;
             if (out.coins) return COIN_ICON;
+            if (out.danhuo) return DANHUO_ICON;
+            if (out.shenshi) return SHENSHI_ICON;
             return '✨';
         }
 
@@ -4117,7 +4424,7 @@
             const enemies = (BATTLE_ENEMY_CONFIGS[areaKey] || []).map(e => `${e.icon || ''}${e.name}`).join('、');
             return `<div class="area-reward">
                     <div>敌人：${enemies || '—'}</div>
-                    <div>每场奖励：${COIN_ICON} ${Math.round(a.coins * bonus)} 灵石 · ${Math.round(a.exp * bonus)} 战斗经验${bonus > 1 ? '（含精通加成）' : ''}</div>
+                    <div>每场奖励：${COIN_ICON} ${Math.round(a.coins * bonus)} 灵石 · ${Math.round(a.exp * bonus)} 战斗经验${areaCurrencyText(areaKey, bonus) ? ' · ' + areaCurrencyText(areaKey, bonus) : ''}${bonus > 1 ? '（含精通加成）' : ''}</div>
                     <div class="area-drops">可能掉落：${areaDropText(areaKey, bonus)}</div>
                 </div>`;
         }
@@ -4131,9 +4438,10 @@
             const random = (r.random || []).map(d => `${name(d.id)}×${qty(d.qty)}（${Math.round((d.probability || 1) * 100)}%）`);
             const coins = Array.isArray(r.coins) ? `${r.coins[0]}–${r.coins[1]} 灵石` : (r.coins ? `${r.coins} 灵石` : '');
             const list = fixed.concat(random);
+            const cur = [['danhuo', DANHUO_ICON, '丹火'], ['shenshi', SHENSHI_ICON, '神识']].filter(([k]) => r[k]).map(([k, icon, label]) => ` · ${icon} ${qty(r[k])} ${label}`).join('');
             return `<div class="area-reward">
                     <div class="area-drops">通关掉落：${list.length ? list.join('、') : '无物品'}</div>
-                    <div>另有：${coins}${r.skillExp ? ' · ' + r.skillExp + ' 战斗经验' : ''}（每只怪物还会掉灵石）</div>
+                    <div>另有：${coins}${cur}${r.skillExp ? ' · ' + r.skillExp + ' 战斗经验' : ''}（每只怪物还会掉灵石）</div>
                 </div>`;
         }
 
@@ -4442,10 +4750,8 @@
                 crystal: '灵晶：采矿顶级产出，炼器最高级材料',
 
                 // 其他物品
-                shenshi_map: '神识地图：使用后，下一次通关秘境的随机掉落率 +30%',
-                tempered_essence: '淬炼精华：使用后所有装备属性 +10%，最多叠加3次',
-                danhuo: '丹火：可炼制金丹秘药、淬炼装备，或出售换取灵石',
-                shenshi: '神识：可炼制元婴丹、探查秘境，或出售换取灵石'
+                danhuo_seed: '丹火种子：在丹火技能「培育丹火」里使用，一次得到 25 丹火',
+                shenshi_seed: '神识种子：在神识技能「培育神识」里使用，一次得到 20 神识'
             };
 
             if (specialUsages[itemId]) {
@@ -4510,16 +4816,6 @@
                     actionBtn.style.display = 'block';
                     actionBtn.dataset.itemId = itemId;
                     actionBtn.dataset.itemType = 'food';
-                } else if (itemId === 'tempered_essence') {
-                    actionBtn.textContent = `淬炼装备 (${gameState.player.temperLevel || 0}/3)`;
-                    actionBtn.style.display = 'block';
-                    actionBtn.dataset.itemId = itemId;
-                    actionBtn.dataset.itemType = 'use';
-                } else if (itemId === 'shenshi_map') {
-                    actionBtn.textContent = gameState.player.scoutBonus ? '已生效' : '使用';
-                    actionBtn.style.display = 'block';
-                    actionBtn.dataset.itemId = itemId;
-                    actionBtn.dataset.itemType = 'use';
                 } else {
                     actionBtn.style.display = 'none';
                 }
@@ -4715,7 +5011,7 @@
                 const cfg = GAME_CONFIG.items[itemId];
                 return `<div class="equip-slot"><div class="equip-slot-label">${label}</div>
                     <div class="equip-slot-name">${cfg.icon} ${cfg.name}</div>
-                    <div class="equip-slot-stats">${formatItemStats(itemId) || '无属性'}</div>
+                    <div class="equip-slot-stats">${formatItemStats(itemId) || '无属性'}${getTemper(kind) ? `<br/>淬炼 Lv.${getTemper(kind)}（+${Math.round(getTemper(kind) * TEMPER_PER_LEVEL * 100)}%）` : ''}</div>
                     <button class="btn btn-secondary equip-btn" onclick="unequipItem('${kind}', '${itemId}')">卸下</button></div>`;
             };
             let slots = slotCard('weapon', eq.weapon, '⚔️ 武器') + slotCard('armor', eq.armor, '🛡️ 护甲');
@@ -4728,11 +5024,11 @@
                     <div class="equip-slot-stats">${canBuy ? '可在商城购买（8000灵石）' : '金丹初期后可在商城购买'}</div>
                     ${canBuy ? `<button class="btn btn-secondary equip-btn" onclick="switchPanel('shop')">去商城</button>` : ''}</div>`;
             }
-            const temper = gameState.player.temperLevel || 0;
+            const temperText = TEMPER_SLOTS.map(t => `${t.name}+${Math.round(getTemper(t.key) * TEMPER_PER_LEVEL * 100)}%`).join(' ');
             const forgeBonus = parseFloat(((SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1) - 1) * 100).toFixed(1));
             const summary = `<div class="equip-summary">
                 <span>❤️ 生命 ${stats.hp.max}</span><span>⚔️ 攻击 ${stats.atk}</span><span>🛡️ 防御 ${stats.def}</span><span>💨 速度 ${stats.spd}</span>
-                <div class="equip-summary-sub">装备加成：淬炼 ${temper}/3（装备属性 +${temper * 10}%）${forgeBonus > 0 ? ` · 炼器等级（装备属性 +${forgeBonus}%）` : ''}</div></div>`;
+                <div class="equip-summary-sub">装备加成：淬炼 ${temperText}${isDanhuoUnlocked() ? '（在丹火页淬炼台升级）' : '（金丹后解锁丹火淬炼）'}${forgeBonus > 0 ? ` · 炼器等级（装备属性 +${forgeBonus}%）` : ''}</div></div>`;
             // 背包里的装备
             const bagItems = gameState.player.inventory.filter(i => isEquipmentItem(i.id));
             let bag = '';
@@ -4807,31 +5103,6 @@
                 gameState.player.foodSlot = itemId;
                 showNotification(`已设为战斗食物：${itemConfig.name}（生命低于50%时自动食用）`, '#6f9c8a');
                 updateFoodBar();
-                closeItemDetail();
-                saveGame();
-                return;
-            }
-
-            if (itemType === 'use') {
-                if (itemId === 'tempered_essence') {
-                    if ((gameState.player.temperLevel || 0) >= 3) {
-                        showNotification('装备已淬炼至最高3次', '#c98a3e');
-                        return;
-                    }
-                    if (!consumeItem(itemId, 1)) return;
-                    gameState.player.temperLevel = (gameState.player.temperLevel || 0) + 1;
-                    showNotification(`🔥 淬炼成功！装备属性 +${gameState.player.temperLevel * 10}%`, '#6f9c8a');
-                } else if (itemId === 'shenshi_map') {
-                    if (gameState.player.scoutBonus) {
-                        showNotification('神识地图效果已生效，通关下一个秘境后消耗', '#c98a3e');
-                        return;
-                    }
-                    if (!consumeItem(itemId, 1)) return;
-                    gameState.player.scoutBonus = true;
-                    showNotification('🗺️ 下次秘境掉落率 +30%', '#6f9c8a');
-                }
-                calculateStats();
-                updateUI();
                 closeItemDetail();
                 saveGame();
                 return;
@@ -5327,6 +5598,7 @@
             updateBonusPanel();
             renderHpRestoreBar();
             renderQuestBanner();
+            renderSkillUses();
         }
 
         // 选择性更新UI（仅更新指定的部分，提高性能）
@@ -5929,13 +6201,16 @@
             const weapon = gameState.player.equipment.weapon;
             const armor = gameState.player.equipment.armor;
             const jewelry = gameState.player.equipment.jewelry;
-            // 淬炼 +10%/次，炼器等级 +0.5%/级（SKILL_LEVEL_EFFECTS.forging）
-            const temperMult = (1 + 0.1 * (gameState.player.temperLevel || 0)) * SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1);
+            // 淬炼：武器 / 护甲 / 饰品各自 +4%/级（丹火淬炼台），炼器等级 +0.5%/级（SKILL_LEVEL_EFFECTS.forging）
+            const forgeMult = SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1);
+            const weaponMult = (1 + TEMPER_PER_LEVEL * getTemper('weapon')) * forgeMult;
+            const armorMult = (1 + TEMPER_PER_LEVEL * getTemper('armor')) * forgeMult;
+            const jewelryMult = (1 + TEMPER_PER_LEVEL * getTemper('jewelry')) * forgeMult;
 
             if (weapon && GAME_CONFIG.items[weapon]?.stats) {
                 Object.entries(GAME_CONFIG.items[weapon].stats).forEach(([stat, value]) => {
                     if (totalStats.hasOwnProperty(stat)) {
-                        totalStats[stat] += Math.floor(value * temperMult);
+                        totalStats[stat] += Math.floor(value * weaponMult);
                     }
                 });
             }
@@ -5943,7 +6218,7 @@
             if (armor && GAME_CONFIG.items[armor]?.stats) {
                 Object.entries(GAME_CONFIG.items[armor].stats).forEach(([stat, value]) => {
                     if (totalStats.hasOwnProperty(stat)) {
-                        totalStats[stat] += Math.floor(value * temperMult);
+                        totalStats[stat] += Math.floor(value * armorMult);
                     }
                 });
             }
@@ -5952,7 +6227,7 @@
                 if (GAME_CONFIG.items[jewelryId]?.stats) {
                     Object.entries(GAME_CONFIG.items[jewelryId].stats).forEach(([stat, value]) => {
                         if (totalStats.hasOwnProperty(stat)) {
-                            totalStats[stat] += Math.floor(value * temperMult);
+                            totalStats[stat] += Math.floor(value * jewelryMult);
                         }
                     });
                 }
@@ -6014,6 +6289,7 @@
             if (shopCoin) shopCoin.textContent = gameState.player.coins;
             const mobileCoin = document.getElementById('mobileCoinAmount');
             if (mobileCoin) mobileCoin.textContent = gameState.player.coins;
+            updateCurrencyChips();
         }
 
         // 手动进入战斗后把战斗界面滚到可见处（手机上战斗区域列表很长，战斗界面在最底下，点进去看不到任何变化）；
@@ -6725,6 +7001,23 @@
                 const originArt = gameState.player.origin === 'disciple' ? 'advanced_art' : 'basic_art';
                 gameState.player.ownedArts = [...new Set([originArt, gameState.player.currentArt])];
             }
+            // v6.51：丹火 / 神识改为货币——背包里旧的丹火、神识按 1:1 转入；淬炼精华（当时 3 丹火一个）折成丹火、神识地图（2 神识一张）折成神识；
+            // 全局淬炼次数（每次 +10%）折算成每个部位 2.5 级（每级 +4%），保证老玩家不吃亏
+            if (gameState.player) {
+                const P = ensureCurrencyState();
+                if (Array.isArray(P.inventory)) {
+                    const conv = { danhuo: ['danhuo', 1], shenshi: ['shenshi', 1], tempered_essence: ['danhuo', 3], shenshi_map: ['shenshi', 2] };
+                    P.inventory = P.inventory.filter(i => {
+                        if (i && conv[i.id]) { P[conv[i.id][0]] += i.qty * conv[i.id][1]; return false; }
+                        return true;
+                    });
+                }
+                if (P.temperLevel) {
+                    const lv = Math.min(TEMPER_MAX, Math.round(P.temperLevel * 2.5));
+                    P.temper = { weapon: lv, armor: lv, jewelry: lv };
+                    P.temperLevel = 0;
+                }
+            }
             // 清理配置里已不存在的物品（旧版本删除过物品时，存档里残留的条目会让背包渲染报错）
             if (Array.isArray(gameState.player.inventory)) {
                 gameState.player.inventory = gameState.player.inventory.filter(i => i && GAME_CONFIG.items[i.id] && i.qty > 0);
@@ -6951,7 +7244,7 @@
                     const mins = Math.max(1, Math.round(res.elapsed / 60));
                     const dropText = Object.keys(res.drops).length ? `\n🎁 掉落：${formatDropList(dropMapToList(res.drops))}` : '';
                     const lostText = Object.keys(res.lostDrops).length ? `\n❌ 背包已满，${formatDropList(dropMapToList(res.lostDrops))} 未能获得` : '';
-                    const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验${dropText}${lostText}` +
+                    const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验${res.danhuo ? ` +${res.danhuo}丹火` : ''}${res.shenshi ? ` +${res.shenshi}神识` : ''}${dropText}${lostText}` +
                         (res.stopped ? `\n⚠️ 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，已停止（请检查装备与食物）` : '');
                     showNotification(msg + (res.died ? `
 💀 第 ${res.fights} 场被击败，循环战斗已结束（生命恢复至50%，请检查装备与食物）` : ''), (res.stopped || res.died) ? '#c98a3e' : '#6fa980');
@@ -7034,9 +7327,11 @@
             const perAction = JSON.parse(JSON.stringify(action.output));
             applySkillLevelBonus(savedAction.skill, perAction);
             offlineRewards.coins = (perAction.coins || 0) * completions;
+            offlineRewards.danhuo = (perAction.danhuo || 0) * completions;
+            offlineRewards.shenshi = (perAction.shenshi || 0) * completions;
             offlineRewards.cultivation = (perAction.cultivation || 0) * completions;
-            // 「产出翻倍」特效：按概率折算（期望值）
-            const doubleRate = getSkillMod('double', savedAction.skill) + getMasteryBonus(savedAction.skill, savedAction.action).double;
+            // 「产出翻倍」特效：按概率折算（期望值）；丹火助炼按能负担的次数折算
+            const doubleRate = getSkillMod('double', savedAction.skill) + getMasteryBonus(savedAction.skill, savedAction.action).double + applyAlchemyBoostBatch(savedAction.skill, action, completions);
             (perAction.items || []).forEach(item => {
                 offlineRewards.items.push({ id: item.id, qty: Math.floor(item.qty * completions * (1 + doubleRate) + 1e-9) });
             });
@@ -7047,6 +7342,7 @@
 
             // 应用离线奖励
             gameState.player.coins += offlineRewards.coins;
+            addCurrency(offlineRewards);
 
             // 处理修为，检查是否会超过本境界上限
             if (offlineRewards.cultivation > 0) {
@@ -7107,7 +7403,7 @@
             const cultivationCapped = gameState.player.cultivationXP >= GAME_CONFIG.realms[gameState.player.realmIndex].nextReq;
 
             // 没有任何收益（例如刷新页面只离开几秒）时不弹结算窗
-            const earnedAnything = offlineRewards.coins > 0 || offlineRewards.cultivation > 0 ||
+            const earnedAnything = offlineRewards.coins > 0 || offlineRewards.danhuo > 0 || offlineRewards.shenshi > 0 || offlineRewards.cultivation > 0 ||
                 offlineRewards.items.length > 0 || offlineRewards.lostItems.length > 0 || Object.keys(offlineRewards.skillExp).length > 0 ||
                 (offlineRewards.overflowCoins || 0) > 0;
             const quiet = offlineSeconds < quietUnder && !exceedsLimit && !cultivationCapped;
@@ -7145,6 +7441,13 @@
                     <span class="stat-label">获得灵石:</span>
                     <span class="stat-value">+${rewards.coins}</span>
                 </div>`;
+            }
+
+            if (rewards.danhuo > 0) {
+                content += `<div class="stat-row"><span class="stat-label">${DANHUO_ICON} 获得丹火:</span><span class="stat-value">+${rewards.danhuo}</span></div>`;
+            }
+            if (rewards.shenshi > 0) {
+                content += `<div class="stat-row"><span class="stat-label">${SHENSHI_ICON} 获得神识:</span><span class="stat-value">+${rewards.shenshi}</span></div>`;
             }
 
             if (rewards.cultivation > 0) {
