@@ -1953,3 +1953,34 @@ body.fx-shake .container { animation: fxShake 0.12s linear infinite; }
 
 .mobile-coins { display: none; }
 @media (max-width: 768px) { .mobile-coins { display: flex; flex-wrap: wrap; gap: 6px; } .mobile-coins .mobile-cur { margin-left: 0; } }
+
+/* ===== 侧栏与货币条重排（v6.54）：货币移到顶部；技能分组单行；导航改成 2×2 小图标 ===== */
+.sidebar { width: 136px; padding: 12px 0; gap: 10px; align-items: stretch; overflow-y: auto; scrollbar-width: none; }
+.sidebar::-webkit-scrollbar { display: none; }
+.sidebar .logo { align-self: center; flex: none; }
+.skill-tree { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 0 8px; gap: 3px; scrollbar-width: none; }
+.skill-tree::-webkit-scrollbar { display: none; }
+.sidebar .skill-item { min-height: 0; padding: 6px 8px 7px; display: grid; grid-template-columns: 1fr auto; align-items: center; row-gap: 5px; text-align: left; font-size: 0.85em; }
+.sidebar .skill-item .skill-name { margin: 0; font-size: 0.95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar .skill-item .skill-level { margin: 0; font-size: 0.75em; color: var(--text-l3); }
+.skill-item .skill-bar { grid-column: 1 / -1; height: 3px; background: var(--bg-l1); overflow: hidden; }
+.skill-item .skill-bar i { display: block; height: 100%; background: var(--patina, #6fa980); transition: width 0.3s; }
+.skill-sep { height: 1px; margin: 5px 6px; background: var(--border-l3); flex: none; }
+.nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0 8px; flex: none; }
+.nav-mini { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 0 6px; background: var(--bg-l2); border: 1px solid var(--border-l4); border-radius: 2px; color: var(--text-l2); cursor: pointer; font-size: 0.75em; }
+.nav-mini .nav-ico { font-size: 1.5em; line-height: 1.1; }
+.nav-mini:hover { background: var(--bg-l3); border-color: var(--bronze-dim); }
+body[data-panel="inventory"] .nav-mini[data-nav="inventory"],
+body[data-panel="equipment"] .nav-mini[data-nav="equipment"],
+body[data-panel="shop"] .nav-mini[data-nav="shop"],
+body[data-panel="settings"] .nav-mini[data-nav="settings"] { background: var(--bg-l3); border-color: var(--cinnabar-2); box-shadow: inset 0 0 0 1px var(--cinnabar); color: var(--text-l1); }
+.currency-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin-left: auto; }
+.cur-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1px solid var(--border-l3); background: var(--bg-l3); color: var(--text-l2); font-size: 0.9em; cursor: pointer; white-space: nowrap; transition: background-color 0.2s, border-color 0.2s; }
+.cur-chip:hover { background: var(--bg-l2); border-color: var(--bronze); }
+.cur-chip .ico { width: 1.3em; height: 1.3em; }
+.cur-chip b { color: var(--text-l1); }
+.cur-chip .cur-name { color: var(--text-l3); }
+body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar-2); box-shadow: inset 0 0 0 1px var(--cinnabar); }
+@media (max-width: 768px) { .currency-bar { width: 100%; justify-content: flex-start; margin-left: 0; } .cur-chip { padding: 6px 12px; } }
+
+@media (max-width: 768px) { .cur-chip { padding: 6px 10px; gap: 5px; } .cur-chip .cur-name { display: none; } }

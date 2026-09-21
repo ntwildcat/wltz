@@ -4090,30 +4090,43 @@
             });
         }
 
+        // 左侧技能树：分三组（核心 / 生活技能 / 进阶），每项一行：图标 + 名称 + 等级，下面一条细经验条
+        const SKILL_GROUPS = [['cultivation', 'battle'], ['alchemy', 'forging', 'farming', 'mining'], ['danhuo', 'shenshi', 'wudao']];
         function buildSkillTree() {
             renderMobileSkillBar();
             const tree = document.getElementById('skillTree');
             if (!tree) return;
             tree.innerHTML = '';
+            const visible = new Set(getVisibleSkills());
+            const activePanel = document.body.dataset.panel;
+            let placed = 0;
 
-            getVisibleSkills().forEach(skillName => {
-                const skill = gameState.skills[skillName];
-                if (!skill) return;
-                const item = document.createElement('div');
-                item.className = 'skill-item';
-                item.id = 'skill-' + skillName;
-                item.onclick = () => switchPanel(skillName);
+            SKILL_GROUPS.forEach(group => {
+                const names = group.filter(n => visible.has(n) && gameState.skills[n]);
+                if (!names.length) return;
+                if (placed > 0) {
+                    const sep = document.createElement('div');
+                    sep.className = 'skill-sep';
+                    tree.appendChild(sep);
+                }
+                names.forEach(skillName => {
+                    const skill = gameState.skills[skillName];
+                    const item = document.createElement('div');
+                    item.className = 'skill-item' + (skillName === activePanel ? ' active' : '');
+                    item.id = 'skill-' + skillName;
+                    item.setAttribute('role', 'button');
+                    item.tabIndex = 0;
+                    item.onclick = () => switchPanel(skillName);
 
-                const info = getSkillExpInfo(skillName);
-                const level = info.level;
-                item.title = `${skill.name} Lv.${level}：经验 ${info.exp} / ${info.need}，还差 ${info.remain} 升级`;
-
-                item.innerHTML = `
-                    <div class="skill-name">${skill.icon} ${skill.name}</div>
-                    <div class="skill-level">Lv.${level}</div>
-                `;
-                item.style.position = 'relative';
-                tree.appendChild(item);
+                    const info = getSkillExpInfo(skillName);
+                    item.title = `${skill.name} Lv.${info.level}：经验 ${info.exp} / ${info.need}，还差 ${info.remain} 升级`;
+                    item.innerHTML = `
+                        <div class="skill-name">${skill.icon} ${skill.name}</div>
+                        <div class="skill-level">Lv.${info.level}</div>
+                        <div class="skill-bar"><i style="width:${Math.min(100, Math.max(0, info.percent))}%"></i></div>`;
+                    tree.appendChild(item);
+                    placed++;
+                });
             });
         }
 
