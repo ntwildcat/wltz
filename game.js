@@ -94,11 +94,11 @@
                     baseRealmIndex: 6,                   // 秘径内怪物的基础境界（新索引）
                     recommendedLevel: '筑基中期~筑基圆满',
                     monsters: [
-                        { name: '残魂守卫', type: '雷', hp: 450, atk: 14, spd: 45, def: 7, attackSpeed: 2.3, drop: 'coins', dropQty: 60 },
-                        { name: '空间裂隙', type: '风', hp: 405, atk: 11, spd: 65, def: 4, attackSpeed: 1.9, drop: 'coins', dropQty: 65 },
-                        { name: '冰晶傀儡', type: '冰', hp: 495, atk: 12, spd: 40, def: 8, attackSpeed: 2.4, drop: 'coins', dropQty: 70 },
-                        { name: '法则残片', type: '无', hp: 630, atk: 13, spd: 50, def: 6, attackSpeed: 2.2, drop: 'coins', dropQty: 75 },
-                        { name: '遗迹意志', type: '无', hp: 900, atk: 20, spd: 48, def: 10, attackSpeed: 3.1, isBoss: true, drop: 'coins', dropQty: 300 }
+                        { name: '残魂守卫', type: '雷', hp: 460, atk: 14, spd: 45, def: 7, attackSpeed: 2.3, drop: 'coins', dropQty: 60 },
+                        { name: '空间裂隙', type: '风', hp: 415, atk: 11, spd: 65, def: 4, attackSpeed: 1.9, drop: 'coins', dropQty: 65 },
+                        { name: '冰晶傀儡', type: '冰', hp: 505, atk: 12, spd: 40, def: 8, attackSpeed: 2.4, drop: 'coins', dropQty: 70 },
+                        { name: '法则残片', type: '无', hp: 645, atk: 13, spd: 50, def: 6, attackSpeed: 2.2, drop: 'coins', dropQty: 75 },
+                        { name: '遗迹意志', type: '无', hp: 920, atk: 20, spd: 48, def: 10, attackSpeed: 3.1, isBoss: true, drop: 'coins', dropQty: 300 }
                     ],
                     rewards: {
                         fixed: [
@@ -122,11 +122,11 @@
                     baseRealmIndex: 9,                      // 怪物境界为金丹初期
                     recommendedLevel: '筑基圆满~金丹中期',
                     monsters: [
-                        { name: '雷劫残魂', type: '雷', hp: 1200, atk: 35, spd: 55, def: 15, attackSpeed: 2.2, drop: 'coins', dropQty: 150 },
-                        { name: '天雷傀儡', type: '雷', hp: 1500, atk: 40, spd: 50, def: 18, attackSpeed: 2.3, drop: 'coins', dropQty: 180 },
-                        { name: '劫云化身', type: '风', hp: 1350, atk: 45, spd: 65, def: 12, attackSpeed: 1.8, drop: 'coins', dropQty: 200 },
-                        { name: '雷劫核心', type: '雷', hp: 1800, atk: 50, spd: 45, def: 22, attackSpeed: 2.4, drop: 'coins', dropQty: 250 },
-                        { name: '天劫意志', type: '无', hp: 3000, atk: 60, spd: 55, def: 25, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 800 }
+                        { name: '雷劫残魂', type: '雷', hp: 1190, atk: 35, spd: 55, def: 15, attackSpeed: 2.2, drop: 'coins', dropQty: 150 },
+                        { name: '天雷傀儡', type: '雷', hp: 1485, atk: 40, spd: 50, def: 18, attackSpeed: 2.3, drop: 'coins', dropQty: 180 },
+                        { name: '劫云化身', type: '风', hp: 1335, atk: 45, spd: 65, def: 12, attackSpeed: 1.8, drop: 'coins', dropQty: 200 },
+                        { name: '雷劫核心', type: '雷', hp: 1780, atk: 50, spd: 45, def: 22, attackSpeed: 2.4, drop: 'coins', dropQty: 250 },
+                        { name: '天劫意志', type: '无', hp: 2970, atk: 60, spd: 55, def: 25, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 800 }
                     ],
                     rewards: {
                         fixed: [
@@ -151,11 +151,11 @@
                     baseRealmIndex: 13,                     // 怪物境界为元婴初期
                     recommendedLevel: '金丹圆满~元婴中期',
                     monsters: [
-                        { name: '元神残影', type: '无', hp: 5000, atk: 80, spd: 60, def: 30, attackSpeed: 2.1, drop: 'coins', dropQty: 400 },
-                        { name: '虚空吞噬者', type: '风', hp: 6000, atk: 90, spd: 70, def: 25, attackSpeed: 1.8, drop: 'coins', dropQty: 450 },
-                        { name: '神识傀儡', type: '雷', hp: 5500, atk: 85, spd: 55, def: 35, attackSpeed: 2.2, drop: 'coins', dropQty: 500 },
-                        { name: '幻梦妖灵', type: '水', hp: 6500, atk: 95, spd: 65, def: 28, attackSpeed: 2.0, drop: 'coins', dropQty: 550 },
-                        { name: '化神意志', type: '无', hp: 12000, atk: 120, spd: 60, def: 40, attackSpeed: 3.3, isBoss: true, drop: 'coins', dropQty: 2000 }
+                        { name: '元神残影', type: '无', hp: 4990, atk: 80, spd: 60, def: 30, attackSpeed: 2.1, drop: 'coins', dropQty: 400 },
+                        { name: '虚空吞噬者', type: '风', hp: 5990, atk: 90, spd: 70, def: 25, attackSpeed: 1.8, drop: 'coins', dropQty: 450 },
+                        { name: '神识傀儡', type: '雷', hp: 5490, atk: 85, spd: 55, def: 35, attackSpeed: 2.2, drop: 'coins', dropQty: 500 },
+                        { name: '幻梦妖灵', type: '水', hp: 6490, atk: 95, spd: 65, def: 28, attackSpeed: 2.0, drop: 'coins', dropQty: 550 },
+                        { name: '化神意志', type: '无', hp: 11980, atk: 120, spd: 60, def: 40, attackSpeed: 3.3, isBoss: true, drop: 'coins', dropQty: 2000 }
                     ],
                     rewards: {
                         fixed: [
@@ -180,11 +180,11 @@
                     baseRealmIndex: 17,                     // 怪物境界为化神初期
                     recommendedLevel: '元婴圆满~化神中期',
                     monsters: [
-                        { name: '幻境行者', type: '风', hp: 20600, atk: 150, spd: 70, def: 50, attackSpeed: 2.0, drop: 'coins', dropQty: 800 },
-                        { name: '虚实道人', type: '水', hp: 24720, atk: 165, spd: 65, def: 55, attackSpeed: 2.1, drop: 'coins', dropQty: 900 },
-                        { name: '万象傀儡', type: '雷', hp: 22660, atk: 170, spd: 60, def: 65, attackSpeed: 2.2, drop: 'coins', dropQty: 1000 },
-                        { name: '心魔化身', type: '无', hp: 26780, atk: 180, spd: 75, def: 60, attackSpeed: 1.9, drop: 'coins', dropQty: 1100 },
-                        { name: '太虚道主', type: '无', hp: 51500, atk: 220, spd: 70, def: 70, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 4000 }
+                        { name: '幻境行者', type: '风', hp: 21630, atk: 150, spd: 70, def: 50, attackSpeed: 2.0, drop: 'coins', dropQty: 800 },
+                        { name: '虚实道人', type: '水', hp: 25955, atk: 165, spd: 65, def: 55, attackSpeed: 2.1, drop: 'coins', dropQty: 900 },
+                        { name: '万象傀儡', type: '雷', hp: 23795, atk: 170, spd: 60, def: 65, attackSpeed: 2.2, drop: 'coins', dropQty: 1000 },
+                        { name: '心魔化身', type: '无', hp: 28120, atk: 180, spd: 75, def: 60, attackSpeed: 1.9, drop: 'coins', dropQty: 1100 },
+                        { name: '太虚道主', type: '无', hp: 54075, atk: 220, spd: 70, def: 70, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 4000 }
                     ],
                     rewards: {
                         fixed: [
@@ -653,12 +653,12 @@
         // （保留真实的怪物属性和克制关系），最低境界平均通关率约 60%~90%。原始数值保留在 GAME_CONFIG.dungeons，
         // 调平衡只需改此表。修改装备/属性/灵根特效后需要重新标定，临界点很陡。
         const P4_MONSTER_SCALE = {
-            mysteryTower: 0.7,
-            mysteriousForest: 0.497,
-            ancientRuin: 0.416,
-            tribulationGround: 0.1365,
-            huashenRealm: 0.0636,
-            taixuDream: 0.03
+            mysteryTower: 0.725,
+            mysteriousForest: 0.505,
+            ancientRuin: 0.46,
+            tribulationGround: 0.1635,
+            huashenRealm: 0.0876,
+            taixuDream: 0.0467
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -673,10 +673,10 @@
         // 标定：无特效玩家（桃木剑、最低境界）通关率约 65%，且敌人平均每击约打掉玩家 12% 最大生命，
         // 让防御/闪避/生命类特效在普通战斗里同样有价值（只缩放血量会变成纯输出检定，输出型灵根占尽优势）。
         const P4_AREA_SCALE = {
-            forest: { hp: 1.071, atk: 1.071 }, mountain: { hp: 1.056, atk: 1.117 }, deepMountain: { hp: 0.876, atk: 1.079 },
-            swamp: { hp: 0.978, atk: 1.206 }, abyss: { hp: 0.775, atk: 1.104 }, goldenPlains: { hp: 0.572, atk: 0.735 },
-            tribulationGround: { hp: 0.424, atk: 0.654 }, voidSea: { hp: 0.15, atk: 0.497 }, abyssRuins: { hp: 0.047, atk: 0.353 },
-            chaosWastes: { hp: 0.037, atk: 0.18 }, nineNether: { hp: 0.0175, atk: 0.14 }
+            forest: { hp: 1.12, atk: 1.12 }, mountain: { hp: 1.1, atk: 1.17 }, deepMountain: { hp: 0.944, atk: 1.16 },
+            swamp: { hp: 1.08, atk: 1.33 }, abyss: { hp: 0.921, atk: 1.31 }, goldenPlains: { hp: 0.689, atk: 0.885 },
+            tribulationGround: { hp: 0.516, atk: 0.76 }, voidSea: { hp: 0.205, atk: 0.65 }, abyssRuins: { hp: 0.0705, atk: 0.512 },
+            chaosWastes: { hp: 0.0607, atk: 0.287 }, nineNether: { hp: 0.031, atk: 0.238 }
         };
 
         const BATTLE_FORMULAS = {
@@ -5596,6 +5596,8 @@
             return false;
         }
 
+        const REALM_STAT_COMPOUND = 1.03;   // 生命 / 攻击 / 防御每境界额外复利系数（速度不变）
+
         function calculateStats() {
             // P4重写：境界驱动的属性系统（替代技能等级驱动）
             const realmIndex = gameState.player.realmIndex;
@@ -5610,10 +5612,13 @@
             // - 生命 +40%/级（快速增长，提升续航）
             // - 攻击 +30%/级（显著提升）
             // - 防御 +25%/级（稳定防守）
+            // - 以上三项再乘 REALM_STAT_COMPOUND^境界（v6.40）
             // - 速度 +30%/级（战斗体验）
-            const hpMultiplier = 1 + realmIndex * 0.40;
-            const atkMultiplier = 1 + realmIndex * 0.30;
-            const defMultiplier = 1 + realmIndex * 0.25;
+            // v6.40：在线性增长上再乘一个每境界 +3% 的复利系数，使高境界的每次突破提升更明显（线性增长的相对提升越往后越小）
+            const realmGrowth = Math.pow(REALM_STAT_COMPOUND, realmIndex);
+            const hpMultiplier = (1 + realmIndex * 0.40) * realmGrowth;
+            const atkMultiplier = (1 + realmIndex * 0.30) * realmGrowth;
+            const defMultiplier = (1 + realmIndex * 0.25) * realmGrowth;
             const spdMultiplier = 1 + realmIndex * 0.30;
 
             // === 第三步：灵根 + 功法的属性百分比特效（作用于境界基础属性，先乘后取整，避免小数值被吃掉）===
