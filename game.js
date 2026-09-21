@@ -3603,8 +3603,6 @@
             // 1. 判断解锁状态
             const unlockState = getRecipeUnlockState(skillName, recipe);
 
-            // 2. 计算效率
-            const efficiency = calculateRecipeEfficiency(skillName, recipe, recipeKey);
             // 卡片显示实际耗时（含装备、功法、精通等加成）；与基础耗时不同时附上基础值
             const adjDur = getAdjustedDuration(skillName, recipe.duration, recipeKey);
             const fmt = v => parseFloat(v.toFixed(v < 10 ? 2 : 1));
@@ -3647,7 +3645,6 @@
             const outEquip = ((recipe.output && recipe.output.items) || []).find(i => isEquipmentItem(i.id));
             const equipStatsHtml = outEquip
                 ? `<div class="recipe-equip-stats" title="${GAME_CONFIG.items[outEquip.id].name}">${GAME_CONFIG.items[outEquip.id].icon} ${formatItemStats(outEquip.id)}</div>` : '';
-            const efficiencyStr = efficiency > 0 ? ` · <span class="recipe-efficiency" title="按当前加成折算的收益效率">${efficiency.toFixed(2)}/秒</span>` : '';
 
             // 配方精通（生活技能）：等级、进度条，悬停显示具体加成
             let masteryHtml = '';
@@ -3688,7 +3685,7 @@
             // 不再单独显示「✓ 要求」一行：未解锁时由锁定提示说明，要求全文放在卡片悬停提示里
             card.innerHTML = `
                 <div class="recipe-name rc-name">${recipe.name}</div>
-                <div class="recipe-time rc-meta">⏱ ${timeText}${efficiencyStr}</div>
+                <div class="recipe-time rc-meta">⏱ ${timeText}</div>
                 <div class="rc-art${unlockState.unlocked ? '' : ' locked'}">${unlockState.unlocked ? recipeArtIcon(recipe) : '🔒'}</div>
                 <div class="recipe-output">${outputStr}</div>
                 ${equipStatsHtml}
