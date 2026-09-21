@@ -2335,9 +2335,9 @@
             if (rewards.fixed) {
                 rewards.fixed.forEach(drop => {
                     const qty = Array.isArray(drop.qty) ? Math.floor(Math.random() * (drop.qty[1] - drop.qty[0] + 1)) + drop.qty[0] : drop.qty;
-                    addToInventory(drop.id, qty);
+                    const got = addToInventory(drop.id, qty);
                     const item = GAME_CONFIG.items[drop.id];
-                    rewardMsg += `+ ${item.name} x${qty}\n`;
+                    rewardMsg += `+ ${item.name} x${qty}${got ? '' : '（背包已满，未获得）'}\n`;
                 });
             }
 
@@ -2351,21 +2351,25 @@
                 rewards.random.forEach(drop => {
                     if (Math.random() < drop.probability * scoutMult) {
                         const qty = Array.isArray(drop.qty) ? Math.floor(Math.random() * (drop.qty[1] - drop.qty[0] + 1)) + drop.qty[0] : drop.qty;
-                        addToInventory(drop.id, qty);
+                        const got = addToInventory(drop.id, qty);
                         const item = GAME_CONFIG.items[drop.id];
-                        rewardMsg += `+ ${item.name} x${qty}\n`;
+                        rewardMsg += `+ ${item.name} x${qty}${got ? '' : '（背包已满，未获得）'}\n`;
                     }
                 });
             }
 
-            // 技能经验（指数级：100 × level^1.8）
+            // 通关灵石（此前配置了 rewards.coins 却从未发放）
+            if (rewards.coins) {
+                const coins = Array.isArray(rewards.coins)
+                    ? rewards.coins[0] + Math.floor(Math.random() * (rewards.coins[1] - rewards.coins[0] + 1))
+                    : rewards.coins;
+                gameState.player.coins += coins;
+                rewardMsg += `+ ${coins} 灵石\n`;
+            }
+
+            // 战斗技能经验：走统一的 addSkillExp（此前手写升级循环，绕过了经验加成与升级提示）
             if (rewards.skillExp) {
-                const skill = gameState.skills.battle;
-                skill.exp += rewards.skillExp;
-                while (skill.exp >= 100 * Math.pow(skill.level, 1.8)) {
-                    skill.exp -= 100 * Math.pow(skill.level, 1.8);
-                    skill.level++;
-                }
+                addSkillExp('battle', rewards.skillExp);
                 rewardMsg += `+ 战斗经验 x${rewards.skillExp}`;
             }
 
