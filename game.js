@@ -5511,7 +5511,7 @@
         // ==================== 突破特效 ====================
         // 小境界：一圈铜色涟漪加火花 + 朱印「破」，约 1.6 秒，不挡操作。
         // 大境界：每个境界有自己的特效（约 4 秒，点击可跳过）：
-        //   筑基 = 地脉升起（大地色石柱自下而上拔起、尘土飞扬、震动）
+        //   筑基 = 筑基台（地上画出八卦阵纹，三层圆台依次升起，一道金光贯天而起）
         //   金丹 = 金丹凝结（金色光点旋转汇聚成丹，光环扩散）
         //   元婴 = 元神出窍（青白色婴儿元神从丹田升起，拖出光带）
         //   化神 = 天地法则（雷霆劈落、八种法则符文环绕旋转、屏幕震动）
@@ -5612,42 +5612,121 @@
             }
         }
 
+        // 筑基：筑基台 —— 地上先画出八卦阵纹（天圆地方），三层圆台依次升起，最后一道金光贯天而起
         function fxDrawFoundation(ctx, W, H, t, s) {
-            const fade = Math.min(1, t / 0.5) * (t > 3.5 ? Math.max(0, (4.2 - t) / 0.7) : 1);
-            ctx.fillStyle = `rgba(14, 12, 8, ${0.6 * fade})`;
+            const cx = W / 2, cy = H * 0.8;
+            const Rx = Math.min(W * 0.42, 430), Ry = Rx * 0.3;
+            const fade = t > 3.7 ? Math.max(0, (4.4 - t) / 0.7) : 1;
+            ctx.fillStyle = `rgba(14, 12, 8, ${0.62 * Math.min(1, t / 0.5) * fade})`;
             ctx.fillRect(0, 0, W, H);
-            if (!s.pillars) {
-                const n = Math.max(7, Math.round(W / 150));
-                s.pillars = Array.from({ length: n }, (_, i) => ({ x: (i + 0.5) * W / n, w: W / n * 0.62, h: fxRand(0.32, 0.72) * H, d: 0.12 * i + fxRand(0, 0.15) }));
-                s.dust = Array.from({ length: 90 }, () => ({ x: fxRand(0, W), y: fxRand(H * 0.5, H), v: fxRand(20, 70), r: fxRand(1, 3), d: fxRand(0, 2) }));
+            // 地面微光
+            const gl = ctx.createRadialGradient(cx, cy, 0, cx, cy, Rx * 1.3);
+            gl.addColorStop(0, `rgba(150, 118, 64, ${0.28 * fade})`);
+            gl.addColorStop(1, 'rgba(150, 118, 64, 0)');
+            ctx.save(); ctx.translate(0, 0); ctx.fillStyle = gl;
+            ctx.beginPath(); ctx.ellipse(cx, cy, Rx * 1.3, Ry * 1.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+
+            // 阵纹：外圈弧线逐渐画满，刻度随之出现
+            const ring = fxEase((t - 0.1) / 1.1);
+            ctx.strokeStyle = `rgba(200, 168, 100, ${0.9 * fade})`;
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.ellipse(cx, cy, Rx, Ry, 0, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * ring); ctx.stroke();
+            ctx.lineWidth = 1.5;
+            for (let i = 0; i < 48; i++) {
+                if (i / 48 > ring) break;
+                const a = -Math.PI / 2 + (i / 48) * Math.PI * 2;
+                ctx.beginPath();
+                ctx.moveTo(cx + Math.cos(a) * Rx, cy + Math.sin(a) * Ry);
+                ctx.lineTo(cx + Math.cos(a) * Rx * 0.94, cy + Math.sin(a) * Ry * 0.94);
+                ctx.stroke();
             }
-            s.pillars.forEach(p => {
-                const k = fxEase((t - 0.25 - p.d) / 0.95);
+            // 内圈与「地方」：一个内接的菱形（透视下的方），线条依次画出
+            const inner = fxEase((t - 0.8) / 1.0);
+            if (inner > 0) {
+                ctx.strokeStyle = `rgba(176, 141, 90, ${0.85 * fade})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.ellipse(cx, cy, Rx * 0.68, Ry * 0.68, 0, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * inner); ctx.stroke();
+                const r = 0.68;
+                const pts = [[0, -Ry * r], [Rx * r, 0], [0, Ry * r], [-Rx * r, 0], [0, -Ry * r]];
+                ctx.beginPath(); ctx.moveTo(cx + pts[0][0], cy + pts[0][1]);
+                const total = 4 * inner;
+                for (let i = 1; i <= 4; i++) {
+                    const seg = Math.min(1, Math.max(0, total - (i - 1)));
+                    if (seg <= 0) break;
+                    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+                    ctx.lineTo(cx + x0 + (x1 - x0) * seg, cy + y0 + (y1 - y0) * seg);
+                }
+                ctx.stroke();
+            }
+            // 八卦：环绕阵盘依次亮起
+            ctx.font = `bold ${Math.round(Math.min(W, H) * 0.045)}px KaiTi, STKaiti, serif`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ['乾', '兑', '离', '震', '巽', '坎', '艮', '坤'].forEach((ch, i) => {
+                const k = fxEase((t - 0.45 - i * 0.11) / 0.5);
                 if (k <= 0) return;
-                const h = p.h * k, x = p.x - p.w / 2, y = H - h;
-                const g = ctx.createLinearGradient(0, y, 0, H);
-                g.addColorStop(0, `rgba(146, 116, 70, ${0.92 * fade})`);
-                g.addColorStop(1, `rgba(52, 42, 28, ${0.92 * fade})`);
-                ctx.fillStyle = g;
-                ctx.fillRect(x, y, p.w, h);
-                ctx.fillStyle = `rgba(232, 212, 160, ${0.85 * fade})`;
-                ctx.fillRect(x, y, p.w, 4);
-                ctx.strokeStyle = `rgba(20, 16, 10, ${0.5 * fade})`;
-                for (let yy = y + 26; yy < H; yy += 26) { ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + p.w, yy); ctx.stroke(); }
+                const a = -Math.PI / 2 + (i / 8) * Math.PI * 2;
+                ctx.save();
+                ctx.globalAlpha = k * fade;
+                ctx.shadowColor = 'rgba(220, 180, 100, 0.9)'; ctx.shadowBlur = 12;
+                ctx.fillStyle = '#e2c27a';
+                ctx.fillText(ch, cx + Math.cos(a) * Rx * 1.13, cy + Math.sin(a) * Ry * 1.28);
+                ctx.restore();
             });
+            // 三层圆台（圜丘）：由下而上依次从地面升起
+            const tiers = [[0.56, 26], [0.4, 26], [0.24, 26]];
+            let base = cy;
+            tiers.forEach(([rf, h], i) => {
+                const k = fxEase((t - 1.5 - i * 0.4) / 0.6);
+                const rx = Rx * rf, ry = Ry * rf;
+                const lift = (1 - k) * 46;
+                const yb = base + lift, yt = yb - h;
+                base -= h;
+                if (k <= 0) return;
+                ctx.globalAlpha = k * fade;
+                const g = ctx.createLinearGradient(0, yt, 0, yb);
+                g.addColorStop(0, 'rgba(170, 136, 84, 1)');
+                g.addColorStop(1, 'rgba(70, 56, 36, 1)');
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.moveTo(cx - rx, yt);
+                ctx.lineTo(cx - rx, yb); ctx.ellipse(cx, yb, rx, ry, 0, Math.PI, 0, true);
+                ctx.lineTo(cx + rx, yt); ctx.ellipse(cx, yt, rx, ry, 0, 0, Math.PI, false);
+                ctx.closePath(); ctx.fill();
+                ctx.fillStyle = 'rgba(214, 184, 118, 1)';
+                ctx.beginPath(); ctx.ellipse(cx, yt, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = 'rgba(70, 52, 28, 0.9)'; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.ellipse(cx, yt, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+                ctx.globalAlpha = 1;
+            });
+            // 落尘
+            if (!s.dust) s.dust = Array.from({ length: 70 }, () => ({ a: fxRand(0, 6.28), r: fxRand(0.2, 1.05), v: fxRand(24, 80), size: fxRand(1, 2.8), d: fxRand(0.6, 3) }));
             s.dust.forEach(d => {
                 if (t < d.d) return;
-                const y = d.y - (t - d.d) * d.v;
-                ctx.fillStyle = `rgba(200, 176, 120, ${0.5 * fade * Math.max(0, 1 - (t - d.d) / 2.6)})`;
-                ctx.beginPath(); ctx.arc(d.x, y, d.r, 0, Math.PI * 2); ctx.fill();
+                const life = (t - d.d) / 1.8;
+                if (life > 1) return;
+                ctx.fillStyle = `rgba(214, 184, 118, ${0.6 * (1 - life) * fade})`;
+                ctx.beginPath(); ctx.arc(cx + Math.cos(d.a) * Rx * d.r, cy + Math.sin(d.a) * Ry * d.r - life * d.v, d.size, 0, Math.PI * 2); ctx.fill();
             });
-            const ln = fxEase((t - 1.6) / 0.9);
-            if (ln > 0) {
-                ctx.strokeStyle = `rgba(232, 212, 160, ${0.8 * fade})`;
-                ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.moveTo(W / 2 - ln * W / 2, H * 0.62); ctx.lineTo(W / 2 + ln * W / 2, H * 0.62); ctx.stroke();
+            // 台成之后，一道金光自台顶贯天而起，并有一圈光环扩散
+            const beam = fxEase((t - 2.7) / 0.5);
+            if (beam > 0) {
+                const topY = base;
+                for (let i = 0; i < 4; i++) {
+                    const w = (54 - i * 12) * (0.6 + 0.4 * beam);
+                    const g = ctx.createLinearGradient(0, topY, 0, 0);
+                    g.addColorStop(0, `rgba(255, 232, 160, ${(0.32 + i * 0.12) * beam * fade})`);
+                    g.addColorStop(1, 'rgba(255, 232, 160, 0)');
+                    ctx.fillStyle = g;
+                    ctx.fillRect(cx - w / 2, 0, w, topY);
+                }
+                const wk = (t - 2.7) / 1.1;
+                if (wk < 1) {
+                    ctx.strokeStyle = `rgba(255, 232, 160, ${0.9 * (1 - wk) * fade})`;
+                    ctx.lineWidth = 4 * (1 - wk) + 1;
+                    ctx.beginPath(); ctx.ellipse(cx, cy, Rx * (0.3 + fxEase(wk) * 1.4), Ry * (0.3 + fxEase(wk) * 1.4), 0, 0, Math.PI * 2); ctx.stroke();
+                }
             }
-            document.body.classList.toggle('fx-shake', t > 0.3 && t < 1.6);
+            document.body.classList.toggle('fx-shake', t > 1.5 && t < 2.3);
         }
 
         function fxDrawCore(ctx, W, H, t, s) {

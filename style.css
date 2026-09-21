@@ -1846,3 +1846,4 @@ body.fx-shake .container { animation: fxShake 0.12s linear infinite; }
 .fx-replay-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .fx-replay-btn { margin-top: 0; padding: 6px 14px; display: inline-flex; flex-direction: column; align-items: center; line-height: 1.3; }
 .fx-replay-btn small { font-size: 0.7em; color: var(--text-l4); font-family: var(--font-body); letter-spacing: 0; }
+.fx-foundation .fx-text { top: 24%; }
