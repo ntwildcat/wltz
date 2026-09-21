@@ -53,7 +53,7 @@
                             { id: 'seed_mushroom', qty: 1, probability: 0.2 },
                             { id: 'stone', qty: [2, 4], probability: 1 }
                         ],
-                        coins: [200, 500],
+                        coins: [80, 160],
                         skillExp: 30
                     }
                 },
@@ -81,7 +81,7 @@
                             { id: 'seed_tea', qty: 1, probability: 0.3 },
                             { id: 'cleangrass', qty: [3, 5], probability: 1 }
                         ],
-                        coins: [500, 1200],
+                        coins: [140, 250],
                         skillExp: 50
                     }
                 },
@@ -108,7 +108,7 @@
                             { id: 'seed_tea', qty: 1, probability: 0.5 },
                             { id: 'crystal', qty: [2, 3], probability: 1 }
                         ],
-                        coins: [1000, 2000],
+                        coins: [200, 370],
                         skillExp: 80
                     }
                 },
@@ -137,7 +137,7 @@
                             { id: 'crystal', qty: [3, 5], probability: 1 },
                             { id: 'spiritore', qty: [5, 8], probability: 1 }
                         ],
-                        coins: [3000, 6000],
+                        coins: [550, 1030],
                         skillExp: 150
                     }
                 },
@@ -166,7 +166,7 @@
                             { id: 'lotus', qty: [2, 4], probability: 1 },
                             { id: 'crystal', qty: [5, 10], probability: 1 }
                         ],
-                        coins: [8000, 15000],
+                        coins: [1400, 2500],
                         skillExp: 250
                     }
                 },
@@ -195,7 +195,7 @@
                             { id: 'lotus', qty: [3, 5], probability: 1 },
                             { id: 'immortalore', qty: [3, 6], probability: 1 }
                         ],
-                        coins: [15000, 30000],
+                        coins: [2700, 5100],
                         skillExp: 400
                     }
                 }
@@ -448,13 +448,6 @@
                     { id: 'cleangrass', name: '清灵草', icon: '🍃', price: 25, desc: '炼丹材料' },
                     { id: 'mushroom', name: '灵芝', icon: '🍄', price: 50, desc: '高级材料' }
                 ],
-                equipment: [
-                    { id: 'sword', name: '桃木剑', icon: '⚔️', price: 150, desc: '攻击力+15', minRealmIndex: 0 },
-                    { id: 'ironarmor', name: '铁甲', icon: '🛡️', price: 300, desc: '防御力+10', minRealmIndex: 5 },
-                    { id: 'spiritsword', name: '灵剑', icon: '⚡', price: 1000, desc: '攻击力+40', minRealmIndex: 8 },
-                    { id: 'goldenarmor', name: '金丹法袍', icon: '👔', price: 3000, desc: '防御力+25', minRealmIndex: 9 },
-                    { id: 'yuanyingsword', name: '元婴灵剑', icon: '✨', price: 10000, desc: '攻击力+80', minRealmIndex: 13 }
-                ],
                 materials: [
                     { id: 'spiritore', name: '灵矿石', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5 },
                     { id: 'crystal', name: '玄晶', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
@@ -653,12 +646,12 @@
         // （保留真实的怪物属性和克制关系），最低境界平均通关率约 60%~90%。原始数值保留在 GAME_CONFIG.dungeons，
         // 调平衡只需改此表。修改装备/属性/灵根特效后需要重新标定，临界点很陡。
         const P4_MONSTER_SCALE = {
-            mysteryTower: 0.725,
-            mysteriousForest: 0.505,
-            ancientRuin: 0.46,
-            tribulationGround: 0.1635,
-            huashenRealm: 0.0876,
-            taixuDream: 0.0467
+            mysteryTower: 0.814,
+            mysteriousForest: 0.617,
+            ancientRuin: 0.763,
+            tribulationGround: 0.262,
+            huashenRealm: 0.16,
+            taixuDream: 0.1013
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -868,8 +861,8 @@
                 每个配方做得越多，<b>🎓 精通</b>等级越高，会带来翻倍、省材料、缩短耗时等加成；把鼠标悬停（手机上点一下）可以看到详情。` },
             { title: '⚔️ 战斗', body: `进入<b>战斗区域</b>打怪，获得灵石和经验，区域随境界解锁。战斗时生命低会自动吃你装备的<b>食物</b>（在炼丹里制作，背包里设为战斗食物）。<br/><br/>
                 <b>🔁 循环战斗</b>：进入战斗区域后会一直打下去，点「撤退」才退出，离线也会继续。<b>秘境</b>同样会一直循环挑战，掉落种子和突破材料，但被击败会损失修为和食物，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
-            { title: '🏪 商城与小提示', body: `用灵石在<b>商城</b>买装备、材料、食物和功法；功法和灵根都有各自的特效，可以在修炼面板切换功法。<br/><br/>
-                💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份。这个介绍可以在<b>设置 → 玩法介绍</b>里随时重看。祝你道途顺遂！` }
+            { title: '🏪 商城与小提示', body: `用灵石在<b>商城</b>买材料、食物和功法（装备只能在炼器里打造）；功法和灵根都有各自的特效，可以在修炼面板切换功法。<br/><br/>
+                💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份（会下载一个存档文件，需要时用「导入存档」选择它）。这个介绍可以在<b>设置 → 玩法介绍</b>里随时重看。祝你道途顺遂！` }
         ];
         let tutorialStep = 0;
 
@@ -1149,13 +1142,14 @@
                 applySkillLevelBonus(skill, per);
                 const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double;
                 gameState.player.coins += (per.coins || 0) * n;
+                const lost = [];
                 (per.items || []).forEach(item => {
                     const qty = Math.floor(item.qty * n * (1 + doubleRate) + 1e-9);
-                    if (qty > 0) addToInventory(item.id, qty);
+                    if (qty > 0 && !addToInventory(item.id, qty, true)) lost.push(`${GAME_CONFIG.items[item.id].name}×${qty}`);
                 });
                 if (per.skill && per.exp) addSkillExp(per.skill, per.exp * n, key);
                 addMasteryExp(skill, key, action.duration * n);
-                showNotification(`🌀 ${label}离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}`, '#6fa980');
+                showNotification(`🌀 ${label}离线完成 ${n} 次：${action.name}${ranOut ? '（材料用完，已停止）' : ''}${lost.length ? `\n❌ 背包已满，${lost.join('、')} 未能获得` : ''}`, lost.length ? '#c98a3e' : '#6fa980');
             }
             if (ranOut) { c.action = null; generateRecipeList(skill); }
             c.progress = 0;
@@ -1805,6 +1799,68 @@
             addBattleLog(`自动进食${status}`, 'info');
         }
 
+        // 生命过低（<50%）时进入战斗的提醒
+        function warnLowHp() {
+            const hp = gameState.player.stats.hp;
+            if (hp && hp.max && hp.current / hp.max < FOOD_CONFIG.autoEatConfig.hpThreshold) {
+                showNotification(`⚠️ 生命只有 ${Math.round(hp.current / hp.max * 100)}%，建议先进食恢复（战斗页顶部「吃一份」）`, '#c98a3e', 'warning');
+            }
+        }
+
+        // 战斗外的当前可用食物：当前选择的食物不可用时，换成背包里恢复量最高的可用食物
+        function getRestFood() {
+            pickBestFood();
+            const id = gameState.player.foodSlot;
+            const cfg = id && FOOD_CONFIG.foods[id];
+            if (!cfg || gameState.player.realmIndex < cfg.minRealm || getFoodCount() <= 0) return null;
+            return id;
+        }
+
+        // 战斗外手动进食（生命不会自动恢复，只能靠食物）。战斗中由「自动食用」负责，这里不可用
+        // all = true：一直吃到满血或没有食物
+        function eatFoodManually(all = false) {
+            if (gameState.currentAction && (gameState.currentAction.isBattle || gameState.currentAction.isDungeon)) {
+                showNotification('战斗中请使用「自动食用」', '#c98a3e', 'warning');
+                return;
+            }
+            const hp = gameState.player.stats.hp;
+            if (hp.current >= hp.max) { showNotification('生命已满', '#c98a3e', 'normal'); return; }
+            let eaten = 0, healed = 0, foodName = '';
+            do {
+                const id = getRestFood();
+                if (!id) break;
+                const cfg = FOOD_CONFIG.foods[id];
+                const restore = Math.min(Math.floor(cfg.hpRestore * (1 + getMod('foodPct'))), hp.max - hp.current);
+                if (restore <= 0) break;
+                hp.current += restore;
+                consumeItem(id, 1);
+                eaten++; healed += restore; foodName = cfg.name;
+            } while (all && hp.current < hp.max);
+            if (!eaten) { showNotification('没有可用的食物（在炼丹里制作）', '#c4483a', 'error'); return; }
+            showNotification(`食用${foodName}×${eaten}，恢复 ${healed} 生命（${hp.current}/${hp.max}）`, '#6fa980');
+            updateUI();
+            renderHpRestoreBar();
+            saveGame();
+        }
+
+        // 战斗面板顶部：生命值 + 战斗外进食按钮
+        function renderHpRestoreBar() {
+            const el = document.getElementById('hpRestoreBar');
+            if (!el) return;
+            const hp = gameState.player.stats.hp;
+            if (!hp || !hp.max) { el.innerHTML = ''; return; }
+            const inCombat = !!(gameState.currentAction && (gameState.currentAction.isBattle || gameState.currentAction.isDungeon));
+            const foodId = getRestFood();
+            const cfg = foodId && FOOD_CONFIG.foods[foodId];
+            const pct = Math.round(hp.current / hp.max * 100);
+            const disabled = inCombat || !cfg || hp.current >= hp.max;
+            el.innerHTML = `<span class="hp-rest-text">❤ 生命 <b>${hp.current}/${hp.max}</b>（${pct}%）</span>` +
+                `<span class="hp-rest-food">${cfg ? `${cfg.icon} ${cfg.name} ×${getFoodCount()}（+${cfg.hpRestore}）` : '无可用食物（在炼丹里制作）'}</span>` +
+                `<button class="btn btn-secondary" ${disabled ? 'disabled' : ''} onclick="eatFoodManually(false)">吃一份</button>` +
+                `<button class="btn btn-secondary" ${disabled ? 'disabled' : ''} onclick="eatFoodManually(true)">吃到满</button>` +
+                `<span class="hp-rest-hint">${inCombat ? '战斗中由「自动食用」负责' : '生命不会自动恢复，只能靠食物'}</span>`;
+        }
+
         // 重置战斗状态（撤退和死亡时使用）
         function resetBattleState(newState = 'idle') {
             gameState.dungeons.currentDungeon = null;
@@ -1884,12 +1940,14 @@
                     showNotification('已撤退', '#c2a25f');
                     switchPanel('battle');
                     switchBattleTab('areas');
+                    scrollMainToTop();
                 } else {
                     resetBattleState('idle');
                     showNotification('已撤退秘境', '#c2a25f');
                     updateUI();
                     switchPanel('battle');
                     switchBattleTab('dungeons');
+                    scrollMainToTop();
                 }
             };
             buttons[1].onclick = () => {
@@ -2259,6 +2317,7 @@
         }
 
         function renderAutoBattleBar() {
+            renderHpRestoreBar();
             const auto = getAutoBattle();
             const fighting = !!(gameState.currentAction && gameState.currentAction.isBattle);
             const stats = (auto.wins + auto.losses) > 0
@@ -2335,9 +2394,9 @@
             if (rewards.fixed) {
                 rewards.fixed.forEach(drop => {
                     const qty = Array.isArray(drop.qty) ? Math.floor(Math.random() * (drop.qty[1] - drop.qty[0] + 1)) + drop.qty[0] : drop.qty;
-                    addToInventory(drop.id, qty);
+                    const got = addToInventory(drop.id, qty);
                     const item = GAME_CONFIG.items[drop.id];
-                    rewardMsg += `+ ${item.name} x${qty}\n`;
+                    rewardMsg += `+ ${item.name} x${qty}${got ? '' : '（背包已满，未获得）'}\n`;
                 });
             }
 
@@ -2351,21 +2410,25 @@
                 rewards.random.forEach(drop => {
                     if (Math.random() < drop.probability * scoutMult) {
                         const qty = Array.isArray(drop.qty) ? Math.floor(Math.random() * (drop.qty[1] - drop.qty[0] + 1)) + drop.qty[0] : drop.qty;
-                        addToInventory(drop.id, qty);
+                        const got = addToInventory(drop.id, qty);
                         const item = GAME_CONFIG.items[drop.id];
-                        rewardMsg += `+ ${item.name} x${qty}\n`;
+                        rewardMsg += `+ ${item.name} x${qty}${got ? '' : '（背包已满，未获得）'}\n`;
                     }
                 });
             }
 
-            // 技能经验（指数级：100 × level^1.8）
+            // 通关灵石（此前配置了 rewards.coins 却从未发放）
+            if (rewards.coins) {
+                const coins = Array.isArray(rewards.coins)
+                    ? rewards.coins[0] + Math.floor(Math.random() * (rewards.coins[1] - rewards.coins[0] + 1))
+                    : rewards.coins;
+                gameState.player.coins += coins;
+                rewardMsg += `+ ${coins} 灵石\n`;
+            }
+
+            // 战斗技能经验：走统一的 addSkillExp（此前手写升级循环，绕过了经验加成与升级提示）
             if (rewards.skillExp) {
-                const skill = gameState.skills.battle;
-                skill.exp += rewards.skillExp;
-                while (skill.exp >= 100 * Math.pow(skill.level, 1.8)) {
-                    skill.exp -= 100 * Math.pow(skill.level, 1.8);
-                    skill.level++;
-                }
+                addSkillExp('battle', rewards.skillExp);
                 rewardMsg += `+ 战斗经验 x${rewards.skillExp}`;
             }
 
@@ -4458,7 +4521,7 @@
                         <button class="btn equip-btn" onclick="equipFromBag('${i.id}')">装备</button></div>`;
                 }).join('');
             });
-            box.innerHTML = `<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（炼器可以打造，商城也有出售）</div>'}`;
+            box.innerHTML = `<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（可以在炼器里打造）</div>'}`;
         }
 
         // 旧存档迁移：装备曾同时保留在背包里，现在装备栏与背包分开。每件已装备的物品从背包扣掉 1 件；
@@ -4898,6 +4961,7 @@
             gameState.battles.currentArea = areaKey;
             gameState.battles.playerHP = { current: gameState.player.stats.hp.current, max: gameState.player.stats.hp.max };
             gameState.battles.startPlayerHP = gameState.player.stats.hp.current;
+            if (!auto) warnLowHp();
 
             // 随机生成敌人
             gameState.battles.currentEnemy = createAreaEnemy(areaKey);
@@ -4933,6 +4997,7 @@
             updateNormalBattleUI();
             renderAutoBattleBar();
             updateUI();
+            if (!auto) scrollBattleIntoView();
         }
 
         // 进入秘境
@@ -4968,8 +5033,8 @@
             if (typeof gameState.player.stats.hp === 'number') {
                 gameState.player.stats.hp = { current: gameState.player.stats.hp, max: gameState.player.stats.hp };
             } else if (!auto) {
-                // 手动进入：恢复到最大HP；循环续战时不回血（与战斗区域一致，靠食物和生命回复撑下去）
-                gameState.player.stats.hp.current = gameState.player.stats.hp.max;
+                // 手动进入不再回血（此前会回满，导致「进秘境再立刻撤退」等于免费回满血）；生命只靠食物恢复
+                warnLowHp();
             }
 
             // P0-4 食物系统初始化
@@ -5035,6 +5100,7 @@
             updateShop();
             updateArtDisplay();  // 更新功法显示
             updateBonusPanel();
+            renderHpRestoreBar();
         }
 
         // 选择性更新UI（仅更新指定的部分，提高性能）
@@ -5420,7 +5486,6 @@
                 upgrades: '⭐ 永久升级',
                 food: '🌾 食物',
                 pills: '💊 丹药',
-                equipment: '⚔️ 装备',
                 materials: '🪨 材料',
                 arts: '📜 功法',
                 special: '✨ 特殊'
@@ -5720,6 +5785,20 @@
             document.getElementById('coinAmount').textContent = gameState.player.coins;
             const shopCoin = document.getElementById('shopCoin');
             if (shopCoin) shopCoin.textContent = gameState.player.coins;
+            const mobileCoin = document.getElementById('mobileCoinAmount');
+            if (mobileCoin) mobileCoin.textContent = gameState.player.coins;
+        }
+
+        // 手动进入战斗后把战斗界面滚到可见处（手机上战斗区域列表很长，战斗界面在最底下，点进去看不到任何变化）；
+        // 撤退 / 被击败回到列表时滚回顶部
+        function scrollBattleIntoView() {
+            const el = document.getElementById('battleContainer');
+            if (el && !el.classList.contains('hidden')) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        function scrollMainToTop() {
+            const main = document.getElementById('main');
+            if (main && main.scrollTo) main.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // ==================== 突破系统 ====================
@@ -6283,6 +6362,8 @@
             const wasMajor = gameState.player.realmIndex % 4 === 0 && gameState.player.realmIndex > 0;   // 从大境界圆满突破
             gameState.player.realmIndex = nextRealmIndex;
             gameState.player.cultivationXP = 0;
+            calculateStats();
+            if (gameState.player.stats.hp && gameState.player.stats.hp.max) gameState.player.stats.hp.current = gameState.player.stats.hp.max;   // 突破后气血充盈
 
             const newRealm = GAME_CONFIG.realms[nextRealmIndex];
             showNotification(`突破成功！当前境界：${newRealm.name}`, '#6f9c8a', 'success');
@@ -6413,6 +6494,17 @@
                 const originArt = gameState.player.origin === 'disciple' ? 'advanced_art' : 'basic_art';
                 gameState.player.ownedArts = [...new Set([originArt, gameState.player.currentArt])];
             }
+            // 清理配置里已不存在的物品（旧版本删除过物品时，存档里残留的条目会让背包渲染报错）
+            if (Array.isArray(gameState.player.inventory)) {
+                gameState.player.inventory = gameState.player.inventory.filter(i => i && GAME_CONFIG.items[i.id] && i.qty > 0);
+            }
+            if (gameState.player.equipment) {
+                const eq = gameState.player.equipment;
+                if (eq.weapon && !GAME_CONFIG.items[eq.weapon]) eq.weapon = null;
+                if (eq.armor && !GAME_CONFIG.items[eq.armor]) eq.armor = null;
+                if (Array.isArray(eq.jewelry)) eq.jewelry = eq.jewelry.filter(id => GAME_CONFIG.items[id]);
+            }
+            if (gameState.player.foodSlot && !FOOD_CONFIG.foods[gameState.player.foodSlot]) gameState.player.foodSlot = null;
             if (gameState.player.temperLevel === undefined) gameState.player.temperLevel = 0;
             if (gameState.player.scoutBonus === undefined) gameState.player.scoutBonus = false;
 
@@ -6761,7 +6853,11 @@
                 }
             }
 
-            offlineRewards.items.forEach(item => addToInventory(item.id, item.qty));
+            // 背包放不下的物品单独记录并在结算窗里提示，不再静默丢失
+            const keptItems = [];
+            offlineRewards.lostItems = [];
+            offlineRewards.items.forEach(item => (addToInventory(item.id, item.qty, true) ? keptItems : offlineRewards.lostItems).push(item));
+            offlineRewards.items = keptItems;
             Object.entries(offlineRewards.skillExp).forEach(([skill, exp]) => {
                 addSkillExp(skill, exp, savedAction.action);
             });
@@ -6781,7 +6877,7 @@
 
             // 没有任何收益（例如刷新页面只离开几秒）时不弹结算窗
             const earnedAnything = offlineRewards.coins > 0 || offlineRewards.cultivation > 0 ||
-                offlineRewards.items.length > 0 || Object.keys(offlineRewards.skillExp).length > 0 ||
+                offlineRewards.items.length > 0 || offlineRewards.lostItems.length > 0 || Object.keys(offlineRewards.skillExp).length > 0 ||
                 (offlineRewards.overflowCoins || 0) > 0;
             const quiet = offlineSeconds < quietUnder && !exceedsLimit && !cultivationCapped;
             if (quiet) {
@@ -6846,6 +6942,13 @@
                     content += `<span style="color: #6f9c8a;">  ${itemConfig.icon} ${itemConfig.name} x${item.qty}</span>`;
                 });
                 content += `</div>`;
+            }
+
+            if (rewards.lostItems && rewards.lostItems.length > 0) {
+                content += `<div class="stat-row" style="flex-direction: column; align-items: flex-start; color: #c4483a;">
+                    <span class="stat-label">❌ 背包已满，以下物品未能获得:</span>` +
+                    rewards.lostItems.map(item => `<span>  ${GAME_CONFIG.items[item.id].icon} ${GAME_CONFIG.items[item.id].name} x${item.qty}</span>`).join('') +
+                    `</div>`;
             }
 
             content += `</div>`;
@@ -6993,33 +7096,51 @@
             return new TextDecoder().decode(Uint8Array.from(binary, c => c.charCodeAt(0)));
         }
 
+        // 导出：直接下载一个存档文件（内容仍是原来的存档代码格式，所以旧的存档代码也能导入）
         function exportSave() {
             saveGame();
             const code = encodeSave(JSON.stringify(gameState));
-            const fallback = () => prompt('自动复制失败，请手动复制存档代码:', code);
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(code).then(
-                    () => alert('存档已复制到剪贴板！'),
-                    fallback
-                );
-            } else {
-                fallback();
-            }
+            const d = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            const name = `凡人修仙存档_${currentSlot ? '槽' + currentSlot + '_' : ''}${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}.txt`;
+            const url = URL.createObjectURL(new Blob([code], { type: 'text/plain;charset=utf-8' }));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = name;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
+        // 导入：选择之前导出的存档文件（也兼容旧版复制出来的存档代码保存成的文本文件）
         function importSave() {
-            const input = prompt('请粘贴存档代码:');
-            if (!input) return;
+            const input = document.getElementById('importSaveFile');
+            input.value = '';
+            input.click();
+        }
+
+        function onImportFileChosen(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => importSaveText(String(reader.result || ''));
+            reader.onerror = () => alert('读取存档文件失败！');
+            reader.readAsText(file);
+        }
+
+        function importSaveText(text) {
+            if (!text.trim()) return;
 
             let loaded;
             try {
-                loaded = JSON.parse(decodeSave(input));
+                loaded = JSON.parse(decodeSave(text));
             } catch (e) {
-                alert('存档代码无效！');
+                alert('存档文件无效！');
                 return;
             }
             if (!loaded || !loaded.player || !loaded.skills || !loaded.player.name) {
-                alert('存档代码无效：缺少角色数据！');
+                alert('存档文件无效：缺少角色数据！');
                 return;
             }
 
@@ -7039,7 +7160,7 @@
             updateStatsDisplay();
             saveGame();
             updateSlotLabel();
-            alert('存档导入成功！（已覆盖当前存档）');
+            alert('存档导入成功！（已覆盖当前存档）');   // 导入的存档文件会覆盖当前槽位
         }
 
         // 删除当前存档并回到存档选择界面
