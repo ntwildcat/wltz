@@ -385,7 +385,7 @@
                 gatherpill: { name: '聚灵丹', icon: '🔵', type: 'consumable', sellPrice: 100 },
                 realmpill: { name: '破境丹', icon: '🟣', type: 'special', sellPrice: 200 },  // 已弃用，仅供收集
                 marrpill: { name: '洗髓丹', icon: '🟡', type: 'consumable', sellPrice: 500 },
-                goldenpill: { name: '金丹秘药', icon: '🟤', type: 'breakthrough_material' },  // P6 突破材料
+                goldenpill: { name: '金丹秘药', icon: '🟤', type: 'breakthrough_material', sellPrice: 400 },  // P6 突破材料
 
                 // 特殊材料
                 spiritstone: { name: '灵石', icon: '💎', type: 'currency' },
@@ -396,8 +396,8 @@
 
                 // P7 神识相关物品
                 shenshi_seed: { name: '神识种子', icon: '👁️', type: 'seed', sellPrice: 100 },
-                yuanyingpill: { name: '元婴丹', icon: '⭕', type: 'breakthrough_material' },
-                huashenpill: { name: '化神丹', icon: '🔮', type: 'breakthrough_material' },  // P9 突破材料
+                yuanyingpill: { name: '元婴丹', icon: '⭕', type: 'breakthrough_material', sellPrice: 1200 },
+                huashenpill: { name: '化神丹', icon: '🔮', type: 'breakthrough_material', sellPrice: 2700 },  // P9 突破材料
 
                 // 装备
                 sword: { name: '桃木剑', icon: '⚔️', type: 'weapon', sellPrice: 60, stats: { atk: 15 } },
@@ -450,6 +450,25 @@
                     { id: 'crystal', name: '玄晶', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
                     { id: 'spiritcrystal', name: '灵晶', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9 },
                     { id: 'immortalore', name: '仙矿', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13 }
+                ],
+                // 丹火商城（金丹初期起）：用丹火买炼丹 / 战斗食物材料；食物是秘境的刚需
+                danhuo_shop: [
+                    { id: 'mushroom_stew', name: '灵芝羹 ×4', icon: '🥣', price: 40, currency: 'danhuo', bundle: 4, desc: '战斗食物（恢复 500 生命）', minRealmIndex: 9 },
+                    { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 25, currency: 'danhuo', bundle: 5, desc: '炼器材料', minRealmIndex: 9 },
+                    { id: 'crystal', name: '玄晶 ×1', icon: '💎', price: 30, currency: 'danhuo', bundle: 1, desc: '高级材料', minRealmIndex: 9 },
+                    { id: 'mushroom', name: '灵芝 ×5', icon: '🍄', price: 25, currency: 'danhuo', bundle: 5, desc: '炼丹材料', minRealmIndex: 9 },
+                    { id: 'tea', name: '悟道茶叶 ×3', icon: '🍵', price: 30, currency: 'danhuo', bundle: 3, desc: '炼丹材料', minRealmIndex: 9 },
+                    { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 60, currency: 'danhuo', bundle: 1, desc: '元婴级材料', minRealmIndex: 9 },
+                    { id: 'lotus', name: '九叶莲 ×1', icon: '🌸', price: 45, currency: 'danhuo', bundle: 1, desc: '炼丹材料（元婴丹、化神丹）', minRealmIndex: 9 }
+                ],
+                // 神识商城（元婴初期起）：用神识买高阶食物与稀有材料
+                shenshi_shop: [
+                    { id: 'immortal_peach', name: '蟠桃 ×3', icon: '🍑', price: 45, currency: 'shenshi', bundle: 3, desc: '战斗食物（恢复 1000 生命）', minRealmIndex: 13 },
+                    { id: 'jade_nectar', name: '琼浆玉液 ×2', icon: '🍶', price: 80, currency: 'shenshi', bundle: 2, desc: '战斗食物（化神初期起）', minRealmIndex: 17 },
+                    { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 60, currency: 'shenshi', bundle: 1, desc: '顶级材料', minRealmIndex: 13 },
+                    { id: 'chaosstone', name: '混沌石 ×1', icon: '🌑', price: 90, currency: 'shenshi', bundle: 1, desc: '化神装备材料', minRealmIndex: 17 },
+                    { id: 'daofruit', name: '悟道果 ×1', icon: '🍇', price: 50, currency: 'shenshi', bundle: 1, desc: '炼丹 / 神识入定材料', minRealmIndex: 13 },
+                    { id: 'lotus', name: '九叶莲 ×2', icon: '🌸', price: 40, currency: 'shenshi', bundle: 2, desc: '炼丹材料', minRealmIndex: 13 }
                 ],
                 arts: [
                     { id: 'qingmu_art', name: '青木诀', icon: '🌿', price: 200, desc: '修炼速度 ×1.1', minRealmIndex: 1, type: 'art' },
@@ -1366,7 +1385,7 @@
                     你已经把基础玩法都试过一遍了。接下来，这个游戏的目标是——<br/>
                     <b>🎯 一步步修炼、突破，走到当前的最高境界「${maxName}」，成为一方大能。</b><br/><br/>
                     路上你会：<br/>
-                    ・每个大境界（练气→筑基→金丹→元婴→化神）的突破需要<b>突破丹药</b>，靠炼丹或秘境掉落<br/>
+                    ・每个大境界（练气→筑基→金丹→元婴→化神）的突破需要<b>突破丹药</b>，只能靠炼丹制作<br/>
                     ・用<b>炼器</b>打造更好的装备，带足<b>食物</b>挑战更深的秘境，拿材料和种子<br/>
                     ・金丹后解锁<b>丹火</b>（货币：淬炼装备、强化灵根、助炼丹药），元婴后解锁<b>神识</b>（货币：强化分身、加快生活技能、增强战斗感知）和<b>分身</b>，化神后解锁<b>悟道</b><br/>
                     ・学更强的功法、提高精通，让一切越来越快——离线也在成长<br/><br/>
@@ -4723,7 +4742,7 @@
             // 填充物品信息
             document.getElementById('itemIcon').innerHTML = itemConfig.icon;
             document.getElementById('itemName').textContent = itemConfig.name;
-            document.getElementById('itemType').textContent = itemConfig.type;
+            document.getElementById('itemType').textContent = ITEM_TYPE_NAMES[itemConfig.type] || itemConfig.type;
             document.getElementById('itemQty').textContent = qty;
 
             // 获取物品用途（根据物品类型和配方）
@@ -4785,7 +4804,7 @@
             }
 
             if (!itemConfig.sellPrice) {
-                usages.push(itemConfig.type === 'breakthrough_material' ? '突破丹药不能出售（大境界突破必需）' : '此物品不可出售');
+                usages.push('此物品不可出售');
             }
 
             if (usages.length > 0) {
@@ -5754,6 +5773,13 @@
             }
         }
 
+        // 物品类型的中文名与背包里的显示顺序（背包分类标题、物品详情都用它，不再露出英文的类型名）
+        const ITEM_TYPE_NAMES = {
+            food: '食物', material: '材料', ore: '矿石', seed: '种子', breakthrough_material: '突破丹药',
+            weapon: '武器', armor: '护甲', jewelry: '饰品', consumable: '丹药', special: '特殊', currency: '货币'
+        };
+        const ITEM_TYPE_ORDER = ['food', 'material', 'ore', 'seed', 'breakthrough_material', 'weapon', 'armor', 'jewelry', 'consumable', 'special', 'currency'];
+
         function updateInventory() {
             const inventory = gameState.player.inventory;
             const grid = document.getElementById('inventoryGrid');
@@ -5770,9 +5796,13 @@
                 byType[itemConfig.type].push(item);
             });
 
-            // 按类型显示
-            const typeNames = { material: '材料', ore: '矿石', consumable: '丹药', weapon: '装备', jewelry: '首饰' };
-            Object.entries(byType).forEach(([type, items]) => {
+            // 按类型显示（固定顺序；没见过的类型排在最后）
+            const typeNames = ITEM_TYPE_NAMES;
+            const orderedTypes = Object.keys(byType).sort((a, b) => {
+                const ia = ITEM_TYPE_ORDER.indexOf(a), ib = ITEM_TYPE_ORDER.indexOf(b);
+                return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+            });
+            orderedTypes.map(type => [type, byType[type]]).forEach(([type, items]) => {
                 const typeLabel = document.createElement('div');
                 typeLabel.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #6f9c8a; margin-top: 10px; margin-bottom: 5px;';
                 typeLabel.textContent = typeNames[type] || type;
@@ -5804,10 +5834,26 @@
             return !!item && !['art', 'upgrade', 'unlock'].includes(item.type);
         }
 
-        function findShopItem(itemId) {
+        // 商城货币：灵石 / 丹火 / 神识
+        const SHOP_CURRENCIES = {
+            coins:   { name: '灵石', icon: () => COIN_ICON },
+            danhuo:  { name: '丹火', icon: () => DANHUO_ICON },
+            shenshi: { name: '神识', icon: () => SHENSHI_ICON }
+        };
+        let shopTab = 'coins';   // 当前商城标签：coins / danhuo / shenshi
+
+        function setShopTab(tab) {
+            if ((tab === 'danhuo' && !isDanhuoUnlocked()) || (tab === 'shenshi' && !isShenshiUnlocked())) return;
+            shopTab = tab;
+            updateShop();
+        }
+
+        // 同一个物品可能出现在多个商店（如九叶莲），按货币区分
+        function findShopItem(itemId, currency) {
             let found = null;
+            const want = currency || shopTab;
             Object.values(GAME_CONFIG.shop).forEach(category => {
-                const f = category.find(i => i.id === itemId);
+                const f = category.find(i => i.id === itemId && (i.currency || 'coins') === want);
                 if (f) found = f;
             });
             return found;
@@ -5824,9 +5870,11 @@
             document.getElementById('buyIcon').innerHTML = item.icon;
             document.getElementById('buyName').textContent = item.name;
             document.getElementById('buyDesc').textContent = item.desc || '';
-            document.getElementById('buyUnitPrice').textContent = `${item.price} 灵石`;
+            const cur = item.currency || 'coins';
+            document.getElementById('buyUnitPrice').textContent = `${item.price} ${SHOP_CURRENCIES[cur].name}`;
             document.getElementById('buyOwned').textContent = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
-            document.getElementById('buyCoins').textContent = gameState.player.coins;
+            document.getElementById('buyCoins').textContent = Math.floor(gameState.player[cur] || 0);
+            document.getElementById('buyCurLabel').textContent = SHOP_CURRENCIES[cur].name + ':';
             input.value = 1;
             modal.style.display = 'flex';
             updateBuyLabel();
@@ -5840,7 +5888,7 @@
             const modal = document.getElementById('buyModal');
             const item = findShopItem(modal.dataset.itemId);
             if (!item) return 1;
-            return Math.max(1, Math.min(999, Math.floor(gameState.player.coins / item.price)));
+            return Math.max(1, Math.min(999, Math.floor((gameState.player[item.currency || 'coins'] || 0) / item.price)));
         }
 
         function changeBuyQty(delta) {
@@ -5858,10 +5906,13 @@
             const input = document.getElementById('buyQty');
             const q = Math.max(1, Math.min(999, parseInt(input.value, 10) || 1));
             const total = item.price * q;
+            const cur = item.currency || 'coins';
+            const name = SHOP_CURRENCIES[cur].name;
+            const have = gameState.player[cur] || 0;
             const btn = document.getElementById('buyConfirmBtn');
-            btn.textContent = `购买 ${q} 个（${total} 灵石）`;
-            btn.disabled = total > gameState.player.coins;
-            document.getElementById('buyTotalHint').textContent = total > gameState.player.coins ? '灵石不足' : '';
+            btn.textContent = `购买 ${q} 份（${total} ${name}）`;
+            btn.disabled = total > have;
+            document.getElementById('buyTotalHint').textContent = total > have ? `${name}不足` : '';
         }
 
         function confirmBuy() {
@@ -5869,8 +5920,9 @@
             const q = Math.max(1, Math.min(999, parseInt(document.getElementById('buyQty').value, 10) || 1));
             if (buyItem(modal.dataset.shopId, modal.dataset.itemId, q)) {
                 // 买完更新对话框里的持有数量与灵石，方便继续买；不够钱时自动收起
+                const cur = (findShopItem(modal.dataset.itemId) || {}).currency || 'coins';
                 document.getElementById('buyOwned').textContent = (gameState.player.inventory.find(i => i.id === modal.dataset.itemId) || { qty: 0 }).qty;
-                document.getElementById('buyCoins').textContent = gameState.player.coins;
+                document.getElementById('buyCoins').textContent = Math.floor(gameState.player[cur] || 0);
                 changeBuyQty(0);
             }
         }
@@ -5879,9 +5931,9 @@
             let item = null;
             let price = 0;
 
-            // 查找商品
+            // 查找商品（同一物品可能在多个商店，按当前商城标签的货币区分）
             Object.values(GAME_CONFIG.shop).forEach(category => {
-                const found = category.find(i => i.id === itemId);
+                const found = category.find(i => i.id === itemId && (i.currency || 'coins') === shopTab);
                 if (found) {
                     item = found;
                     price = found.price;
@@ -5889,6 +5941,8 @@
             });
 
             if (!item) return;
+            const cur = item.currency || 'coins';
+            const curName = SHOP_CURRENCIES[cur].name;
 
             if (item.type === 'unlock') {
                 showNotification('该功能尚未开放', '#c98a3e');
@@ -5917,9 +5971,9 @@
                 }
             }
 
-            // 检查灵石
-            if (gameState.player.coins < price) {
-                showNotification(`灵石不足！需要${price}，拥有${gameState.player.coins}`, '#c4483a', 'error');
+            // 检查货币
+            if ((gameState.player[cur] || 0) < price) {
+                showNotification(`${curName}不足！需要${price}，拥有${Math.floor(gameState.player[cur] || 0)}`, '#c4483a', 'error');
                 return;
             }
 
@@ -5927,14 +5981,14 @@
             if (!isBulkBuyable(item)) qty = 1;
             qty = Math.max(1, Math.floor(qty));
             const totalPrice = price * qty;
-            if (gameState.player.coins < totalPrice) {
-                showNotification(`灵石不足！需要${totalPrice}，拥有${gameState.player.coins}`, '#c4483a', 'error');
+            if ((gameState.player[cur] || 0) < totalPrice) {
+                showNotification(`${curName}不足！需要${totalPrice}，拥有${Math.floor(gameState.player[cur] || 0)}`, '#c4483a', 'error');
                 return false;
             }
             price = totalPrice;
 
-            // 扣灵石
-            gameState.player.coins -= price;
+            // 扣款
+            gameState.player[cur] -= price;
 
             // 处理不同类型的购买
             if (item.type === 'upgrade') {
@@ -5978,11 +6032,12 @@
                 updateActionDisplay();
             } else {
                 // 消耗品处理
-                if (!addToInventory(itemId, qty)) {
-                    gameState.player.coins += price;   // 背包放不下：退款
+                const units = qty * (item.bundle || 1);   // bundle：一份含多个（如「灵芝羹 ×4」）
+                if (!addToInventory(itemId, units)) {
+                    gameState.player[cur] += price;   // 背包放不下：退款
                     return false;
                 }
-                showNotification(`购买成功：${item.name} ×${qty}`, '#6f9c8a');
+                showNotification(`购买成功：${GAME_CONFIG.items[itemId].name} ×${units}`, '#6f9c8a');
             }
 
             trackQuest('buy');
@@ -6003,14 +6058,28 @@
                 pills: '💊 丹药',
                 materials: '🪨 材料',
                 arts: '📜 功法',
-                special: '✨ 特殊'
+                special: '✨ 特殊',
+                danhuo_shop: '🔥 丹火商品',
+                shenshi_shop: '👁️ 神识商品'
             };
+
+            // 商城标签：灵石商城 / 丹火商城（金丹起）/ 神识商城（元婴起）
+            if ((shopTab === 'danhuo' && !isDanhuoUnlocked()) || (shopTab === 'shenshi' && !isShenshiUnlocked())) shopTab = 'coins';
+            const tabsEl = document.getElementById('shopTabs');
+            if (tabsEl) {
+                const tabs = [['coins', true], ['danhuo', isDanhuoUnlocked()], ['shenshi', isShenshiUnlocked()]].filter(t => t[1]);
+                tabsEl.style.display = tabs.length > 1 ? '' : 'none';
+                tabsEl.innerHTML = tabs.map(([k]) => `<button type="button" class="shop-tab${k === shopTab ? ' active' : ''}" onclick="setShopTab('${k}')">${SHOP_CURRENCIES[k].icon()} ${SHOP_CURRENCIES[k].name}商城</button>`).join('');
+            }
+            const balEl = document.getElementById('shopBalance');
+            if (balEl) balEl.innerHTML = `${SHOP_CURRENCIES[shopTab].icon()} ${SHOP_CURRENCIES[shopTab].name}: <span ${shopTab === 'coins' ? 'id="shopCoin"' : ''}>${Math.floor(gameState.player[shopTab === 'coins' ? 'coins' : shopTab] || 0)}</span>`;
 
             const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满', '金丹初期', '金丹中期', '金丹后期', '金丹圆满', '元婴初期', '元婴中期', '元婴后期', '元婴圆满'];
             const currentRealmIdx = gameState.player.realmIndex;
             const currentRealmName = realmNames[currentRealmIdx] || '未知';
 
-            Object.entries(GAME_CONFIG.shop).forEach(([category, items]) => {
+            Object.entries(GAME_CONFIG.shop).forEach(([category, allItems]) => {
+                const items = allItems.filter(i => (i.currency || 'coins') === shopTab);   // 只显示当前标签货币的商品
                 // 筛选该分类中可见的商品（境界满足要求的）
                 // 功法始终显示（未到境界的灰显并标注要求），其余商品未到境界时隐藏
                 const visibleItems = items.filter(item => {
@@ -6052,7 +6121,7 @@
                     const priceDisplay = isBought ? '✓ 已拥有'
                         : isOwnedArt ? (gameState.player.currentArt === item.id ? '✓ 当前功法' : '已拥有 · 点击装备')
                         : isLocked ? `🔒 需要${getRealmName(item.minRealmIndex)}`
-                        : `${item.price} 灵石`;
+                        : `${SHOP_CURRENCIES[item.currency || 'coins'].icon()} ${item.price} ${SHOP_CURRENCIES[item.currency || 'coins'].name}`;
                     const priceColor = isBought ? '#6f9c8a' : isLocked ? '#c98a3e' : '#c2a25f';
                     // 未拥有的功法同时显示价格与境界要求，方便对比规划
                     const artExtra = item.type === 'art' && !isOwnedArt

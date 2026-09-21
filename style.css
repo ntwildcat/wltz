@@ -1984,3 +1984,10 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 @media (max-width: 768px) { .currency-bar { width: 100%; justify-content: flex-start; margin-left: 0; } .cur-chip { padding: 6px 12px; } }
 
 @media (max-width: 768px) { .cur-chip { padding: 6px 10px; gap: 5px; } .cur-chip .cur-name { display: none; } }
+
+/* 商城标签（灵石 / 丹火 / 神识） */
+.shop-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.shop-tab { padding: 6px 16px; background: var(--bg-l2); border: 1px solid var(--border-l4); color: var(--text-l3); cursor: pointer; font-size: 0.9em; }
+.shop-tab:hover { background: var(--bg-l3); border-color: var(--bronze-dim); }
+.shop-tab.active { background: var(--bg-l3); border-color: var(--cinnabar-2); box-shadow: inset 0 0 0 1px var(--cinnabar); color: var(--text-l1); }
+.shop-tab .ico { width: 1.2em; height: 1.2em; vertical-align: -0.2em; }
