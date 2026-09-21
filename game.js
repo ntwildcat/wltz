@@ -653,12 +653,12 @@
         // （保留真实的怪物属性和克制关系），最低境界平均通关率约 60%~90%。原始数值保留在 GAME_CONFIG.dungeons，
         // 调平衡只需改此表。修改装备/属性/灵根特效后需要重新标定，临界点很陡。
         const P4_MONSTER_SCALE = {
-            mysteryTower: 0.725,
-            mysteriousForest: 0.505,
-            ancientRuin: 0.46,
-            tribulationGround: 0.1635,
-            huashenRealm: 0.0876,
-            taixuDream: 0.0467
+            mysteryTower: 0.814,
+            mysteriousForest: 0.617,
+            ancientRuin: 0.763,
+            tribulationGround: 0.262,
+            huashenRealm: 0.16,
+            taixuDream: 0.1013
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
