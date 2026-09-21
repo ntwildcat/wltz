@@ -1874,3 +1874,7 @@ body.fx-shake .container { animation: fxShake 0.12s linear infinite; }
 .rc-mtxt { flex: none; color: var(--text-l4); }
 .rc-mastery .infuse-btn { margin: 0; flex: none; }
 .action-item .clone-btn { margin: 6px 0 0; }
+
+/* 修为 / 灵石图标占位（静态页面里的 data-ico） */
+[data-ico] .ico { width: 1.15em; height: 1.15em; }
+.coin-display [data-ico] .ico { width: 1.3em; height: 1.3em; }

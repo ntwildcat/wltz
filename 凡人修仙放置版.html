@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=10.7">
+    <link rel="stylesheet" href="style.css?v=10.8">
 
 </head>
 <body data-panel="cultivation">
@@ -30,7 +30,7 @@
                 </button>
             </div>
             <div class="coin-display" onclick="switchPanel('shop')" role="button" tabindex="0" title="点击进入商城" aria-label="商城，当前灵石">
-                <div>💎 灵石</div>
+                <div><span data-ico="coin">💎</span> 灵石</div>
                 <div id="coinAmount">100</div>
             </div>
         </div>
@@ -110,7 +110,7 @@
                             <div class="info-value" id="realmDisplay">练气初期</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">修为进度</div>
+                            <div class="info-label"><span data-ico="qi">✨</span> 修为进度</div>
                             <div class="progress-bar">
                                 <div class="progress-fill" id="cultivationProgress" style="width: 0%">
                                     <span id="progressText">0%</span>
@@ -205,7 +205,7 @@
                                     <span id="activeProgress">0%</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span>获得修为:</span>
+                                    <span><span data-ico="qi">✨</span> 获得修为:</span>
                                     <span id="activeOutput">0</span>
                                 </div>
                                 <button class="btn" id="stopBtn" onclick="stopAction()" style="display: none;">
@@ -399,7 +399,7 @@
                         <div id="panel-shop" class="panel-content hidden">
                             <div class="panel-title">🏪 商城</div>
                             <div style="margin-bottom: 15px; color: #c2a25f;">
-                                💎 灵石: <span id="shopCoin">100</span>
+                                <span data-ico="coin">💎</span> 灵石: <span id="shopCoin">100</span>
                             </div>
                             <div class="inventory-grid" id="shopGrid"></div>
                         </div>
@@ -491,7 +491,7 @@
                     <div class="side-panel">
                         <!-- 修为信息 -->
                         <div class="stat-panel">
-                            <div class="stat-title">⚡ 修为信息</div>
+                            <div class="stat-title"><span data-ico="qi">✨</span> 修为信息</div>
                             <div class="stat-row">
                                 <span class="stat-label">修为值:</span>
                                 <span class="stat-value"><span id="cultivationXP">0/100</span></span>
@@ -738,7 +738,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=10.7"></script>
+    <script src="game.js?v=10.8"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

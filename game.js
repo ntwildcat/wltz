@@ -625,6 +625,18 @@
             };
         })();
 
+        // 核心资源图标：修为（金色灵气漩涡）、灵石（与物品「灵石」同一枚青绿晶石）
+        const QI_ICON = icoSvg(`<circle cx="16" cy="16" r="13" fill="#3a2e14"/><path d="M16 4A12 12 0 0 1 28 16A8.5 8.5 0 0 1 16 24.5A5 5 0 0 1 11 16A2.8 2.8 0 0 1 16 13.5" stroke="#f3d36a" stroke-width="2.4"/><circle cx="16" cy="16" r="1.7" fill="#fff4c4" stroke="none"/>${icoSparkle(6, 7, 2.2)}${icoSparkle(27, 27, 2)}`);
+        const COIN_ICON = ITEM_ICONS.spiritstone;
+
+        // 静态页面里的图标占位：<span data-ico="qi|coin">emoji</span>，加载时换成手绘图标
+        function fillIconSlots(root = document) {
+            root.querySelectorAll('[data-ico]').forEach(el => {
+                const icon = { qi: QI_ICON, coin: COIN_ICON }[el.dataset.ico];
+                if (icon) el.innerHTML = icon;
+            });
+        }
+
         // 把手绘图标写回各处配置（商店、食物按同名 id 对应到物品图标）
         (function applyItemIcons() {
             Object.keys(GAME_CONFIG.items).forEach(id => { if (ITEM_ICONS[id]) GAME_CONFIG.items[id].icon = ITEM_ICONS[id]; });
@@ -3545,10 +3557,10 @@
             const parts = [];
 
             if (output.cultivation) {
-                parts.push(`✨ +${output.cultivation}修为`);
+                parts.push(`${QI_ICON} +${output.cultivation}修为`);
             }
             if (output.coins) {
-                parts.push(`💎 +${output.coins}`);
+                parts.push(`${COIN_ICON} +${output.coins}`);
             }
             if (output.exp) {
                 parts.push(`+${output.exp}exp`);
@@ -3589,8 +3601,8 @@
             const out = recipe.output || {};
             const first = (out.items || []).map(i => GAME_CONFIG.items[i.id]).find(Boolean);
             if (first) return first.icon;
-            if (out.cultivation) return '☯️';
-            if (out.coins) return '💎';
+            if (out.cultivation) return QI_ICON;
+            if (out.coins) return COIN_ICON;
             return '✨';
         }
 
@@ -3748,7 +3760,7 @@
             const enemies = (BATTLE_ENEMY_CONFIGS[areaKey] || []).map(e => `${e.icon || ''}${e.name}`).join('、');
             return `<div class="area-reward">
                     <div>敌人：${enemies || '—'}</div>
-                    <div>每场奖励：💎 ${Math.round(a.coins * bonus)} 灵石 · ${Math.round(a.exp * bonus)} 战斗经验${bonus > 1 ? '（含精通加成）' : ''}</div>
+                    <div>每场奖励：${COIN_ICON} ${Math.round(a.coins * bonus)} 灵石 · ${Math.round(a.exp * bonus)} 战斗经验${bonus > 1 ? '（含精通加成）' : ''}</div>
                     <div class="area-drops">掉落物：无（只获得灵石与经验）</div>
                 </div>`;
         }
@@ -7030,6 +7042,7 @@
 
         // ==================== 页面加载 ====================
         window.addEventListener('load', () => {
+            fillIconSlots();
             populateRootOptions();
             loadGame();
         });
