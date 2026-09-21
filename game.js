@@ -854,7 +854,8 @@
         // 简短的玩法介绍：新角色创建后自动弹出一次，设置面板里可随时重看
         const TUTORIAL_STEPS = [
             { title: '🌄 欢迎来到凡人修仙', body: `你从一个凡人起步，目标是一步步修炼、突破境界，成为一方强者。<br/><br/>
-                这是一款<b>放置游戏</b>：点一个行动，它就会自动重复进行；<b>离开游戏也会继续</b>（默认最多结算 24 小时），回来时领取收益。` },
+                这是一款<b>放置游戏</b>：点一个行动，它就会自动重复进行；<b>离开游戏也会继续</b>（默认最多结算 24 小时），回来时领取收益。<br/><br/>
+                📜 别担心不知道做什么：关掉这个介绍后，屏幕上方有一串<b>新手任务</b>，跟着做一遍就熟悉了，每个任务还有灵石奖励。` },
             { title: '🧘 修炼与突破', body: `<b>修炼</b>获得修为，修为满了就可以<b>突破</b>到更高境界，属性会大幅提升，也会解锁新的配方、战斗区域和秘境。<br/><br/>
                 部分大境界的突破需要材料（筑基丹、金丹秘药、元婴丹），可以靠<b>炼丹</b>或<b>秘境掉落</b>获得——留意突破界面里的提示。` },
             { title: '🔨 生活技能', body: `<b>采矿、灵田</b>产出材料，<b>炼丹、炼器</b>用材料制作丹药、食物和装备，后期还有<b>丹火、神识</b>。配方按技能等级解锁。<br/><br/>
@@ -862,7 +863,7 @@
             { title: '⚔️ 战斗', body: `进入<b>战斗区域</b>打怪，获得灵石和经验，区域随境界解锁。战斗时生命低会自动吃你装备的<b>食物</b>（在炼丹里制作，背包里设为战斗食物）。<br/><br/>
                 <b>🔁 循环战斗</b>：进入战斗区域后会一直打下去，点「撤退」才退出，离线也会继续。<b>秘境</b>同样会一直循环挑战，掉落种子和突破材料，但被击败会损失修为和食物，量力而行。灵根之间有克制关系，克制敌人伤害更高。` },
             { title: '🏪 商城与小提示', body: `用灵石在<b>商城</b>买材料、食物和功法（装备只能在炼器里打造）；功法和灵根都有各自的特效，可以在修炼面板切换功法。<br/><br/>
-                💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份（会下载一个存档文件，需要时用「导入存档」选择它）。这个介绍可以在<b>设置 → 玩法介绍</b>里随时重看。祝你道途顺遂！` }
+                💾 存档保存在浏览器本地，建议偶尔在设置里<b>导出存档</b>备份（会下载一个存档文件，需要时用「导入存档」选择它）。这个介绍和新手任务都可以在<b>设置 → 玩法介绍</b>里随时重看。现在就去完成第一个任务吧！祝你道途顺遂！` }
         ];
         let tutorialStep = 0;
 
@@ -887,6 +888,206 @@
                 gameState.tutorialSeen = true;
                 saveGame();
             }
+        }
+
+        // ==================== 新手任务 ====================
+        // 一串连续的小任务，带新玩家把每个基础玩法（六个基础技能、出售 / 购买、装备、战斗、秘境）都用一遍；每个任务完成后
+        // 点「领取奖励」得灵石（个别送物品），全部做完再告诉玩家游戏目标。进度靠 gameState.tally（累计事件计数）和当前状态判断，
+        // 存档字段：gameState.quests = { index: 当前第几个任务, done: 是否全部完成, goalShown: 是否看过游戏目标 }。
+        // 老存档（境界已超过练气初期）迁移时直接标记为已完成，不再显示任务条。
+        const NEWBIE_QUESTS = [
+            { title: '吐纳灵气', panel: 'cultivation', target: ['cultivation', 'basic'],
+              desc: '你现在只是个凡人。在「修炼」页点下面高亮的「吐纳灵气」开始修炼——行动会<b>自动重复</b>，不用一直点。左侧（手机在顶部）是各个技能页的入口。',
+              need: { act: 'cultivation.basic', n: 1 }, reward: { coins: 20 } },
+            { title: '踏入练气', panel: 'cultivation', target: ['cultivation', 'basic'],
+              desc: '继续修炼，等上方「修为进度」满了，会出现「尝试突破」按钮，点它突破到<b>练气初期</b>。突破会让属性大涨，并解锁新配方和战斗区域。',
+              need: { realm: 1 }, reward: { coins: 50 } },
+            { title: '种植灵米', panel: 'farming', target: ['farming', 'millet'],
+              desc: '去「灵田」种植灵米 3 次。<b>生活技能</b>做得越多等级越高，解锁更多配方。同一时间只能做一件事，切换行动会打断当前的。',
+              need: { act: 'farming.millet', n: 3 }, reward: { coins: 30 } },
+            { title: '熬灵米粥', panel: 'alchemy', target: ['alchemy', 'millet_porridge'],
+              desc: '去「炼丹」制作 1 次灵米粥（需要 2 份灵米，刚种的就够）。灵米粥是<b>战斗食物</b>——战斗中生命低会自动吃，之后你会用到。',
+              need: { act: 'alchemy.millet_porridge', n: 1 }, reward: { coins: 40 } },
+            { title: '采石', panel: 'mining', target: ['mining', 'stone'],
+              desc: '去「采矿」采石 3 次。矿石是炼器的材料，采矿等级高了还能挖到更好的矿。',
+              need: { act: 'mining.stone', n: 3 }, reward: { coins: 30 } },
+            { title: '打铁', panel: 'forging', target: ['forging', 'practice'],
+              desc: '去「炼器」做 2 次「打铁练习」。炼器等级够了就能打造武器、护甲和饰品——装备只能靠炼器打造。完成后师父会送你一把桃木剑。',
+              need: { act: 'forging.practice', n: 2 }, reward: { coins: 30, items: [{ id: 'sword', qty: 1 }] } },
+            { title: '出售杂物', panel: 'inventory',
+              desc: '去「背包」点开一件物品（比如刚采的碎石），点「出售」换成灵石。用不上的材料都可以卖掉。',
+              need: { count: 'sell', n: 1 }, reward: { coins: 30 } },
+            { title: '装备武器', panel: 'equipment',
+              desc: '去「装备」页（手机在技能栏最前面）或背包里点开桃木剑，把它装备上。装备提供攻击、防御等属性。',
+              need: { weapon: true }, reward: { coins: 30 } },
+            { title: '初战森林', panel: 'battle', tab: 'areas',
+              desc: '去「战斗」页进入「森林」，打赢 3 场。战斗会<b>一直循环</b>，想结束点「撤退」。注意：生命<b>不会自己恢复</b>，只能靠食物——生命低会自动吃灵米粥，战斗页顶部也能手动「吃一份」。',
+              need: { count: 'battleWin', n: 3 }, reward: { coins: 80 } },
+            { title: '逛逛商城', panel: 'shop',
+              desc: '去「商城」买点东西（灵米、材料，或者功法——功法会加快修炼速度）。商城里还有永久升级，比如扩充背包。',
+              need: { count: 'buy', n: 1 }, reward: { coins: 40 } },
+            { title: '练气中期', panel: 'cultivation', target: ['cultivation', 'small'],
+              desc: '练气初期解锁了更快的「小周天」。用它修炼到修为满，突破到<b>练气中期</b>——这样就能进入第一个秘境了。',
+              need: { realm: 2 }, reward: { coins: 100 } },
+            { title: '挑战秘境', panel: 'battle', tab: 'dungeons',
+              desc: '去「战斗」页的「秘境」标签，通关<b>神秘之塔</b>。秘境要连续打过 5 只怪，血量不会中途恢复：带上灵米粥、装备好桃木剑再去；打不过就撤退，回去多修炼。通关有灵石、种子等奖励。',
+              need: { count: 'dungeon:mysteryTower', n: 1 }, reward: { coins: 200 } }
+        ];
+        const NEWBIE_FINAL_REWARD = 300;   // 全部任务做完的额外奖励（灵石）
+
+        function freshQuestState() {
+            return { index: 0, done: false, goalShown: false };
+        }
+
+        function getQuestState() {
+            if (!gameState.quests) gameState.quests = freshQuestState();
+            return gameState.quests;
+        }
+
+        // 累计事件计数（做过几次配方、赢过几场战斗等）；只在新手任务还没结束时才记，省得老玩家的存档白白变大
+        function trackQuest(key, n = 1) {
+            const q = gameState.quests;
+            if (!q || q.done) return;
+            if (!gameState.tally) gameState.tally = {};
+            gameState.tally[key] = (gameState.tally[key] || 0) + n;
+        }
+
+        // 某个任务的进度：{ cur, max, text }
+        function questProgress(quest) {
+            const need = quest.need;
+            const tally = gameState.tally || {};
+            if (need.realm !== undefined) {
+                const idx = gameState.player.realmIndex;
+                const cur = Math.min(idx, need.realm);
+                const req = GAME_CONFIG.realms[idx] && GAME_CONFIG.realms[idx].nextReq;
+                const xp = gameState.player.cultivationXP || 0;
+                return { cur, max: need.realm, text: idx < need.realm && req ? `修为 ${xp} / ${req}` : `${cur} / ${need.realm}` };
+            }
+            if (need.weapon) {
+                const cur = gameState.player.equipment && gameState.player.equipment.weapon ? 1 : 0;
+                return { cur, max: 1, text: cur ? '已装备武器' : '还没有装备武器' };
+            }
+            const key = need.act ? 'act:' + need.act : need.count;
+            const cur = Math.min(tally[key] || 0, need.n);
+            return { cur, max: need.n, text: `${cur} / ${need.n}` };
+        }
+
+        function getActiveQuest() {
+            const q = gameState.quests;
+            if (!q || q.done) return null;
+            return NEWBIE_QUESTS[q.index] || null;
+        }
+
+        function isQuestComplete(quest) {
+            const p = questProgress(quest);
+            return p.cur >= p.max;
+        }
+
+        // 配方卡片是否是当前任务要点的那一个（用来高亮）
+        function isQuestTarget(skill, key) {
+            const quest = getActiveQuest();
+            return !!(quest && quest.target && quest.target[0] === skill && quest.target[1] === key && !isQuestComplete(quest));
+        }
+
+        function questRewardText(reward) {
+            const parts = [];
+            if (reward.coins) parts.push(`${COIN_ICON} ${reward.coins} 灵石`);
+            (reward.items || []).forEach(i => { const cfg = GAME_CONFIG.items[i.id]; parts.push(`${cfg.icon} ${cfg.name}×${i.qty}`); });
+            return parts.join(' + ');
+        }
+
+        // 任务条：显示在顶部信息栏下面，当前任务的说明、进度、前往 / 领取按钮
+        function renderQuestBanner() {
+            const el = document.getElementById('questBanner');
+            if (!el) return;
+            const quest = getActiveQuest();
+            if (!quest) { el.style.display = 'none'; el.innerHTML = ''; return; }
+            const state = getQuestState();
+            const p = questProgress(quest);
+            const complete = p.cur >= p.max;
+            el.style.display = '';
+            el.className = 'quest-banner' + (complete ? ' complete' : '');
+            el.innerHTML = `
+                <div class="quest-head">
+                    <span class="quest-tag">📜 新手任务 ${state.index + 1}/${NEWBIE_QUESTS.length}</span>
+                    <b class="quest-title">${quest.title}</b>
+                    <button type="button" class="quest-list-link" onclick="showQuestList()">全部任务</button>
+                </div>
+                <div class="quest-desc">${quest.desc}</div>
+                <div class="quest-foot">
+                    <span class="quest-progress">${complete ? '✅ 已完成' : '进度 ' + p.text}</span>
+                    <span class="quest-reward">奖励：${questRewardText(quest.reward)}</span>
+                    ${complete
+                        ? '<button type="button" class="btn quest-btn" onclick="claimQuest()">领取奖励</button>'
+                        : '<button type="button" class="btn btn-secondary quest-btn" onclick="goToQuest()">前往</button>'}
+                </div>`;
+        }
+
+        function goToQuest() {
+            const quest = getActiveQuest();
+            if (!quest) return;
+            switchPanel(quest.panel);
+            if (quest.tab) switchBattleTab(quest.tab);
+            scrollMainToTop();
+        }
+
+        function claimQuest() {
+            const quest = getActiveQuest();
+            if (!quest || !isQuestComplete(quest)) return;
+            const state = getQuestState();
+            const reward = quest.reward;
+            if (reward.coins) gameState.player.coins += reward.coins;
+            (reward.items || []).forEach(i => addToInventory(i.id, i.qty));
+            showNotification(`📜 任务完成：${quest.title}\n奖励 ${questRewardText(reward)}`, '#b89a5b');
+            state.index++;
+            if (state.index >= NEWBIE_QUESTS.length) {
+                state.done = true;
+                gameState.player.coins += NEWBIE_FINAL_REWARD;
+                updateUI();
+                saveGame();
+                showQuestGoal(true);
+                return;
+            }
+            updateUI();
+            refreshVisiblePanelLists();
+            saveGame();
+        }
+
+        // 全部任务列表（已完成 / 当前 / 未开始）
+        function showQuestList() {
+            const state = getQuestState();
+            const rows = NEWBIE_QUESTS.map((q, i) => {
+                const mark = i < state.index || state.done ? '✅' : (i === state.index ? '👉' : '⚪');
+                return `<div class="quest-row${i === state.index && !state.done ? ' current' : ''}"><span>${mark} ${i + 1}. ${q.title}</span><small>${questRewardText(q.reward)}</small></div>`;
+            }).join('');
+            document.getElementById('tutorialContent').innerHTML = `
+                <div class="tutorial-title">📜 新手任务</div>
+                <div class="tutorial-body quest-list">${rows}
+                    <div class="quest-row final"><span>🎁 全部完成</span><small>${COIN_ICON} ${NEWBIE_FINAL_REWARD} 灵石 + 游戏目标介绍</small></div></div>
+                <div class="tutorial-actions"><button class="btn" onclick="closeTutorial()">关闭</button>${state.done ? '<button class="btn btn-secondary" onclick="showQuestGoal(false)">查看游戏目标</button>' : ''}</div>`;
+            document.getElementById('tutorialModal').classList.add('show');
+        }
+
+        // 新手任务全部完成后：告诉玩家游戏的目标是什么
+        function showQuestGoal(justFinished = false) {
+            const state = getQuestState();
+            state.goalShown = true;
+            const maxName = GAME_CONFIG.realms[GAME_CONFIG.realms.length - 1].name;
+            document.getElementById('tutorialContent').innerHTML = `
+                <div class="tutorial-title">🎉 新手任务全部完成！</div>
+                <div class="tutorial-body">
+                    ${justFinished ? `额外奖励 ${COIN_ICON} ${NEWBIE_FINAL_REWARD} 灵石已到账。<br/><br/>` : ''}
+                    你已经把基础玩法都试过一遍了。接下来，这个游戏的目标是——<br/>
+                    <b>🎯 一步步修炼、突破，走到当前的最高境界「${maxName}」，成为一方大能。</b><br/><br/>
+                    路上你会：<br/>
+                    ・每个大境界（练气→筑基→金丹→元婴→化神）的突破需要<b>突破丹药</b>，靠炼丹或秘境掉落<br/>
+                    ・用<b>炼器</b>打造更好的装备，带足<b>食物</b>挑战更深的秘境，拿材料和种子<br/>
+                    ・金丹后解锁<b>丹火</b>，元婴后解锁<b>神识</b>和<b>分身</b>，化神后解锁<b>悟道</b><br/>
+                    ・学更强的功法、提高精通，让一切越来越快——离线也在成长<br/><br/>
+                    不用着急，放置游戏，慢慢来。这份任务和玩法介绍都可以在<b>设置</b>里重新查看。
+                </div>
+                <div class="tutorial-actions"><button class="btn" onclick="closeTutorial()">继续修仙</button></div>`;
+            document.getElementById('tutorialModal').classList.add('show');
         }
 
         function startGame() {
@@ -942,6 +1143,8 @@
 
             // 立即保存游戏（确保新创建的角色不会丢失）
             gameState.tutorialSeen = false;
+            gameState.quests = freshQuestState();   // 新角色从第一个新手任务开始
+            gameState.tally = {};
             gameState.equipSlotsV2 = true;   // 新角色本来就是装备栏与背包分开，不需要迁移
             saveGame();
             updateSlotLabel();
@@ -2292,6 +2495,7 @@
             addSkillExp('battle', exp);
             addMasteryExp('battle', areaKey, 10);
             const { got, lost } = rollAreaDrops(areaKey, reward);
+            trackQuest('battleWin');
             return { coins, exp, items: got, lost };
         }
 
@@ -2432,6 +2636,7 @@
                 rewardMsg += `+ 战斗经验 x${rewards.skillExp}`;
             }
 
+            trackQuest('dungeon:' + dungeonId);
             showNotification(rewardMsg.trim(), '#6f9c8a');
             updateUI();
             saveGame();
@@ -3382,6 +3587,7 @@
                 }
             }
 
+            trackQuest('act:' + act.skill + '.' + actionKey);
             updateUI();
             saveGame();
         }
@@ -3750,6 +3956,7 @@
             let className = 'action-item';
             if (isActive) className += ' active';
             if (!unlockState.unlocked) className += ' disabled';
+            if (isQuestTarget(skillName, recipeKey)) className += ' quest-target';
             if (materials.length > 0 && !materials.every(m => m.enough) && unlockState.unlocked) {
                 className += ' recipe-materials-lack';
             }
@@ -4375,6 +4582,7 @@
             if (qty <= 0 || !consumeItem(itemId, qty)) return;
             const gain = itemConfig.sellPrice * qty;
             gameState.player.coins += gain;
+            trackQuest('sell');
             showNotification(`出售${itemConfig.name}×${qty} +${gain}灵石`, '#6f9c8a');
             updateUI();
             saveGame();
@@ -5101,6 +5309,7 @@
             updateArtDisplay();  // 更新功法显示
             updateBonusPanel();
             renderHpRestoreBar();
+            renderQuestBanner();
         }
 
         // 选择性更新UI（仅更新指定的部分，提高性能）
@@ -5471,6 +5680,7 @@
                 showNotification(`购买成功：${item.name} ×${qty}`, '#6f9c8a');
             }
 
+            trackQuest('buy');
             updateUI();
             saveGame();
             return true;
@@ -6439,6 +6649,10 @@
             gameState.workSpeedMultiplier = 1;   // 旧版把孤儿的 5% 存在这里且与灵玉脱钩；现在只由装备的灵玉提供（getWorkSpeedMultiplier）
             migrateEquipmentSlots();
             if (gameState.tutorialSeen === undefined) gameState.tutorialSeen = true;   // 已有存档的玩家不再自动弹出引导
+            // 新手任务：境界不超过练气初期的老存档从头开始；已经玩了一阵的直接视为完成，不再显示任务条
+            if (!gameState.quests && gameState.player) {
+                gameState.quests = gameState.player.realmIndex <= 1 ? freshQuestState() : { index: NEWBIE_QUESTS.length, done: true, goalShown: true };
+            }
 
             const currentVersion = 2;  // P4：属性系统重写 + 初始化BugFix
 

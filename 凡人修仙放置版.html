@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=12.1">
+    <link rel="stylesheet" href="style.css?v=12.3">
 
 </head>
 <body data-panel="cultivation">
@@ -125,6 +125,9 @@
                         ✨ 尝试突破 ✨
                     </div>
                 </div>
+
+                <!-- 新手任务条（任务全部完成后自动隐藏） -->
+                <div id="questBanner" class="quest-banner" style="display: none;"></div>
 
                 <!-- 面板容器 -->
                 <div class="panel-container">
@@ -427,6 +430,10 @@
                                 <div class="stat-row">
                                     <span class="stat-label">新手引导:</span>
                                     <button class="btn" onclick="showTutorial(0)" style="padding: 6px 16px;">重新查看</button>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">新手任务:</span>
+                                    <button class="btn" onclick="showQuestList()" style="padding: 6px 16px;">查看任务</button>
                                 </div>
                             </div>
 
@@ -743,7 +750,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=12.1"></script>
+    <script src="game.js?v=12.3"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
