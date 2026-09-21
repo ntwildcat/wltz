@@ -540,11 +540,13 @@
         // ==================== 美术：物品图标（手绘矢量，水墨线 + 铜金 + 朱印色） ====================
         // 每种物品单独一枚 SVG（32×32），不依赖外部图片。加载时写回 GAME_CONFIG.items / 商店 / 食物配置的 icon 字段；
         // 没有对应图标的物品保持原来的 emoji。图标是 HTML 字符串，所以显示图标的地方一律用 innerHTML。
+        // 图标共用的小工具：外壳（墨色描边）、四角星光、叶片
+        const icoSvg = inner => `<svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><g stroke="#2b2016" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" fill="none">${inner}</g></svg>`;
+        const icoSparkle = (x, y, s = 2.4, c = '#fff4c4') => `<path d="M${x} ${y - s}L${x + s * 0.35} ${y - s * 0.35}L${x + s} ${y}L${x + s * 0.35} ${y + s * 0.35}L${x} ${y + s}L${x - s * 0.35} ${y + s * 0.35}L${x - s} ${y}L${x - s * 0.35} ${y - s * 0.35}Z" fill="${c}" stroke="none"/>`;
+        const icoLeaf = (x, y, rot, len, c) => `<path d="M0 0Q${len / 2} ${-len * 0.42} ${len} 0Q${len / 2} ${len * 0.42} 0 0Z" transform="translate(${x} ${y}) rotate(${rot})" fill="${c}"/>`;
+
         const ITEM_ICONS = (() => {
-            const INK = '#2b2016';
-            const svg = inner => `<svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><g stroke="${INK}" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" fill="none">${inner}</g></svg>`;
-            const sparkle = (x, y, s = 2.4, c = '#fff4c4') => `<path d="M${x} ${y - s}L${x + s * 0.35} ${y - s * 0.35}L${x + s} ${y}L${x + s * 0.35} ${y + s * 0.35}L${x} ${y + s}L${x - s * 0.35} ${y + s * 0.35}L${x - s} ${y}L${x - s * 0.35} ${y - s * 0.35}Z" fill="${c}" stroke="none"/>`;
-            const leaf = (x, y, rot, len, c) => `<path d="M0 0Q${len / 2} ${-len * 0.42} ${len} 0Q${len / 2} ${len * 0.42} 0 0Z" transform="translate(${x} ${y}) rotate(${rot})" fill="${c}"/>`;
+            const svg = icoSvg, sparkle = icoSparkle, leaf = icoLeaf;
             const bowl = (fill, rim = '#b08d5a') => `<path d="M5 15H27Q27 25 16 26Q5 25 5 15Z" fill="${rim}"/><ellipse cx="16" cy="15" rx="11" ry="3" fill="${fill}"/><path d="M12 27H20" stroke-width="1.6"/>`;
             const steam = c => `<path d="M12 11Q10 8 12 5M17 11Q15 8 17 4M22 11Q20 8 22 5" stroke="${c}" stroke-width="1.1" opacity=".75"/>`;
             const sack = (c, emblem) => `<path d="M12 6Q16 8 20 6L22 9Q27 16 25 24Q23 28 16 28Q9 28 7 24Q5 16 10 9Z" fill="${c}"/><path d="M11 8Q16 11 21 8" stroke="#e2c27a" stroke-width="1.4"/><path d="M12 6L11 3M20 6L21 3" stroke="#a58a55"/>${emblem}`;
@@ -622,6 +624,18 @@
                 huashenpendant: svg(pendant('#7fe0e8', '#e6f4f2', `${sparkle(25, 22, 2.4)}<circle cx="16" cy="20" r="8" stroke="#8fe0e8" stroke-width=".8" opacity=".7"/>`))
             };
         })();
+
+        // 核心资源图标：修为（金色灵气漩涡）、灵石（与物品「灵石」同一枚青绿晶石）
+        const QI_ICON = icoSvg(`<circle cx="16" cy="16" r="13" fill="#3a2e14"/><path d="M16 4A12 12 0 0 1 28 16A8.5 8.5 0 0 1 16 24.5A5 5 0 0 1 11 16A2.8 2.8 0 0 1 16 13.5" stroke="#f3d36a" stroke-width="2.4"/><circle cx="16" cy="16" r="1.7" fill="#fff4c4" stroke="none"/>${icoSparkle(6, 7, 2.2)}${icoSparkle(27, 27, 2)}`);
+        const COIN_ICON = ITEM_ICONS.spiritstone;
+
+        // 静态页面里的图标占位：<span data-ico="qi|coin">emoji</span>，加载时换成手绘图标
+        function fillIconSlots(root = document) {
+            root.querySelectorAll('[data-ico]').forEach(el => {
+                const icon = { qi: QI_ICON, coin: COIN_ICON }[el.dataset.ico];
+                if (icon) el.innerHTML = icon;
+            });
+        }
 
         // 把手绘图标写回各处配置（商店、食物按同名 id 对应到物品图标）
         (function applyItemIcons() {
@@ -1144,92 +1158,92 @@
             c.progress = 0;
         }
 
-        // ==================== 第二块灵田 ====================
-        // 商城购买「第二块灵田」（boughtUpgrades 里的 farming_slot，5000 灵石，只能买一次）后，主角之外多一块田：
-        // 并行做灵田配方，速度与主角相同（不打折），可与主角种同一种作物；共用背包与材料，离线也结算。
-        function isFarmPlotUnlocked() {
-            return (gameState.player.boughtUpgrades || []).includes('farming_slot');
-        }
-
-        function getFarmPlot() {
-            if (!gameState.farmPlot) gameState.farmPlot = { action: null, progress: 0 };
-            return gameState.farmPlot;
-        }
-
-        function assignFarmPlot(key) {
-            if (!isFarmPlotUnlocked()) { showNotification('🔒 需要先在商城购买「第二块灵田」', '#c98a3e'); return; }
-            const recipe = getAction('farming', key);
-            if (!recipe || !getRecipeUnlockState('farming', recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#c98a3e'); return; }
-            if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#c4483a', 'error'); return; }
-            const f = getFarmPlot();
-            f.action = { skill: 'farming', action: key };
-            f.progress = 0;
-            showNotification(`🌾 第二块田开始：${recipe.name}`, '#b89a5b');
-            generateRecipeList('farming');
-            renderPlotBar();
-            saveGame();
-        }
-
-        function stopFarmPlot(silent = false) {
-            const f = getFarmPlot();
-            const had = !!f.action;
-            f.action = null;
-            f.progress = 0;
-            if (!silent && had) showNotification('🌾 第二块田已停止', '#b89a5b');
-            generateRecipeList('farming');
-            renderPlotBar();
-        }
-
-        function tickFarmPlot() {
-            if (!isFarmPlotUnlocked()) return;
-            const f = getFarmPlot();
-            if (!f.action) return;
-            const action = getAction('farming', f.action.action);
-            if (!action || !action.output) { stopFarmPlot(true); return; }
-            if (!cloneHasMaterials(action)) {
-                showNotification(`🌾 第二块田：${action.name}所需材料不足，已停止`, '#c4483a', 'error');
-                stopFarmPlot(true);
-                return;
-            }
-            f.progress += 0.1;
-            const duration = getAdjustedDuration('farming', action.duration, f.action.action);
-            if (f.progress >= duration) {
-                completeAction(f.action);
-                f.progress = 0;
-            }
-            tickPlotBar(duration);
-        }
-
-        function renderPlotBar() {
-            const bar = document.getElementById('plotBar');
-            if (!bar) return;
-            if (!isFarmPlotUnlocked()) { bar.style.display = 'none'; return; }
-            bar.style.display = 'block';
-            const f = getFarmPlot();
-            const action = f.action ? getAction('farming', f.action.action) : null;
-            bar.innerHTML = action
-                ? `<div class="clone-row"><div class="clone-bar-top"><span>🌾 第二块田：<b>${action.name}</b></span><span id="plotRemain"></span>
-                    <button class="btn btn-secondary clone-stop" onclick="stopFarmPlot()">停止</button></div>
-                    <div class="progress-bar" style="height: 6px;"><div id="plotFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div>`
-                : `<div class="clone-row"><div class="clone-bar-top"><span>🌾 第二块田空闲</span><span class="clone-hint">在灵田面板的配方卡片上点「种到第二块田」</span></div></div>`;
-        }
-
-        function tickPlotBar(duration) {
-            const f = getFarmPlot();
-            const pct = Math.min(100, (f.progress / duration) * 100);
-            const fill = document.getElementById('plotFill');
-            if (fill) fill.style.width = pct + '%';
-            const remain = document.getElementById('plotRemain');
-            if (remain) remain.textContent = Math.max(0, duration - f.progress).toFixed(1) + 's';
-        }
-
-        // 离线结算：与分身共用同一套离线规则，只是耗时不打折
-        function settleFarmPlotOffline(offlineSeconds) {
-            if (!isFarmPlotUnlocked() || !(offlineSeconds >= 1)) return;
-            settleOneClone(getFarmPlot(), '第二块田', offlineSeconds, getAdjustedDuration);
-            renderPlotBar();
-        }
-
+        // ==================== 第二块灵田 ====================
+        // 商城购买「第二块灵田」（boughtUpgrades 里的 farming_slot，5000 灵石，只能买一次）后，主角之外多一块田：
+        // 并行做灵田配方，速度与主角相同（不打折），可与主角种同一种作物；共用背包与材料，离线也结算。
+        function isFarmPlotUnlocked() {
+            return (gameState.player.boughtUpgrades || []).includes('farming_slot');
+        }
+
+        function getFarmPlot() {
+            if (!gameState.farmPlot) gameState.farmPlot = { action: null, progress: 0 };
+            return gameState.farmPlot;
+        }
+
+        function assignFarmPlot(key) {
+            if (!isFarmPlotUnlocked()) { showNotification('🔒 需要先在商城购买「第二块灵田」', '#c98a3e'); return; }
+            const recipe = getAction('farming', key);
+            if (!recipe || !getRecipeUnlockState('farming', recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#c98a3e'); return; }
+            if (!cloneHasMaterials(recipe)) { showNotification(`${recipe.name}所需材料不足`, '#c4483a', 'error'); return; }
+            const f = getFarmPlot();
+            f.action = { skill: 'farming', action: key };
+            f.progress = 0;
+            showNotification(`🌾 第二块田开始：${recipe.name}`, '#b89a5b');
+            generateRecipeList('farming');
+            renderPlotBar();
+            saveGame();
+        }
+
+        function stopFarmPlot(silent = false) {
+            const f = getFarmPlot();
+            const had = !!f.action;
+            f.action = null;
+            f.progress = 0;
+            if (!silent && had) showNotification('🌾 第二块田已停止', '#b89a5b');
+            generateRecipeList('farming');
+            renderPlotBar();
+        }
+
+        function tickFarmPlot() {
+            if (!isFarmPlotUnlocked()) return;
+            const f = getFarmPlot();
+            if (!f.action) return;
+            const action = getAction('farming', f.action.action);
+            if (!action || !action.output) { stopFarmPlot(true); return; }
+            if (!cloneHasMaterials(action)) {
+                showNotification(`🌾 第二块田：${action.name}所需材料不足，已停止`, '#c4483a', 'error');
+                stopFarmPlot(true);
+                return;
+            }
+            f.progress += 0.1;
+            const duration = getAdjustedDuration('farming', action.duration, f.action.action);
+            if (f.progress >= duration) {
+                completeAction(f.action);
+                f.progress = 0;
+            }
+            tickPlotBar(duration);
+        }
+
+        function renderPlotBar() {
+            const bar = document.getElementById('plotBar');
+            if (!bar) return;
+            if (!isFarmPlotUnlocked()) { bar.style.display = 'none'; return; }
+            bar.style.display = 'block';
+            const f = getFarmPlot();
+            const action = f.action ? getAction('farming', f.action.action) : null;
+            bar.innerHTML = action
+                ? `<div class="clone-row"><div class="clone-bar-top"><span>🌾 第二块田：<b>${action.name}</b></span><span id="plotRemain"></span>
+                    <button class="btn btn-secondary clone-stop" onclick="stopFarmPlot()">停止</button></div>
+                    <div class="progress-bar" style="height: 6px;"><div id="plotFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div>`
+                : `<div class="clone-row"><div class="clone-bar-top"><span>🌾 第二块田空闲</span><span class="clone-hint">在灵田面板的配方卡片上点「种到第二块田」</span></div></div>`;
+        }
+
+        function tickPlotBar(duration) {
+            const f = getFarmPlot();
+            const pct = Math.min(100, (f.progress / duration) * 100);
+            const fill = document.getElementById('plotFill');
+            if (fill) fill.style.width = pct + '%';
+            const remain = document.getElementById('plotRemain');
+            if (remain) remain.textContent = Math.max(0, duration - f.progress).toFixed(1) + 's';
+        }
+
+        // 离线结算：与分身共用同一套离线规则，只是耗时不打折
+        function settleFarmPlotOffline(offlineSeconds) {
+            if (!isFarmPlotUnlocked() || !(offlineSeconds >= 1)) return;
+            settleOneClone(getFarmPlot(), '第二块田', offlineSeconds, getAdjustedDuration);
+            renderPlotBar();
+        }
+
         let lastTickWall = 0;
         function startGameTick() {
             lastTickWall = Date.now();
@@ -1659,7 +1673,7 @@
 
             document.getElementById('playerNameBattle').textContent = gameState.player.name || '玩家';
             document.getElementById('monsterNameBattle').textContent = monster.name || '敌人';
-            document.getElementById('monsterSprite').textContent = monster.icon || '👾';
+            document.getElementById('monsterSprite').innerHTML = monster.icon || '👾';
 
             addBattleLog(`与${monster.name}开始战斗！`, 'info');
         }
@@ -1803,7 +1817,8 @@
         // P1-4 从秘径撤退（模态对话框版本）
         function retreatFromDungeon() {
             const isNormalBattle = !!(gameState.currentAction && gameState.currentAction.isBattle);
-            if (!isNormalBattle && gameState.dungeons.battleState !== 'fighting') return;
+            // 秘境里随时可以撤退：只要还在秘境中即可（击败第一只怪后 battleState 会变成 monster_dead，不能再要求 'fighting'）
+            if (!isNormalBattle && !gameState.dungeons.currentDungeon) return;
 
             // 显示自定义确认模态框
             const modal = document.createElement('div');
@@ -2044,7 +2059,7 @@
 
             // 更新敌人信息
             const monsterName = document.getElementById('monsterNameBattle');
-            if (monsterName) monsterName.textContent = `${battle.currentEnemy.icon || '👹'} ${battle.currentEnemy.name}`;
+            if (monsterName) monsterName.innerHTML = `${battle.currentEnemy.icon || '👹'} ${battle.currentEnemy.name}`;
 
             // 更新玩家HP
             const playerHPBar = document.querySelector('.combatant.player .hp-fill');
@@ -2094,7 +2109,7 @@
             setText('playerDef', player.stats.def);
             setText('monsterAtk', battle.currentEnemy.atk);
             setText('monsterDef', battle.currentEnemy.def);
-            setText('monsterSprite', battle.currentEnemy.icon || '👾');
+            document.getElementById('monsterSprite').innerHTML = battle.currentEnemy.icon || '👾';
 
             // 更新战斗日志（共用日志，仅在有新条目时重绘，保留用户的滚动位置）
             renderBattleLog();
@@ -2594,155 +2609,155 @@
 
         const EFFECT_SKILL_NAMES = { cultivation: '修炼', alchemy: '炼丹', forging: '炼器', farming: '灵田', mining: '采矿', danhuo: '丹火', shenshi: '神识', battle: '战斗', wudao: '悟道', life: '所有生活技能' };
 
-        // ==================== 悟道：八种法则 ====================
-        // 化神初期起可用。每种法则有独立的领悟等级（累计经验推算，不单独存等级），效果 = 每级效果 × 等级 + 各里程碑加成，
-        // 通过 getMod() 统一接入战斗 / 生活技能 / 全局加成。等级上限随境界提高（化神初期 10，每高一个境界 +5，最高 30）。
-        // 与自身灵根同名的法则，参悟速度 +50%。
-        const LAW_IDS = ['metal', 'wood', 'water', 'fire', 'earth', 'wind', 'thunder', 'ice'];
-        const LAW_MAX_LEVEL = 30;
-        const LAW_UNLOCK_REALM = 17;            // 化神初期
-        const LAW_EXP_PER_COMPLETION = 12;      // 每次参悟获得的法则经验
-        const LAW_RESONANCE_BONUS = 0.5;        // 与灵根同名的法则，经验 +50%
-        const LAW_MILESTONE_LEVELS = [5, 10, 15, 20, 25];
-
-        const LAW_EFFECTS = {
-            metal:   { name: '金之法则', icon: '🟡', perLevel: { atkPct: 0.004 },
-                       milestones: { 5: { crit: 0.02 }, 10: { 'save:forging': 0.03 }, 15: { crit: 0.02 }, 20: { 'save:forging': 0.03 }, 25: { critDmg: 0.10 } } },
-            wood:    { name: '木之法则', icon: '🟢', perLevel: { hpPct: 0.004 },
-                       milestones: { 5: { regen: 0.0005 }, 10: { 'double:farming': 0.03 }, 15: { regen: 0.0005 }, 20: { 'double:farming': 0.03 }, 25: { cloneSpeed: 0.08 } } },
-            water:   { name: '水之法则', icon: '🔵', perLevel: { foodPct: 0.006 },
-                       milestones: { 5: { regen: 0.0005 }, 10: { 'exp:alchemy': 0.05 }, 15: { 'save:alchemy': 0.03 }, 20: { 'exp:alchemy': 0.05 }, 25: { 'save:alchemy': 0.03 } } },
-            fire:    { name: '火之法则', icon: '🔴', perLevel: { critDmg: 0.006 },
-                       milestones: { 5: { atkPct: 0.02 }, 10: { 'time:danhuo': -0.04 }, 15: { atkPct: 0.02 }, 20: { 'time:alchemy': -0.04 }, 25: { 'time:danhuo': -0.04 } } },
-            earth:   { name: '土之法则', icon: '🟤', perLevel: { defPct: 0.006 },
-                       milestones: { 5: { hpPct: 0.02 }, 10: { 'double:mining': 0.03 }, 15: { hpPct: 0.02 }, 20: { 'double:mining': 0.03 }, 25: { 'exp:mining': 0.10 } } },
-            wind:    { name: '风之法则', icon: '🌪️', perLevel: { spdPct: 0.004 },
-                       milestones: { 5: { dodge: 0.02 }, 10: { 'time:life': -0.02 }, 15: { dodge: 0.02 }, 20: { 'time:life': -0.02 }, 25: { 'time:life': -0.02 } } },
-            thunder: { name: '雷之法则', icon: '🟣', perLevel: { crit: 0.002 },
-                       milestones: { 5: { hit: 0.02 }, 10: { 'exp:shenshi': 0.06 }, 15: { dropPct: 0.05 }, 20: { 'exp:shenshi': 0.06 }, 25: { dropPct: 0.05 } } },
-            ice:     { name: '冰之法则', icon: '❄️', perLevel: { dodge: 0.003 },
-                       milestones: { 5: { defPct: 0.02 }, 10: { cultSpeed: 0.05 }, 15: { autoOffline: 0.03 }, 20: { cultSpeed: 0.05 }, 25: { autoOffline: 0.04 } } }
-        };
-
-        // 升到 level 级所需的累计法则经验（level 级 = 从 level-1 升上来所需 lawNeed(level)）
-        function lawNeed(level) { return Math.round(25 * Math.pow(level, 1.5)); }
-        function lawCumulative(level) {
-            let sum = 0;
-            for (let l = 1; l <= level; l++) sum += lawNeed(l);
-            return sum;
-        }
-
-        // 当前境界允许领悟到的最高等级（未到化神初期为 0）
-        function lawLevelCap() {
-            const realm = gameState.player.realmIndex;
-            if (realm < LAW_UNLOCK_REALM) return 0;
-            return Math.min(LAW_MAX_LEVEL, 10 + 5 * (realm - LAW_UNLOCK_REALM));
-        }
-
-        function getLawStore() {
-            if (!gameState.laws) gameState.laws = {};
-            return gameState.laws;
-        }
-
-        function getLawInfo(id) {
-            let exp = Math.floor(getLawStore()[id] || 0);
-            let level = 0;
-            while (level < LAW_MAX_LEVEL && exp >= lawNeed(level + 1)) {
-                exp -= lawNeed(level + 1);
-                level++;
-            }
-            const maxed = level >= LAW_MAX_LEVEL;
-            const need = maxed ? 0 : lawNeed(level + 1);
-            return { level, exp: maxed ? 0 : exp, need, percent: maxed ? 100 : (exp / need) * 100, maxed };
-        }
-
-        // 某个法则在指定等级下的全部效果
-        function getLawEffectsAt(id, level) {
-            const def = LAW_EFFECTS[id];
-            const total = {};
-            if (!def || level <= 0) return total;
-            const add = (eff, mult) => Object.entries(eff).forEach(([k, v]) => { total[k] = (total[k] || 0) + v * mult; });
-            add(def.perLevel, level);
-            Object.entries(def.milestones).forEach(([lv, eff]) => { if (level >= Number(lv)) add(eff, 1); });
-            return total;
-        }
-
-        // 全部法则的加成合计（带缓存；法则升级或读档时失效）
-        let lawTotalsCache = null;
-        function invalidateLawTotals() { lawTotalsCache = null; }
-        function getLawTotals() {
-            if (!lawTotalsCache) {
-                lawTotalsCache = {};
-                LAW_IDS.forEach(id => {
-                    Object.entries(getLawEffectsAt(id, getLawInfo(id).level)).forEach(([k, v]) => {
-                        lawTotalsCache[k] = (lawTotalsCache[k] || 0) + v;
-                    });
-                });
-            }
-            return lawTotalsCache;
-        }
-
-        function isLawResonant(id) {
-            return gameState.player.spiritRoot === id;
-        }
-
-        // 参悟获得法则经验；返回是否已到当前境界的领悟上限
-        function addLawExp(id, completions = 1) {
-            if (!LAW_EFFECTS[id]) return false;
-            const cap = lawLevelCap();
-            const store = getLawStore();
-            const before = getLawInfo(id).level;
-            const mult = 1 + getSkillMod('exp', 'wudao') + (isLawResonant(id) ? LAW_RESONANCE_BONUS : 0);
-            const capExp = lawCumulative(cap);
-            store[id] = Math.min(capExp, (store[id] || 0) + LAW_EXP_PER_COMPLETION * completions * mult);
-            const after = getLawInfo(id).level;
-            if (after > before) {
-                invalidateLawTotals();
-                const def = LAW_EFFECTS[id];
-                const isMs = LAW_MILESTONE_LEVELS.includes(after);
-                const msText = isMs ? '（里程碑：' + describeEffects(def.milestones[after]).join('、') + '）' : '';
-                showNotification(`${def.icon} ${def.name} 领悟到 Lv.${after}${msText}`, '#b89a5b');
-            }
-            if (document.body.dataset.panel === 'wudao') generateLawList();
-            return after >= cap;
-        }
-
-        function describeLawNext(id) {
-            const { level } = getLawInfo(id);
-            const next = LAW_MILESTONE_LEVELS.find(m => m > level);
-            if (!next) return '';
-            return `下一里程碑 Lv.${next}：${describeEffects(LAW_EFFECTS[id].milestones[next]).join('、')}`;
-        }
-
-        // 悟道面板：八种法则卡片
-        function generateLawList() {
-            const list = document.getElementById('wudaoActions');
-            if (!list) return;
-            const cap = lawLevelCap();
-            const cur = gameState.currentAction;
-            list.innerHTML = '';
-            LAW_IDS.forEach(id => {
-                const def = LAW_EFFECTS[id];
-                const info = getLawInfo(id);
-                const eff = describeEffects(getLawEffectsAt(id, info.level));
-                const atCap = info.level >= cap;
-                const active = cur && cur.skill === 'wudao' && cur.action === id;
-                const card = document.createElement('div');
-                card.className = 'action-item law-card' + (active ? ' active' : '') + (atCap ? ' law-capped' : '');
-                card.id = 'action-wudao-' + id;
-                card.innerHTML = `
-                    <div class="recipe-header"><span class="recipe-icon">${def.icon}</span><span class="recipe-name">${def.name}</span>${isLawResonant(id) ? '<span class="law-resonant" title="与你的灵根相合：参悟速度 +50%">✦ 灵根相合</span>' : ''}</div>
-                    <div class="law-level">Lv.${info.level} <small>/ ${cap}</small></div>
-                    <div class="mastery-track"><div class="mastery-fill" style="width: ${info.percent}%"></div></div>
-                    <div class="law-exp">${atCap ? '已至当前境界上限，突破后可继续领悟' : `${info.exp} / ${info.need}`}</div>
-                    <div class="law-effects">${eff.length ? eff.join(' · ') : '尚未领悟'}</div>
-                    <div class="law-next">${describeLawNext(id)}</div>
-                    <div class="action-progress-bar ${active ? 'active' : ''}"><div class="action-progress-fill" style="width: 0%"></div></div>`;
-                card.onclick = () => selectAction('wudao', id);
-                list.appendChild(card);
-            });
-        }
-
+        // ==================== 悟道：八种法则 ====================
+        // 化神初期起可用。每种法则有独立的领悟等级（累计经验推算，不单独存等级），效果 = 每级效果 × 等级 + 各里程碑加成，
+        // 通过 getMod() 统一接入战斗 / 生活技能 / 全局加成。等级上限随境界提高（化神初期 10，每高一个境界 +5，最高 30）。
+        // 与自身灵根同名的法则，参悟速度 +50%。
+        const LAW_IDS = ['metal', 'wood', 'water', 'fire', 'earth', 'wind', 'thunder', 'ice'];
+        const LAW_MAX_LEVEL = 30;
+        const LAW_UNLOCK_REALM = 17;            // 化神初期
+        const LAW_EXP_PER_COMPLETION = 12;      // 每次参悟获得的法则经验
+        const LAW_RESONANCE_BONUS = 0.5;        // 与灵根同名的法则，经验 +50%
+        const LAW_MILESTONE_LEVELS = [5, 10, 15, 20, 25];
+
+        const LAW_EFFECTS = {
+            metal:   { name: '金之法则', icon: '🟡', perLevel: { atkPct: 0.004 },
+                       milestones: { 5: { crit: 0.02 }, 10: { 'save:forging': 0.03 }, 15: { crit: 0.02 }, 20: { 'save:forging': 0.03 }, 25: { critDmg: 0.10 } } },
+            wood:    { name: '木之法则', icon: '🟢', perLevel: { hpPct: 0.004 },
+                       milestones: { 5: { regen: 0.0005 }, 10: { 'double:farming': 0.03 }, 15: { regen: 0.0005 }, 20: { 'double:farming': 0.03 }, 25: { cloneSpeed: 0.08 } } },
+            water:   { name: '水之法则', icon: '🔵', perLevel: { foodPct: 0.006 },
+                       milestones: { 5: { regen: 0.0005 }, 10: { 'exp:alchemy': 0.05 }, 15: { 'save:alchemy': 0.03 }, 20: { 'exp:alchemy': 0.05 }, 25: { 'save:alchemy': 0.03 } } },
+            fire:    { name: '火之法则', icon: '🔴', perLevel: { critDmg: 0.006 },
+                       milestones: { 5: { atkPct: 0.02 }, 10: { 'time:danhuo': -0.04 }, 15: { atkPct: 0.02 }, 20: { 'time:alchemy': -0.04 }, 25: { 'time:danhuo': -0.04 } } },
+            earth:   { name: '土之法则', icon: '🟤', perLevel: { defPct: 0.006 },
+                       milestones: { 5: { hpPct: 0.02 }, 10: { 'double:mining': 0.03 }, 15: { hpPct: 0.02 }, 20: { 'double:mining': 0.03 }, 25: { 'exp:mining': 0.10 } } },
+            wind:    { name: '风之法则', icon: '🌪️', perLevel: { spdPct: 0.004 },
+                       milestones: { 5: { dodge: 0.02 }, 10: { 'time:life': -0.02 }, 15: { dodge: 0.02 }, 20: { 'time:life': -0.02 }, 25: { 'time:life': -0.02 } } },
+            thunder: { name: '雷之法则', icon: '🟣', perLevel: { crit: 0.002 },
+                       milestones: { 5: { hit: 0.02 }, 10: { 'exp:shenshi': 0.06 }, 15: { dropPct: 0.05 }, 20: { 'exp:shenshi': 0.06 }, 25: { dropPct: 0.05 } } },
+            ice:     { name: '冰之法则', icon: '❄️', perLevel: { dodge: 0.003 },
+                       milestones: { 5: { defPct: 0.02 }, 10: { cultSpeed: 0.05 }, 15: { autoOffline: 0.03 }, 20: { cultSpeed: 0.05 }, 25: { autoOffline: 0.04 } } }
+        };
+
+        // 升到 level 级所需的累计法则经验（level 级 = 从 level-1 升上来所需 lawNeed(level)）
+        function lawNeed(level) { return Math.round(25 * Math.pow(level, 1.5)); }
+        function lawCumulative(level) {
+            let sum = 0;
+            for (let l = 1; l <= level; l++) sum += lawNeed(l);
+            return sum;
+        }
+
+        // 当前境界允许领悟到的最高等级（未到化神初期为 0）
+        function lawLevelCap() {
+            const realm = gameState.player.realmIndex;
+            if (realm < LAW_UNLOCK_REALM) return 0;
+            return Math.min(LAW_MAX_LEVEL, 10 + 5 * (realm - LAW_UNLOCK_REALM));
+        }
+
+        function getLawStore() {
+            if (!gameState.laws) gameState.laws = {};
+            return gameState.laws;
+        }
+
+        function getLawInfo(id) {
+            let exp = Math.floor(getLawStore()[id] || 0);
+            let level = 0;
+            while (level < LAW_MAX_LEVEL && exp >= lawNeed(level + 1)) {
+                exp -= lawNeed(level + 1);
+                level++;
+            }
+            const maxed = level >= LAW_MAX_LEVEL;
+            const need = maxed ? 0 : lawNeed(level + 1);
+            return { level, exp: maxed ? 0 : exp, need, percent: maxed ? 100 : (exp / need) * 100, maxed };
+        }
+
+        // 某个法则在指定等级下的全部效果
+        function getLawEffectsAt(id, level) {
+            const def = LAW_EFFECTS[id];
+            const total = {};
+            if (!def || level <= 0) return total;
+            const add = (eff, mult) => Object.entries(eff).forEach(([k, v]) => { total[k] = (total[k] || 0) + v * mult; });
+            add(def.perLevel, level);
+            Object.entries(def.milestones).forEach(([lv, eff]) => { if (level >= Number(lv)) add(eff, 1); });
+            return total;
+        }
+
+        // 全部法则的加成合计（带缓存；法则升级或读档时失效）
+        let lawTotalsCache = null;
+        function invalidateLawTotals() { lawTotalsCache = null; }
+        function getLawTotals() {
+            if (!lawTotalsCache) {
+                lawTotalsCache = {};
+                LAW_IDS.forEach(id => {
+                    Object.entries(getLawEffectsAt(id, getLawInfo(id).level)).forEach(([k, v]) => {
+                        lawTotalsCache[k] = (lawTotalsCache[k] || 0) + v;
+                    });
+                });
+            }
+            return lawTotalsCache;
+        }
+
+        function isLawResonant(id) {
+            return gameState.player.spiritRoot === id;
+        }
+
+        // 参悟获得法则经验；返回是否已到当前境界的领悟上限
+        function addLawExp(id, completions = 1) {
+            if (!LAW_EFFECTS[id]) return false;
+            const cap = lawLevelCap();
+            const store = getLawStore();
+            const before = getLawInfo(id).level;
+            const mult = 1 + getSkillMod('exp', 'wudao') + (isLawResonant(id) ? LAW_RESONANCE_BONUS : 0);
+            const capExp = lawCumulative(cap);
+            store[id] = Math.min(capExp, (store[id] || 0) + LAW_EXP_PER_COMPLETION * completions * mult);
+            const after = getLawInfo(id).level;
+            if (after > before) {
+                invalidateLawTotals();
+                const def = LAW_EFFECTS[id];
+                const isMs = LAW_MILESTONE_LEVELS.includes(after);
+                const msText = isMs ? '（里程碑：' + describeEffects(def.milestones[after]).join('、') + '）' : '';
+                showNotification(`${def.icon} ${def.name} 领悟到 Lv.${after}${msText}`, '#b89a5b');
+            }
+            if (document.body.dataset.panel === 'wudao') generateLawList();
+            return after >= cap;
+        }
+
+        function describeLawNext(id) {
+            const { level } = getLawInfo(id);
+            const next = LAW_MILESTONE_LEVELS.find(m => m > level);
+            if (!next) return '';
+            return `下一里程碑 Lv.${next}：${describeEffects(LAW_EFFECTS[id].milestones[next]).join('、')}`;
+        }
+
+        // 悟道面板：八种法则卡片
+        function generateLawList() {
+            const list = document.getElementById('wudaoActions');
+            if (!list) return;
+            const cap = lawLevelCap();
+            const cur = gameState.currentAction;
+            list.innerHTML = '';
+            LAW_IDS.forEach(id => {
+                const def = LAW_EFFECTS[id];
+                const info = getLawInfo(id);
+                const eff = describeEffects(getLawEffectsAt(id, info.level));
+                const atCap = info.level >= cap;
+                const active = cur && cur.skill === 'wudao' && cur.action === id;
+                const card = document.createElement('div');
+                card.className = 'action-item law-card' + (active ? ' active' : '') + (atCap ? ' law-capped' : '');
+                card.id = 'action-wudao-' + id;
+                card.innerHTML = `
+                    <div class="recipe-header"><span class="recipe-icon">${def.icon}</span><span class="recipe-name">${def.name}</span>${isLawResonant(id) ? '<span class="law-resonant" title="与你的灵根相合：参悟速度 +50%">✦ 灵根相合</span>' : ''}</div>
+                    <div class="law-level">Lv.${info.level} <small>/ ${cap}</small></div>
+                    <div class="mastery-track"><div class="mastery-fill" style="width: ${info.percent}%"></div></div>
+                    <div class="law-exp">${atCap ? '已至当前境界上限，突破后可继续领悟' : `${info.exp} / ${info.need}`}</div>
+                    <div class="law-effects">${eff.length ? eff.join(' · ') : '尚未领悟'}</div>
+                    <div class="law-next">${describeLawNext(id)}</div>
+                    <div class="action-progress-bar ${active ? 'active' : ''}"><div class="action-progress-fill" style="width: 0%"></div></div>`;
+                card.onclick = () => selectAction('wudao', id);
+                list.appendChild(card);
+            });
+        }
+
         // 当前灵根 + 当前功法 + 悟道法则提供的某项特效总和
         function getMod(key) {
             const player = gameState && gameState.player;
@@ -3543,10 +3558,10 @@
             const parts = [];
 
             if (output.cultivation) {
-                parts.push(`✨ +${output.cultivation}修为`);
+                parts.push(`${QI_ICON} +${output.cultivation}修为`);
             }
             if (output.coins) {
-                parts.push(`💎 +${output.coins}`);
+                parts.push(`${COIN_ICON} +${output.coins}`);
             }
             if (output.exp) {
                 parts.push(`+${output.exp}exp`);
@@ -3582,6 +3597,16 @@
         /**
          * 渲染单个配方卡片（新系统）
          */
+        // 配方卡片正中的大图：产出物品的图标；产出灵石 / 修为时用通用符号
+        function recipeArtIcon(recipe) {
+            const out = recipe.output || {};
+            const first = (out.items || []).map(i => GAME_CONFIG.items[i.id]).find(Boolean);
+            if (first) return first.icon;
+            if (out.cultivation) return QI_ICON;
+            if (out.coins) return COIN_ICON;
+            return '✨';
+        }
+
         function renderRecipeCard(skillName, recipeKey, recipe) {
             const card = document.createElement('div');
             const isActive = gameState.currentAction &&
@@ -3591,8 +3616,6 @@
             // 1. 判断解锁状态
             const unlockState = getRecipeUnlockState(skillName, recipe);
 
-            // 2. 计算效率
-            const efficiency = calculateRecipeEfficiency(skillName, recipe, recipeKey);
             // 卡片显示实际耗时（含装备、功法、精通等加成）；与基础耗时不同时附上基础值
             const adjDur = getAdjustedDuration(skillName, recipe.duration, recipeKey);
             const fmt = v => parseFloat(v.toFixed(v < 10 ? 2 : 1));
@@ -3625,26 +3648,25 @@
 
             const lockHint = formatRecipeLockHint(skillName, unlockState);
             const lockHintHtml = lockHint ? `<div class="recipe-lock-hint">${lockHint}</div>` : '';
-            // 无论是否解锁都显示等级/境界要求（已达成为绿色，未达成为橙色）
+            // 要求全文放在卡片悬停提示里（未解锁时锁定提示已说明，不再单独占一行）
             const reqText = unlockState.reason === 'realm' || skillName === 'cultivation'
                 ? `境界要求：${getRealmName(unlockState.requiredValue)}`
                 : `等级要求：Lv.${unlockState.requiredValue}`;
-            const reqHtml = `<div class="recipe-req ${unlockState.unlocked ? 'met' : 'unmet'}">${unlockState.unlocked ? '✓' : '✗'} ${reqText}</div>`;
 
             const outputStr = formatRecipeOutput(recipe.output || {});
             // 产出是装备时直接显示属性，方便对比
             const outEquip = ((recipe.output && recipe.output.items) || []).find(i => isEquipmentItem(i.id));
             const equipStatsHtml = outEquip
                 ? `<div class="recipe-equip-stats" title="${GAME_CONFIG.items[outEquip.id].name}">${GAME_CONFIG.items[outEquip.id].icon} ${formatItemStats(outEquip.id)}</div>` : '';
-            const efficiencyStr = efficiency > 0 ? `<div class="recipe-efficiency">效率: ${efficiency.toFixed(2)}/秒</div>` : '';
 
             // 配方精通（生活技能）：等级、进度条，悬停显示具体加成
             let masteryHtml = '';
             if (LIFE_SKILLS.includes(skillName) && unlockState.unlocked) {
                 const m = getMasteryInfo(skillName, recipeKey);
-                masteryHtml = `<div class="recipe-mastery" title="${describeMastery(skillName, recipeKey)}">
-                    🎓 精通 <b>Lv.${m.level}</b>${m.maxed ? ' ✦满级' : ` · ${m.exp}/${m.need}`}
-                    <div class="mastery-track"><div class="mastery-fill" style="width: ${m.percent}%"></div></div>
+                masteryHtml = `<div class="recipe-mastery rc-mastery" title="${describeMastery(skillName, recipeKey)}">
+                    <span class="rc-mlv" title="精通等级">🎓<b>${m.level}</b></span>
+                    <div class="mastery-track"><div class="mastery-fill" style="width: ${m.maxed ? 100 : m.percent}%"></div></div>
+                    <span class="rc-mtxt">${m.maxed ? '✦满级' : `${m.exp}/${m.need}`}</span>
                     ${!m.maxed && getMasteryPoolInfo(skillName).exp > 0 ? `<button class="infuse-btn" onclick="event.stopPropagation(); infuseMastery('${skillName}', '${recipeKey}')" title="从精通池转入经验，直到升下一级（池减少，可能失去检查点加成）">灌注</button>` : ''}
                 </div>`;
             }
@@ -3672,24 +3694,23 @@
                 card.className = className;
             }
 
+            // 布局（自上而下）：名称 → 耗时 / 效率 → 产出大图 → 产出与消耗 → 进度条 → 精通条 → 分身按钮
+            // 不再单独显示「✓ 要求」一行：未解锁时由锁定提示说明，要求全文放在卡片悬停提示里
             card.innerHTML = `
-                <div class="recipe-header">
-                    <span class="recipe-icon">${unlockState.unlocked ? '🟢' : '⭕'}</span>
-                    <span class="recipe-name">${recipe.name}</span>
-                </div>
-                <div class="recipe-time">⏱ ${timeText}</div>
-                ${reqHtml}
-                ${masteryHtml}
-                ${cloneHtml}
+                <div class="recipe-name rc-name">${recipe.name}</div>
+                <div class="recipe-time rc-meta">⏱ ${timeText}</div>
+                <div class="rc-art${unlockState.unlocked ? '' : ' locked'}">${unlockState.unlocked ? recipeArtIcon(recipe) : '🔒'}</div>
                 <div class="recipe-output">${outputStr}</div>
                 ${equipStatsHtml}
                 ${materialsHtml}
-                ${efficiencyStr}
                 ${lockHintHtml}
                 <div class="action-progress-bar ${isActive ? 'active' : ''}">
                     <div class="action-progress-fill" style="width: 0%"></div>
                 </div>
+                ${masteryHtml}
+                ${cloneHtml}
             `;
+            card.title = reqText;
 
             // 6. 绑定事件
             if (unlockState.unlocked && materials.every(m => m.enough || materials.length === 0)) {
@@ -3740,7 +3761,7 @@
             const enemies = (BATTLE_ENEMY_CONFIGS[areaKey] || []).map(e => `${e.icon || ''}${e.name}`).join('、');
             return `<div class="area-reward">
                     <div>敌人：${enemies || '—'}</div>
-                    <div>每场奖励：💎 ${Math.round(a.coins * bonus)} 灵石 · ${Math.round(a.exp * bonus)} 战斗经验${bonus > 1 ? '（含精通加成）' : ''}</div>
+                    <div>每场奖励：${COIN_ICON} ${Math.round(a.coins * bonus)} 灵石 · ${Math.round(a.exp * bonus)} 战斗经验${bonus > 1 ? '（含精通加成）' : ''}</div>
                     <div class="area-drops">掉落物：无（只获得灵石与经验）</div>
                 </div>`;
         }
@@ -4233,165 +4254,165 @@
             }
         }
 
-        // ==================== 装备系统 ====================
-        // 装备栏与背包分开：装备 = 把物品从背包挪到装备栏，卸下 = 放回背包，换装备时旧的自动回背包。
-        // 武器、护甲各 1 件；饰品初始 1 个栏位，商城购买「第二饰品栏位」（金丹初期起）后有 2 个，同名饰品不能重复佩戴。
-        const STAT_LABELS = { hp: '生命', atk: '攻击', def: '防御', spd: '速度' };
-        const EQUIP_TYPES = ['weapon', 'armor', 'jewelry'];
-        const EQUIP_TYPE_NAMES = { weapon: '武器', armor: '护甲', jewelry: '饰品' };
-
-        function isEquipmentItem(itemId) {
-            const cfg = GAME_CONFIG.items[itemId];
-            return !!cfg && EQUIP_TYPES.includes(cfg.type);
-        }
-
-        // 装备属性文字，如「攻击+40 · 生命+30」，带特殊效果（如灵玉的工作速度）
-        function formatItemStats(itemId) {
-            const cfg = GAME_CONFIG.items[itemId];
-            if (!cfg) return '';
-            const parts = [];
-            if (cfg.stats) Object.entries(cfg.stats).forEach(([k, v]) => parts.push(`${STAT_LABELS[k] || k}+${v}`));
-            if (cfg.effect && cfg.effect.workSpeed) parts.push(`工作速度 +${Math.round((1 / cfg.effect.workSpeed - 1) * 100)}%`);
-            return parts.join(' · ');
-        }
-
-        function getJewelrySlots() {
-            return 1 + ((gameState.player.boughtUpgrades || []).includes('jewelry_slot2') ? 1 : 0);
-        }
-
-        function equipAfterChange() {
-            calculateStats();
-            updateUI();
-            saveGame();
-            renderEquipmentPanel();
-        }
-
-        // 从背包装备（武器 / 护甲：替换并把旧的放回背包；饰品：需要有空栏位）
-        function equipFromBag(itemId) {
-            const cfg = GAME_CONFIG.items[itemId];
-            if (!cfg || !EQUIP_TYPES.includes(cfg.type)) return false;
-            const inv = gameState.player.inventory.find(i => i.id === itemId);
-            if (!inv || inv.qty < 1) { showNotification('背包里没有这件装备', '#c98a3e'); return false; }
-            const eq = gameState.player.equipment;
-            if (cfg.type === 'jewelry') {
-                if ((eq.jewelry || []).includes(itemId)) { showNotification('已经佩戴同名饰品，不能重复', '#c98a3e'); return false; }
-                if ((eq.jewelry || []).length >= getJewelrySlots()) {
-                    showNotification(getJewelrySlots() < 2 ? '饰品栏位已满，请先卸下（第二饰品栏位可在商城购买）' : '饰品栏位已满，请先卸下一件', '#c98a3e');
-                    return false;
-                }
-                consumeItem(itemId, 1);
-                eq.jewelry.push(itemId);
-            } else {
-                const old = eq[cfg.type];
-                consumeItem(itemId, 1);
-                eq[cfg.type] = itemId;
-                if (old && !addToInventory(old)) {
-                    // 背包放不下旧装备：回滚
-                    eq[cfg.type] = old;
-                    addToInventory(itemId, 1);
-                    return false;
-                }
-            }
-            showNotification(`已装备${cfg.name}`, '#6f9c8a');
-            equipAfterChange();
-            return true;
-        }
-
-        // 卸下装备放回背包（背包满则失败）
-        function unequipItem(kind, itemId) {
-            const eq = gameState.player.equipment;
-            const cfg = GAME_CONFIG.items[itemId];
-            if (!cfg) return false;
-            if (kind === 'jewelry' ? !(eq.jewelry || []).includes(itemId) : eq[kind] !== itemId) return false;
-            if (!addToInventory(itemId, 1)) return false;
-            if (kind === 'jewelry') eq.jewelry = eq.jewelry.filter(id => id !== itemId);
-            else eq[kind] = null;
-            showNotification(`已卸下${cfg.name}`, '#6f9c8a');
-            equipAfterChange();
-            return true;
-        }
-
-        // 换上 candidate 相对当前同槽装备的属性变化（武器 / 护甲），返回带颜色的 HTML；饰品直接显示属性
-        function describeEquipDiff(itemId) {
-            const cfg = GAME_CONFIG.items[itemId];
-            const eq = gameState.player.equipment;
-            if (cfg.type === 'jewelry') return '';
-            const cur = GAME_CONFIG.items[eq[cfg.type]]?.stats || {};
-            const keys = new Set([...Object.keys(cfg.stats || {}), ...Object.keys(cur)]);
-            const out = [];
-            keys.forEach(k => {
-                const d = ((cfg.stats || {})[k] || 0) - (cur[k] || 0);
-                if (d) out.push(`<span style="color:${d > 0 ? '#7fae9a' : '#c4483a'}">${STAT_LABELS[k] || k}${d > 0 ? '+' : ''}${d}</span>`);
-            });
-            return out.length ? `（换上后 ${out.join(' ')}）` : '（属性相同）';
-        }
-
-        // 装备界面：三类装备栏 + 总属性 + 背包里可换的装备
-        function renderEquipmentPanel() {
-            const box = document.getElementById('equipmentContent');
-            if (!box) return;
-            const eq = gameState.player.equipment;
-            const stats = gameState.player.stats;
-            const slotCard = (kind, itemId, label) => {
-                if (!itemId) return `<div class="equip-slot empty"><div class="equip-slot-label">${label}</div><div class="equip-slot-empty">— 空 —</div></div>`;
-                const cfg = GAME_CONFIG.items[itemId];
-                return `<div class="equip-slot"><div class="equip-slot-label">${label}</div>
-                    <div class="equip-slot-name">${cfg.icon} ${cfg.name}</div>
-                    <div class="equip-slot-stats">${formatItemStats(itemId) || '无属性'}</div>
-                    <button class="btn btn-secondary equip-btn" onclick="unequipItem('${kind}', '${itemId}')">卸下</button></div>`;
-            };
-            let slots = slotCard('weapon', eq.weapon, '⚔️ 武器') + slotCard('armor', eq.armor, '🛡️ 护甲');
-            const jSlots = getJewelrySlots();
-            for (let i = 0; i < jSlots; i++) slots += slotCard('jewelry', (eq.jewelry || [])[i], `📿 饰品${jSlots > 1 ? i + 1 : ''}`);
-            if (jSlots < 2) {
-                const canBuy = gameState.player.realmIndex >= 9;
-                slots += `<div class="equip-slot locked"><div class="equip-slot-label">📿 饰品2</div>
-                    <div class="equip-slot-empty">🔒 第二饰品栏位</div>
-                    <div class="equip-slot-stats">${canBuy ? '可在商城购买（8000灵石）' : '金丹初期后可在商城购买'}</div>
-                    ${canBuy ? `<button class="btn btn-secondary equip-btn" onclick="switchPanel('shop')">去商城</button>` : ''}</div>`;
-            }
-            const temper = gameState.player.temperLevel || 0;
-            const forgeBonus = parseFloat(((SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1) - 1) * 100).toFixed(1));
-            const summary = `<div class="equip-summary">
-                <span>❤️ 生命 ${stats.hp.max}</span><span>⚔️ 攻击 ${stats.atk}</span><span>🛡️ 防御 ${stats.def}</span><span>💨 速度 ${stats.spd}</span>
-                <div class="equip-summary-sub">装备加成：淬炼 ${temper}/3（装备属性 +${temper * 10}%）${forgeBonus > 0 ? ` · 炼器等级（装备属性 +${forgeBonus}%）` : ''}</div></div>`;
-            // 背包里的装备
-            const bagItems = gameState.player.inventory.filter(i => isEquipmentItem(i.id));
-            let bag = '';
-            EQUIP_TYPES.forEach(type => {
-                const list = bagItems.filter(i => GAME_CONFIG.items[i.id].type === type);
-                if (!list.length) return;
-                bag += `<div class="equip-bag-title">${EQUIP_TYPE_NAMES[type]}（背包中）</div>` + list.map(i => {
-                    const cfg = GAME_CONFIG.items[i.id];
-                    return `<div class="equip-bag-row"><span class="equip-bag-name">${cfg.icon} ${cfg.name}${i.qty > 1 ? ' ×' + i.qty : ''}</span>
-                        <span class="equip-bag-stats">${formatItemStats(i.id)} ${describeEquipDiff(i.id)}</span>
-                        <button class="btn equip-btn" onclick="equipFromBag('${i.id}')">装备</button></div>`;
-                }).join('');
-            });
-            box.innerHTML = `<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（炼器可以打造，商城也有出售）</div>'}`;
-        }
-
-        // 旧存档迁移：装备曾同时保留在背包里，现在装备栏与背包分开。每件已装备的物品从背包扣掉 1 件；
-        // 已戴 ≥2 件饰品的老玩家自动送第二饰品栏位，超过 2 件的放回背包。
-        function migrateEquipmentSlots() {
-            if (gameState.equipSlotsV2 || !gameState.player) return;
-            const eq = gameState.player.equipment || (gameState.player.equipment = { weapon: null, armor: null, jewelry: [] });
-            if (!eq.jewelry) eq.jewelry = [];
-            const inv = gameState.player.inventory;
-            [eq.weapon, eq.armor, ...eq.jewelry].filter(Boolean).forEach(id => {
-                const it = inv.find(i => i.id === id);
-                if (it) { it.qty -= 1; if (it.qty <= 0) inv.splice(inv.indexOf(it), 1); }
-            });
-            if (!gameState.player.boughtUpgrades) gameState.player.boughtUpgrades = [];
-            if (eq.jewelry.length >= 2 && !gameState.player.boughtUpgrades.includes('jewelry_slot2')) gameState.player.boughtUpgrades.push('jewelry_slot2');
-            while (eq.jewelry.length > getJewelrySlots()) {
-                const id = eq.jewelry.pop();
-                const it = inv.find(i => i.id === id);
-                if (it) it.qty += 1; else inv.push({ id, qty: 1 });
-            }
-            gameState.equipSlotsV2 = true;
-        }
-
+        // ==================== 装备系统 ====================
+        // 装备栏与背包分开：装备 = 把物品从背包挪到装备栏，卸下 = 放回背包，换装备时旧的自动回背包。
+        // 武器、护甲各 1 件；饰品初始 1 个栏位，商城购买「第二饰品栏位」（金丹初期起）后有 2 个，同名饰品不能重复佩戴。
+        const STAT_LABELS = { hp: '生命', atk: '攻击', def: '防御', spd: '速度' };
+        const EQUIP_TYPES = ['weapon', 'armor', 'jewelry'];
+        const EQUIP_TYPE_NAMES = { weapon: '武器', armor: '护甲', jewelry: '饰品' };
+
+        function isEquipmentItem(itemId) {
+            const cfg = GAME_CONFIG.items[itemId];
+            return !!cfg && EQUIP_TYPES.includes(cfg.type);
+        }
+
+        // 装备属性文字，如「攻击+40 · 生命+30」，带特殊效果（如灵玉的工作速度）
+        function formatItemStats(itemId) {
+            const cfg = GAME_CONFIG.items[itemId];
+            if (!cfg) return '';
+            const parts = [];
+            if (cfg.stats) Object.entries(cfg.stats).forEach(([k, v]) => parts.push(`${STAT_LABELS[k] || k}+${v}`));
+            if (cfg.effect && cfg.effect.workSpeed) parts.push(`工作速度 +${Math.round((1 / cfg.effect.workSpeed - 1) * 100)}%`);
+            return parts.join(' · ');
+        }
+
+        function getJewelrySlots() {
+            return 1 + ((gameState.player.boughtUpgrades || []).includes('jewelry_slot2') ? 1 : 0);
+        }
+
+        function equipAfterChange() {
+            calculateStats();
+            updateUI();
+            saveGame();
+            renderEquipmentPanel();
+        }
+
+        // 从背包装备（武器 / 护甲：替换并把旧的放回背包；饰品：需要有空栏位）
+        function equipFromBag(itemId) {
+            const cfg = GAME_CONFIG.items[itemId];
+            if (!cfg || !EQUIP_TYPES.includes(cfg.type)) return false;
+            const inv = gameState.player.inventory.find(i => i.id === itemId);
+            if (!inv || inv.qty < 1) { showNotification('背包里没有这件装备', '#c98a3e'); return false; }
+            const eq = gameState.player.equipment;
+            if (cfg.type === 'jewelry') {
+                if ((eq.jewelry || []).includes(itemId)) { showNotification('已经佩戴同名饰品，不能重复', '#c98a3e'); return false; }
+                if ((eq.jewelry || []).length >= getJewelrySlots()) {
+                    showNotification(getJewelrySlots() < 2 ? '饰品栏位已满，请先卸下（第二饰品栏位可在商城购买）' : '饰品栏位已满，请先卸下一件', '#c98a3e');
+                    return false;
+                }
+                consumeItem(itemId, 1);
+                eq.jewelry.push(itemId);
+            } else {
+                const old = eq[cfg.type];
+                consumeItem(itemId, 1);
+                eq[cfg.type] = itemId;
+                if (old && !addToInventory(old)) {
+                    // 背包放不下旧装备：回滚
+                    eq[cfg.type] = old;
+                    addToInventory(itemId, 1);
+                    return false;
+                }
+            }
+            showNotification(`已装备${cfg.name}`, '#6f9c8a');
+            equipAfterChange();
+            return true;
+        }
+
+        // 卸下装备放回背包（背包满则失败）
+        function unequipItem(kind, itemId) {
+            const eq = gameState.player.equipment;
+            const cfg = GAME_CONFIG.items[itemId];
+            if (!cfg) return false;
+            if (kind === 'jewelry' ? !(eq.jewelry || []).includes(itemId) : eq[kind] !== itemId) return false;
+            if (!addToInventory(itemId, 1)) return false;
+            if (kind === 'jewelry') eq.jewelry = eq.jewelry.filter(id => id !== itemId);
+            else eq[kind] = null;
+            showNotification(`已卸下${cfg.name}`, '#6f9c8a');
+            equipAfterChange();
+            return true;
+        }
+
+        // 换上 candidate 相对当前同槽装备的属性变化（武器 / 护甲），返回带颜色的 HTML；饰品直接显示属性
+        function describeEquipDiff(itemId) {
+            const cfg = GAME_CONFIG.items[itemId];
+            const eq = gameState.player.equipment;
+            if (cfg.type === 'jewelry') return '';
+            const cur = GAME_CONFIG.items[eq[cfg.type]]?.stats || {};
+            const keys = new Set([...Object.keys(cfg.stats || {}), ...Object.keys(cur)]);
+            const out = [];
+            keys.forEach(k => {
+                const d = ((cfg.stats || {})[k] || 0) - (cur[k] || 0);
+                if (d) out.push(`<span style="color:${d > 0 ? '#7fae9a' : '#c4483a'}">${STAT_LABELS[k] || k}${d > 0 ? '+' : ''}${d}</span>`);
+            });
+            return out.length ? `（换上后 ${out.join(' ')}）` : '（属性相同）';
+        }
+
+        // 装备界面：三类装备栏 + 总属性 + 背包里可换的装备
+        function renderEquipmentPanel() {
+            const box = document.getElementById('equipmentContent');
+            if (!box) return;
+            const eq = gameState.player.equipment;
+            const stats = gameState.player.stats;
+            const slotCard = (kind, itemId, label) => {
+                if (!itemId) return `<div class="equip-slot empty"><div class="equip-slot-label">${label}</div><div class="equip-slot-empty">— 空 —</div></div>`;
+                const cfg = GAME_CONFIG.items[itemId];
+                return `<div class="equip-slot"><div class="equip-slot-label">${label}</div>
+                    <div class="equip-slot-name">${cfg.icon} ${cfg.name}</div>
+                    <div class="equip-slot-stats">${formatItemStats(itemId) || '无属性'}</div>
+                    <button class="btn btn-secondary equip-btn" onclick="unequipItem('${kind}', '${itemId}')">卸下</button></div>`;
+            };
+            let slots = slotCard('weapon', eq.weapon, '⚔️ 武器') + slotCard('armor', eq.armor, '🛡️ 护甲');
+            const jSlots = getJewelrySlots();
+            for (let i = 0; i < jSlots; i++) slots += slotCard('jewelry', (eq.jewelry || [])[i], `📿 饰品${jSlots > 1 ? i + 1 : ''}`);
+            if (jSlots < 2) {
+                const canBuy = gameState.player.realmIndex >= 9;
+                slots += `<div class="equip-slot locked"><div class="equip-slot-label">📿 饰品2</div>
+                    <div class="equip-slot-empty">🔒 第二饰品栏位</div>
+                    <div class="equip-slot-stats">${canBuy ? '可在商城购买（8000灵石）' : '金丹初期后可在商城购买'}</div>
+                    ${canBuy ? `<button class="btn btn-secondary equip-btn" onclick="switchPanel('shop')">去商城</button>` : ''}</div>`;
+            }
+            const temper = gameState.player.temperLevel || 0;
+            const forgeBonus = parseFloat(((SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1) - 1) * 100).toFixed(1));
+            const summary = `<div class="equip-summary">
+                <span>❤️ 生命 ${stats.hp.max}</span><span>⚔️ 攻击 ${stats.atk}</span><span>🛡️ 防御 ${stats.def}</span><span>💨 速度 ${stats.spd}</span>
+                <div class="equip-summary-sub">装备加成：淬炼 ${temper}/3（装备属性 +${temper * 10}%）${forgeBonus > 0 ? ` · 炼器等级（装备属性 +${forgeBonus}%）` : ''}</div></div>`;
+            // 背包里的装备
+            const bagItems = gameState.player.inventory.filter(i => isEquipmentItem(i.id));
+            let bag = '';
+            EQUIP_TYPES.forEach(type => {
+                const list = bagItems.filter(i => GAME_CONFIG.items[i.id].type === type);
+                if (!list.length) return;
+                bag += `<div class="equip-bag-title">${EQUIP_TYPE_NAMES[type]}（背包中）</div>` + list.map(i => {
+                    const cfg = GAME_CONFIG.items[i.id];
+                    return `<div class="equip-bag-row"><span class="equip-bag-name">${cfg.icon} ${cfg.name}${i.qty > 1 ? ' ×' + i.qty : ''}</span>
+                        <span class="equip-bag-stats">${formatItemStats(i.id)} ${describeEquipDiff(i.id)}</span>
+                        <button class="btn equip-btn" onclick="equipFromBag('${i.id}')">装备</button></div>`;
+                }).join('');
+            });
+            box.innerHTML = `<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（炼器可以打造，商城也有出售）</div>'}`;
+        }
+
+        // 旧存档迁移：装备曾同时保留在背包里，现在装备栏与背包分开。每件已装备的物品从背包扣掉 1 件；
+        // 已戴 ≥2 件饰品的老玩家自动送第二饰品栏位，超过 2 件的放回背包。
+        function migrateEquipmentSlots() {
+            if (gameState.equipSlotsV2 || !gameState.player) return;
+            const eq = gameState.player.equipment || (gameState.player.equipment = { weapon: null, armor: null, jewelry: [] });
+            if (!eq.jewelry) eq.jewelry = [];
+            const inv = gameState.player.inventory;
+            [eq.weapon, eq.armor, ...eq.jewelry].filter(Boolean).forEach(id => {
+                const it = inv.find(i => i.id === id);
+                if (it) { it.qty -= 1; if (it.qty <= 0) inv.splice(inv.indexOf(it), 1); }
+            });
+            if (!gameState.player.boughtUpgrades) gameState.player.boughtUpgrades = [];
+            if (eq.jewelry.length >= 2 && !gameState.player.boughtUpgrades.includes('jewelry_slot2')) gameState.player.boughtUpgrades.push('jewelry_slot2');
+            while (eq.jewelry.length > getJewelrySlots()) {
+                const id = eq.jewelry.pop();
+                const it = inv.find(i => i.id === id);
+                if (it) it.qty += 1; else inv.push({ id, qty: 1 });
+            }
+            gameState.equipSlotsV2 = true;
+        }
+
         function isItemEquipped(itemId) {
             const cfg = GAME_CONFIG.items[itemId];
             const eq = gameState.player.equipment;
@@ -4644,6 +4665,144 @@
                     { name: '幽冥鬼帝', hp: 5200, atk: 350, def: 110, spd: 55, icon: '💀' }
                 ]
             };
+
+        // ==================== 美术：怪物与功法图标（手绘矢量，同物品图标的画法） ====================
+        // 怪物按名字对应（战斗区域敌人与秘境怪物都用这张表）；功法按功法 id 对应。没有图标的仍用 emoji。
+        const MONSTER_ICONS = (() => {
+            const svg = icoSvg, sparkle = icoSparkle, leaf = icoLeaf;
+            const eye = (x, y, c, rx = 1.9, ry = 1.3) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${c}" stroke="none"/>`;
+            const glowEyes = (y, c, dx = 4.5) => eye(16 - dx, y, c) + eye(16 + dx, y, c);
+            const fangs = (y, w = 3) => `<path d="M${16 - w} ${y}L${16 - w + 0.7} ${y + 2.6}L${16 - w + 1.5} ${y}M${16 + w - 1.5} ${y}L${16 + w - 0.7} ${y + 2.6}L${16 + w} ${y}" fill="#fff" stroke-width=".7"/>`;
+
+            // —— 兽类 ——
+            const wolf = (c, d, e) => `<path d="M5 3L11 10H21L27 3L28 16Q28 26 16 29Q4 26 4 16Z" fill="${c}"/><path d="M7 7L10 10L8 12ZM25 7L22 10L24 12Z" fill="${d}" stroke="none"/><path d="M11 19Q16 17 21 19L19 25Q16 27 13 25Z" fill="${d}"/><circle cx="16" cy="20.5" r="1.5" fill="#2b2016" stroke="none"/><path d="M8.5 14L14 16L9.5 17.5ZM23.5 14L18 16L22.5 17.5Z" fill="${e}" stroke="none"/>${fangs(24.5, 2.4)}`;
+            const boar = c => `<path d="M4 9L10 6L11 11M28 9L22 6L21 11" fill="${c}"/><ellipse cx="16" cy="17" rx="12" ry="11" fill="${c}"/><ellipse cx="16" cy="21.5" rx="6.5" ry="4.6" fill="#d9a88a"/><circle cx="14" cy="21.5" r="1" fill="#4a2a20" stroke="none"/><circle cx="18" cy="21.5" r="1" fill="#4a2a20" stroke="none"/><path d="M9 23Q5 22 5.5 17Q9 19 11.5 23ZM23 23Q27 22 26.5 17Q23 19 20.5 23Z" fill="#f6f0dc"/>${eye(11, 14, '#ff5a3a', 1.5, 1.1)}${eye(21, 14, '#ff5a3a', 1.5, 1.1)}`;
+            const tiger = () => `<circle cx="7" cy="8" r="3.6" fill="#e8963a"/><circle cx="25" cy="8" r="3.6" fill="#e8963a"/><path d="M3 17Q3 6 16 6Q29 6 29 17Q29 27 16 29Q3 27 3 17Z" fill="#e8963a"/><path d="M13.5 6L16 12L18.5 6M4 15L9 16M4 20L9 19M28 15L23 16M28 20L23 19" stroke="#3a2418" stroke-width="1.6"/><ellipse cx="16" cy="22" rx="6.5" ry="5" fill="#f7ead0"/><path d="M14 20H18L16 22Z" fill="#c8503a"/><path d="M16 22V25M13 25Q16 27 19 25" stroke-width=".9"/>${eye(10.5, 15, '#ffe04a', 1.7, 1.2)}${eye(21.5, 15, '#ffe04a', 1.7, 1.2)}`;
+            const bear = () => `<circle cx="7" cy="8" r="4" fill="#7a5a3e"/><circle cx="25" cy="8" r="4" fill="#7a5a3e"/><ellipse cx="16" cy="17" rx="13" ry="12" fill="#7a5a3e"/><ellipse cx="16" cy="21.5" rx="6" ry="4.6" fill="#c9a880"/><ellipse cx="16" cy="19.5" rx="2.2" ry="1.6" fill="#2b2016" stroke="none"/>${eye(10.5, 14.5, '#ffcf4a', 1.4, 1.4)}${eye(21.5, 14.5, '#ffcf4a', 1.4, 1.4)}<path d="M8.5 12L13 13.5M23.5 12L19 13.5" stroke-width="1.5"/>${fangs(24.6, 2.2)}`;
+            const lion = () => `<path d="M16 1L20 5L25 3L26 8L31 10L28 15L31 20L26 22L25 27L20 27L16 31L12 27L7 27L6 22L1 20L4 15L1 10L6 8L7 3L12 5Z" fill="#c9922e"/><circle cx="16" cy="17" r="9" fill="#e8c46a"/><path d="M11 9L13 12M21 9L19 12M16 8V11" stroke="#8a5a1a" stroke-width="1"/>${eye(12.5, 15, '#7a2a1a', 1.4, 1.4)}${eye(19.5, 15, '#7a2a1a', 1.4, 1.4)}<path d="M14 18H18L16 20.5Z" fill="#8a3a2a"/><path d="M16 20.5V23M12.5 23Q16 25.5 19.5 23" stroke-width=".9"/><path d="M12 12L14 14M20 12L18 14" stroke="#fff4c4" stroke-width=".8"/>`;
+            const dragon = (c, h, e) => `<path d="M4 3Q9 6 10 12Q16 10 22 12Q23 6 28 3Q28 11 26 16Q28 23 22 27Q16 30 10 27Q4 23 6 16Q4 11 4 3Z" fill="${c}"/><path d="M11 19Q16 17 21 19Q21 25 16 26Q11 25 11 19Z" fill="${h}"/><circle cx="14" cy="21" r=".9" fill="#2b2016" stroke="none"/><circle cx="18" cy="21" r=".9" fill="#2b2016" stroke="none"/><path d="M8 14L13 15.5L9 17ZM24 14L19 15.5L23 17Z" fill="${e}" stroke="none"/><path d="M5 20Q2 20 1 23M27 20Q30 20 31 23" stroke="${h}"/>${fangs(25.5, 2.6)}`;
+            const turtle = () => `<path d="M3 23Q3 8 16 8Q29 8 29 23Z" fill="#6a4a8a"/><path d="M16 8V23M9 10L11 23M23 10L21 23M4 17H28" stroke="#3a2a4a" stroke-width=".9"/><path d="M3 23H29L27 27H5Z" fill="#a8946a"/><g fill="#8ff05a" stroke="none"><circle cx="8" cy="13" r="1.5"/><circle cx="24" cy="12" r="1.2"/><circle cx="22" cy="19" r="1.5"/></g><path d="M16 4Q10 4 10 9L22 9Q22 4 16 4Z" fill="#8ab06a"/>${eye(13.5, 6.5, '#d6ff5a', 1, 1)}${eye(18.5, 6.5, '#d6ff5a', 1, 1)}`;
+            const snake = () => `<path d="M7 27Q3 19 12 19Q21 19 22 13Q23 8 17 8" stroke="#2b2016" stroke-width="7.4"/><path d="M7 27Q3 19 12 19Q21 19 22 13Q23 8 17 8" stroke="#5fa06a" stroke-width="5.4"/><path d="M8 24Q7 21 11 21M18 17Q21 16 21 13" stroke="#c8e88a" stroke-width="1.2"/><ellipse cx="14" cy="6.5" rx="6" ry="4.6" fill="#5fa06a"/>${eye(12, 5.4, '#ffd84a', 1.3, 1.6)}${eye(16.5, 5.4, '#ffd84a', 1.3, 1.6)}<path d="M13 11L11 14M13 11L15 14" stroke="#c8443a" stroke-width="1"/>`;
+            const fox = () => `<path d="M3 3L11 10H21L29 3L28 17Q25 27 16 29Q7 27 4 17Z" fill="#f4ecdc"/><path d="M6 6L10 10L7 12ZM26 6L22 10L25 12Z" fill="#e88a9a" stroke="none"/><path d="M4 17L10 20M28 17L22 20" stroke="#c8503a" stroke-width="1.6"/><path d="M14.5 18H17.5L16 20Z" fill="#2b2016"/><path d="M8 14Q11 12.5 13.5 15M24 14Q21 12.5 18.5 15" stroke="#2b2016" stroke-width="1.4"/><path d="M16 5L18 8L16 11L14 8Z" fill="#7fe8f0" stroke="#3aa8b8" stroke-width=".8"/>${sparkle(26, 22, 2.4, '#bff8ff')}`;
+            const lizard = () => `<path d="M16 2L26 11L25 23Q16 30 7 23L6 11Z" fill="#c8503a"/><path d="M16 2V10M9 12L14 15M23 12L18 15" stroke="#ff9a3a" stroke-width="1.4"/><path d="M11 24L13 21M21 24L19 21" stroke="#8a2a1a"/>${eye(11, 15, '#ffe04a', 1.1, 2)}${eye(21, 15, '#ffe04a', 1.1, 2)}<path d="M16 26L14 30M16 26L18 30" stroke="#ff4a3a" stroke-width="1"/><path d="M13 20Q16 22 19 20" stroke-width=".9"/>`;
+            const butterfly = () => `<path d="M16 15Q6 2 3 8Q1 16 12 18Z" fill="#8a6ad8"/><path d="M16 15Q26 2 29 8Q31 16 20 18Z" fill="#8a6ad8"/><path d="M15 19Q5 20 6 27Q10 30 15 22ZM17 19Q27 20 26 27Q22 30 17 22Z" fill="#5a8ae0"/><circle cx="8" cy="10" r="2" fill="#f8e0ff" stroke="none"/><circle cx="24" cy="10" r="2" fill="#f8e0ff" stroke="none"/><rect x="14.6" y="9" width="2.8" height="16" rx="1.4" fill="#3a2a4a"/><path d="M15 9Q12 4 9 3M17 9Q20 4 23 3"/>${eye(16, 11, '#ff9ad8', 1, 1)}`;
+
+            // —— 幽魂 / 魔类 ——
+            const ghost = (c, e, mouth = 'o') => `<path d="M5 29V14Q5 3 16 3Q27 3 27 14V29L22.5 25L19.5 29L16 25L12.5 29L9.5 25Z" fill="${c}"/>${eye(11.5, 14, e, 2.2, 3)}${eye(20.5, 14, e, 2.2, 3)}${mouth === 'o' ? '<ellipse cx="16" cy="21" rx="2.2" ry="2.8" fill="#2b2016" stroke="none"/>' : '<path d="M9 20Q16 28 23 20Q16 22 9 20Z" fill="#2b2016"/><path d="M12 21.5V23M16 22.5V24.5M20 21.5V23" stroke="#fff" stroke-width=".9"/>'}`;
+            const demon = (c, horn, e, crown = false) => `<path d="M6 12Q1 6 6 1Q6 8 11 9ZM26 12Q31 6 26 1Q26 8 21 9Z" fill="${horn}"/>${crown ? `<path d="M10 9L12 4L14 8L16 3L18 8L20 4L22 9Z" fill="${horn}"/>` : ''}<path d="M5 17Q5 8 16 8Q27 8 27 17Q27 28 16 30Q5 28 5 17Z" fill="${c}"/><path d="M7 13L14 16M25 13L18 16" stroke="#2b2016" stroke-width="1.8"/>${eye(11, 17, e, 2.1, 1.3)}${eye(21, 17, e, 2.1, 1.3)}<path d="M9 24Q16 28 23 24" stroke="#2b2016" stroke-width="1.4"/>${fangs(24.5, 4)}`;
+            const skull = c => `<path d="M9 8L11 3L14 7L16 2L18 7L21 3L23 8Z" fill="#e2c27a"/><path d="M5 17Q5 7 16 7Q27 7 27 17Q27 22 23 24V29H9V24Q5 22 5 17Z" fill="${c}"/><ellipse cx="11" cy="17" rx="3.4" ry="3.8" fill="#1a1a2a"/><ellipse cx="21" cy="17" rx="3.4" ry="3.8" fill="#1a1a2a"/><circle cx="11" cy="17.5" r="1.3" fill="#5affc8" stroke="none"/><circle cx="21" cy="17.5" r="1.3" fill="#5affc8" stroke="none"/><path d="M14.5 22L16 20L17.5 22ZM12 26V29M16 26V29M20 26V29" stroke-width=".9"/>`;
+            const golem = (c, g, extra = '') => `<path d="M8 6H24L27 11V22L24 28H8L5 22V11Z" fill="${c}"/><path d="M8 6L12 12M24 6L20 12M5 22L10 20M27 22L22 20" stroke="#2b2016" stroke-width=".9" opacity=".8"/><rect x="8" y="12" width="16" height="5" rx="1.5" fill="#1a1612"/><rect x="10" y="13.4" width="4.4" height="2.2" fill="${g}" stroke="none"/><rect x="17.6" y="13.4" width="4.4" height="2.2" fill="${g}" stroke="none"/><path d="M11 22H21" stroke="${g}" stroke-width="1.6"/>${extra}`;
+            const vortex = (c, e) => `<circle cx="16" cy="16" r="13" fill="#1c1430"/><path d="M16 4A12 12 0 0 1 28 16A9 9 0 0 1 16 25A6 6 0 0 1 10 16A3.5 3.5 0 0 1 16 14" stroke="${c}" stroke-width="2.6"/><circle cx="16" cy="16" r="2.2" fill="${e}" stroke="none"/>${sparkle(5, 6, 2)}${sparkle(27, 27, 1.8)}`;
+            const hood = (c, e, face = '#1a1420') => `<path d="M16 2Q4 5 4 17L7 29H25L28 17Q28 5 16 2Z" fill="${c}"/><path d="M16 7Q8 9 9 18Q10 24 16 25Q22 24 23 18Q24 9 16 7Z" fill="${face}"/>${eye(12.5, 16, e, 1.8, 1.2)}${eye(19.5, 16, e, 1.8, 1.2)}<path d="M16 3V7M7 24L9 28M25 24L23 28" stroke-width=".8" opacity=".7"/>`;
+            const eyeTent = (c, e) => `<path d="M6 16Q1 22 5 29M11 21Q7 27 10 30M21 21Q25 27 22 30M26 16Q31 22 27 29" stroke="${c}" stroke-width="3"/><circle cx="16" cy="14" r="11" fill="${c}"/><path d="M6 14Q16 5 26 14Q16 23 6 14Z" fill="#e8f0ff"/><circle cx="16" cy="14" r="4.6" fill="${e}"/><ellipse cx="16" cy="14" rx="1.4" ry="3.8" fill="#0a1020" stroke="none"/>`;
+            const ancient = () => `<path d="M3 30Q2 22 8 20L6 10Q10 8 12 12Q16 8 20 12Q22 8 26 10L24 20Q30 22 29 30Z" fill="#3a1a2a"/><path d="M8 20Q16 25 24 20" stroke="#ff4a5a" stroke-width="1.4"/><path d="M8 15Q16 6 24 15Q16 24 8 15Z" fill="#f0d8c0"/><circle cx="16" cy="15" r="4.2" fill="#c8203a"/><ellipse cx="16" cy="15" rx="1.2" ry="3.4" fill="#1a0a10" stroke="none"/>${sparkle(5, 7, 2, '#ff9aa8')}${sparkle(27, 6, 2, '#ff9aa8')}`;
+
+            // —— 塔 / 林 / 遗迹 / 劫 / 梦 ——
+            const sage = (robe, trim, hair = '#e8e0d0', face = '#e8c8a0') => `<path d="M3 30Q4 21 16 20Q28 21 29 30Z" fill="${robe}"/><path d="M16 20L12 30M16 20L20 30" stroke="${trim}" stroke-width="1.2"/><path d="M8 11Q8 4 16 3Q24 4 24 11Z" fill="${trim}"/><path d="M12 3L16 0L20 3" fill="${trim}"/><ellipse cx="16" cy="13" rx="6.6" ry="7.4" fill="${face}"/><path d="M10 17Q16 30 22 17Q16 22 10 17Z" fill="${hair}"/><path d="M11 12H14M18 12H21" stroke-width="1.3"/>`;
+            const flower = () => `<g fill="#c8443a"><ellipse cx="16" cy="6" rx="4" ry="5.5"/><ellipse cx="6" cy="12" rx="4" ry="5.5" transform="rotate(-60 6 12)"/><ellipse cx="26" cy="12" rx="4" ry="5.5" transform="rotate(60 26 12)"/><ellipse cx="9" cy="22" rx="4" ry="5.5" transform="rotate(-125 9 22)"/><ellipse cx="23" cy="22" rx="4" ry="5.5" transform="rotate(125 23 22)"/></g><circle cx="16" cy="16" r="8" fill="#7a2a4a"/><path d="M9 15Q16 21 23 15Q16 27 9 15Z" fill="#1a0a14"/><path d="M11 15.5L12.6 19L14 16M18 16L19.4 19L21 15.5" fill="#fff" stroke-width=".7"/>${eye(12.5, 12, '#ffd84a', 1.3, 1)}${eye(19.5, 12, '#ffd84a', 1.3, 1)}`;
+            const miasma = () => `<path d="M6 24Q1 22 3 17Q2 12 8 12Q9 6 16 7Q23 6 24 12Q30 12 29 18Q31 24 25 25Q20 28 16 26Q10 28 6 24Z" fill="#7a8a4a"/>${eye(11.5, 17, '#3a1a10', 2.2, 2.6)}${eye(20.5, 17, '#3a1a10', 2.2, 2.6)}${eye(11.5, 17, '#c8ff5a', 0.9, 1.3)}${eye(20.5, 17, '#c8ff5a', 0.9, 1.3)}<path d="M11 23Q16 26 21 23" stroke-width="1.2"/><g fill="#c8e86a" stroke="none" opacity=".8"><circle cx="6" cy="8" r="1.3"/><circle cx="26" cy="6" r="1"/><circle cx="4" cy="26" r="1"/></g>`;
+            const treant = () => `<path d="M5 6Q0 4 2 10Q4 12 8 12M27 6Q32 4 30 10Q28 12 24 12" stroke="#5a3a20" stroke-width="2.4"/><circle cx="6" cy="6" r="4" fill="#5fa060"/><circle cx="26" cy="6" r="4" fill="#5fa060"/><circle cx="16" cy="6" r="6" fill="#4f9050"/><path d="M8 10H24L26 30H6Z" fill="#7a5230"/><path d="M11 12V28M20 12V26M8 22Q11 20 12 24" stroke="#4a2e18" stroke-width=".8"/>${eye(12, 16, '#ffe04a', 2.2, 1.6)}${eye(20, 16, '#ffe04a', 2.2, 1.6)}<path d="M11 23Q16 27 21 23Q16 25 11 23Z" fill="#1a0e08"/>`;
+            const grassSpirit = () => `<path d="M16 2Q28 12 25 24Q22 30 16 30Q10 30 7 24Q4 12 16 2Z" fill="#7fc070"/><path d="M16 4V28M16 14L10 10M16 19L22 15" stroke="#3f7a3f" stroke-width=".9"/>${eye(12, 17, '#1a3a1a', 1.6, 2.2)}${eye(20, 17, '#1a3a1a', 1.6, 2.2)}<path d="M13 23Q16 25 19 23" stroke-width="1.1"/>${sparkle(26, 6, 2, '#eaffd0')}${sparkle(5, 23, 1.8, '#eaffd0')}`;
+            const heartForest = () => `<path d="M16 29Q1 19 3 10Q5 4 11 5Q15 6 16 10Q17 6 21 5Q27 4 29 10Q31 19 16 29Z" fill="#4f9a55"/><path d="M8 9Q12 8 14 12M24 10Q20 9 18 13M16 12V27M10 16L16 20L22 16" stroke="#c8f8a0" stroke-width=".9"/><path d="M16 29V31M12 27L9 31M20 27L23 31" stroke="#6a4a2a" stroke-width="1.6"/>${leaf(21, 6, -70, 8, '#8adc7a')}${leaf(11, 6, -110, 8, '#8adc7a')}<circle cx="16" cy="15" r="2.4" fill="#f8ffc8" stroke="none"/>${sparkle(6, 22, 2, '#f8ffc8')}${sparkle(27, 21, 2, '#f8ffc8')}`;
+            const helm = (c, e) => `<path d="M16 1L21 5V8L26 10V22L22 29H10L6 22V10L11 8V5Z" fill="${c}"/><path d="M11 12H21V19H11Z" fill="#141018"/><path d="M11 15.5H21M16 12V19" stroke="${c}" stroke-width=".8"/>${eye(13.5, 15.5, e, 1.3, 1)}${eye(18.5, 15.5, e, 1.3, 1)}<path d="M16 1V8M9 24H23" stroke="#141018" stroke-width=".8" opacity=".6"/>`;
+            const rift = () => `<path d="M17 1L12 10L18 13L11 21L16 24L10 31L22 19L17 16L23 11L18 8Z" fill="#160e2a"/><path d="M14 10L18 13L12 21L16 24L15 26L20 18L16 16L21 12Z" fill="#a86af0" stroke="none"/><path d="M5 8L9 12M27 22L23 20M4 22L8 20M27 8L22 12" stroke="#6a4ab8" stroke-width="1.2"/>${sparkle(16, 17, 2.6, '#f4e6ff')}`;
+            const shard = () => `<path d="M16 2L26 14L20 30L8 22L6 10Z" fill="#f0d68a"/><path d="M16 2L15 16L20 30M6 10L15 16L26 14M8 22L15 16" stroke="#fff6d0" stroke-width=".9"/><path d="M16 2L6 10L15 16Z" fill="#c9a04a" stroke="none" opacity=".8"/><path d="M11 12L13 14M19 18L21 16M14 22H17" stroke="#7a5a1a" stroke-width="1"/>${sparkle(26, 4, 2.4)}${sparkle(4, 26, 2)}`;
+            const stoneFace = (c, g) => `<path d="M4 30V13L9 5H23L28 13V30Z" fill="${c}"/><path d="M9 5L11 12M23 5L21 12M4 13H28" stroke="#2b2016" stroke-width=".8" opacity=".7"/><path d="M8 14H14L13 19H9ZM24 14H18L19 19H23Z" fill="#141018"/>${eye(11, 16.5, g, 1.5, 1.3)}${eye(21, 16.5, g, 1.5, 1.3)}<path d="M13 25H19M14.5 21L16 24L17.5 21" stroke="${g}" stroke-width="1.3"/><path d="M12 3L16 0L20 3" fill="${g}" stroke="none"/>`;
+            const stormCloud = () => `<path d="M6 20Q1 19 3 13Q4 9 9 10Q10 4 17 5Q24 4 24 10Q30 10 29 16Q30 21 25 21Z" fill="#4a5470"/>${eye(12, 13, '#ffe04a', 2, 1.4)}${eye(21, 13, '#ffe04a', 2, 1.4)}<path d="M13 17Q16 19 19 17" stroke-width="1.2"/><path d="M15 21L11 27H15L12 32M22 21L19 26H22" stroke="#ffe04a" stroke-width="1.6"/>`;
+            const core = () => `<circle cx="16" cy="16" r="12" fill="#3a4a8a"/><circle cx="16" cy="16" r="8.5" fill="#6a8ae8"/><path d="M18 5L11 17H16L13 27L22 14H17Z" fill="#fff06a" stroke="#a88a1a" stroke-width=".8"/><path d="M3 10L6 12M29 10L26 12M3 22L6 20M29 22L26 20" stroke="#ffe04a" stroke-width="1.3"/>`;
+            const willEye = (c, ring) => `<circle cx="16" cy="15" r="13.5" stroke="${ring}" stroke-width="1.2" opacity=".85"/><path d="M4 15Q16 3 28 15Q16 27 4 15Z" fill="#f4f0e8"/><circle cx="16" cy="15" r="6" fill="${c}"/><ellipse cx="16" cy="15" rx="1.8" ry="5" fill="#0a1020" stroke="none"/><circle cx="14" cy="13" r="1.3" fill="#fff" stroke="none"/><path d="M7 29L9 25M16 30V26M25 29L23 25" stroke="${ring}" stroke-width="1.4"/>`;
+            const soulFig = c => `<path d="M16 3Q9 3 9 10Q9 15 13 17Q4 19 3 30H29Q28 19 19 17Q23 15 23 10Q23 3 16 3Z" fill="${c}" opacity=".92"/>${eye(13, 10, '#1a2a5a', 1.5, 2)}${eye(19, 10, '#1a2a5a', 1.5, 2)}<path d="M14 14Q16 15.5 18 14" stroke-width="1"/><path d="M4 26L28 24M6 29L26 28" stroke="#fff" stroke-width=".7" opacity=".7"/>${sparkle(26, 6, 2, '#eaf8ff')}`;
+            const maw = () => `<circle cx="16" cy="16" r="14" fill="#1a1024"/><circle cx="16" cy="16" r="9" fill="#5a1a3a"/><circle cx="16" cy="16" r="4.5" fill="#0a0410"/><g fill="#f4ecd8" stroke-width=".7"><path d="M16 2L14 8H18Z"/><path d="M28 10L22 12L24 16Z"/><path d="M28 22L23 19L22 24Z"/><path d="M16 30L18 24H14Z"/><path d="M4 22L9 19L10 24Z"/><path d="M4 10L10 12L8 16Z"/></g>`;
+            const dreamSprite = () => `<path d="M22 3Q8 4 8 18Q8 29 21 29Q12 26 13 17Q14 8 22 3Z" fill="#c8a8f0"/><path d="M16 12Q22 8 26 14Q28 22 22 27Q24 20 16 12Z" fill="#f0c8e8"/>${eye(14.5, 19, '#3a2a5a', 1.6, .7)}<path d="M13 22Q15 23.5 17 22" stroke-width="1"/><path d="M24 6L27 6L24 9L27 9M27 13L29.5 13L27 16" stroke="#fff" stroke-width="1"/>${sparkle(6, 6, 2)}${sparkle(28, 26, 2)}`;
+            const shadowFace = () => `<path d="M3 30Q3 8 16 4Q29 8 29 30Z" fill="#241a2e"/><path d="M6 8L9 3L11 8M15 6L16 1L18 6M21 8L24 3L26 8" fill="#3a2a4a"/><path d="M7 16Q12 12 14 17ZM25 16Q20 12 18 17Z" fill="#ff3a4a" stroke="none"/><path d="M8 22Q16 32 24 22Q16 25 8 22Z" fill="#ff3a4a"/><path d="M11 23.5L12 25.5L13.5 24.5M18.5 24.5L20 25.5L21 23.5" fill="#fff" stroke-width=".6"/>`;
+            const multiGolem = () => golem('#8a6a9a', '#7fe8ff', `<circle cx="9" cy="8" r="1.6" fill="#ff6a6a" stroke="none"/><circle cx="16" cy="7" r="1.6" fill="#ffe04a" stroke="none"/><circle cx="23" cy="8" r="1.6" fill="#6ae88a" stroke="none"/><circle cx="7" cy="25" r="1.5" fill="#6a9aff" stroke="none"/><circle cx="25" cy="25" r="1.5" fill="#e86aff" stroke="none"/>`);
+            const yinSage = () => `<path d="M3 30Q4 21 16 20Q28 21 29 30Z" fill="#3a3a48"/><path d="M8 11Q8 4 16 3Q24 4 24 11Z" fill="#2a2a34"/><path d="M16 5A8 8 0 0 1 16 21A4 4 0 0 1 16 13A4 4 0 0 0 16 5Z" fill="#f4f0e8" stroke="none"/><path d="M16 5A8 8 0 0 0 16 21A4 4 0 0 0 16 13A4 4 0 0 1 16 5Z" fill="#1c1c26" stroke="none"/><circle cx="16" cy="9" r="1.1" fill="#1c1c26" stroke="none"/><circle cx="16" cy="17" r="1.1" fill="#f4f0e8" stroke="none"/><circle cx="16" cy="13" r="8" stroke-width="1"/>`;
+            const supremeSage = () => `<circle cx="16" cy="11" r="10.5" stroke="#f3d36a" stroke-width="1.4" opacity=".9"/>${sage('#e8e4f4', '#8a6ad8', '#f4f0f8')}${sparkle(4, 5, 2.2)}${sparkle(28, 5, 2.2)}<path d="M10 25H22" stroke="#8a6ad8" stroke-width="1.2"/>`;
+
+            return {
+                野狼: svg(wolf('#8a8a92', '#c9c9d0', '#f3d36a')),
+                灵狼: svg(wolf('#7fb0d8', '#dceeff', '#6affff') + sparkle(27, 6, 2.2, '#dffcff')),
+                野猪: svg(boar('#8a6a4a')),
+                虎妖: svg(tiger()),
+                熊妖: svg(bear()),
+                恶魔: svg(demon('#b8443a', '#3a2a20', '#ffd84a')),
+                灵兽: svg(fox()),
+                毒兽: svg(turtle()),
+                蛇妖: svg(snake()),
+                魔王: svg(demon('#6a3a8a', '#e2b84a', '#ff4a4a', true)),
+                深渊生物: svg(eyeTent('#2a3a6a', '#6ac8ff')),
+                金甲兽: svg(lion()),
+                雷劫残魂: svg(ghost('#c8d0f0', '#ffe04a') + '<path d="M25 2L21 8H25L22 13" stroke="#ffe04a" stroke-width="1.6"/>'),
+                天雷傀儡: svg(golem('#8a94b8', '#ffe04a', '<path d="M16 22L14 26H17L15 30" stroke="#ffe04a" stroke-width="1.4"/>')),
+                虚空生物: svg(vortex('#8a5ad8', '#e6d0ff')),
+                噬魂者: svg(ghost('#6ab88a', '#f0fff0', 'maw')),
+                深渊领主: svg(demon('#1e2440', '#5a78c8', '#6ac8ff', true)),
+                古神残影: svg(ancient()),
+                混沌兽: svg(dragon('#5a4a7a', '#8a7ab8', '#ff6adf')),
+                虚空行者: svg(hood('#3a2a6a', '#c8a0ff')),
+                九幽魔君: svg(demon('#3a2a5a', '#8a5ad8', '#ff6adf', true) + '<path d="M16 8Q19 4 16 0Q13 4 16 8Z" fill="#a86aff" stroke="none"/>'),
+                幽冥鬼帝: svg(skull('#d8e0d0')),
+                // 秘境怪物
+                塔灵傀儡: svg(golem('#b08d5a', '#7fe8d8')),
+                灵雾幽魂: svg(ghost('#a8d8ea', '#5a9ad8')),
+                火纹蜥蜴: svg(lizard()),
+                土甲石像: svg(golem('#8a7a5a', '#e0a040', '<path d="M5 11L2 6L8 8M27 11L30 6L24 8" fill="#8a7a5a"/>')),
+                玄机子: svg(sage('#4a7a8a', '#2a5a6a')),
+                食人花妖: svg(flower()),
+                腐沼瘴气: svg(miasma()),
+                幻影蝶: svg(butterfly()),
+                古树守卫: svg(treant()),
+                灵草魅影: svg(grassSpirit()),
+                森林之心: svg(heartForest()),
+                残魂守卫: svg(helm('#5a6a9a', '#7fe8ff')),
+                空间裂隙: svg(rift()),
+                冰晶傀儡: svg(golem('#a8d8ec', '#e8ffff', '<path d="M8 6L6 1L11 5M24 6L26 1L21 5" fill="#d8f4ff"/>')),
+                法则残片: svg(shard()),
+                遗迹意志: svg(stoneFace('#7a7a6a', '#ffd84a')),
+                劫云化身: svg(stormCloud()),
+                雷劫核心: svg(core()),
+                天劫意志: svg(willEye('#5a78d8', '#ffe04a')),
+                元神残影: svg(soulFig('#bcd8f0')),
+                虚空吞噬者: svg(maw()),
+                神识傀儡: svg(golem('#7a5aa8', '#e8d0ff', '<circle cx="16" cy="8.5" r="2" fill="#e8d0ff"/><circle cx="16" cy="8.5" r=".8" fill="#3a1a6a" stroke="none"/>')),
+                幻梦妖灵: svg(dreamSprite()),
+                化神意志: svg(willEye('#5ab8c8', '#8fe8f0')),
+                幻境行者: svg(hood('#6a8ab8', '#e0f0ff', '#2a3a5a')),
+                虚实道人: svg(yinSage()),
+                万象傀儡: svg(multiGolem()),
+                心魔化身: svg(shadowFace()),
+                太虚道主: svg(supremeSage())
+            };
+        })();
+
+        const ART_ICONS = (() => {
+            const svg = icoSvg, sparkle = icoSparkle, leaf = icoLeaf;
+            // 功法册：封皮颜色 + 封面徽记
+            const book = (cover, spine, mark) => `<path d="M6 4H24Q26 4 26 6V27Q26 29 24 29H6Z" fill="${cover}"/><path d="M6 4V29" stroke="${spine}" stroke-width="3.4"/><path d="M8 27H24" stroke="#f0e6c8" stroke-width="1.2" opacity=".8"/><rect x="11" y="8" width="11" height="14" rx="1.2" fill="#efe2bc" opacity=".92"/>${mark}<path d="M8 2V7" stroke="#b08d5a" stroke-width="1.6"/>`;
+            const m = s => `<g transform="translate(16.5 15)">${s}</g>`;
+            return {
+                basic_art: svg(book('#8a7a5a', '#5a4a30', m('<path d="M0 -4Q4 -4 4 0Q4 4 0 4Q-2.6 4 -2.6 1.6Q-2.6 -.6 -.6 -.6" stroke="#6a4a2a" stroke-width="1.2"/>'))),
+                advanced_art: svg(book('#3a5a8a', '#22385a', m('<circle r="4" stroke="#2a3a6a" stroke-width="1.2"/><circle r="1.6" fill="#2a3a6a" stroke="none"/>'))),
+                qingmu_art: svg(book('#4f8a55', '#2f5a35', m('<path d="M0 5V-4M0 1L-3.4 -2M0 -1L3.4 -4" stroke="#2f5a35" stroke-width="1.2"/>'))),
+                liuyun_art: svg(book('#7a9ab8', '#4a6a88', m('<path d="M-4.5 3Q-5.5 -1 -2 -1Q-1.5 -4.6 2 -3.4Q5.4 -3.4 4.5 0Q6 3 3 3Z" fill="#fff" stroke="#4a6a88" stroke-width="1"/>'))),
+                xuanshui_art: svg(book('#3a6a9a', '#224466', m('<path d="M0 -5Q4.4 1 3.2 3.4Q2 5.4 0 5.4Q-2 5.4 -3.2 3.4Q-4.4 1 0 -5Z" fill="#7fc8ff" stroke="#224466" stroke-width="1"/>'))),
+                lieyang_art: svg(book('#c8843a', '#8a5a1a', m('<circle r="2.6" fill="#ffd84a" stroke="#8a5a1a" stroke-width="1"/><path d="M0 -6V-4M0 6V4M-6 0H-4M6 0H4M-4.2 -4.2L-3 -3M4.2 4.2L3 3M-4.2 4.2L-3 3M4.2 -4.2L3 -3" stroke="#c8683a" stroke-width="1"/>'))),
+                golden_art: svg(book('#c9a04a', '#8a6a22', m('<circle r="3.8" fill="#f3d36a" stroke="#8a6a22" stroke-width="1"/><path d="M-2 .6Q0 -2.4 2 .6Q0 2 -2 .6Z" stroke="#8a6a22" stroke-width=".9"/>')) + sparkle(25, 5, 2.4)),
+                fire_art: svg(book('#b8443a', '#7a2a22', m('<path d="M0 -5.6Q3.6 -1 3.4 2Q3 5.4 0 5.4Q-3 5.4 -3.4 2Q-3.6 -1 0 -5.6Z" fill="#ff8a3a" stroke="#7a2a22" stroke-width=".9"/><path d="M0 0Q1.8 2 1.4 3.6Q1 4.6 0 4.6Q-1 4.6 -1.4 3.6Q-1.8 2 0 0Z" fill="#ffe04a" stroke="none"/>'))),
+                yuanying_art: svg(book('#a83a5a', '#6a2238', m('<circle cy="-2.4" r="2.2" fill="#ffe8d0" stroke="#6a2238" stroke-width=".9"/><path d="M-3.4 5Q0 -1 3.4 5Z" fill="#ffe8d0" stroke="#6a2238" stroke-width=".9"/>')) + sparkle(25, 6, 2.2)),
+                soul_art: svg(book('#3a2f6a', '#1f1840', m('<path d="M0 -5A5 5 0 0 1 5 0A3.2 3.2 0 0 1 0 2A1.6 1.6 0 0 1 -1.4 0" stroke="#3a2f6a" stroke-width="1.2"/><circle r=".8" fill="#3a2f6a" stroke="none"/>')) + sparkle(24, 5, 2.4) + sparkle(9, 26, 1.6)),
+                huashen_art: svg(book('#5ab0b8', '#2f7a82', m('<circle r="5" stroke="#2f7a82" stroke-width=".9"/><g fill="#2f7a82" stroke="none"><circle cy="-3" r=".9"/><circle cy="3" r=".9"/><circle cx="-3" r=".9"/><circle cx="3" r=".9"/><circle r="1.1"/></g>')) + sparkle(25, 5, 2.4, '#dffcff')),
+                primordial_art: svg(book('#2a2a3a', '#111118', m('<path d="M0 -5A5 5 0 0 1 0 5A2.5 2.5 0 0 1 0 0A2.5 2.5 0 0 0 0 -5Z" fill="#1c1c26" stroke="none"/><path d="M0 -5A5 5 0 0 0 0 5A2.5 2.5 0 0 0 0 0A2.5 2.5 0 0 1 0 -5Z" fill="#fff" stroke="none"/><circle r="5" stroke="#1c1c26" stroke-width=".9"/>')) + sparkle(25, 5, 2.4))
+            };
+        })();
+
+        // 把手绘图标写回：敌人 / 秘境怪物按名字，功法按 id（商店与功法表）
+        (function applyMonsterAndArtIcons() {
+            Object.values(BATTLE_ENEMY_CONFIGS).forEach(list => list.forEach(e => { if (MONSTER_ICONS[e.name]) e.icon = MONSTER_ICONS[e.name]; }));
+            Object.values(GAME_CONFIG.dungeons).forEach(d => (d.monsters || []).forEach(mo => { if (MONSTER_ICONS[mo.name]) mo.icon = MONSTER_ICONS[mo.name]; }));
+            Object.keys(ART_ICONS).forEach(id => { if (CULTIVATION_ARTS[id]) CULTIVATION_ARTS[id].icon = ART_ICONS[id]; });
+            (GAME_CONFIG.shop.arts || []).forEach(a => { if (ART_ICONS[a.id]) a.icon = ART_ICONS[a.id]; });
+        })();
 
         // 按区域随机生成一个敌人（在线战斗与离线自动战斗共用）
         function createAreaEnemy(areaKey) {
@@ -6662,7 +6821,7 @@
                 itemDiv.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: start; gap: 10px;">
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; color: #c2a25f; font-size: 1em;">${art.name}</div>
+                            <div style="font-weight: bold; color: #c2a25f; font-size: 1em;">${art.icon || ''} ${art.name}</div>
                             <div style="font-size: 0.85em; color: #aaa; margin-top: 4px;">${art.description}</div>
                             <div style="font-size: 0.8em; color: #888; margin-top: 6px;">
                                 修炼速度倍率：<span style="color: #7d9bb5;">${art.speedMultiplier.toFixed(2)}x</span>
@@ -6884,6 +7043,7 @@
 
         // ==================== 页面加载 ====================
         window.addEventListener('load', () => {
+            fillIconSlots();
             populateRootOptions();
             loadGame();
         });

@@ -1853,3 +1853,28 @@ body.fx-shake .container { animation: fxShake 0.12s linear infinite; }
 .item-icon .ico { width: 2.1em; height: 2.1em; }
 #itemIcon .ico, #buyIcon .ico { width: 1.1em; height: 1.1em; }
 .food-icon .ico { width: 1.3em; height: 1.3em; }
+
+/* 怪物立绘：战斗界面里放大显示 */
+.monster-sprite .ico { width: 1em; height: 1em; vertical-align: baseline; filter: drop-shadow(2px 3px 3px rgba(0,0,0,.6)); }
+
+/* 配方卡片：名称 → 耗时 → 产出大图 → 产出 / 消耗 → 进度条 → 精通条（参考主流放置游戏的卡片层级） */
+.action-list { grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); }
+.action-item { justify-content: flex-start; align-items: stretch; gap: 3px; padding: 12px 12px 10px; }
+.rc-name { font-size: 1.02em; letter-spacing: .04em; }
+.rc-meta { font-size: 0.78em; margin: 0; }
+.rc-art { font-size: 40px; line-height: 1; height: 54px; display: flex; align-items: center; justify-content: center; margin: 6px 0 4px; }
+.rc-art .ico { width: 1.25em; height: 1.25em; filter: drop-shadow(0 2px 2px rgba(0,0,0,.55)); }
+.rc-art.locked { opacity: .55; filter: grayscale(1); font-size: 30px; }
+.action-item .recipe-output { margin: 0; }
+.action-item .action-progress-bar { margin-top: auto; }
+.rc-mastery { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; font-size: 0.72em; }
+.rc-mastery .mastery-track { flex: 1; max-width: none; margin: 0; }
+.rc-mlv { flex: none; padding: 0 5px; border: 1px solid var(--border-l2); border-radius: 2px; background: var(--bg-l1); white-space: nowrap; }
+.rc-mlv b { margin-left: 2px; }
+.rc-mtxt { flex: none; color: var(--text-l4); }
+.rc-mastery .infuse-btn { margin: 0; flex: none; }
+.action-item .clone-btn { margin: 6px 0 0; }
+
+/* 修为 / 灵石图标占位（静态页面里的 data-ico） */
+[data-ico] .ico { width: 1.15em; height: 1.15em; }
+.coin-display [data-ico] .ico { width: 1.3em; height: 1.3em; }
