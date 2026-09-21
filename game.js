@@ -1137,8 +1137,19 @@
             renderPlotBar();
         }
 
+        let lastTickWall = 0;
         function startGameTick() {
+            lastTickWall = Date.now();
             tickInterval = setInterval(() => {
+                // 页面可见但循环断了很久（电脑休眠、浏览器冻结）：没有 visibilitychange，这里按离线结算
+                const wall = Date.now();
+                if (lastTickWall && wall - lastTickWall > 10000 && !document.hidden && gameRunning) {
+                    gameState.lastActiveTime = lastTickWall;
+                    lastTickWall = wall;
+                    resumeAfterAway();
+                    return;
+                }
+                lastTickWall = wall;
                 tickFarmPlot();
                 tickClone();
                 if (!gameState.currentAction) return;
@@ -5999,7 +6010,9 @@
         function saveGame() {
             if (!currentSlot) return;   // 还没选择存档槽位（存档选择界面）时不保存
             gameState.lastSaveTime = Date.now();
-            gameState.lastActiveTime = gameState.lastSaveTime;
+            // 页面在后台时，后台的自动存档不能刷新「最后活跃时间」，否则回来时只按最后一次自动存档算离线，离线收益几乎为 0
+            // （切到后台那一刻的时间由 visibilitychange 显式记录）
+            if (!document.hidden) gameState.lastActiveTime = gameState.lastSaveTime;
             try {
                 localStorage.setItem(slotKey(currentSlot), JSON.stringify(gameState));
             } catch (e) {
@@ -6792,26 +6805,32 @@
 
         // 页面被隐藏（切标签页、锁屏、切应用）时浏览器会限制甚至冻结定时器：
         // 隐藏时暂停游戏循环，切回前台按离线规则补算；战斗只暂停不结算、不中断。
+        // 离开一段时间回来后的结算：切后台 / 电脑休眠 / 页面卡住都走这里；调用前 gameState.lastActiveTime 应是离开的那一刻
+        function resumeAfterAway() {
+            const action = gameState.currentAction;
+            const autoBattling = !!(action && action.isBattle && getAutoBattle().enabled);
+            if (autoBattling && (Date.now() - gameState.lastActiveTime) >= 10000) {
+                handleOfflineTime(60);   // 循环战斗：后台期间按离线规则模拟战斗
+            } else if (action && (action.isBattle || action.isDungeon)) {
+                const awaySecs = (Date.now() - gameState.lastActiveTime) / 1000;
+                settleCloneOffline(awaySecs);   // 主角在战斗时，分身与第二块田仍按离线结算
+                settleFarmPlotOffline(awaySecs);
+                gameState.lastActiveTime = Date.now();
+            } else {
+                handleOfflineTime(60);
+            }
+            clearInterval(tickInterval);
+            startGameTick();
+            updateUI();
+        }
+
         document.addEventListener('visibilitychange', () => {
             if (!gameRunning) return;
             if (document.hidden) {
+                gameState.lastActiveTime = Date.now();   // 记下离开的时刻（后台自动存档不会再改它）
                 saveGame();
                 clearInterval(tickInterval);
             } else {
-                const action = gameState.currentAction;
-                const autoBattling = !!(action && action.isBattle && getAutoBattle().enabled);
-                if (autoBattling && (Date.now() - gameState.lastActiveTime) >= 10000) {
-                    handleOfflineTime(60);   // 自动战斗托管：后台期间按离线规则模拟战斗
-                } else if (action && (action.isBattle || action.isDungeon)) {
-                    const awaySecs = (Date.now() - gameState.lastActiveTime) / 1000;
-                    settleCloneOffline(awaySecs);   // 主角在战斗时，分身与第二块田仍按离线结算
-                    settleFarmPlotOffline(awaySecs);
-                    gameState.lastActiveTime = Date.now();
-                } else {
-                    handleOfflineTime(60);
-                }
-                clearInterval(tickInterval);
-                startGameTick();
-                updateUI();
+                resumeAfterAway();
             }
         });
