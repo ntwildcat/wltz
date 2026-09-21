@@ -1817,7 +1817,8 @@
         // P1-4 从秘径撤退（模态对话框版本）
         function retreatFromDungeon() {
             const isNormalBattle = !!(gameState.currentAction && gameState.currentAction.isBattle);
-            if (!isNormalBattle && gameState.dungeons.battleState !== 'fighting') return;
+            // 秘境里随时可以撤退：只要还在秘境中即可（击败第一只怪后 battleState 会变成 monster_dead，不能再要求 'fighting'）
+            if (!isNormalBattle && !gameState.dungeons.currentDungeon) return;
 
             // 显示自定义确认模态框
             const modal = document.createElement('div');
