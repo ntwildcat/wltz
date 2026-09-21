@@ -1878,3 +1878,11 @@ body.fx-shake .container { animation: fxShake 0.12s linear infinite; }
 /* 修为 / 灵石图标占位（静态页面里的 data-ico） */
 [data-ico] .ico { width: 1.15em; height: 1.15em; }
 .coin-display [data-ico] .ico { width: 1.3em; height: 1.3em; }
+
+/* 战斗面板顶部：生命值与战斗外进食 */
+.hp-restore-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 12px; padding: 8px 12px; border: 1px solid var(--border-l3); background: var(--bg-l3); font-size: 0.85em; }
+.hp-restore-bar .hp-rest-text b { color: var(--text-l1); }
+.hp-restore-bar .hp-rest-food { color: var(--text-l3); }
+.hp-restore-bar .btn { padding: 2px 10px; font-size: 0.95em; }
+.hp-restore-bar .btn:disabled { opacity: .45; cursor: not-allowed; }
+.hp-restore-bar .hp-rest-hint { color: var(--text-l4); font-size: 0.9em; margin-left: auto; }

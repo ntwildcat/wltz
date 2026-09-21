@@ -53,7 +53,7 @@
                             { id: 'seed_mushroom', qty: 1, probability: 0.2 },
                             { id: 'stone', qty: [2, 4], probability: 1 }
                         ],
-                        coins: [200, 500],
+                        coins: [80, 160],
                         skillExp: 30
                     }
                 },
@@ -81,7 +81,7 @@
                             { id: 'seed_tea', qty: 1, probability: 0.3 },
                             { id: 'cleangrass', qty: [3, 5], probability: 1 }
                         ],
-                        coins: [500, 1200],
+                        coins: [140, 250],
                         skillExp: 50
                     }
                 },
@@ -108,7 +108,7 @@
                             { id: 'seed_tea', qty: 1, probability: 0.5 },
                             { id: 'crystal', qty: [2, 3], probability: 1 }
                         ],
-                        coins: [1000, 2000],
+                        coins: [200, 370],
                         skillExp: 80
                     }
                 },
@@ -137,7 +137,7 @@
                             { id: 'crystal', qty: [3, 5], probability: 1 },
                             { id: 'spiritore', qty: [5, 8], probability: 1 }
                         ],
-                        coins: [3000, 6000],
+                        coins: [550, 1030],
                         skillExp: 150
                     }
                 },
@@ -166,7 +166,7 @@
                             { id: 'lotus', qty: [2, 4], probability: 1 },
                             { id: 'crystal', qty: [5, 10], probability: 1 }
                         ],
-                        coins: [8000, 15000],
+                        coins: [1400, 2500],
                         skillExp: 250
                     }
                 },
@@ -195,7 +195,7 @@
                             { id: 'lotus', qty: [3, 5], probability: 1 },
                             { id: 'immortalore', qty: [3, 6], probability: 1 }
                         ],
-                        coins: [15000, 30000],
+                        coins: [2700, 5100],
                         skillExp: 400
                     }
                 }
@@ -1805,6 +1805,68 @@
             addBattleLog(`自动进食${status}`, 'info');
         }
 
+        // 生命过低（<50%）时进入战斗的提醒
+        function warnLowHp() {
+            const hp = gameState.player.stats.hp;
+            if (hp && hp.max && hp.current / hp.max < FOOD_CONFIG.autoEatConfig.hpThreshold) {
+                showNotification(`⚠️ 生命只有 ${Math.round(hp.current / hp.max * 100)}%，建议先进食恢复（战斗页顶部「吃一份」）`, '#c98a3e', 'warning');
+            }
+        }
+
+        // 战斗外的当前可用食物：当前选择的食物不可用时，换成背包里恢复量最高的可用食物
+        function getRestFood() {
+            pickBestFood();
+            const id = gameState.player.foodSlot;
+            const cfg = id && FOOD_CONFIG.foods[id];
+            if (!cfg || gameState.player.realmIndex < cfg.minRealm || getFoodCount() <= 0) return null;
+            return id;
+        }
+
+        // 战斗外手动进食（生命不会自动恢复，只能靠食物）。战斗中由「自动食用」负责，这里不可用
+        // all = true：一直吃到满血或没有食物
+        function eatFoodManually(all = false) {
+            if (gameState.currentAction && (gameState.currentAction.isBattle || gameState.currentAction.isDungeon)) {
+                showNotification('战斗中请使用「自动食用」', '#c98a3e', 'warning');
+                return;
+            }
+            const hp = gameState.player.stats.hp;
+            if (hp.current >= hp.max) { showNotification('生命已满', '#c98a3e', 'normal'); return; }
+            let eaten = 0, healed = 0, foodName = '';
+            do {
+                const id = getRestFood();
+                if (!id) break;
+                const cfg = FOOD_CONFIG.foods[id];
+                const restore = Math.min(Math.floor(cfg.hpRestore * (1 + getMod('foodPct'))), hp.max - hp.current);
+                if (restore <= 0) break;
+                hp.current += restore;
+                consumeItem(id, 1);
+                eaten++; healed += restore; foodName = cfg.name;
+            } while (all && hp.current < hp.max);
+            if (!eaten) { showNotification('没有可用的食物（在炼丹里制作）', '#c4483a', 'error'); return; }
+            showNotification(`食用${foodName}×${eaten}，恢复 ${healed} 生命（${hp.current}/${hp.max}）`, '#6fa980');
+            updateUI();
+            renderHpRestoreBar();
+            saveGame();
+        }
+
+        // 战斗面板顶部：生命值 + 战斗外进食按钮
+        function renderHpRestoreBar() {
+            const el = document.getElementById('hpRestoreBar');
+            if (!el) return;
+            const hp = gameState.player.stats.hp;
+            if (!hp || !hp.max) { el.innerHTML = ''; return; }
+            const inCombat = !!(gameState.currentAction && (gameState.currentAction.isBattle || gameState.currentAction.isDungeon));
+            const foodId = getRestFood();
+            const cfg = foodId && FOOD_CONFIG.foods[foodId];
+            const pct = Math.round(hp.current / hp.max * 100);
+            const disabled = inCombat || !cfg || hp.current >= hp.max;
+            el.innerHTML = `<span class="hp-rest-text">❤ 生命 <b>${hp.current}/${hp.max}</b>（${pct}%）</span>` +
+                `<span class="hp-rest-food">${cfg ? `${cfg.icon} ${cfg.name} ×${getFoodCount()}（+${cfg.hpRestore}）` : '无可用食物（在炼丹里制作）'}</span>` +
+                `<button class="btn btn-secondary" ${disabled ? 'disabled' : ''} onclick="eatFoodManually(false)">吃一份</button>` +
+                `<button class="btn btn-secondary" ${disabled ? 'disabled' : ''} onclick="eatFoodManually(true)">吃到满</button>` +
+                `<span class="hp-rest-hint">${inCombat ? '战斗中由「自动食用」负责' : '生命不会自动恢复，只能靠食物'}</span>`;
+        }
+
         // 重置战斗状态（撤退和死亡时使用）
         function resetBattleState(newState = 'idle') {
             gameState.dungeons.currentDungeon = null;
@@ -2259,6 +2321,7 @@
         }
 
         function renderAutoBattleBar() {
+            renderHpRestoreBar();
             const auto = getAutoBattle();
             const fighting = !!(gameState.currentAction && gameState.currentAction.isBattle);
             const stats = (auto.wins + auto.losses) > 0
@@ -4902,6 +4965,7 @@
             gameState.battles.currentArea = areaKey;
             gameState.battles.playerHP = { current: gameState.player.stats.hp.current, max: gameState.player.stats.hp.max };
             gameState.battles.startPlayerHP = gameState.player.stats.hp.current;
+            if (!auto) warnLowHp();
 
             // 随机生成敌人
             gameState.battles.currentEnemy = createAreaEnemy(areaKey);
@@ -4972,8 +5036,8 @@
             if (typeof gameState.player.stats.hp === 'number') {
                 gameState.player.stats.hp = { current: gameState.player.stats.hp, max: gameState.player.stats.hp };
             } else if (!auto) {
-                // 手动进入：恢复到最大HP；循环续战时不回血（与战斗区域一致，靠食物和生命回复撑下去）
-                gameState.player.stats.hp.current = gameState.player.stats.hp.max;
+                // 手动进入不再回血（此前会回满，导致「进秘境再立刻撤退」等于免费回满血）；生命只靠食物恢复
+                warnLowHp();
             }
 
             // P0-4 食物系统初始化
@@ -5039,6 +5103,7 @@
             updateShop();
             updateArtDisplay();  // 更新功法显示
             updateBonusPanel();
+            renderHpRestoreBar();
         }
 
         // 选择性更新UI（仅更新指定的部分，提高性能）
@@ -6765,7 +6830,11 @@
                 }
             }
 
-            offlineRewards.items.forEach(item => addToInventory(item.id, item.qty));
+            // 背包放不下的物品单独记录并在结算窗里提示，不再静默丢失
+            const keptItems = [];
+            offlineRewards.lostItems = [];
+            offlineRewards.items.forEach(item => (addToInventory(item.id, item.qty, true) ? keptItems : offlineRewards.lostItems).push(item));
+            offlineRewards.items = keptItems;
             Object.entries(offlineRewards.skillExp).forEach(([skill, exp]) => {
                 addSkillExp(skill, exp, savedAction.action);
             });
@@ -6785,7 +6854,7 @@
 
             // 没有任何收益（例如刷新页面只离开几秒）时不弹结算窗
             const earnedAnything = offlineRewards.coins > 0 || offlineRewards.cultivation > 0 ||
-                offlineRewards.items.length > 0 || Object.keys(offlineRewards.skillExp).length > 0 ||
+                offlineRewards.items.length > 0 || offlineRewards.lostItems.length > 0 || Object.keys(offlineRewards.skillExp).length > 0 ||
                 (offlineRewards.overflowCoins || 0) > 0;
             const quiet = offlineSeconds < quietUnder && !exceedsLimit && !cultivationCapped;
             if (quiet) {
@@ -6850,6 +6919,13 @@
                     content += `<span style="color: #6f9c8a;">  ${itemConfig.icon} ${itemConfig.name} x${item.qty}</span>`;
                 });
                 content += `</div>`;
+            }
+
+            if (rewards.lostItems && rewards.lostItems.length > 0) {
+                content += `<div class="stat-row" style="flex-direction: column; align-items: flex-start; color: #c4483a;">
+                    <span class="stat-label">❌ 背包已满，以下物品未能获得:</span>` +
+                    rewards.lostItems.map(item => `<span>  ${GAME_CONFIG.items[item.id].icon} ${GAME_CONFIG.items[item.id].name} x${item.qty}</span>`).join('') +
+                    `</div>`;
             }
 
             content += `</div>`;
