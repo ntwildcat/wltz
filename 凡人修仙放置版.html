@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=12.8">
+    <link rel="stylesheet" href="style.css?v=13.0">
 
 </head>
 <body data-panel="cultivation">
@@ -18,28 +18,11 @@
         <div class="sidebar">
             <div class="logo" onclick="showStartScreen()" aria-label="返回存档选择">仙</div>
             <div class="skill-tree" id="skillTree"></div>
-            <div style="display: flex; flex-direction: column; gap: 8px; padding: 10px;">
-                <button class="nav-btn" onclick="switchPanel('inventory')" style="width: 100%; padding: 10px; background: rgba(111,156,138,0.2); border: 1px solid #6f9c8a; border-radius: 4px; color: #dcd1b6; cursor: pointer; transition: all 0.3s;">
-                    🎒 背包
-                </button>
-                <button class="nav-btn" onclick="switchPanel('equipment')" style="width: 100%; padding: 10px; background: rgba(111,156,138,0.2); border: 1px solid #6f9c8a; border-radius: 4px; color: #dcd1b6; cursor: pointer; transition: all 0.3s;">
-                    🎽 装备
-                </button>
-                <button class="nav-btn" onclick="switchPanel('settings')" style="width: 100%; padding: 10px; background: rgba(111,156,138,0.2); border: 1px solid #6f9c8a; border-radius: 4px; color: #dcd1b6; cursor: pointer; transition: all 0.3s;">
-                    ⚙️ 设置
-                </button>
-            </div>
-            <div class="coin-display" onclick="switchPanel('shop')" role="button" tabindex="0" title="点击进入商城" aria-label="商城，当前灵石">
-                <div><span data-ico="coin">💎</span> 灵石</div>
-                <div id="coinAmount">100</div>
-            </div>
-            <div class="coin-display cur-display" data-cur="danhuo" style="display: none;" onclick="switchPanel('danhuo')" role="button" tabindex="0" title="丹火：点击进入丹火（淬炼装备、强化灵根）">
-                <div><span data-ico="danhuo">🔥</span> 丹火</div>
-                <div class="cur-amount">0</div>
-            </div>
-            <div class="coin-display cur-display" data-cur="shenshi" style="display: none;" onclick="switchPanel('shenshi')" role="button" tabindex="0" title="神识：点击进入神识（分身强化、专注、感应）">
-                <div><span data-ico="shenshi">👁️</span> 神识</div>
-                <div class="cur-amount">0</div>
+            <div class="nav-grid">
+                <button type="button" class="nav-mini" data-nav="inventory" onclick="switchPanel('inventory')" title="背包"><span class="nav-ico">🎒</span><span>背包</span></button>
+                <button type="button" class="nav-mini" data-nav="equipment" onclick="switchPanel('equipment')" title="装备"><span class="nav-ico">🎽</span><span>装备</span></button>
+                <button type="button" class="nav-mini" data-nav="shop" onclick="switchPanel('shop')" title="商城"><span class="nav-ico">🏪</span><span>商城</span></button>
+                <button type="button" class="nav-mini" data-nav="settings" onclick="switchPanel('settings')" title="设置"><span class="nav-ico">⚙️</span><span>设置</span></button>
             </div>
         </div>
 
@@ -126,16 +109,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mobile-coins">
-                    <div class="mobile-coin" onclick="switchPanel('shop')" role="button" tabindex="0" aria-label="灵石，点击进入商城">
-                        <span data-ico="coin">💎</span> 灵石 <b id="mobileCoinAmount">0</b>
-                    </div>
-                    <div class="mobile-coin mobile-cur" data-cur="danhuo" style="display: none;" onclick="switchPanel('danhuo')" role="button" tabindex="0" aria-label="丹火">
-                        <span data-ico="danhuo">🔥</span> 丹火 <b class="cur-amount">0</b>
-                    </div>
-                    <div class="mobile-coin mobile-cur" data-cur="shenshi" style="display: none;" onclick="switchPanel('shenshi')" role="button" tabindex="0" aria-label="神识">
-                        <span data-ico="shenshi">👁️</span> 神识 <b class="cur-amount">0</b>
-                    </div>
+                    <div class="currency-bar" id="currencyBar">
+                        <div class="cur-chip" onclick="switchPanel('shop')" role="button" tabindex="0" title="灵石：点击进入商城" aria-label="灵石，点击进入商城">
+                            <span data-ico="coin">💎</span><span class="cur-name">灵石</span><b id="coinAmount">100</b>
+                        </div>
+                        <div class="cur-chip" data-cur="danhuo" style="display: none;" onclick="switchPanel('danhuo')" role="button" tabindex="0" title="丹火：点击进入丹火（淬炼装备、强化灵根）" aria-label="丹火">
+                            <span data-ico="danhuo">🔥</span><span class="cur-name">丹火</span><b class="cur-amount">0</b>
+                        </div>
+                        <div class="cur-chip" data-cur="shenshi" style="display: none;" onclick="switchPanel('shenshi')" role="button" tabindex="0" title="神识：点击进入神识（分身强化、专注、感应）" aria-label="神识">
+                            <span data-ico="shenshi">👁️</span><span class="cur-name">神识</span><b class="cur-amount">0</b>
+                        </div>
                     </div>
                     <div id="breakThroughBtn" class="btn btn-secondary" onclick="showBreakthroughModal()" style="display: none;">
                         ✨ 尝试突破 ✨
@@ -769,7 +752,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=12.8"></script>
+    <script src="game.js?v=13.0"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
