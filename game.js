@@ -26,7 +26,12 @@
                 { name: '化神初期', nextReq: 116000 },   // 沿曲线 100 × n^2.5，取整
                 { name: '化神中期', nextReq: 136000 },
                 { name: '化神后期', nextReq: 158000 },
-                { name: '化神圆满', nextReq: 182000 }
+                { name: '化神圆满', nextReq: 182000 },
+                // 合体期（索引21-24，沿曲线 100 × n^2.5）：合体初期起可「合道」（收回分身，换取主行动大幅加速）；合体圆满（24）预留炼虚期入口
+                { name: '合体初期', nextReq: 202000 },
+                { name: '合体中期', nextReq: 227000 },
+                { name: '合体后期', nextReq: 254000 },
+                { name: '合体圆满', nextReq: 282000 }
             ],
             // P2功能：秘境系统
             dungeons: {
@@ -200,6 +205,37 @@
                         shenshi: [80, 160],
                         skillExp: 400
                     }
+                },
+                // P10 合体期秘境：天道秘境（入口化神圆满，怪物为合体初期）
+                tiandaoRealm: {
+                    id: 'tiandaoRealm',
+                    name: '天道秘境',
+                    desc: '天道试炼·通关掉落天道石与道果种子',
+                    icon: '🌌',
+                    minRealmIndex: 20,                      // 最低化神圆满
+                    baseRealmIndex: 21,                     // 怪物境界为合体初期
+                    recommendedLevel: '化神圆满~合体中期',
+                    monsters: [
+                        { name: '天道残影', type: '无', hp: 36000, atk: 250, spd: 70, def: 70, attackSpeed: 2.2, drop: 'coins', dropQty: 1400 },
+                        { name: '法则傀儡', type: '雷', hp: 43000, atk: 270, spd: 65, def: 80, attackSpeed: 2.3, drop: 'coins', dropQty: 1600 },
+                        { name: '道影行者', type: '风', hp: 40000, atk: 285, spd: 80, def: 65, attackSpeed: 2.0, drop: 'coins', dropQty: 1800 },
+                        { name: '天道意志', type: '无', hp: 47000, atk: 300, spd: 75, def: 90, attackSpeed: 2.4, drop: 'coins', dropQty: 2000 },
+                        { name: '天道化身', type: '无', hp: 90000, atk: 360, spd: 70, def: 105, attackSpeed: 3.3, isBoss: true, drop: 'coins', dropQty: 7000 }
+                    ],
+                    rewards: {
+                        fixed: [
+                            { id: 'daoguo_seed', qty: [3, 6] }
+                        ],
+                        random: [
+                            { id: 'daostone', qty: [2, 4], probability: 1 },
+                            { id: 'immortalore', qty: [3, 5], probability: 1 }
+                        ],
+                        coins: [6000, 11000],
+                        danhuo: [150, 300],
+                        shenshi: [120, 240],
+                        daoguo: [20, 40],
+                        skillExp: 600
+                    }
                 }
             },
             skills: {
@@ -225,7 +261,11 @@
                         // P9 化神期配方
                         huashen_ning: { name: '化神凝元', desc: '化神初期主力', duration: 60, output: { cultivation: 2400, skill: 'cultivation', exp: 500 }, requiredRealmIndex: 17, unlocked: false },
                         yuanshen_huaxu: { name: '元神化虚', desc: '化神中期高产', duration: 80, output: { cultivation: 4200, skill: 'cultivation', exp: 650 }, requiredRealmIndex: 18, unlocked: false },
-                        tiandi_gongming: { name: '天地共鸣', desc: '化神期最终法', duration: 150, output: { cultivation: 9000, skill: 'cultivation', exp: 900 }, requiredRealmIndex: 19, unlocked: false }
+                        tiandi_gongming: { name: '天地共鸣', desc: '化神期最终法', duration: 150, output: { cultivation: 9000, skill: 'cultivation', exp: 900 }, requiredRealmIndex: 19, unlocked: false },
+                        // 合体期配方（索引21–23解锁；修为 / 秒高于化神期的 60，配合合体期功法）
+                        heti_unity: { name: '合体归一', desc: '合体初期主力', duration: 200, output: { cultivation: 15000, skill: 'cultivation', exp: 1000 }, requiredRealmIndex: 21, unlocked: false },
+                        dao_body: { name: '道果炼体', desc: '合体中期高产', duration: 300, output: { cultivation: 27000, skill: 'cultivation', exp: 1500 }, requiredRealmIndex: 22, unlocked: false },
+                        dao_perfect: { name: '合道圆满', desc: '合体期最终修炼法', duration: 450, output: { cultivation: 50000, skill: 'cultivation', exp: 2200 }, requiredRealmIndex: 23, unlocked: false }
                     },
                     actions: {}
                 },
@@ -244,7 +284,9 @@
                         yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2（金丹圆满突破必需）', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 400 }, requiredLevel: 12, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false },
                         huashen_pill_alchemy: { name: '化神丹', desc: '九叶莲 ×5 + 悟道茶 ×8 + 仙矿 ×2（元婴圆满突破必需）', duration: 120, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'alchemy', exp: 700 }, requiredLevel: 17, requires: { lotus: 5, tea: 8, immortalore: 2 }, unlocked: false },
                         immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 14, requires: { tea: 3, mushroom: 2 }, unlocked: false },
-                        jade_nectar: { name: '琼浆玉液', desc: '悟道果 ×2 + 悟道茶 ×3（战斗食物：恢复2000生命，冷却更短）', duration: 80, output: { items: [{ id: 'jade_nectar', qty: 2 }], skill: 'alchemy', exp: 900 }, requiredLevel: 19, requires: { daofruit: 2, tea: 3 }, unlocked: false }
+                        jade_nectar: { name: '琼浆玉液', desc: '悟道果 ×2 + 悟道茶 ×3（战斗食物：恢复2000生命，冷却更短）', duration: 80, output: { items: [{ id: 'jade_nectar', qty: 2 }], skill: 'alchemy', exp: 900 }, requiredLevel: 19, requires: { daofruit: 2, tea: 3 }, unlocked: false },
+                        heti_pill_alchemy: { name: '合体丹', desc: '九叶莲 ×8 + 悟道茶 ×10 + 天道石 ×2（化神圆满突破必需）', duration: 150, output: { items: [{ id: 'hetipill', qty: 1 }], skill: 'alchemy', exp: 1100 }, requiredLevel: 22, requires: { lotus: 8, tea: 10, daostone: 2 }, unlocked: false },
+                        jade_marrow: { name: '玉髓琼浆', desc: '悟道果 ×3 + 悟道茶 ×4 + 天道石 ×1（战斗食物：恢复3500生命）', duration: 100, output: { items: [{ id: 'jade_marrow', qty: 2 }], skill: 'alchemy', exp: 1300 }, requiredLevel: 23, requires: { daofruit: 3, tea: 4, daostone: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -268,7 +310,10 @@
                         yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 17, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false },
                         huashen_sword: { name: '化神剑', desc: '混沌石 ×3 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashensword', qty: 1 }], skill: 'forging', exp: 800 }, requiredLevel: 19, requires: { chaosstone: 3, immortalore: 2 }, unlocked: false },
                         huashen_armor: { name: '化神法衣', desc: '混沌石 ×4 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashenarmor', qty: 1 }], skill: 'forging', exp: 880 }, requiredLevel: 20, requires: { chaosstone: 4, immortalore: 2 }, unlocked: false },
-                        huashen_pendant: { name: '化神佩', desc: '混沌石 ×2 + 灵晶 ×3', duration: 100, output: { items: [{ id: 'huashenpendant', qty: 1 }], skill: 'forging', exp: 950 }, requiredLevel: 21, requires: { chaosstone: 2, spiritcrystal: 3 }, unlocked: false }
+                        huashen_pendant: { name: '化神佩', desc: '混沌石 ×2 + 灵晶 ×3', duration: 100, output: { items: [{ id: 'huashenpendant', qty: 1 }], skill: 'forging', exp: 950 }, requiredLevel: 21, requires: { chaosstone: 2, spiritcrystal: 3 }, unlocked: false },
+                        heti_sword: { name: '合体剑', desc: '天道石 ×3 + 混沌石 ×2', duration: 130, output: { items: [{ id: 'hetisword', qty: 1 }], skill: 'forging', exp: 1100 }, requiredLevel: 24, requires: { daostone: 3, chaosstone: 2 }, unlocked: false },
+                        heti_armor: { name: '合体法衣', desc: '天道石 ×4 + 混沌石 ×2', duration: 130, output: { items: [{ id: 'hetiarmor', qty: 1 }], skill: 'forging', exp: 1200 }, requiredLevel: 25, requires: { daostone: 4, chaosstone: 2 }, unlocked: false },
+                        heti_pendant: { name: '合体佩', desc: '天道石 ×2 + 灵晶 ×3', duration: 120, output: { items: [{ id: 'hetipendant', qty: 1 }], skill: 'forging', exp: 1300 }, requiredLevel: 26, requires: { daostone: 2, spiritcrystal: 3 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -299,7 +344,8 @@
                         crystal: { name: '采玄晶', desc: '产出玄晶', duration: 20, output: { items: [{ id: 'crystal', qty: 1 }], skill: 'mining', exp: 110 }, requiredLevel: 8, unlocked: false },
                         spiritcrystal: { name: '采灵晶', desc: '产出灵晶', duration: 25, output: { items: [{ id: 'spiritcrystal', qty: 1 }], skill: 'mining', exp: 220 }, requiredLevel: 12, unlocked: false },
                         immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 330 }, requiredLevel: 15, unlocked: false },
-                        chaosstone: { name: '采混沌石', desc: '产出混沌石', duration: 50, output: { items: [{ id: 'chaosstone', qty: 1 }], skill: 'mining', exp: 600 }, requiredLevel: 18, unlocked: false }
+                        chaosstone: { name: '采混沌石', desc: '产出混沌石', duration: 50, output: { items: [{ id: 'chaosstone', qty: 1 }], skill: 'mining', exp: 600 }, requiredLevel: 18, unlocked: false },
+                        daostone: { name: '采天道石', desc: '产出天道石（合体期材料）', duration: 60, output: { items: [{ id: 'daostone', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 22, unlocked: false }
                     },
                     actions: {}
                 },
@@ -354,6 +400,20 @@
                         refine: { name: '提炼神识', desc: '更高效的提炼：耗时翻倍，产出更多', duration: 40, output: { shenshi: 10, skill: 'shenshi', exp: 150 }, requiredLevel: 5, unlocked: false },
                         meditate: { name: '神识入定', desc: '悟道果 ×1 → 神识 ×15', duration: 60, output: { shenshi: 15, skill: 'shenshi', exp: 260 }, requiredLevel: 10, requires: { daofruit: 1 }, unlocked: false },
                         deep: { name: '深度入定', desc: '神识技能的顶级提取法', duration: 90, output: { shenshi: 28, skill: 'shenshi', exp: 420 }, requiredLevel: 15, unlocked: false }
+                    },
+                    actions: {}
+                },
+                // 合体期技能：道果（货币，与丹火 / 神识同一套机制）。用悟道果等材料凝练，用于道果淬体、道果悟法，并在道果商城消费
+                daoguo: {
+                    name: '道果',
+                    icon: '🍎',
+                    level: 1,
+                    exp: 0,
+                    recipes: {
+                        condense: { name: '凝练道果', desc: '悟道果 ×1 → 道果 ×6（货币：道果淬体、道果悟法）', duration: 90, output: { daoguo: 6, skill: 'daoguo', exp: 200 }, requiredLevel: 1, requires: { daofruit: 1 }, unlocked: true },
+                        seed: { name: '培育道果', desc: '以道果种子培育，一次得到 30 道果（种子来自天道秘境）', duration: 120, output: { daoguo: 30, skill: 'daoguo', exp: 300 }, requiredLevel: 3, requires: { daoguo_seed: 1 }, unlocked: false },
+                        refine: { name: '提炼道果', desc: '悟道果 ×2 + 混沌石 ×1 → 道果 ×20', duration: 150, output: { daoguo: 20, skill: 'daoguo', exp: 400 }, requiredLevel: 8, requires: { daofruit: 2, chaosstone: 1 }, unlocked: false },
+                        deep: { name: '归元凝道', desc: '悟道果 ×3 + 天道石 ×1 → 道果 ×45', duration: 240, output: { daoguo: 45, skill: 'daoguo', exp: 700 }, requiredLevel: 15, requires: { daofruit: 3, daostone: 1 }, unlocked: false }
                     },
                     actions: {}
                 }
@@ -418,6 +478,14 @@
                 chaosstone: { name: '混沌石', icon: '🌑', type: 'ore', sellPrice: 1200 },
                 daofruit: { name: '悟道果', icon: '🍇', type: 'material', sellPrice: 600 },
                 seed_daofruit: { name: '悟道果种子', icon: '🌰', type: 'seed', sellPrice: 300 },
+                // 合体期新物品
+                daostone: { name: '天道石', icon: '🔶', type: 'ore', sellPrice: 2000 },
+                daoguo_seed: { name: '道果种子', icon: '🌰', type: 'seed', sellPrice: 500 },
+                hetipill: { name: '合体丹', icon: '🔮', type: 'breakthrough_material', sellPrice: 6000 },
+                hetisword: { name: '合体剑', icon: '🗡️', type: 'weapon', sellPrice: 7000, stats: { atk: 150 } },
+                hetiarmor: { name: '合体法衣', icon: '🥼', type: 'armor', sellPrice: 8000, stats: { def: 85, hp: 230 } },
+                hetipendant: { name: '合体佩', icon: '📿', type: 'jewelry', sellPrice: 5000, stats: { spd: 19, hp: 150 } },
+                jade_marrow: { name: '玉髓琼浆', icon: '🍶', type: 'food', sellPrice: 3000 },
 
                 // P6/P7 新作物
                 // 战斗食物（在炼丹中制作；在战斗中HP低于50%时自动食用）
@@ -472,6 +540,14 @@
                     { id: 'daofruit', name: '悟道果 ×1', icon: '🍇', price: 50, currency: 'shenshi', bundle: 1, desc: '炼丹 / 神识入定材料', minRealmIndex: 13 },
                     { id: 'lotus', name: '九叶莲 ×2', icon: '🌸', price: 40, currency: 'shenshi', bundle: 2, desc: '炼丹材料', minRealmIndex: 13 }
                 ],
+                daoguo_shop: [
+                    { id: 'jade_marrow', name: '玉髓琼浆 ×2', icon: '🍶', price: 30, currency: 'daoguo', bundle: 2, desc: '战斗食物（合体初期起，恢复 3500 生命）', minRealmIndex: 21 },
+                    { id: 'daostone', name: '天道石 ×2', icon: '🪨', price: 40, currency: 'daoguo', bundle: 2, desc: '合体级矿石（合体丹 / 合体装备材料）', minRealmIndex: 21 },
+                    { id: 'chaosstone', name: '混沌石 ×2', icon: '🌑', price: 30, currency: 'daoguo', bundle: 2, desc: '合体装备材料', minRealmIndex: 21 },
+                    { id: 'immortalore', name: '仙矿 ×3', icon: '✨', price: 30, currency: 'daoguo', bundle: 3, desc: '顶级材料', minRealmIndex: 21 },
+                    { id: 'daofruit', name: '悟道果 ×2', icon: '🍇', price: 35, currency: 'daoguo', bundle: 2, desc: '炼丹 / 玉髓琼浆 / 道果技能材料', minRealmIndex: 21 },
+                    { id: 'lotus', name: '九叶莲 ×3', icon: '🌸', price: 35, currency: 'daoguo', bundle: 3, desc: '炼丹材料', minRealmIndex: 21 }
+                ],
                 arts: [
                     { id: 'qingmu_art', name: '青木诀', icon: '🌿', price: 200, desc: '修炼速度 ×1.1', minRealmIndex: 1, type: 'art' },
                     { id: 'liuyun_art', name: '流云诀', icon: '☁️', price: 1200, desc: '修炼速度 ×1.25', minRealmIndex: 3, type: 'art' },
@@ -482,7 +558,9 @@
                     { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 30000, desc: '修炼速度 ×2.2', minRealmIndex: 11, type: 'art' },
                     { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' },
                 { id: 'huashen_art', name: '化神真经', icon: '📖', price: 120000, desc: '修炼速度 ×3.4', minRealmIndex: 17, type: 'art' },
-                { id: 'primordial_art', name: '太初混元诀', icon: '☯️', price: 300000, desc: '修炼速度 ×4.2', minRealmIndex: 19, type: 'art' }
+                { id: 'primordial_art', name: '太初混元诀', icon: '☯️', price: 300000, desc: '修炼速度 ×4.2', minRealmIndex: 19, type: 'art' },
+                    { id: 'heti_art', name: '合体真经', icon: '📖', price: 800000, desc: '修炼速度 ×5', minRealmIndex: 21, type: 'art' },
+                    { id: 'dao_art', name: '太上合道经', icon: '🕮', price: 2000000, desc: '修炼速度 ×6.2', minRealmIndex: 23, type: 'art' }
                 ]
             }
         };
@@ -539,6 +617,15 @@
                     cooldown: 3.0,
                     minRealm: 17,             // 化神初期
                     description: '化神修士的琼浆，饮下瞬间生机勃发，冷却比蟠桃更短'
+                },
+                jade_marrow: {
+                    id: 'jade_marrow',
+                    name: '玉髓琼浆',
+                    icon: '🍶',
+                    hpRestore: 3500,          // 恢复HP
+                    cooldown: 3.0,
+                    minRealm: 21,             // 合体初期
+                    description: '合体修士的玉髓，肉身与元神共鸣，恢复量远超琼浆玉液'
                 }
             },
             // 默认食物配置
@@ -611,6 +698,7 @@
                 spiritpill: svg(pill('#3f74c0', '#bfdcff', '<circle cx="16" cy="16" r="5" stroke="#dbeaff" stroke-width="1"/><circle cx="16" cy="16" r="2" fill="#dbeaff" stroke="none"/>', `<circle cx="16" cy="16" r="12.5" stroke="#7fb0ff" stroke-width="1.2" opacity=".7"/>${sparkle(26, 6, 2.2)}`)),
                 // —— 丹火 / 神识 / 精华 ——
                 danhuo: svg(`<path d="M16 2Q22 10 24 16Q27 24 20 29Q16 31 12 29Q5 24 8 16Q9 12 12 9Q12 13 14 14Q13 8 16 2Z" fill="#e8642a"/><path d="M16 14Q20 19 19 23Q18 27 16 27Q13 27 13 23Q13 19 16 14Z" fill="#ffc94a"/><path d="M16 21Q17.5 23 16 26Q14.5 23 16 21Z" fill="#fff4c4" stroke="none"/>`),
+                daoguo: svg(`<path d="M16 8Q9 6 6 13Q4 22 11 28Q16 30 21 28Q28 22 26 13Q23 6 16 8Z" fill="#d9a441"/><path d="M16 8Q16 4 19 2" stroke="#6f4a1e" stroke-width="1.6"/><path d="M19 5Q23 3 26 6Q22 9 19 5Z" fill="#6fae7a" stroke="none"/><path d="M11 13Q9 17 11 22" stroke="#fff0b8" stroke-width="1.6" opacity=".8"/>${sparkle(25, 22, 2)}`),
                 shenshi: svg(`<path d="M2 16Q16 3 30 16Q16 29 2 16Z" fill="#e6e0f8"/><circle cx="16" cy="16" r="6" fill="#6a48b0"/><circle cx="16" cy="16" r="2.6" fill="#1c1430"/><circle cx="14" cy="14" r="1.2" fill="#fff" stroke="none"/><path d="M16 1V5M6 5L8 8M26 5L24 8" stroke="#b7a0f0" stroke-width="1.3"/>`),
                 // —— 食物 ——
                 millet_porridge: svg(`${steam('#f0e8d0')}${bowl('#f0e0a8')}<g fill="#c9a45a" stroke="none"><circle cx="12" cy="15" r=".9"/><circle cx="16" cy="14.5" r=".9"/><circle cx="20" cy="15.2" r=".9"/></g>`),
@@ -634,7 +722,14 @@
                 // —— 佩饰 ——
                 goldenpendant: svg(pendant('#e8642a', '#d8b45a')),
                 yuanyingpendant: svg(pendant('#d0384a', '#c99a4a', sparkle(25, 22, 2.2))),
-                huashenpendant: svg(pendant('#7fe0e8', '#e6f4f2', `${sparkle(25, 22, 2.4)}<circle cx="16" cy="20" r="8" stroke="#8fe0e8" stroke-width=".8" opacity=".7"/>`))
+                huashenpendant: svg(pendant('#7fe0e8', '#e6f4f2', `${sparkle(25, 22, 2.4)}<circle cx="16" cy="20" r="8" stroke="#8fe0e8" stroke-width=".8" opacity=".7"/>`)),
+                hetipill: svg(pill('#f6ecd0', '#fff', '<g fill="#c9a04a" stroke="none"><circle cx="16" cy="16" r="3"/></g><path d="M16 9V13M16 19V23M9 16H13M19 16H23" stroke="#c9a04a" stroke-width="1.4"/>', '<circle cx="16" cy="16" r="13" stroke="#f3d36a" stroke-width="1.4" opacity=".85"/>')),
+                hetisword: svg(sword('#f6ecd0', '#fff', '#c9a04a', '<circle cx="16" cy="16" r="14" stroke="#f3d36a" stroke-width="1" opacity=".7"/>')),
+                hetiarmor: svg(robe('#f6ecd0', '#c9a04a', '<path d="M12 24Q14 22 16 24Q18 22 20 24" stroke="#d8b868" stroke-width="1"/>')),
+                hetipendant: svg(pendant('#f3d36a', '#f6ecd0', `${sparkle(25, 22, 2.4)}<circle cx="16" cy="20" r="8" stroke="#f3d36a" stroke-width=".8" opacity=".7"/>`)),
+                jade_marrow: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#b08d5a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#e8c46a"/><path d="M10 18Q16 21 22 18" stroke="#fff3c4" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2)}`),
+                daostone: svg(rock('#d9a441', '#8a5a1a', `<path d="M9 22L14 15L18 20L24 12" stroke="#fff0b8" stroke-width="1.8"/>${sparkle(8, 9, 2.6)}${sparkle(25, 24, 2.2)}`)),
+                daoguo_seed: seedSack('#a07a2a', `<path d="M10 20Q16 13 22 20Q16 27 10 20Z" fill="#ffe8a0"/><circle cx="16" cy="20" r="2.2" fill="#8a5a1a"/>`)
             };
         })();
 
@@ -672,6 +767,9 @@
             const P = gameState.player;
             if (typeof P.danhuo !== 'number') P.danhuo = 0;
             if (typeof P.shenshi !== 'number') P.shenshi = 0;
+            if (typeof P.daoguo !== 'number') P.daoguo = 0;
+            if (typeof P.daoBody !== 'number') P.daoBody = 0;
+            if (typeof P.daoLaw !== 'number') P.daoLaw = 0;
             if (!P.temper) P.temper = { weapon: 0, armor: 0, jewelry: 0 };
             if (typeof P.rootLevel !== 'number') P.rootLevel = 0;
             if (!P.shen) P.shen = { clone: 0, focus: 0, sense: 0 };
@@ -698,7 +796,7 @@
 
         function spendNotify(kind, need) {
             const have = gameState.player[kind];
-            showNotification(`${kind === 'danhuo' ? '丹火' : '神识'}不足：需要 ${need}，现有 ${have}`, '#c4483a', 'error');
+            showNotification(`${{ danhuo: '丹火', shenshi: '神识', daoguo: '道果' }[kind]}不足：需要 ${need}，现有 ${have}`, '#c4483a', 'error');
         }
 
         function afterCurrencySpend() {
@@ -790,8 +888,11 @@
             const P = ensureCurrencyState();
             if (output.danhuo) P.danhuo += output.danhuo;
             if (output.shenshi) P.shenshi += output.shenshi;
+            if (output.daoguo) P.daoguo += output.daoguo;
         }
 
+        const CURRENCY_NAMES = { danhuo: '丹火', shenshi: '神识', daoguo: '道果' };
+        const CURRENCY_ICONS = { danhuo: () => DANHUO_ICON, shenshi: () => SHENSHI_ICON, daoguo: () => DAOGUO_ICON };
         // 战斗区域胜利掉落的丹火 / 神识（金丹级战斗区域起掉丹火，元婴级起掉神识；乘该区域精通的奖励加成）
         const BATTLE_CURRENCY = {
             goldenPlains:      { danhuo: [1, 2] },
@@ -799,11 +900,13 @@
             voidSea:           { danhuo: [2, 4], shenshi: [1, 2] },
             abyssRuins:        { danhuo: [3, 5], shenshi: [2, 3] },
             chaosWastes:       { danhuo: [4, 6], shenshi: [3, 4] },
-            nineNether:        { danhuo: [5, 8], shenshi: [4, 6] }
+            nineNether:        { danhuo: [5, 8], shenshi: [4, 6] },
+            daoWastes:         { danhuo: [6, 9], shenshi: [5, 7], daoguo: [1, 2] },
+            fusionVoid:        { danhuo: [8, 12], shenshi: [6, 9], daoguo: [2, 4] }
         };
         function rollAreaCurrency(areaKey, bonus) {
             const cfg = BATTLE_CURRENCY[areaKey] || {};
-            const got = { danhuo: 0, shenshi: 0 };
+            const got = { danhuo: 0, shenshi: 0, daoguo: 0 };
             Object.entries(cfg).forEach(([kind, [lo, hi]]) => {
                 got[kind] = Math.max(1, Math.round((lo + Math.floor(Math.random() * (hi - lo + 1))) * bonus));
             });
@@ -815,7 +918,7 @@
             if (!cfg) return '';
             return Object.entries(cfg).map(([kind, [lo, hi]]) => {
                 const a = Math.max(1, Math.round(lo * bonus)), b = Math.max(1, Math.round(hi * bonus));
-                return `${kind === 'danhuo' ? DANHUO_ICON : SHENSHI_ICON} ${a === b ? a : a + '–' + b} ${kind === 'danhuo' ? '丹火' : '神识'}`;
+                return `${CURRENCY_ICONS[kind]()} ${a === b ? a : a + '–' + b} ${CURRENCY_NAMES[kind]}`;
             }).join(' · ');
         }
 
@@ -824,8 +927,8 @@
         // 顶部货币条：丹火（金丹起）、神识（元婴起）；桌面在侧栏灵石下面，手机在头部灵石条旁
         function updateCurrencyChips() {
             const P = gameState.player;
-            const show = { danhuo: isDanhuoUnlocked(), shenshi: isShenshiUnlocked() };
-            ['danhuo', 'shenshi'].forEach(kind => {
+            const show = { danhuo: isDanhuoUnlocked(), shenshi: isShenshiUnlocked(), daoguo: isDaoguoUnlocked() };
+            ['danhuo', 'shenshi', 'daoguo'].forEach(kind => {
                 const val = Math.floor(P[kind] || 0);
                 document.querySelectorAll(`[data-cur="${kind}"]`).forEach(el => {
                     el.style.display = show[kind] ? '' : 'none';
@@ -850,7 +953,7 @@
         function useRow(name, lvText, effectText, cost, currency, onclick, maxed) {
             const P = gameState.player;
             const affordable = P[currency] >= cost;
-            const icon = currency === 'danhuo' ? DANHUO_ICON : SHENSHI_ICON;
+            const icon = CURRENCY_ICONS[currency]();
             return `<div class="use-row">
                 <div class="use-main"><b>${name}</b> <span class="use-lv">${lvText}</span><div class="use-effect">${effectText}</div></div>
                 ${maxed ? '<span class="use-max">已满级</span>'
@@ -906,11 +1009,127 @@
                     <button type="button" class="btn ${scoutOn || P.shenshi < SCOUT_COST ? 'btn-secondary' : ''} use-btn" onclick="castScout()">${scoutOn ? '已生效' : `探查 ${SHENSHI_ICON}${SCOUT_COST}`}</button></div></div>`;
         }
 
+        // ---- 道果（合体期货币）、道果强化与合道（v6.60） ----
+        // 合体初期（索引 21）起解锁道果技能与货币。道果不能出售，用于：道果淬体（基础属性）、道果悟法（法则效果）、道果商城；
+        // 并可用丹火 + 神识融合凝练。合道：收回分身（不可逆），换取主行动大幅加速与属性 / 产出加成；晋升炼虚期必须已合道。
+        const DAOGUO_ICON = ITEM_ICONS.daoguo;
+        const DAO_BODY_MAX = 10, DAO_BODY_PER_LEVEL = 0.03;      // 道果淬体：生命 / 攻击 / 防御 +3%/级
+        const DAO_LAW_MAX = 5, DAO_LAW_PER_LEVEL = 0.10;         // 道果悟法：全部法则效果 +10%/级
+        const FUSE_COST = { danhuo: 10, shenshi: 10 };           // 丹火 10 + 神识 10 → 道果 1
+        const FUSION_BONUS = {
+            workSpeed: 0.5,      // 生活技能 / 悟道耗时 ×0.5（速度 +100%）
+            cultSpeed: 1.0,      // 修炼速度 +100%
+            stats: 0.15,         // 生命 / 攻击 / 防御 / 速度 +15%
+            outShenshi: 0.5,     // 神识产出 +50%
+            outDaoguo: 0.3       // 道果产出 +30%
+        };
+        const FUSION_REQUIRED_REALM = 24;   // 合体圆满：晋升炼虚期（预留）必须已合道
+        function daoBodyCost(level) { return Math.round(10 * Math.pow(level + 1, 1.5)); }
+        function daoLawCost(level) { return Math.round(25 * Math.pow(level + 1, 1.5)); }
+        function isDaoguoUnlocked() { return gameState.player.realmIndex >= 21; }
+        function isFused() { return !!(gameState.player.fusion && gameState.player.fusion.active); }
+        function getDaoBody() { return gameState.player.daoBody || 0; }
+        function getDaoLaw() { return gameState.player.daoLaw || 0; }
+
+        function upgradeDaoBody() {
+            const P = ensureCurrencyState();
+            const lv = getDaoBody();
+            if (lv >= DAO_BODY_MAX) { showNotification('道果淬体已至最高级', '#c98a3e'); return; }
+            const cost = daoBodyCost(lv);
+            if (P.daoguo < cost) { spendNotify('daoguo', cost); return; }
+            P.daoguo -= cost;
+            P.daoBody = lv + 1;
+            showNotification(`🍎 道果淬体成功！生命 / 攻击 / 防御 +${Math.round((lv + 1) * DAO_BODY_PER_LEVEL * 100)}%`, '#6f9c8a');
+            afterCurrencySpend();
+        }
+
+        function upgradeDaoLaw() {
+            const P = ensureCurrencyState();
+            const lv = getDaoLaw();
+            if (lv >= DAO_LAW_MAX) { showNotification('道果悟法已至最高级', '#c98a3e'); return; }
+            const cost = daoLawCost(lv);
+            if (P.daoguo < cost) { spendNotify('daoguo', cost); return; }
+            P.daoguo -= cost;
+            P.daoLaw = lv + 1;
+            invalidateLawTotals();
+            showNotification(`🍎 道果悟法成功！法则效果 +${Math.round((lv + 1) * DAO_LAW_PER_LEVEL * 100)}%`, '#6f9c8a');
+            afterCurrencySpend();
+        }
+
+        // 丹火 + 神识融合凝练道果
+        function fuseCurrencies(times = 1) {
+            const P = ensureCurrencyState();
+            const maxTimes = Math.floor(Math.min(P.danhuo / FUSE_COST.danhuo, P.shenshi / FUSE_COST.shenshi));
+            const n = times === 'max' ? maxTimes : Math.min(times, maxTimes);
+            if (n <= 0) { showNotification(`需要 丹火 ${FUSE_COST.danhuo} + 神识 ${FUSE_COST.shenshi} 才能凝练 1 个道果`, '#c4483a', 'error'); return; }
+            P.danhuo -= n * FUSE_COST.danhuo;
+            P.shenshi -= n * FUSE_COST.shenshi;
+            P.daoguo += n;
+            showNotification(`🍎 融合凝练：获得道果 ×${n}`, '#6f9c8a');
+            afterCurrencySpend();
+        }
+
+        // 合道：收回分身（不可逆）。二次确认后生效
+        function startFusion() {
+            const P = ensureCurrencyState();
+            if (!isDaoguoUnlocked()) { showNotification('合体初期才能合道', '#c98a3e'); return; }
+            if (isFused()) { showNotification('你已经合道了', '#c98a3e'); return; }
+            const ok = confirm('确定要合道吗？\n\n合道后你的分身将永久消失，且不可逆（无法解除、无法再召回分身，神识里的「分身强化」也会失效）。\n\n换来的是：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・神识产出 +50%、道果产出 +30%\n\n注意：晋升炼虚期必须已合道。');
+            if (!ok) return;
+            P.fusion = { active: true, at: Date.now() };
+            getClones().forEach(c => { c.action = null; c.progress = 0; });
+            calculateStats();
+            showNotification('🌟 合道成功！分身已收回体内，万法归一', '#b89a5b');
+            renderCloneBar();
+            updateUI();
+            renderSkillUses();
+            saveGame();
+        }
+
+        function daoguoUsesHtml() {
+            const P = ensureCurrencyState();
+            const bl = getDaoBody(), ll = getDaoLaw();
+            const fusedCard = isFused()
+                ? `<div class="use-row"><div class="use-main"><b>🌟 已合道</b><div class="use-effect">所有主行动速度 +100% · 生命 / 攻击 / 防御 / 速度 +15% · 神识产出 +50% · 道果产出 +30%<br/>分身已收回体内，不可逆。</div></div><span class="use-max">已合道</span></div>`
+                : `<div class="use-row"><div class="use-main"><b>🌟 合道（不可逆）</b><div class="use-effect">收回你的分身：所有主行动速度 +100%、生命 / 攻击 / 防御 / 速度 +15%、神识产出 +50%、道果产出 +30%。<br/>代价：分身永久消失，无法解除。<b>晋升炼虚期必须先合道。</b></div></div><button type="button" class="btn use-btn" onclick="startFusion()">合道</button></div>`;
+            const maxTimes = Math.floor(Math.min(P.danhuo / FUSE_COST.danhuo, P.shenshi / FUSE_COST.shenshi));
+            return `
+                <div class="use-balance">${DAOGUO_ICON} 道果 <b>${Math.floor(P.daoguo)}</b><small>产出：道果技能的配方（凝练 / 培育 / 提炼 / 归元）· 合体级战斗区域胜利 · 天道秘境通关 · 丹火与神识融合。道果不能出售，只用来变强和购买商品。</small></div>
+                <div class="use-card"><div class="use-title">🌟 合道 <small>合体期的核心选择：收回分身，换取主行动的质变</small></div>${fusedCard}</div>
+                <div class="use-card"><div class="use-title">🍎 道果淬体 <small>永久提升生命 / 攻击 / 防御，每级 +${Math.round(DAO_BODY_PER_LEVEL * 100)}%</small></div>${useRow('🍎 淬体', `Lv.${bl}/${DAO_BODY_MAX}`, `当前 +${Math.round(bl * DAO_BODY_PER_LEVEL * 100)}%${bl >= DAO_BODY_MAX ? '' : ` → +${Math.round((bl + 1) * DAO_BODY_PER_LEVEL * 100)}%`}`, daoBodyCost(bl), 'daoguo', 'upgradeDaoBody()', bl >= DAO_BODY_MAX)}</div>
+                <div class="use-card"><div class="use-title">☯️ 道果悟法 <small>永久放大全部悟道法则的效果，每级 +${Math.round(DAO_LAW_PER_LEVEL * 100)}%</small></div>${useRow('☯️ 悟法', `Lv.${ll}/${DAO_LAW_MAX}`, `当前 +${Math.round(ll * DAO_LAW_PER_LEVEL * 100)}%${ll >= DAO_LAW_MAX ? '' : ` → +${Math.round((ll + 1) * DAO_LAW_PER_LEVEL * 100)}%`}`, daoLawCost(ll), 'daoguo', 'upgradeDaoLaw()', ll >= DAO_LAW_MAX)}</div>
+                <div class="use-card"><div class="use-title">🔥👁️ 融合凝练 <small>丹火 ${FUSE_COST.danhuo} + 神识 ${FUSE_COST.shenshi} → 道果 1（把用不完的丹火和神识变成道果）</small></div>
+                    <div class="use-row"><div class="use-main"><div class="use-effect">当前最多可凝练 ${maxTimes} 次</div></div>
+                    <button type="button" class="btn ${maxTimes > 0 ? '' : 'btn-secondary'} use-btn" onclick="fuseCurrencies(1)">凝练 ×1</button>
+                    <button type="button" class="btn ${maxTimes > 0 ? '' : 'btn-secondary'} use-btn" onclick="fuseCurrencies('max')">全部凝练</button></div></div>`;
+        }
+
+        function renderDaoguoUses() {
+            const el = document.getElementById('daoguoUses');
+            if (el) el.innerHTML = daoguoUsesHtml();
+        }
+
+
+        // 道果 / 合道对各类加成的贡献（getMod 调用）：道果淬体（生命 / 攻击 / 防御）、合道（修炼速度、四维、神识 / 道果产出）
+        function getDaoMod(key) {
+            const P = gameState.player;
+            let t = 0;
+            if (key === 'hpPct' || key === 'atkPct' || key === 'defPct') t += (P.daoBody || 0) * DAO_BODY_PER_LEVEL;
+            if (isFused()) {
+                if (key === 'hpPct' || key === 'atkPct' || key === 'defPct' || key === 'spdPct') t += FUSION_BONUS.stats;
+                else if (key === 'cultSpeed') t += FUSION_BONUS.cultSpeed;
+                else if (key === 'out:shenshi') t += FUSION_BONUS.outShenshi;
+                else if (key === 'out:daoguo') t += FUSION_BONUS.outDaoguo;
+            }
+            return t;
+        }
+
         // 当前打开的是丹火 / 神识 / 炼丹面板时刷新对应的「用途」区
         function renderSkillUses() {
             const panel = document.body.dataset.panel;
             if (panel === 'danhuo') renderDanhuoUses();
             else if (panel === 'shenshi') renderShenshiUses();
+            else if (panel === 'daoguo') renderDaoguoUses();
             else if (panel === 'alchemy') renderAlchemyBoostBar();
             else if (panel === 'shop' && shopTab !== 'coins') updateShop();
         }
@@ -919,7 +1138,7 @@
         // 静态页面里的图标占位：<span data-ico="qi|coin">emoji</span>，加载时换成手绘图标
         function fillIconSlots(root = document) {
             root.querySelectorAll('[data-ico]').forEach(el => {
-                const icon = { qi: QI_ICON, coin: COIN_ICON, danhuo: DANHUO_ICON, shenshi: SHENSHI_ICON }[el.dataset.ico];
+                const icon = { qi: QI_ICON, coin: COIN_ICON, danhuo: DANHUO_ICON, shenshi: SHENSHI_ICON, daoguo: DAOGUO_ICON }[el.dataset.ico];
                 if (icon) el.innerHTML = icon;
             });
         }
@@ -937,12 +1156,13 @@
         // （保留真实的怪物属性和克制关系），最低境界平均通关率约 60%~90%。原始数值保留在 GAME_CONFIG.dungeons，
         // 调平衡只需改此表。修改装备/属性/灵根特效后需要重新标定，临界点很陡。
         const P4_MONSTER_SCALE = {
-            mysteryTower: 1.954,
-            mysteriousForest: 1.394,
+            mysteryTower: 2.52,
+            mysteriousForest: 1.95,
             ancientRuin: 1.735,
-            tribulationGround: 0.647,
-            huashenRealm: 0.534,
-            taixuDream: 0.354
+            tribulationGround: 1.39,
+            huashenRealm: 0.935,
+            taixuDream: 0.496,
+            tiandaoRealm: 0.48
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -960,7 +1180,8 @@
             forest: { hp: 1.12, atk: 1.12 }, mountain: { hp: 1.1, atk: 1.17 }, deepMountain: { hp: 0.944, atk: 1.16 },
             swamp: { hp: 1.08, atk: 1.33 }, abyss: { hp: 0.921, atk: 1.31 }, goldenPlains: { hp: 0.689, atk: 0.885 },
             tribulationGround: { hp: 0.516, atk: 0.76 }, voidSea: { hp: 0.205, atk: 0.65 }, abyssRuins: { hp: 0.0705, atk: 0.512 },
-            chaosWastes: { hp: 0.0607, atk: 0.287 }, nineNether: { hp: 0.031, atk: 0.238 }
+            chaosWastes: { hp: 0.0607, atk: 0.287 }, nineNether: { hp: 0.031, atk: 0.238 },
+            daoWastes: { hp: 0.0252, atk: 0.232 }, fusionVoid: { hp: 0.0213, atk: 0.229 }
         };
 
         const BATTLE_FORMULAS = {
@@ -1073,6 +1294,10 @@
                 temperLevel: 0,      // （旧）全局淬炼次数，v6.51 起改为 temper（按部位），读档时迁移
                 danhuo: 0,           // 丹火（货币，金丹起）
                 shenshi: 0,          // 神识（货币，元婴起）
+                daoguo: 0,           // 道果（货币，合体起）
+                daoBody: 0,          // 道果淬体等级（0–10）
+                daoLaw: 0,           // 道果悟法等级（0–5）
+                fusion: null,        // 合道状态 { active, at }（不可逆）
                 temper: { weapon: 0, armor: 0, jewelry: 0 },   // 淬炼等级（按部位，0–10）
                 rootLevel: 0,        // 灵根强化等级（0–10）
                 shen: { clone: 0, focus: 0, sense: 0 },        // 神识强化等级（各 0–10）
@@ -1538,6 +1763,7 @@
         const CLONE_UNLOCK_REALMS = [13, 17];   // 第 1、2 个分身的解锁境界：元婴初期、化神初期
 
         function getCloneSlotCount() {
+            if (isFused()) return 0;   // 合道后分身永久消失
             return CLONE_UNLOCK_REALMS.filter(r => gameState.player.realmIndex >= r).length;
         }
 
@@ -1583,7 +1809,7 @@
 
         // 让分身开始做某个配方（不指定槽位时用第一个空闲的分身）
         function assignClone(skill, key, slot = null) {
-            if (!isCloneUnlocked()) { showNotification('🔒 分身要到元婴初期才会出现', '#c98a3e'); return; }
+            if (!isCloneUnlocked()) { showNotification(isFused() ? '你已合道，分身已收回体内' : '🔒 分身要到元婴初期才会出现', '#c98a3e'); return; }
             if (!LIFE_SKILLS.includes(skill)) { showNotification('分身只能做生活技能的配方', '#c98a3e'); return; }
             const recipe = getAction(skill, key);
             if (!recipe || !getRecipeUnlockState(skill, recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#c98a3e'); return; }
@@ -1709,7 +1935,7 @@
                 const isClone = durationFn === getCloneDuration;
                 const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double + (isClone ? getCloneDoubleBonus() : 0) + applyAlchemyBoostBatch(skill, action, n);
                 gameState.player.coins += (per.coins || 0) * n;
-                addCurrency({ danhuo: (per.danhuo || 0) * n, shenshi: (per.shenshi || 0) * n });
+                addCurrency({ danhuo: (per.danhuo || 0) * n, shenshi: (per.shenshi || 0) * n, daoguo: (per.daoguo || 0) * n });
                 const lost = [];
                 (per.items || []).forEach(item => {
                     const qty = Math.floor(item.qty * n * (1 + doubleRate) + 1e-9);
@@ -2780,9 +3006,9 @@
             battleLogEntries.push(won ? `🎉 战胜${battle.currentEnemy.name}` : (battle.playerHP.current <= 0 ? `💀 被${battle.currentEnemy.name}击败` : `⚔️ 未能击败${battle.currentEnemy.name}（超时）`));
             trimBattleLog();
             if (won) {
-                const { coins, exp, items, lost, danhuo, shenshi } = grantNormalBattleWin(areaKey);
+                const { coins, exp, items, lost, danhuo, shenshi, daoguo } = grantNormalBattleWin(areaKey);
                 auto.wins++; auto.coins += coins; auto.exp += exp;
-                battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验${danhuo ? `、${danhuo} 丹火` : ''}${shenshi ? `、${shenshi} 神识` : ''}`);
+                battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验${danhuo ? `、${danhuo} 丹火` : ''}${shenshi ? `、${shenshi} 神识` : ''}${daoguo ? `、${daoguo} 道果` : ''}`);
                 if (items.length) battleLogEntries.push(`🎁 掉落：${formatDropList(items)}`);
                 if (lost.length) {
                     battleLogEntries.push(`❌ 背包已满，${formatDropList(lost)} 未能获得`);
@@ -2840,7 +3066,9 @@
             voidSea:           [{ id: 'crystal', p: 0.12, qty: 1 }, { id: 'spiritcrystal', p: 0.12, qty: 1 }, { id: 'immortalore', p: 0.02, qty: 1 }, { id: 'shenshi_seed', p: 0.015, qty: 1 }],
             abyssRuins:        [{ id: 'spiritcrystal', p: 0.15, qty: [1, 2] }, { id: 'immortalore', p: 0.05, qty: 1 }, { id: 'daofruit', p: 0.02, qty: 1 }],
             chaosWastes:       [{ id: 'immortalore', p: 0.10, qty: 1 }, { id: 'chaosstone', p: 0.04, qty: 1 }, { id: 'seed_daofruit', p: 0.02, qty: 1 }],
-            nineNether:        [{ id: 'immortalore', p: 0.15, qty: [1, 2] }, { id: 'chaosstone', p: 0.08, qty: 1 }, { id: 'daofruit', p: 0.05, qty: 1 }, { id: 'seed_daofruit', p: 0.03, qty: 1 }]
+            nineNether:        [{ id: 'immortalore', p: 0.15, qty: [1, 2] }, { id: 'chaosstone', p: 0.08, qty: 1 }, { id: 'daofruit', p: 0.05, qty: 1 }, { id: 'seed_daofruit', p: 0.03, qty: 1 }],
+            daoWastes:         [{ id: 'daostone', p: 0.10, qty: 1 }, { id: 'chaosstone', p: 0.12, qty: 1 }, { id: 'daofruit', p: 0.06, qty: 1 }, { id: 'seed_daofruit', p: 0.03, qty: 1 }],
+            fusionVoid:        [{ id: 'daostone', p: 0.18, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'daoguo_seed', p: 0.015, qty: 1 }]
         };
 
         // 掉落数量文字（如 1–2 / 1）
@@ -2879,7 +3107,7 @@
             const { got, lost } = rollAreaDrops(areaKey, reward);
             const currency = rollAreaCurrency(areaKey, reward);
             trackQuest('battleWin');
-            return { coins, exp, items: got, lost, danhuo: currency.danhuo, shenshi: currency.shenshi };
+            return { coins, exp, items: got, lost, danhuo: currency.danhuo, shenshi: currency.shenshi, daoguo: currency.daoguo };
         }
 
         // 把若干次掉落合并成 { id: 数量 }
@@ -2923,7 +3151,7 @@
             const savedSpeed = gameState.battleSpeed;
             const savedTimer = gameState.player.foodUseTimer;
             gameState.battleSpeed = 5;
-            const r = { fights: 0, wins: 0, losses: 0, coins: 0, exp: 0, stopped: false, drops: {}, lostDrops: {}, danhuo: 0, shenshi: 0 };
+            const r = { fights: 0, wins: 0, losses: 0, coins: 0, exp: 0, stopped: false, drops: {}, lostDrops: {}, danhuo: 0, shenshi: 0, daoguo: 0 };
             let elapsed = 0, streak = 0;
             try {
                 while (elapsed < budgetSeconds && r.fights < 20000) {
@@ -2942,7 +3170,7 @@
                         const g = grantNormalBattleWin(areaKey);
                         r.wins++; r.coins += g.coins; r.exp += g.exp; streak = 0;
                         mergeDrops(r.drops, g.items); mergeDrops(r.lostDrops, g.lost);
-                        r.danhuo += g.danhuo; r.shenshi += g.shenshi;
+                        r.danhuo += g.danhuo; r.shenshi += g.shenshi; r.daoguo += g.daoguo;
                     } else {
                         r.losses++;
                         if (battle.playerHP.current <= 0) { r.died = true; break; }   // 被击败：与在线一致，循环结束
@@ -3015,7 +3243,7 @@
             }
 
             // 通关丹火 / 神识（金丹级以上秘境）
-            [['danhuo', '丹火'], ['shenshi', '神识']].forEach(([kind, label]) => {
+            [['danhuo', '丹火'], ['shenshi', '神识'], ['daoguo', '道果']].forEach(([kind, label]) => {
                 const range = rewards[kind];
                 if (!range) return;
                 const amount = Array.isArray(range) ? range[0] + Math.floor(Math.random() * (range[1] - range[0] + 1)) : range;
@@ -3106,7 +3334,9 @@
             4: { pillId: 'pill', pillName: '筑基丹', qty: 1 },   // 练气巅峰(索引4)→筑基初期(索引5)
             8: { pillId: 'goldenpill', pillName: '金丹秘药', qty: 1 },  // P6 筑基圆满(索引8)→金丹初期(索引9)
             12: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 },  // P7 金丹圆满(索引12)→元婴初期(索引13)
-            16: { pillId: 'huashenpill', pillName: '化神丹', qty: 1 }   // P9 元婴圆满(索引16)→化神初期(索引17)
+            16: { pillId: 'huashenpill', pillName: '化神丹', qty: 1 },   // P9 元婴圆满(索引16)→化神初期(索引17)
+            20: { pillId: 'hetipill', pillName: '合体丹', qty: 1 }       // P10 化神圆满(索引20)→合体初期(索引21)
+            // 24（合体圆满 → 炼虚初期）预留：需要炼虚丹，并且必须已「合道」（见 attemptBreakthrough）
         };
 
         // 功法系统（绑定到角色出身，影响修炼速度）
@@ -3225,6 +3455,26 @@
                 effects: { hpPct: 0.12, defPct: 0.10, 'time:life': -0.08 },  // 特效
                 description: '相传自太初而来的混元之法，肉身与元神浑然一体，修行与劳作皆事半功倍。',
                 origin: null
+            },
+            // 合体期功法（商城购买）
+            heti_art: {
+                id: 'heti_art',
+                name: '合体真经',
+                tier: 9,
+                speedMultiplier: 5.0,               // 修炼速度快400%
+                effects: { atkPct: 0.12, defPct: 0.10, 'out:daoguo': 0.10 },
+                description: '合体修士的根本大典，肉身与元神合一，出手沉稳，凝道更快。',
+                origin: null
+            },
+            // 合体期高阶功法（稀有）
+            dao_art: {
+                id: 'dao_art',
+                name: '太上合道经',
+                tier: 10,
+                speedMultiplier: 6.2,               // 修炼速度快520%
+                effects: { hpPct: 0.15, 'exp:life': 0.15, 'out:daoguo': 0.15 },
+                description: '太上宗门不传之秘，直接吞吐天地大道，修行一日千里。',
+                origin: null
             }
         };
 
@@ -3313,7 +3563,7 @@
         //   生活：time:<技能> 耗时变化（负数=更快）、exp:<技能> 经验加成、
         //         double:<技能> 产出翻倍概率、save:<技能> 不消耗材料的概率
         //         <技能> 可写 life 表示所有生活技能（炼丹/炼器/灵田/采矿/丹火/神识）
-        const LIFE_SKILLS = ['alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi'];
+        const LIFE_SKILLS = ['alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi', 'daoguo'];
         const BASE_CRIT = { rate: 0.05, dmg: 1.5 };   // 所有玩家的基础暴击率与暴击倍率
 
         const SPIRIT_ROOT_EFFECTS = {
@@ -3327,7 +3577,7 @@
             wind:    { name: '风灵根', effects: { spdPct: 0.10, dodge: 0.07, 'time:life': -0.06 } }
         };
 
-        const EFFECT_SKILL_NAMES = { cultivation: '修炼', alchemy: '炼丹', forging: '炼器', farming: '灵田', mining: '采矿', danhuo: '丹火', shenshi: '神识', battle: '战斗', wudao: '悟道', life: '所有生活技能' };
+        const EFFECT_SKILL_NAMES = { cultivation: '修炼', alchemy: '炼丹', forging: '炼器', farming: '灵田', mining: '采矿', danhuo: '丹火', shenshi: '神识', daoguo: '道果', battle: '战斗', wudao: '悟道', life: '所有生活技能' };
 
         // ==================== 悟道：八种法则 ====================
         // 化神初期起可用。每种法则有独立的领悟等级（累计经验推算，不单独存等级），效果 = 每级效果 × 等级 + 各里程碑加成，
@@ -3413,6 +3663,8 @@
                         lawTotalsCache[k] = (lawTotalsCache[k] || 0) + v;
                     });
                 });
+                const lawScale = 1 + DAO_LAW_PER_LEVEL * getDaoLaw();   // 道果悟法：全部法则效果放大
+                if (lawScale !== 1) Object.keys(lawTotalsCache).forEach(k => { lawTotalsCache[k] *= lawScale; });
             }
             return lawTotalsCache;
         }
@@ -3527,11 +3779,16 @@
             { id: 'sense_lamp',  skill: 'shenshi', level: 15, price: 40000,  icon: '🏮', name: '观照灯',   effects: { 'out:shenshi': 0.15 } },
             { id: 'sense_tower', skill: 'shenshi', level: 20, price: 120000, icon: '🔭', name: '通明台',   effects: { 'out:shenshi': 0.20, cloneSpeed: 0.05 } },
             // 悟道
+            // 道果
+            { id: 'dao_altar',    skill: 'daoguo', level: 5,  price: 60000,   icon: '🛕', name: '凝道坛',   effects: { 'out:daoguo': 0.10 } },
+            { id: 'dao_cave',     skill: 'daoguo', level: 10, price: 200000,  icon: '🕳️', name: '归元洞',   effects: { 'time:daoguo': -0.05, 'exp:daoguo': 0.08 } },
+            { id: 'dao_pagoda',   skill: 'daoguo', level: 15, price: 500000,  icon: '🗼', name: '悟真塔',   effects: { 'out:daoguo': 0.15 } },
+            { id: 'dao_heaven',   skill: 'daoguo', level: 20, price: 1200000, icon: '🌌', name: '洞天福地', effects: { 'out:daoguo': 0.20 } },
             { id: 'law_stone',    skill: 'wudao', level: 5,  price: 20000,  icon: '🪨', name: '悟道石',   effects: { 'time:wudao': -0.05 } },
             { id: 'law_platform', skill: 'wudao', level: 10, price: 60000,  icon: '⛩️', name: '悟道台',   effects: { 'time:wudao': -0.06 } },
             { id: 'law_tree',     skill: 'wudao', level: 15, price: 150000, icon: '🌳', name: '悟道茶树', effects: { 'exp:wudao': 0.10 } }
         ];
-        const SKILL_SHOP_ORDER = ['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi', 'wudao'];
+        const SKILL_SHOP_ORDER = ['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi', 'daoguo', 'wudao'];
 
         let skillUpgradeCache = null;
         function invalidateSkillUpgrades() { skillUpgradeCache = null; }
@@ -3579,7 +3836,7 @@
                 const skill = gameState.skills[skillName];
                 const list = SKILL_UPGRADES.filter(u => u.skill === skillName);
                 if (!skill || !list.length) return;
-                if ((skillName === 'danhuo' && !isDanhuoUnlocked()) || (skillName === 'shenshi' && !isShenshiUnlocked()) || (skillName === 'wudao' && P.realmIndex < LAW_UNLOCK_REALM)) return;
+                if ((skillName === 'danhuo' && !isDanhuoUnlocked()) || (skillName === 'shenshi' && !isShenshiUnlocked()) || (skillName === 'daoguo' && !isDaoguoUnlocked()) || (skillName === 'wudao' && P.realmIndex < LAW_UNLOCK_REALM)) return;
                 const title = document.createElement('div');
                 title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #6f9c8a; margin-top: 10px; margin-bottom: 5px;';
                 title.textContent = `${skill.icon} ${skill.name}设施（${skill.name} Lv.${skill.level || 1}）`;
@@ -3629,6 +3886,7 @@
             total += getLawTotals()[key] || 0;
             total += getSkillUpgradeTotals()[key] || 0;   // 技能商店里已购置的设施
             if (key === 'cultSpeed') total += getEquippedEffectSum('cultSpeed');   // 装备物品自带的修炼速度
+            total += getDaoMod(key);   // 道果淬体 / 合道
             return total;
         }
 
@@ -3769,7 +4027,7 @@
                 const ws = GAME_CONFIG.items[id]?.effect?.workSpeed;
                 if (ws) mult *= ws;
             });
-            return mult * (1 - 0.015 * getShenLevel('focus'));   // 神识「专注」：生活技能 / 悟道耗时 -1.5%/级
+            return mult * (1 - 0.015 * getShenLevel('focus')) * (isFused() ? FUSION_BONUS.workSpeed : 1);   // 神识「专注」：耗时 -1.5%/级；合道：耗时 ×0.5
         }
 
         // 其他技能：仅受工作速度倍率 = duration × getWorkSpeedMultiplier()
@@ -4109,7 +4367,7 @@
                     if (item.qty > 0) addToInventory(item.id, item.qty);
                 });
             }
-            if (finalOutput.danhuo || finalOutput.shenshi) addCurrency(finalOutput);
+            if (finalOutput.danhuo || finalOutput.shenshi || finalOutput.daoguo) addCurrency(finalOutput);
 
             // 处理技能经验
             if (finalOutput.skill && finalOutput.exp) {
@@ -4181,11 +4439,12 @@
         // 应用技能等级加成到产出
         function applySkillLevelBonus(skillName, output) {
             // 丹火 / 神识产出：技能每级 +2%
-            if ((skillName === 'danhuo' || skillName === 'shenshi') && (output.danhuo || output.shenshi)) {
+            if ((skillName === 'danhuo' || skillName === 'shenshi' || skillName === 'daoguo') && (output.danhuo || output.shenshi || output.daoguo)) {
                 const m = 1 + ((gameState.skills[skillName] || {}).level - 1 || 0) * 0.02;
                 const outMod = 1 + getSkillMod('out', skillName);   // 技能商店设施：丹火 / 神识产出 +x%
                 if (output.danhuo) output.danhuo = Math.floor(output.danhuo * m * outMod);
                 if (output.shenshi) output.shenshi = Math.floor(output.shenshi * m * outMod);
+                if (output.daoguo) output.daoguo = Math.floor(output.daoguo * m * outMod);
                 return;
             }
             const skill = gameState.skills[skillName];
@@ -4232,12 +4491,12 @@
             renderMobileSkillBar();
 
             // 只有技能相关面板才更新技能树高亮
-            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi', 'wudao'].includes(panelName)) {
+            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi', 'daoguo', 'wudao'].includes(panelName)) {
                 updateSkillTree(panelName);
             }
 
             // 生成配方/技能列表
-            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi'].includes(panelName)) {
+            if (['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi', 'daoguo'].includes(panelName)) {
                 generateRecipeList(panelName);
             } else if (panelName === 'wudao') {
                 generateLawList();
@@ -4305,6 +4564,7 @@
             const realmIdx = gameState.player.realmIndex;
             if (realmIdx >= 9) skills.push('danhuo');
             if (realmIdx >= 13) skills.push('shenshi');
+            if (realmIdx >= 21) skills.push('daoguo');
             if (realmIdx >= LAW_UNLOCK_REALM) skills.push('wudao');
             return skills.filter(name => gameState.skills[name]);
         }
@@ -4340,7 +4600,7 @@
         }
 
         // 左侧技能树：分三组（核心 / 生活技能 / 进阶），每项一行：图标 + 名称 + 等级，下面一条细经验条
-        const SKILL_GROUPS = [['cultivation', 'battle'], ['alchemy', 'forging', 'farming', 'mining'], ['danhuo', 'shenshi', 'wudao']];
+        const SKILL_GROUPS = [['cultivation', 'battle'], ['alchemy', 'forging', 'farming', 'mining'], ['danhuo', 'shenshi', 'daoguo', 'wudao']];
         function buildSkillTree() {
             renderMobileSkillBar();
             const tree = document.getElementById('skillTree');
@@ -4478,6 +4738,9 @@
             if (output.shenshi) {
                 parts.push(`${SHENSHI_ICON} +${output.shenshi}神识`);
             }
+            if (output.daoguo) {
+                parts.push(`${DAOGUO_ICON} +${output.daoguo}道果`);
+            }
             if (output.exp) {
                 parts.push(`+${output.exp}exp`);
             }
@@ -4521,6 +4784,7 @@
             if (out.coins) return COIN_ICON;
             if (out.danhuo) return DANHUO_ICON;
             if (out.shenshi) return SHENSHI_ICON;
+            if (out.daoguo) return DAOGUO_ICON;
             return '✨';
         }
 
@@ -4703,7 +4967,7 @@
             const random = (r.random || []).map(d => `${name(d.id)}×${qty(d.qty)}（${Math.round((d.probability || 1) * 100)}%）`);
             const coins = Array.isArray(r.coins) ? `${r.coins[0]}–${r.coins[1]} 灵石` : (r.coins ? `${r.coins} 灵石` : '');
             const list = fixed.concat(random);
-            const cur = [['danhuo', DANHUO_ICON, '丹火'], ['shenshi', SHENSHI_ICON, '神识']].filter(([k]) => r[k]).map(([k, icon, label]) => ` · ${icon} ${qty(r[k])} ${label}`).join('');
+            const cur = [['danhuo', DANHUO_ICON, '丹火'], ['shenshi', SHENSHI_ICON, '神识'], ['daoguo', DAOGUO_ICON, '道果']].filter(([k]) => r[k]).map(([k, icon, label]) => ` · ${icon} ${qty(r[k])} ${label}`).join('');
             return `<div class="area-reward">
                     <div class="area-drops">通关掉落：${list.length ? list.join('、') : '无物品'}</div>
                     <div>另有：${coins}${cur}${r.skillExp ? ' · ' + r.skillExp + ' 战斗经验' : ''}（每只怪物还会掉灵石）</div>
@@ -5394,7 +5658,10 @@
                 abyssRuins: { name: '深渊遗迹', desc: '极端危险的废墟', minLevel: 15, maxLevel: 16, enemies: ['abyss-lord', 'ancient-god'], coins: 2000, exp: 800 },
                 // P9 化神期新增
                 chaosWastes: { name: '混沌荒原', desc: '化神修士的试炼场', minLevel: 17, maxLevel: 18, enemies: ['chaos-beast', 'void-walker'], coins: 4000, exp: 1600 },
-                nineNether: { name: '九幽冥渊', desc: '幽冥深处的绝地', minLevel: 19, maxLevel: 20, enemies: ['nether-lord', 'ghost-emperor'], coins: 8000, exp: 3200 }
+                nineNether: { name: '九幽冥渊', desc: '幽冥深处的绝地', minLevel: 19, maxLevel: 20, enemies: ['nether-lord', 'ghost-emperor'], coins: 8000, exp: 3200 },
+                // P10 合体期新增
+                daoWastes: { name: '道痕荒原', desc: '大道崩落之地', minLevel: 21, maxLevel: 22, enemies: ['dao-shade', 'law-puppet'], coins: 16000, exp: 6400 },
+                fusionVoid: { name: '合一虚境', desc: '万法归一的尽头', minLevel: 23, maxLevel: 24, enemies: ['void-beast', 'fusion-lord'], coins: 32000, exp: 12800 }
             };
 
             const actions = {};
@@ -5557,6 +5824,14 @@
                 nineNether: [
                     { name: '九幽魔君', hp: 6000, atk: 320, def: 120, spd: 45, icon: '😈' },
                     { name: '幽冥鬼帝', hp: 5200, atk: 350, def: 110, spd: 55, icon: '💀' }
+                ],
+                daoWastes: [
+                    { name: '道影行者', hp: 7000, atk: 420, def: 130, spd: 60, icon: '👤' },
+                    { name: '法则傀儡', hp: 8200, atk: 450, def: 150, spd: 50, icon: '🤖' }
+                ],
+                fusionVoid: [
+                    { name: '归墟古兽', hp: 10500, atk: 520, def: 170, spd: 55, icon: '🐉' },
+                    { name: '合一魔尊', hp: 9800, atk: 560, def: 160, spd: 65, icon: '😈' }
                 ]
             };
 
@@ -5665,7 +5940,14 @@
                 虚实道人: svg(yinSage()),
                 万象傀儡: svg(multiGolem()),
                 心魔化身: svg(shadowFace()),
-                太虚道主: svg(supremeSage())
+                太虚道主: svg(supremeSage()),
+                天道残影: svg(soulFig('#e8d8a8')),
+                法则傀儡: svg(golem('#a8843a', '#fff0c0', '<circle cx="16" cy="8.5" r="2" fill="#fff0c0"/><circle cx="16" cy="8.5" r=".8" fill="#6a4a1a" stroke="none"/>')),
+                道影行者: svg(hood('#3a3a56', '#ffe08a', '#12121a')),
+                天道意志: svg(willEye('#c9a04a', '#fff4c4')),
+                天道化身: svg(supremeSage()),
+                归墟古兽: svg(ancient()),
+                合一魔尊: svg(demon('#3a2a4a', '#c9a04a', '#ffe08a', true))
             };
         })();
 
@@ -5686,6 +5968,8 @@
                 yuanying_art: svg(book('#a83a5a', '#6a2238', m('<circle cy="-2.4" r="2.2" fill="#ffe8d0" stroke="#6a2238" stroke-width=".9"/><path d="M-3.4 5Q0 -1 3.4 5Z" fill="#ffe8d0" stroke="#6a2238" stroke-width=".9"/>')) + sparkle(25, 6, 2.2)),
                 soul_art: svg(book('#3a2f6a', '#1f1840', m('<path d="M0 -5A5 5 0 0 1 5 0A3.2 3.2 0 0 1 0 2A1.6 1.6 0 0 1 -1.4 0" stroke="#3a2f6a" stroke-width="1.2"/><circle r=".8" fill="#3a2f6a" stroke="none"/>')) + sparkle(24, 5, 2.4) + sparkle(9, 26, 1.6)),
                 huashen_art: svg(book('#5ab0b8', '#2f7a82', m('<circle r="5" stroke="#2f7a82" stroke-width=".9"/><g fill="#2f7a82" stroke="none"><circle cy="-3" r=".9"/><circle cy="3" r=".9"/><circle cx="-3" r=".9"/><circle cx="3" r=".9"/><circle r="1.1"/></g>')) + sparkle(25, 5, 2.4, '#dffcff')),
+                heti_art: svg(book('#c9a04a', '#7a5a1a', m('<circle r="5" stroke="#7a5a1a" stroke-width=".9"/><path d="M0 -5A2.5 2.5 0 0 1 0 0A2.5 2.5 0 0 0 0 5" stroke="#7a5a1a" stroke-width="1"/><circle cy="-2.5" r=".8" fill="#7a5a1a" stroke="none"/>')) + sparkle(25, 5, 2.4)),
+                dao_art: svg(book('#e8dcc0', '#8a7a5a', m('<path d="M0 -5.4L4.6 2.6H-4.6Z" stroke="#8a6a2a" stroke-width="1" fill="#f3d36a"/><circle r="1.2" fill="#8a6a2a" stroke="none"/>')) + sparkle(25, 5, 2.4) + sparkle(8, 26, 2)),
                 primordial_art: svg(book('#2a2a3a', '#111118', m('<path d="M0 -5A5 5 0 0 1 0 5A2.5 2.5 0 0 1 0 0A2.5 2.5 0 0 0 0 -5Z" fill="#1c1c26" stroke="none"/><path d="M0 -5A5 5 0 0 0 0 5A2.5 2.5 0 0 0 0 0A2.5 2.5 0 0 1 0 -5Z" fill="#fff" stroke="none"/><circle r="5" stroke="#1c1c26" stroke-width=".9"/>')) + sparkle(25, 5, 2.4))
             };
         })();
@@ -5825,7 +6109,7 @@
         // ==================== UI更新 ====================
         // 当前打开的配方 / 法则 / 战斗列表随数据实时刷新：突破后解锁的配方、技能升级后解锁的配方、
         // 精通等级与进度、材料数量等，不用再切换面板才能看到变化
-        const RECIPE_PANELS = ['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi'];
+        const RECIPE_PANELS = ['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'danhuo', 'shenshi', 'daoguo'];
         function refreshVisiblePanelLists() {
             const panel = document.body.dataset.panel;
             if (RECIPE_PANELS.includes(panel)) {
@@ -6070,12 +6354,13 @@
         const SHOP_CURRENCIES = {
             coins:   { name: '灵石', icon: () => COIN_ICON },
             danhuo:  { name: '丹火', icon: () => DANHUO_ICON },
-            shenshi: { name: '神识', icon: () => SHENSHI_ICON }
+            shenshi: { name: '神识', icon: () => SHENSHI_ICON },
+            daoguo:  { name: '道果', icon: () => DAOGUO_ICON }
         };
         let shopTab = 'coins';   // 当前商城标签：coins / danhuo / shenshi
 
         function setShopTab(tab) {
-            if ((tab === 'danhuo' && !isDanhuoUnlocked()) || (tab === 'shenshi' && !isShenshiUnlocked())) return;
+            if ((tab === 'danhuo' && !isDanhuoUnlocked()) || (tab === 'shenshi' && !isShenshiUnlocked()) || (tab === 'daoguo' && !isDaoguoUnlocked())) return;
             shopTab = tab;
             updateShop();
         }
@@ -6292,14 +6577,15 @@
                 arts: '📜 功法',
                 special: '✨ 特殊',
                 danhuo_shop: '🔥 丹火商品',
-                shenshi_shop: '👁️ 神识商品'
+                shenshi_shop: '👁️ 神识商品',
+                daoguo_shop: '🍎 道果商品'
             };
 
             // 商城标签：灵石商城 / 丹火商城（金丹起）/ 神识商城（元婴起）
-            if ((shopTab === 'danhuo' && !isDanhuoUnlocked()) || (shopTab === 'shenshi' && !isShenshiUnlocked())) shopTab = 'coins';
+            if ((shopTab === 'danhuo' && !isDanhuoUnlocked()) || (shopTab === 'shenshi' && !isShenshiUnlocked()) || (shopTab === 'daoguo' && !isDaoguoUnlocked())) shopTab = 'coins';
             const tabsEl = document.getElementById('shopTabs');
             if (tabsEl) {
-                const tabs = [['coins', true], ['skills', true], ['danhuo', isDanhuoUnlocked()], ['shenshi', isShenshiUnlocked()]].filter(t => t[1]);
+                const tabs = [['coins', true], ['skills', true], ['danhuo', isDanhuoUnlocked()], ['shenshi', isShenshiUnlocked()], ['daoguo', isDaoguoUnlocked()]].filter(t => t[1]);
                 tabsEl.style.display = '';
                 tabsEl.innerHTML = tabs.map(([k]) => `<button type="button" class="shop-tab${k === shopTab ? ' active' : ''}" onclick="setShopTab('${k}')">${k === 'skills' ? '🏛 技能商店' : `${SHOP_CURRENCIES[k].icon()} ${SHOP_CURRENCIES[k].name}商城`}</button>`).join('');
             }
@@ -6313,10 +6599,12 @@
             const currentRealmName = realmNames[currentRealmIdx] || '未知';
 
             // 丹火 / 神识商城顶部：该货币的全部强化（与丹火 / 神识技能页里的相同）
-            if (shopTab === 'danhuo' || shopTab === 'shenshi') {
+            if (shopTab === 'danhuo' || shopTab === 'shenshi' || shopTab === 'daoguo') {
                 const box = document.createElement('div');
                 box.style.cssText = 'grid-column: 1/-1;';
-                box.innerHTML = `<div class="shop-section-title">${shopTab === 'danhuo' ? '🔥 丹火强化' : '👁️ 神识强化'}</div>${shopTab === 'danhuo' ? danhuoUsesHtml() : shenshiUsesHtml()}`;
+                const usesTitle = { danhuo: '🔥 丹火强化', shenshi: '👁️ 神识强化', daoguo: '🍎 道果强化' }[shopTab];
+                const usesHtml = { danhuo: danhuoUsesHtml, shenshi: shenshiUsesHtml, daoguo: daoguoUsesHtml }[shopTab]();
+                box.innerHTML = `<div class="shop-section-title">${usesTitle}</div>${usesHtml}`;
                 shopContainer.appendChild(box);
             }
 
@@ -6742,6 +7030,12 @@
                 return;
             }
 
+            // 炼虚期（预留）：合体圆满起必须已合道才能晋升
+            if (realmIndex >= FUSION_REQUIRED_REALM && !isFused()) {
+                showNotification('晋升炼虚期必须先合道（在「道果」页面选择合道，不可逆）', '#c98a3e', 'warning');
+                return;
+            }
+
             // 判断是否为大境界突破（新索引规则）
             const isMajorBreakthrough = (realmIndex % 4 === 0 && realmIndex > 0);
 
@@ -6767,7 +7061,8 @@
             5:  { name: '筑基', line: '根基已成，百脉皆通', kind: 'foundation', dur: 4.2 },
             9:  { name: '金丹', line: '丹成九转，金光内蕴', kind: 'core', dur: 4.2 },
             13: { name: '元婴', line: '元神出窍，神游太虚', kind: 'nascent', dur: 4.4 },
-            17: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 }
+            17: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 },
+            21: { name: '合体', line: '天人合一，万法归宗', kind: 'unity', dur: 4.8 }
         };
         // 灵根对应的颜色（灵气入体特效用你自己的灵根色）
         const ROOT_FX_COLORS = { metal: '#d8c078', wood: '#7fae9a', water: '#7d9bb5', fire: '#d9614f', earth: '#b08d5a', wind: '#b7c9c2', thunder: '#b39ddb', ice: '#a8d8e8' };
@@ -7120,6 +7415,48 @@
             document.body.classList.toggle('fx-shake', t < 1.9);
         }
 
+        // 合体：一金一青两股气流从两侧盘旋汇入中心，合成一枚缓缓转动的阴阳圆盘，最后向外震开一圈光环
+        function fxDrawUnity(ctx, W, H, t, s) {
+            const cx = W / 2, cy = H * 0.32, R = Math.min(W, H) * 0.16;
+            const fade = t > 4.1 ? Math.max(0, (4.8 - t) / 0.7) : 1;
+            ctx.fillStyle = `rgba(8, 10, 14, ${0.7 * Math.min(1, t / 0.4) * fade})`;
+            ctx.fillRect(0, 0, W, H);
+            const conv = fxEase(t / 2.2);
+            [[0, '232, 200, 110'], [Math.PI, '120, 210, 220']].forEach(([off, col]) => {
+                for (let i = 0; i < 46; i++) {
+                    const k = i / 46, ang = off + (1 - conv) * 5 + k * 4.2 - t * 1.6;
+                    const dist = (1 - conv * 0.92) * Math.max(W, H) * 0.42 * (0.25 + k * 0.75) + R * 0.1;
+                    const x = cx + Math.cos(ang) * dist, y = cy + Math.sin(ang) * dist;
+                    ctx.fillStyle = `rgba(${col}, ${(0.15 + 0.7 * (1 - k)) * fade})`;
+                    ctx.beginPath(); ctx.arc(x, y, 2.6 - k * 1.6, 0, Math.PI * 2); ctx.fill();
+                }
+            });
+            const disc = fxEase((t - 1.8) / 1.0);
+            if (disc > 0) {
+                const rr = R * disc, rot = t * 1.1;
+                ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot); ctx.globalAlpha = fade;
+                const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rr * 1.9);
+                g.addColorStop(0, 'rgba(255, 244, 210, 0.55)'); g.addColorStop(1, 'rgba(200, 160, 80, 0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, rr * 1.9, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#e8c86e'; ctx.beginPath(); ctx.arc(0, 0, rr, -Math.PI / 2, Math.PI / 2); ctx.fill();
+                ctx.fillStyle = '#78d2dc'; ctx.beginPath(); ctx.arc(0, 0, rr, Math.PI / 2, Math.PI * 1.5); ctx.fill();
+                ctx.fillStyle = '#e8c86e'; ctx.beginPath(); ctx.arc(0, -rr / 2, rr / 2, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#78d2dc'; ctx.beginPath(); ctx.arc(0, rr / 2, rr / 2, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#78d2dc'; ctx.beginPath(); ctx.arc(0, -rr / 2, rr / 7, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#e8c86e'; ctx.beginPath(); ctx.arc(0, rr / 2, rr / 7, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 244, 210, 0.85)'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2); ctx.stroke();
+                ctx.restore();
+            }
+            [3.0, 3.4].forEach((t0, i) => {
+                const k = (t - t0) / 1.2;
+                if (k <= 0 || k >= 1) return;
+                ctx.strokeStyle = `rgba(${i ? '120, 210, 220' : '240, 210, 120'}, ${0.85 * (1 - k)})`;
+                ctx.lineWidth = 5 * (1 - k) + 1;
+                ctx.beginPath(); ctx.arc(cx, cy, R + fxEase(k) * Math.max(W, H) * 0.55, 0, Math.PI * 2); ctx.stroke();
+            });
+        }
+
         // 设置里的「突破特效回放」：只列出已经突破过的大境界（含凡人入练气）
         function renderFxReplay() {
             const box = document.getElementById('fxReplayList');
@@ -7135,7 +7472,7 @@
             playBreakthroughEffect(idx, true, true);
         }
 
-        const FX_DRAWERS = { minor: fxDrawMinor, qi: fxDrawQi, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw };
+        const FX_DRAWERS = { minor: fxDrawMinor, qi: fxDrawQi, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw, unity: fxDrawUnity };
 
         // 播放突破特效：newRealmIndex = 突破后的境界索引；major = 是否大境界突破
         // force = true：设置里「回放」时使用，即使关闭了突破特效也播放
@@ -7571,7 +7908,7 @@
                     const mins = Math.max(1, Math.round(res.elapsed / 60));
                     const dropText = Object.keys(res.drops).length ? `\n🎁 掉落：${formatDropList(dropMapToList(res.drops))}` : '';
                     const lostText = Object.keys(res.lostDrops).length ? `\n❌ 背包已满，${formatDropList(dropMapToList(res.lostDrops))} 未能获得` : '';
-                    const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验${res.danhuo ? ` +${res.danhuo}丹火` : ''}${res.shenshi ? ` +${res.shenshi}神识` : ''}${dropText}${lostText}` +
+                    const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验${res.danhuo ? ` +${res.danhuo}丹火` : ''}${res.shenshi ? ` +${res.shenshi}神识` : ''}${res.daoguo ? ` +${res.daoguo}道果` : ''}${dropText}${lostText}` +
                         (res.stopped ? `\n⚠️ 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，已停止（请检查装备与食物）` : '');
                     showNotification(msg + (res.died ? `
 💀 第 ${res.fights} 场被击败，循环战斗已结束（生命恢复至50%，请检查装备与食物）` : ''), (res.stopped || res.died) ? '#c98a3e' : '#6fa980');
@@ -7656,6 +7993,7 @@
             offlineRewards.coins = (perAction.coins || 0) * completions;
             offlineRewards.danhuo = (perAction.danhuo || 0) * completions;
             offlineRewards.shenshi = (perAction.shenshi || 0) * completions;
+            offlineRewards.daoguo = (perAction.daoguo || 0) * completions;
             offlineRewards.cultivation = (perAction.cultivation || 0) * completions;
             // 「产出翻倍」特效：按概率折算（期望值）；丹火助炼按能负担的次数折算
             const doubleRate = getSkillMod('double', savedAction.skill) + getMasteryBonus(savedAction.skill, savedAction.action).double + applyAlchemyBoostBatch(savedAction.skill, action, completions);
@@ -7730,7 +8068,7 @@
             const cultivationCapped = gameState.player.cultivationXP >= GAME_CONFIG.realms[gameState.player.realmIndex].nextReq;
 
             // 没有任何收益（例如刷新页面只离开几秒）时不弹结算窗
-            const earnedAnything = offlineRewards.coins > 0 || offlineRewards.danhuo > 0 || offlineRewards.shenshi > 0 || offlineRewards.cultivation > 0 ||
+            const earnedAnything = offlineRewards.coins > 0 || offlineRewards.danhuo > 0 || offlineRewards.shenshi > 0 || offlineRewards.daoguo > 0 || offlineRewards.cultivation > 0 ||
                 offlineRewards.items.length > 0 || offlineRewards.lostItems.length > 0 || Object.keys(offlineRewards.skillExp).length > 0 ||
                 (offlineRewards.overflowCoins || 0) > 0;
             const quiet = offlineSeconds < quietUnder && !exceedsLimit && !cultivationCapped;
@@ -7775,6 +8113,9 @@
             }
             if (rewards.shenshi > 0) {
                 content += `<div class="stat-row"><span class="stat-label">${SHENSHI_ICON} 获得神识:</span><span class="stat-value">+${rewards.shenshi}</span></div>`;
+            }
+            if (rewards.daoguo > 0) {
+                content += `<div class="stat-row"><span class="stat-label">${DAOGUO_ICON} 获得道果:</span><span class="stat-value">+${rewards.daoguo}</span></div>`;
             }
 
             if (rewards.cultivation > 0) {
