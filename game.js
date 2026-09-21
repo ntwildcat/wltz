@@ -910,8 +910,8 @@
             mysteriousForest: 0.617,
             ancientRuin: 0.763,
             tribulationGround: 0.262,
-            huashenRealm: 0.16,
-            taixuDream: 0.1013
+            huashenRealm: 0.221,
+            taixuDream: 0.1441
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
