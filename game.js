@@ -1177,11 +1177,11 @@
         // 标定：无特效玩家（桃木剑、最低境界）通关率约 65%，且敌人平均每击约打掉玩家 12% 最大生命，
         // 让防御/闪避/生命类特效在普通战斗里同样有价值（只缩放血量会变成纯输出检定，输出型灵根占尽优势）。
         const P4_AREA_SCALE = {
-            forest: { hp: 1.12, atk: 1.12 }, mountain: { hp: 1.1, atk: 1.17 }, deepMountain: { hp: 0.944, atk: 1.16 },
-            swamp: { hp: 1.08, atk: 1.33 }, abyss: { hp: 0.921, atk: 1.31 }, goldenPlains: { hp: 0.689, atk: 0.885 },
-            tribulationGround: { hp: 0.516, atk: 0.76 }, voidSea: { hp: 0.205, atk: 0.65 }, abyssRuins: { hp: 0.0705, atk: 0.512 },
-            chaosWastes: { hp: 0.0607, atk: 0.287 }, nineNether: { hp: 0.031, atk: 0.238 },
-            daoWastes: { hp: 0.0252, atk: 0.232 }, fusionVoid: { hp: 0.0213, atk: 0.229 }
+            forest: { hp: 1.12, atk: 1.12 }, mountain: { hp: 1.1, atk: 1.17 }, deepMountain: { hp: 1.218, atk: 1.844 },
+            swamp: { hp: 1.393, atk: 2.115 }, abyss: { hp: 1.087, atk: 1.782 }, goldenPlains: { hp: 1.357, atk: 2.602 },
+            tribulationGround: { hp: 0.96, atk: 2.067 }, voidSea: { hp: 0.482, atk: 2.405 }, abyssRuins: { hp: 0.1558, atk: 1.756 },
+            chaosWastes: { hp: 0.1718, atk: 1.337 }, nineNether: { hp: 0.0837, atk: 1.047 },
+            daoWastes: { hp: 0.0811, atk: 1.262 }, fusionVoid: { hp: 0.0639, atk: 1.145 }
         };
 
         const BATTLE_FORMULAS = {
@@ -2469,10 +2469,12 @@
             // 手动进入时清空日志；循环续战（通关后再进）保留最近 30 条
             if (!keepLog) resetBattleLog(); else renderBattleLog(true);
 
-            // 设置初始速度
-            gameState.battleSpeed = 1;
+            // 沿用玩家已选的战斗速度（通关后循环续战、被击败后再进都不重置）；从未选过则为 1x
+            const keepSpeed = gameState.battleSpeed || 1;
+            const speedBtn = document.querySelector(`.speed-btn[data-speed="${keepSpeed}"]`);
+            gameState.battleSpeed = speedBtn ? keepSpeed : 1;
             document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('.speed-btn[data-speed="1"]').classList.add('active');
+            (speedBtn || document.querySelector('.speed-btn[data-speed="1"]')).classList.add('active');
 
             // 初始化玩家和怪物信息
             const dungeonId = gameState.dungeons.currentDungeon;
