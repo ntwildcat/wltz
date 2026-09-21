@@ -537,6 +537,99 @@
             }
         };
 
+        // ==================== 美术：物品图标（手绘矢量，水墨线 + 铜金 + 朱印色） ====================
+        // 每种物品单独一枚 SVG（32×32），不依赖外部图片。加载时写回 GAME_CONFIG.items / 商店 / 食物配置的 icon 字段；
+        // 没有对应图标的物品保持原来的 emoji。图标是 HTML 字符串，所以显示图标的地方一律用 innerHTML。
+        const ITEM_ICONS = (() => {
+            const INK = '#2b2016';
+            const svg = inner => `<svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><g stroke="${INK}" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" fill="none">${inner}</g></svg>`;
+            const sparkle = (x, y, s = 2.4, c = '#fff4c4') => `<path d="M${x} ${y - s}L${x + s * 0.35} ${y - s * 0.35}L${x + s} ${y}L${x + s * 0.35} ${y + s * 0.35}L${x} ${y + s}L${x - s * 0.35} ${y + s * 0.35}L${x - s} ${y}L${x - s * 0.35} ${y - s * 0.35}Z" fill="${c}" stroke="none"/>`;
+            const leaf = (x, y, rot, len, c) => `<path d="M0 0Q${len / 2} ${-len * 0.42} ${len} 0Q${len / 2} ${len * 0.42} 0 0Z" transform="translate(${x} ${y}) rotate(${rot})" fill="${c}"/>`;
+            const bowl = (fill, rim = '#b08d5a') => `<path d="M5 15H27Q27 25 16 26Q5 25 5 15Z" fill="${rim}"/><ellipse cx="16" cy="15" rx="11" ry="3" fill="${fill}"/><path d="M12 27H20" stroke-width="1.6"/>`;
+            const steam = c => `<path d="M12 11Q10 8 12 5M17 11Q15 8 17 4M22 11Q20 8 22 5" stroke="${c}" stroke-width="1.1" opacity=".75"/>`;
+            const sack = (c, emblem) => `<path d="M12 6Q16 8 20 6L22 9Q27 16 25 24Q23 28 16 28Q9 28 7 24Q5 16 10 9Z" fill="${c}"/><path d="M11 8Q16 11 21 8" stroke="#e2c27a" stroke-width="1.4"/><path d="M12 6L11 3M20 6L21 3" stroke="#a58a55"/>${emblem}`;
+            const pill = (base, hi, deco = '', glow = '') => `${glow}<circle cx="16" cy="16" r="9" fill="${base}"/><path d="M10 13Q12 9 16 9" stroke="${hi}" stroke-width="1.8" opacity=".8"/>${deco}`;
+            const rock = (fill, facet, extra = '') => `<path d="M5 22L8 12L14 7L22 8L27 15L26 23L18 27L9 26Z" fill="${fill}"/><path d="M8 12L14 16L22 8M14 16L18 27M14 16L5 22M22 8L27 15L14 16L26 23" stroke="${facet}" stroke-width=".9"/>${extra}`;
+            const sword = (bl, hi, gd, extra = '') => `${extra}<g transform="rotate(40 16 16)"><path d="M16 1L19.5 6V21H12.5V6Z" fill="${bl}"/><path d="M16 4V19" stroke="${hi}" stroke-width="1.1"/><rect x="8.5" y="21" width="15" height="3" rx="1" fill="${gd}"/><rect x="14.3" y="24" width="3.4" height="5" fill="#7a5638"/><circle cx="16" cy="30" r="1.7" fill="${gd}"/></g>`;
+            const armor = (m, t) => `<path d="M9 6L13 4Q16 8 19 4L23 6L27 11L23 14V26H9V14L5 11Z" fill="${m}"/><path d="M13 4Q16 9 19 4M9 14H23M16 9V26" stroke="${t}" stroke-width="1"/><circle cx="12" cy="19" r="1" fill="${t}"/><circle cx="20" cy="19" r="1" fill="${t}"/>`;
+            const robe = (m, t, extra = '') => `<path d="M12 3L16 7L20 3L28 12L25 16L22 14V28H10V14L7 16L4 12Z" fill="${m}"/><path d="M12 3L16 15L20 3" stroke="${t}" stroke-width="1.3"/><rect x="10" y="17" width="12" height="2.6" fill="${t}"/>${extra}`;
+            const pendant = (gem, frame, extra = '') => `<path d="M8 3Q16 17 24 3" stroke="#c9b07a" stroke-width="1.3"/><circle cx="16" cy="20" r="7" fill="${frame}"/><circle cx="16" cy="20" r="3.6" fill="${gem}"/><path d="M16 27V31" stroke-width="1.4"/>${extra}`;
+            const seedSack = (c, emblem) => svg(sack(c, emblem));
+
+            return {
+                // —— 灵植与食材 ——
+                millet: svg(`<path d="M9 29Q10 18 8 6M16 29Q16 16 16 4M23 29Q22 18 24 6" stroke="#8a7a3c" stroke-width="1.4"/><g fill="#e2c27a"><ellipse cx="8" cy="9" rx="2" ry="3.2"/><ellipse cx="6.6" cy="15" rx="2" ry="3.2"/><ellipse cx="16" cy="7" rx="2" ry="3.2"/><ellipse cx="14.6" cy="13" rx="2" ry="3.2"/><ellipse cx="17.4" cy="13" rx="2" ry="3.2"/><ellipse cx="24" cy="9" rx="2" ry="3.2"/><ellipse cx="25.4" cy="15" rx="2" ry="3.2"/></g>`),
+                cleangrass: svg(`<path d="M16 29Q15 20 8 8Q16 12 16 29ZM16 29Q17 18 16 3Q22 12 16 29ZM16 29Q18 21 25 9Q23 20 16 29Z" fill="#7fae6a"/><path d="M16 27Q16 14 16 5" stroke="#dcefc8" stroke-width=".8"/>${sparkle(24, 21, 2.2, '#dcffd0')}`),
+                mushroom: svg(`<path d="M12 18Q11 26 13 28H19Q21 26 20 18Z" fill="#e8d9b0"/><path d="M3 18Q3 6 16 6Q29 6 29 18Q29 21 16 21Q3 21 3 18Z" fill="#a8483a"/><path d="M8 16Q16 11 24 16M11 12Q16 9 21 12" stroke="#e2a27a" stroke-width=".9"/>${sparkle(25, 6, 2.2, '#ffe6a8')}`),
+                tea: svg(`${steam('#cfe8c8')}${bowl('#7fae6a', '#a58a55')}<path d="M15 15Q18 12 21 15Q18 17 15 15Z" fill="#4f8a4a"/>`),
+                lotus: svg(`<path d="M3 24Q10 30 16 27Q22 30 29 24Q22 25 16 23Q10 25 3 24Z" fill="#5f9a6a"/><path d="M16 5Q11 12 16 22Q21 12 16 5Z" fill="#f1b8c8"/><path d="M8 9Q6 17 16 22Q10 15 8 9ZM24 9Q26 17 16 22Q22 15 24 9Z" fill="#e58fa8"/><path d="M4 15Q6 21 16 22Q8 20 4 15ZM28 15Q26 21 16 22Q24 20 28 15Z" fill="#d97695"/><circle cx="16" cy="21" r="1.6" fill="#f3d36a"/>`),
+                daofruit: svg(`<path d="M16 9Q15 5 19 3" stroke="#6a5a3a"/>${leaf(16, 7, -30, 9, '#6aa060')}<g fill="#8b6bb0"><circle cx="11" cy="14" r="4"/><circle cx="21" cy="14" r="4"/><circle cx="16" cy="14" r="4"/><circle cx="13.5" cy="20" r="4"/><circle cx="19.5" cy="20" r="4"/><circle cx="16.5" cy="26" r="3.6"/></g><g fill="#fff" stroke="none" opacity=".7"><circle cx="10" cy="13" r="1"/><circle cx="15" cy="13" r="1"/><circle cx="20" cy="13" r="1"/></g>`),
+                // —— 种子（布袋 + 徽记） ——
+                seed_millet: seedSack('#c9a45a', `<g fill="#f3e0a0" stroke="none"><ellipse cx="13" cy="19" rx="1.4" ry="2.2"/><ellipse cx="16.5" cy="17" rx="1.4" ry="2.2"/><ellipse cx="19.5" cy="20" rx="1.4" ry="2.2"/></g>`),
+                seed_cleangrass: seedSack('#7d9a62', leaf(16, 23, -60, 9, '#d6f0c0')),
+                seed_mushroom: seedSack('#9a6a5a', `<path d="M11 21Q11 15 16 15Q21 15 21 21Z" fill="#e8b8a0"/><path d="M14 21V24H18V21" fill="#f3e8cc"/>`),
+                seed_tea: seedSack('#6f9a7e', `${leaf(13, 22, -45, 7, '#d6f0c0')}${leaf(19, 22, -135, 7, '#d6f0c0')}`),
+                seed_lotus: seedSack('#c98a9a', `<path d="M16 15Q12 19 16 24Q20 19 16 15Z" fill="#fbe0e8"/>`),
+                seed_daofruit: seedSack('#7a6a9a', `<g fill="#d8c8f0" stroke="none"><circle cx="14" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><circle cx="16" cy="22" r="2"/></g>`),
+                danhuo_seed: seedSack('#a5563a', `<path d="M16 14Q21 19 18 24Q16 26 14 24Q11 19 16 14Z" fill="#ffb84a"/>`),
+                shenshi_seed: seedSack('#5b5a8a', `<path d="M10 20Q16 13 22 20Q16 27 10 20Z" fill="#dcd6f5"/><circle cx="16" cy="20" r="2.2" fill="#5b3f9a"/>`),
+                // —— 矿石 ——
+                stone: svg(`<path d="M3 25L6 17L12 15L15 22L13 27Z" fill="#8f8a7c"/><path d="M13 27L15 17L22 12L28 18L26 26Z" fill="#a39e8f"/><path d="M20 26L21 20L27 20" stroke="#6e6a5e" stroke-width=".9"/><path d="M15 17L22 12" stroke="#c9c4b4" stroke-width=".9"/>`),
+                ironore: svg(rock('#6b7078', '#4a4e56', `<g fill="#b5673e" stroke="none"><circle cx="10" cy="20" r="1.6"/><circle cx="20" cy="21" r="1.3"/><circle cx="17" cy="11" r="1.2"/></g><path d="M22 8L27 15L21 13Z" fill="#a9b0ba" stroke="none"/>`)),
+                spiritore: svg(rock('#6a7a7a', '#3f4f52', `<path d="M9 21L14 16L19 19L24 14" stroke="#7fe8d8" stroke-width="1.8"/>${sparkle(23, 9, 2.6, '#c8fff4')}`)),
+                crystal: svg(`<path d="M8 27L6 14L10 6L14 14L13 27Z" fill="#5c5a9a"/><path d="M14 27L13 10L18 2L23 10L22 27Z" fill="#7a72c8"/><path d="M22 27L22 17L26 11L28 18L27 27Z" fill="#4b4886"/><path d="M18 2V27M10 6V27" stroke="#b7b0ee" stroke-width=".8" opacity=".8"/>${sparkle(24, 5, 2.4)}`),
+                spiritcrystal: svg(`<path d="M16 2L24 12L16 30L8 12Z" fill="#8fd8f0"/><path d="M8 12H24M16 2L13 12L16 30L19 12Z" stroke="#e2f8ff" stroke-width=".9"/><path d="M13 12L16 30M19 12L16 30" stroke="#5fa8c8" stroke-width=".7"/>${sparkle(6, 7, 2.2)}${sparkle(26, 23, 2)}`),
+                immortalore: svg(rock('#c9b479', '#8a743a', `<path d="M9 22L14 15L18 20L24 12" stroke="#fff2b0" stroke-width="1.8"/>${sparkle(8, 9, 2.6)}${sparkle(25, 24, 2.2)}${sparkle(23, 7, 2)}`)),
+                chaosstone: svg(`<circle cx="16" cy="16" r="12" fill="#2a2440"/><path d="M16 4A12 12 0 0 1 16 28A6 6 0 0 1 16 16A6 6 0 0 0 16 4Z" fill="#6a4fa8" stroke="none"/><circle cx="16" cy="10" r="1.8" fill="#2a2440" stroke="none"/><circle cx="16" cy="22" r="1.8" fill="#c9b8f0" stroke="none"/><circle cx="16" cy="16" r="12" stroke="#8a72c8" stroke-width=".8"/>`),
+                spiritstone: svg(`<path d="M8 10L16 4L24 10L26 21L16 28L6 21Z" fill="#59c9b0"/><path d="M8 10L16 15L24 10M16 15V28M6 21L16 15L26 21" stroke="#c6fff0" stroke-width=".9"/><path d="M8 10L6 21L16 15Z" fill="#3ea08e" stroke="none" opacity=".7"/>${sparkle(24, 5, 2.2)}`),
+                jade: svg(`<path d="M12 4Q16 8 20 4" stroke="#c9b07a" stroke-width="1.3"/><circle cx="16" cy="18" r="10" fill="#7fc49a"/><circle cx="16" cy="18" r="3.6" fill="#1c1812" stroke-width="1"/><path d="M9 14Q11 10 15 9" stroke="#d6ffe6" stroke-width="1.4" opacity=".8"/><path d="M16 12V14M16 22V24M10 18H12M20 18H22" stroke="#4f9a72" stroke-width=".8"/>`),
+                // —— 丹药 ——
+                restpill: svg(pill('#e6e2d0', '#fff', leaf(15, 18, -30, 8, '#7fae6a'))),
+                pill: svg(pill('#d8ac52', '#fff0b8', '<path d="M11 18Q16 12 21 18Q16 22 11 18Z" stroke="#8a6220" stroke-width="1"/>', '<circle cx="16" cy="16" r="12" stroke="#f3d36a" stroke-width=".8" opacity=".6"/>')),
+                gatherpill: svg(pill('#5b8fd0', '#cfe6ff', '<circle cx="16" cy="16" r="4" stroke="#e0f0ff" stroke-width="1"/>', '<circle cx="16" cy="16" r="12" stroke="#8fc0ff" stroke-width=".8" opacity=".6"/>')),
+                realmpill: svg(pill('#8b5fb8', '#e2ccff', sparkle(16, 17, 4.5, '#f5e6ff'), '<circle cx="16" cy="16" r="12" stroke="#c9a0f0" stroke-width=".8" opacity=".6"/>')),
+                marrpill: svg(pill('#e0c04a', '#fff6b8', '<path d="M12 18Q16 22 20 18" stroke="#8a6c14" stroke-width="1.2"/>', sparkle(25, 7, 2.4))),
+                goldenpill: svg(pill('#a8763a', '#f0cf8a', '<path d="M10 20L14 15L17 19L22 12" stroke="#ffe08a" stroke-width="1.3"/>', '<circle cx="16" cy="16" r="12.5" stroke="#f3c04a" stroke-width="1.4" opacity=".7"/>')),
+                yuanyingpill: svg(pill('#d05a4a', '#ffc8b8', '<circle cx="16" cy="14" r="2.6" fill="#ffe8d0"/><path d="M11 22Q16 15 21 22Z" fill="#ffe8d0" stroke="none"/>', '<circle cx="16" cy="16" r="12.5" stroke="#f08a6a" stroke-width="1.2" opacity=".7"/>')),
+                huashenpill: svg(pill('#e6f4f2', '#fff', '<g fill="#5bb0c0" stroke="none"><circle cx="16" cy="11" r="1.3"/><circle cx="16" cy="21" r="1.3"/><circle cx="11" cy="16" r="1.3"/><circle cx="21" cy="16" r="1.3"/><circle cx="16" cy="16" r="1.6"/></g>', '<circle cx="16" cy="16" r="13" stroke="#8fe0e8" stroke-width="1.4" opacity=".8"/>')),
+                spiritpill: svg(pill('#3f74c0', '#bfdcff', '<circle cx="16" cy="16" r="5" stroke="#dbeaff" stroke-width="1"/><circle cx="16" cy="16" r="2" fill="#dbeaff" stroke="none"/>', `<circle cx="16" cy="16" r="12.5" stroke="#7fb0ff" stroke-width="1.2" opacity=".7"/>${sparkle(26, 6, 2.2)}`)),
+                // —— 丹火 / 神识 / 精华 ——
+                danhuo: svg(`<path d="M16 2Q22 10 24 16Q27 24 20 29Q16 31 12 29Q5 24 8 16Q9 12 12 9Q12 13 14 14Q13 8 16 2Z" fill="#e8642a"/><path d="M16 14Q20 19 19 23Q18 27 16 27Q13 27 13 23Q13 19 16 14Z" fill="#ffc94a"/><path d="M16 21Q17.5 23 16 26Q14.5 23 16 21Z" fill="#fff4c4" stroke="none"/>`),
+                tempered_essence: svg(`<path d="M16 3Q24 14 24 20Q24 27 16 28Q8 27 8 20Q8 14 16 3Z" fill="#f0d68a"/><path d="M12 19Q12 23 15 25" stroke="#fff" stroke-width="1.4" opacity=".8"/>${sparkle(24, 8, 2.4)}${sparkle(7, 12, 2)}<path d="M13 3H19" stroke="#a58a55" stroke-width="1.6"/>`),
+                shenshi: svg(`<path d="M2 16Q16 3 30 16Q16 29 2 16Z" fill="#e6e0f8"/><circle cx="16" cy="16" r="6" fill="#6a48b0"/><circle cx="16" cy="16" r="2.6" fill="#1c1430"/><circle cx="14" cy="14" r="1.2" fill="#fff" stroke="none"/><path d="M16 1V5M6 5L8 8M26 5L24 8" stroke="#b7a0f0" stroke-width="1.3"/>`),
+                shenshi_map: svg(`<path d="M5 6H27V26H5Z" fill="#dccb9a"/><path d="M5 6L4 8V27H26L27 26M5 6H27" stroke-width="1.1"/><path d="M8 20Q12 12 16 17T24 10" stroke="#a8483a" stroke-width="1.3" stroke-dasharray="2 2"/><circle cx="24" cy="10" r="2" fill="#a8483a" stroke="none"/><path d="M9 11L11 9M20 22L22 24M20 24L22 22" stroke="#7a6a4a" stroke-width="1"/>`),
+                // —— 食物 ——
+                millet_porridge: svg(`${steam('#f0e8d0')}${bowl('#f0e0a8')}<g fill="#c9a45a" stroke="none"><circle cx="12" cy="15" r=".9"/><circle cx="16" cy="14.5" r=".9"/><circle cx="20" cy="15.2" r=".9"/></g>`),
+                herb_soup: svg(`${steam('#d6f0c8')}${bowl('#8ab86a')}${leaf(11, 15, -20, 5, '#3f7a3f')}${leaf(19, 15.5, -160, 5, '#3f7a3f')}`),
+                mushroom_stew: svg(`${steam('#f0e0d0')}${bowl('#a8703f', '#8a6a4a')}<path d="M12 15Q12 11 16 11Q20 11 20 15Z" fill="#e8b8a0"/>`),
+                immortal_peach: svg(`<path d="M16 8Q7 6 5 16Q4 27 16 29Q28 27 27 16Q25 6 16 8Z" fill="#f4a8a0"/><path d="M16 8Q18 18 16 29" stroke="#d97a7a" stroke-width="1"/><path d="M22 12Q26 15 25 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${leaf(16, 8, -40, 10, '#5fa060')}${leaf(16, 8, -140, 7, '#7fb870')}`),
+                jade_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#b08d5a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#7fc4a0"/><path d="M10 18Q16 21 22 18" stroke="#d6ffe6" stroke-width="1" opacity=".7"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2)}`),
+                // —— 武器 ——
+                sword: svg(sword('#b98a5a', '#dcb586', '#8a6a3a')),
+                spiritsword: svg(sword('#bfe0ee', '#fff', '#6fa0b8', '<path d="M8 6L4 13H8L5 20" stroke="#f3d36a" stroke-width="1.4"/>')),
+                goldensword: svg(sword('#e2c27a', '#fff4c4', '#a86a2a')),
+                yuanyingsword: svg(sword('#f0b8a8', '#fff', '#d8a24a', '<path d="M6 26Q3 18 8 14Q7 19 10 21ZM26 26Q29 18 24 14Q25 19 22 21Z" fill="#e8642a" stroke="none" opacity=".8"/>')),
+                huashensword: svg(sword('#e6f8f6', '#fff', '#5bb0c0', '<circle cx="16" cy="16" r="14" stroke="#8fe0e8" stroke-width="1" opacity=".7"/>')),
+                // —— 护甲 / 法衣 ——
+                ironarmor: svg(armor('#8a929c', '#4a5058')),
+                spiritarmor: svg(armor('#5fb0b8', '#2f6a72')),
+                goldenarmor: svg(robe('#d8b45a', '#8a5a1a')),
+                yuanyingarmor: svg(robe('#a8483a', '#e2c27a', sparkle(16, 23, 2.8, '#ffe8b0'))),
+                huashenarmor: svg(robe('#e6f4f2', '#5bb0c0', '<path d="M12 24Q14 22 16 24Q18 22 20 24" stroke="#8fc8d0" stroke-width="1"/>')),
+                // —— 佩饰 ——
+                goldenpendant: svg(pendant('#e8642a', '#d8b45a')),
+                yuanyingpendant: svg(pendant('#d0384a', '#c99a4a', sparkle(25, 22, 2.2))),
+                huashenpendant: svg(pendant('#7fe0e8', '#e6f4f2', `${sparkle(25, 22, 2.4)}<circle cx="16" cy="20" r="8" stroke="#8fe0e8" stroke-width=".8" opacity=".7"/>`))
+            };
+        })();
+
+        // 把手绘图标写回各处配置（商店、食物按同名 id 对应到物品图标）
+        (function applyItemIcons() {
+            Object.keys(GAME_CONFIG.items).forEach(id => { if (ITEM_ICONS[id]) GAME_CONFIG.items[id].icon = ITEM_ICONS[id]; });
+            Object.values(GAME_CONFIG.shop).forEach(list => list.forEach(s => { if (ITEM_ICONS[s.id]) s.icon = ITEM_ICONS[s.id]; }));
+            Object.keys(FOOD_CONFIG.foods).forEach(id => { if (ITEM_ICONS[id]) FOOD_CONFIG.foods[id].icon = ITEM_ICONS[id]; });
+        })();
+
         // Priority 4: 战斗系统完整公式
         // P4 平衡层：秘境怪物的原始数值按旧属性体系设计，P4 改为「境界×线性倍数」后玩家属性
         // 明显偏低，这里按系数缩放怪物血量与攻击。系数由战斗模拟标定：以「8 个灵根的平均通关率」为准
@@ -1137,8 +1230,19 @@
             renderPlotBar();
         }
 
+        let lastTickWall = 0;
         function startGameTick() {
+            lastTickWall = Date.now();
             tickInterval = setInterval(() => {
+                // 页面可见但循环断了很久（电脑休眠、浏览器冻结）：没有 visibilitychange，这里按离线结算
+                const wall = Date.now();
+                if (lastTickWall && wall - lastTickWall > 10000 && !document.hidden && gameRunning) {
+                    gameState.lastActiveTime = lastTickWall;
+                    lastTickWall = wall;
+                    resumeAfterAway();
+                    return;
+                }
+                lastTickWall = wall;
                 tickFarmPlot();
                 tickClone();
                 if (!gameState.currentAction) return;
@@ -1466,7 +1570,7 @@
             const name = document.getElementById('foodName');
             const count = document.getElementById('foodCountText');
             if (!icon || !name || !count) return;
-            icon.textContent = cfg ? cfg.icon : '🍽️';
+            icon.innerHTML = cfg ? cfg.icon : '🍽️';
             name.textContent = cfg ? cfg.name : '无食物';
             count.textContent = cfg ? `×${getFoodCount()}（+${cfg.hpRestore}）` : '在炼丹中制作';
             const toggle = document.getElementById('autoEatToggle');
@@ -3916,7 +4020,7 @@
             if (!itemConfig) return;
 
             // 填充物品信息
-            document.getElementById('itemIcon').textContent = itemConfig.icon;
+            document.getElementById('itemIcon').innerHTML = itemConfig.icon;
             document.getElementById('itemName').textContent = itemConfig.name;
             document.getElementById('itemType').textContent = itemConfig.type;
             document.getElementById('itemQty').textContent = qty;
@@ -4909,7 +5013,7 @@
             const input = document.getElementById('buyQty');
             modal.dataset.shopId = shopId;
             modal.dataset.itemId = itemId;
-            document.getElementById('buyIcon').textContent = item.icon;
+            document.getElementById('buyIcon').innerHTML = item.icon;
             document.getElementById('buyName').textContent = item.name;
             document.getElementById('buyDesc').textContent = item.desc || '';
             document.getElementById('buyUnitPrice').textContent = `${item.price} 灵石`;
@@ -5511,7 +5615,7 @@
         // ==================== 突破特效 ====================
         // 小境界：一圈铜色涟漪加火花 + 朱印「破」，约 1.6 秒，不挡操作。
         // 大境界：每个境界有自己的特效（约 4 秒，点击可跳过）：
-        //   筑基 = 地脉升起（大地色石柱自下而上拔起、尘土飞扬、震动）
+        //   筑基 = 筑基台（地上画出八卦阵纹，三层圆台依次升起，一道金光贯天而起）
         //   金丹 = 金丹凝结（金色光点旋转汇聚成丹，光环扩散）
         //   元婴 = 元神出窍（青白色婴儿元神从丹田升起，拖出光带）
         //   化神 = 天地法则（雷霆劈落、八种法则符文环绕旋转、屏幕震动）
@@ -5612,42 +5716,121 @@
             }
         }
 
+        // 筑基：筑基台 —— 地上先画出八卦阵纹（天圆地方），三层圆台依次升起，最后一道金光贯天而起
         function fxDrawFoundation(ctx, W, H, t, s) {
-            const fade = Math.min(1, t / 0.5) * (t > 3.5 ? Math.max(0, (4.2 - t) / 0.7) : 1);
-            ctx.fillStyle = `rgba(14, 12, 8, ${0.6 * fade})`;
+            const cx = W / 2, cy = H * 0.8;
+            const Rx = Math.min(W * 0.42, 430), Ry = Rx * 0.3;
+            const fade = t > 3.7 ? Math.max(0, (4.4 - t) / 0.7) : 1;
+            ctx.fillStyle = `rgba(14, 12, 8, ${0.62 * Math.min(1, t / 0.5) * fade})`;
             ctx.fillRect(0, 0, W, H);
-            if (!s.pillars) {
-                const n = Math.max(7, Math.round(W / 150));
-                s.pillars = Array.from({ length: n }, (_, i) => ({ x: (i + 0.5) * W / n, w: W / n * 0.62, h: fxRand(0.32, 0.72) * H, d: 0.12 * i + fxRand(0, 0.15) }));
-                s.dust = Array.from({ length: 90 }, () => ({ x: fxRand(0, W), y: fxRand(H * 0.5, H), v: fxRand(20, 70), r: fxRand(1, 3), d: fxRand(0, 2) }));
+            // 地面微光
+            const gl = ctx.createRadialGradient(cx, cy, 0, cx, cy, Rx * 1.3);
+            gl.addColorStop(0, `rgba(150, 118, 64, ${0.28 * fade})`);
+            gl.addColorStop(1, 'rgba(150, 118, 64, 0)');
+            ctx.save(); ctx.translate(0, 0); ctx.fillStyle = gl;
+            ctx.beginPath(); ctx.ellipse(cx, cy, Rx * 1.3, Ry * 1.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+
+            // 阵纹：外圈弧线逐渐画满，刻度随之出现
+            const ring = fxEase((t - 0.1) / 1.1);
+            ctx.strokeStyle = `rgba(200, 168, 100, ${0.9 * fade})`;
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.ellipse(cx, cy, Rx, Ry, 0, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * ring); ctx.stroke();
+            ctx.lineWidth = 1.5;
+            for (let i = 0; i < 48; i++) {
+                if (i / 48 > ring) break;
+                const a = -Math.PI / 2 + (i / 48) * Math.PI * 2;
+                ctx.beginPath();
+                ctx.moveTo(cx + Math.cos(a) * Rx, cy + Math.sin(a) * Ry);
+                ctx.lineTo(cx + Math.cos(a) * Rx * 0.94, cy + Math.sin(a) * Ry * 0.94);
+                ctx.stroke();
             }
-            s.pillars.forEach(p => {
-                const k = fxEase((t - 0.25 - p.d) / 0.95);
+            // 内圈与「地方」：一个内接的菱形（透视下的方），线条依次画出
+            const inner = fxEase((t - 0.8) / 1.0);
+            if (inner > 0) {
+                ctx.strokeStyle = `rgba(176, 141, 90, ${0.85 * fade})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.ellipse(cx, cy, Rx * 0.68, Ry * 0.68, 0, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * inner); ctx.stroke();
+                const r = 0.68;
+                const pts = [[0, -Ry * r], [Rx * r, 0], [0, Ry * r], [-Rx * r, 0], [0, -Ry * r]];
+                ctx.beginPath(); ctx.moveTo(cx + pts[0][0], cy + pts[0][1]);
+                const total = 4 * inner;
+                for (let i = 1; i <= 4; i++) {
+                    const seg = Math.min(1, Math.max(0, total - (i - 1)));
+                    if (seg <= 0) break;
+                    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+                    ctx.lineTo(cx + x0 + (x1 - x0) * seg, cy + y0 + (y1 - y0) * seg);
+                }
+                ctx.stroke();
+            }
+            // 八卦：环绕阵盘依次亮起
+            ctx.font = `bold ${Math.round(Math.min(W, H) * 0.045)}px KaiTi, STKaiti, serif`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ['乾', '兑', '离', '震', '巽', '坎', '艮', '坤'].forEach((ch, i) => {
+                const k = fxEase((t - 0.45 - i * 0.11) / 0.5);
                 if (k <= 0) return;
-                const h = p.h * k, x = p.x - p.w / 2, y = H - h;
-                const g = ctx.createLinearGradient(0, y, 0, H);
-                g.addColorStop(0, `rgba(146, 116, 70, ${0.92 * fade})`);
-                g.addColorStop(1, `rgba(52, 42, 28, ${0.92 * fade})`);
-                ctx.fillStyle = g;
-                ctx.fillRect(x, y, p.w, h);
-                ctx.fillStyle = `rgba(232, 212, 160, ${0.85 * fade})`;
-                ctx.fillRect(x, y, p.w, 4);
-                ctx.strokeStyle = `rgba(20, 16, 10, ${0.5 * fade})`;
-                for (let yy = y + 26; yy < H; yy += 26) { ctx.beginPath(); ctx.moveTo(x, yy); ctx.lineTo(x + p.w, yy); ctx.stroke(); }
+                const a = -Math.PI / 2 + (i / 8) * Math.PI * 2;
+                ctx.save();
+                ctx.globalAlpha = k * fade;
+                ctx.shadowColor = 'rgba(220, 180, 100, 0.9)'; ctx.shadowBlur = 12;
+                ctx.fillStyle = '#e2c27a';
+                ctx.fillText(ch, cx + Math.cos(a) * Rx * 1.13, cy + Math.sin(a) * Ry * 1.28);
+                ctx.restore();
             });
+            // 三层圆台（圜丘）：由下而上依次从地面升起
+            const tiers = [[0.56, 26], [0.4, 26], [0.24, 26]];
+            let base = cy;
+            tiers.forEach(([rf, h], i) => {
+                const k = fxEase((t - 1.5 - i * 0.4) / 0.6);
+                const rx = Rx * rf, ry = Ry * rf;
+                const lift = (1 - k) * 46;
+                const yb = base + lift, yt = yb - h;
+                base -= h;
+                if (k <= 0) return;
+                ctx.globalAlpha = k * fade;
+                const g = ctx.createLinearGradient(0, yt, 0, yb);
+                g.addColorStop(0, 'rgba(170, 136, 84, 1)');
+                g.addColorStop(1, 'rgba(70, 56, 36, 1)');
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.moveTo(cx - rx, yt);
+                ctx.lineTo(cx - rx, yb); ctx.ellipse(cx, yb, rx, ry, 0, Math.PI, 0, true);
+                ctx.lineTo(cx + rx, yt); ctx.ellipse(cx, yt, rx, ry, 0, 0, Math.PI, false);
+                ctx.closePath(); ctx.fill();
+                ctx.fillStyle = 'rgba(214, 184, 118, 1)';
+                ctx.beginPath(); ctx.ellipse(cx, yt, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = 'rgba(70, 52, 28, 0.9)'; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.ellipse(cx, yt, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+                ctx.globalAlpha = 1;
+            });
+            // 落尘
+            if (!s.dust) s.dust = Array.from({ length: 70 }, () => ({ a: fxRand(0, 6.28), r: fxRand(0.2, 1.05), v: fxRand(24, 80), size: fxRand(1, 2.8), d: fxRand(0.6, 3) }));
             s.dust.forEach(d => {
                 if (t < d.d) return;
-                const y = d.y - (t - d.d) * d.v;
-                ctx.fillStyle = `rgba(200, 176, 120, ${0.5 * fade * Math.max(0, 1 - (t - d.d) / 2.6)})`;
-                ctx.beginPath(); ctx.arc(d.x, y, d.r, 0, Math.PI * 2); ctx.fill();
+                const life = (t - d.d) / 1.8;
+                if (life > 1) return;
+                ctx.fillStyle = `rgba(214, 184, 118, ${0.6 * (1 - life) * fade})`;
+                ctx.beginPath(); ctx.arc(cx + Math.cos(d.a) * Rx * d.r, cy + Math.sin(d.a) * Ry * d.r - life * d.v, d.size, 0, Math.PI * 2); ctx.fill();
             });
-            const ln = fxEase((t - 1.6) / 0.9);
-            if (ln > 0) {
-                ctx.strokeStyle = `rgba(232, 212, 160, ${0.8 * fade})`;
-                ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.moveTo(W / 2 - ln * W / 2, H * 0.62); ctx.lineTo(W / 2 + ln * W / 2, H * 0.62); ctx.stroke();
+            // 台成之后，一道金光自台顶贯天而起，并有一圈光环扩散
+            const beam = fxEase((t - 2.7) / 0.5);
+            if (beam > 0) {
+                const topY = base;
+                for (let i = 0; i < 4; i++) {
+                    const w = (54 - i * 12) * (0.6 + 0.4 * beam);
+                    const g = ctx.createLinearGradient(0, topY, 0, 0);
+                    g.addColorStop(0, `rgba(255, 232, 160, ${(0.32 + i * 0.12) * beam * fade})`);
+                    g.addColorStop(1, 'rgba(255, 232, 160, 0)');
+                    ctx.fillStyle = g;
+                    ctx.fillRect(cx - w / 2, 0, w, topY);
+                }
+                const wk = (t - 2.7) / 1.1;
+                if (wk < 1) {
+                    ctx.strokeStyle = `rgba(255, 232, 160, ${0.9 * (1 - wk) * fade})`;
+                    ctx.lineWidth = 4 * (1 - wk) + 1;
+                    ctx.beginPath(); ctx.ellipse(cx, cy, Rx * (0.3 + fxEase(wk) * 1.4), Ry * (0.3 + fxEase(wk) * 1.4), 0, 0, Math.PI * 2); ctx.stroke();
+                }
             }
-            document.body.classList.toggle('fx-shake', t > 0.3 && t < 1.6);
+            document.body.classList.toggle('fx-shake', t > 1.5 && t < 2.3);
         }
 
         function fxDrawCore(ctx, W, H, t, s) {
@@ -5920,7 +6103,9 @@
         function saveGame() {
             if (!currentSlot) return;   // 还没选择存档槽位（存档选择界面）时不保存
             gameState.lastSaveTime = Date.now();
-            gameState.lastActiveTime = gameState.lastSaveTime;
+            // 页面在后台时，后台的自动存档不能刷新「最后活跃时间」，否则回来时只按最后一次自动存档算离线，离线收益几乎为 0
+            // （切到后台那一刻的时间由 visibilitychange 显式记录）
+            if (!document.hidden) gameState.lastActiveTime = gameState.lastSaveTime;
             try {
                 localStorage.setItem(slotKey(currentSlot), JSON.stringify(gameState));
             } catch (e) {
@@ -6713,26 +6898,32 @@
 
         // 页面被隐藏（切标签页、锁屏、切应用）时浏览器会限制甚至冻结定时器：
         // 隐藏时暂停游戏循环，切回前台按离线规则补算；战斗只暂停不结算、不中断。
+        // 离开一段时间回来后的结算：切后台 / 电脑休眠 / 页面卡住都走这里；调用前 gameState.lastActiveTime 应是离开的那一刻
+        function resumeAfterAway() {
+            const action = gameState.currentAction;
+            const autoBattling = !!(action && action.isBattle && getAutoBattle().enabled);
+            if (autoBattling && (Date.now() - gameState.lastActiveTime) >= 10000) {
+                handleOfflineTime(60);   // 循环战斗：后台期间按离线规则模拟战斗
+            } else if (action && (action.isBattle || action.isDungeon)) {
+                const awaySecs = (Date.now() - gameState.lastActiveTime) / 1000;
+                settleCloneOffline(awaySecs);   // 主角在战斗时，分身与第二块田仍按离线结算
+                settleFarmPlotOffline(awaySecs);
+                gameState.lastActiveTime = Date.now();
+            } else {
+                handleOfflineTime(60);
+            }
+            clearInterval(tickInterval);
+            startGameTick();
+            updateUI();
+        }
+
         document.addEventListener('visibilitychange', () => {
             if (!gameRunning) return;
             if (document.hidden) {
+                gameState.lastActiveTime = Date.now();   // 记下离开的时刻（后台自动存档不会再改它）
                 saveGame();
                 clearInterval(tickInterval);
             } else {
-                const action = gameState.currentAction;
-                const autoBattling = !!(action && action.isBattle && getAutoBattle().enabled);
-                if (autoBattling && (Date.now() - gameState.lastActiveTime) >= 10000) {
-                    handleOfflineTime(60);   // 自动战斗托管：后台期间按离线规则模拟战斗
-                } else if (action && (action.isBattle || action.isDungeon)) {
-                    const awaySecs = (Date.now() - gameState.lastActiveTime) / 1000;
-                    settleCloneOffline(awaySecs);   // 主角在战斗时，分身与第二块田仍按离线结算
-                    settleFarmPlotOffline(awaySecs);
-                    gameState.lastActiveTime = Date.now();
-                } else {
-                    handleOfflineTime(60);
-                }
-                clearInterval(tickInterval);
-                startGameTick();
-                updateUI();
+                resumeAfterAway();
             }
         });
