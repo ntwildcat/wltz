@@ -277,16 +277,16 @@
                     recipes: {
                         study: { name: '看丹书', desc: '增加经验', duration: 10, output: { skill: 'alchemy', exp: 15 }, requiredLevel: 1, unlocked: true },
                         millet_porridge: { name: '灵米粥', desc: '灵米 ×2（战斗食物：恢复100生命）', duration: 8, output: { items: [{ id: 'millet_porridge', qty: 2 }], skill: 'alchemy', exp: 12 }, requiredLevel: 1, requires: { millet: 2 }, unlocked: false },
-                        herb_soup: { name: '灵草汤', desc: '清灵草 ×2 + 灵米 ×1（战斗食物：恢复250生命）', duration: 12, output: { items: [{ id: 'herb_soup', qty: 2 }], skill: 'alchemy', exp: 30 }, requiredLevel: 3, requires: { cleangrass: 2, millet: 1 }, unlocked: false },
-                        breakthrough: { name: '筑基丹', desc: '清灵草 ×3（练气巅峰突破必需）', duration: 12, output: { items: [{ id: 'pill', qty: 1 }], skill: 'alchemy', exp: 45 }, requiredLevel: 4, requires: { cleangrass: 3 }, unlocked: false },
-                        golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 灵矿石 ×2（筑基圆满突破必需）', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 8, requires: { mushroom: 3, crystal: 1, spiritore: 2 }, unlocked: false },
-                        mushroom_stew: { name: '灵芝羹', desc: '灵芝 ×2 + 灵米 ×2（战斗食物：恢复500生命）', duration: 30, output: { items: [{ id: 'mushroom_stew', qty: 2 }], skill: 'alchemy', exp: 240 }, requiredLevel: 9, requires: { mushroom: 2, millet: 2 }, unlocked: false },
-                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2（金丹圆满突破必需）', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 400 }, requiredLevel: 12, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false },
-                        huashen_pill_alchemy: { name: '化神丹', desc: '九叶莲 ×5 + 悟道茶 ×8 + 仙矿 ×2（元婴圆满突破必需）', duration: 120, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'alchemy', exp: 700 }, requiredLevel: 17, requires: { lotus: 5, tea: 8, immortalore: 2 }, unlocked: false },
-                        immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 14, requires: { tea: 3, mushroom: 2 }, unlocked: false },
-                        jade_nectar: { name: '琼浆玉液', desc: '悟道果 ×2 + 悟道茶 ×3（战斗食物：恢复2000生命，冷却更短）', duration: 80, output: { items: [{ id: 'jade_nectar', qty: 2 }], skill: 'alchemy', exp: 900 }, requiredLevel: 19, requires: { daofruit: 2, tea: 3 }, unlocked: false },
-                        heti_pill_alchemy: { name: '合体丹', desc: '九叶莲 ×8 + 悟道茶 ×10 + 天道石 ×2（化神圆满突破必需）', duration: 150, output: { items: [{ id: 'hetipill', qty: 1 }], skill: 'alchemy', exp: 1100 }, requiredLevel: 22, requires: { lotus: 8, tea: 10, daostone: 2 }, unlocked: false },
-                        jade_marrow: { name: '玉髓琼浆', desc: '悟道果 ×3 + 悟道茶 ×4 + 天道石 ×1（战斗食物：恢复3500生命）', duration: 100, output: { items: [{ id: 'jade_marrow', qty: 2 }], skill: 'alchemy', exp: 1300 }, requiredLevel: 23, requires: { daofruit: 3, tea: 4, daostone: 1 }, unlocked: false }
+                        herb_soup: { name: '灵草汤', desc: '清灵草 ×2 + 灵米 ×1（战斗食物：恢复250生命）', duration: 12, output: { items: [{ id: 'herb_soup', qty: 2 }], skill: 'alchemy', exp: 30 }, requiredLevel: 8, requires: { cleangrass: 2, millet: 1 }, unlocked: false },
+                        breakthrough: { name: '筑基丹', desc: '清灵草 ×3（练气巅峰突破必需）', duration: 12, output: { items: [{ id: 'pill', qty: 1 }], skill: 'alchemy', exp: 45 }, requiredLevel: 10, requires: { cleangrass: 3 }, unlocked: false },
+                        golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 灵矿石 ×2（筑基圆满突破必需）', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 20, requires: { mushroom: 3, crystal: 1, spiritore: 2 }, unlocked: false },
+                        mushroom_stew: { name: '灵芝羹', desc: '灵芝 ×2 + 灵米 ×2（战斗食物：恢复500生命）', duration: 30, output: { items: [{ id: 'mushroom_stew', qty: 2 }], skill: 'alchemy', exp: 240 }, requiredLevel: 22, requires: { mushroom: 2, millet: 2 }, unlocked: false },
+                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2（金丹圆满突破必需）', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 400 }, requiredLevel: 30, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false },
+                        huashen_pill_alchemy: { name: '化神丹', desc: '九叶莲 ×5 + 悟道茶 ×8 + 仙矿 ×2（元婴圆满突破必需）', duration: 120, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'alchemy', exp: 700 }, requiredLevel: 40, requires: { lotus: 5, tea: 8, immortalore: 2 }, unlocked: false },
+                        immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 34, requires: { tea: 3, mushroom: 2 }, unlocked: false },
+                        jade_nectar: { name: '琼浆玉液', desc: '悟道果 ×2 + 悟道茶 ×3（战斗食物：恢复2000生命，冷却更短）', duration: 80, output: { items: [{ id: 'jade_nectar', qty: 2 }], skill: 'alchemy', exp: 900 }, requiredLevel: 45, requires: { daofruit: 2, tea: 3 }, unlocked: false },
+                        heti_pill_alchemy: { name: '合体丹', desc: '九叶莲 ×8 + 悟道茶 ×10 + 天道石 ×2（化神圆满突破必需）', duration: 150, output: { items: [{ id: 'hetipill', qty: 1 }], skill: 'alchemy', exp: 1100 }, requiredLevel: 50, requires: { lotus: 8, tea: 10, daostone: 2 }, unlocked: false },
+                        jade_marrow: { name: '玉髓琼浆', desc: '悟道果 ×3 + 悟道茶 ×4 + 天道石 ×1（战斗食物：恢复3500生命）', duration: 100, output: { items: [{ id: 'jade_marrow', qty: 2 }], skill: 'alchemy', exp: 1300 }, requiredLevel: 54, requires: { daofruit: 3, tea: 4, daostone: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -297,23 +297,23 @@
                     exp: 0,
                     recipes: {
                         practice: { name: '打铁练习', desc: '增加技能经验', duration: 10, output: { skill: 'forging', exp: 15 }, requiredLevel: 1, unlocked: true },
-                        ironsword: { name: '铸造铁剑', desc: '铁矿石 ×3', duration: 20, output: { items: [{ id: 'sword', qty: 1 }], skill: 'forging', exp: 40 }, requiredLevel: 3, requires: { ironore: 3 }, unlocked: false },
-                        iron_armor: { name: '铁甲', desc: '铁矿石 ×5', duration: 30, output: { items: [{ id: 'ironarmor', qty: 1 }], skill: 'forging', exp: 60 }, requiredLevel: 4, requires: { ironore: 5 }, unlocked: false },
-                        iron_blade: { name: '精铁剑', desc: '铁矿石 ×6 + 碎石 ×5', duration: 35, output: { items: [{ id: 'ironblade', qty: 1 }], skill: 'forging', exp: 90 }, requiredLevel: 5, requires: { ironore: 6, stone: 5 }, unlocked: false },
-                        spirit_sword: { name: '灵剑', desc: '灵矿石 ×3 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritsword', qty: 1 }], skill: 'forging', exp: 130 }, requiredLevel: 7, requires: { spiritore: 3, crystal: 1 }, unlocked: false },
-                        spirit_armor: { name: '灵甲', desc: '灵矿石 ×4 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritarmor', qty: 1 }], skill: 'forging', exp: 150 }, requiredLevel: 8, requires: { spiritore: 4, crystal: 1 }, unlocked: false },
-                        golden_sword: { name: '金丹剑', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldensword', qty: 1 }], skill: 'forging', exp: 220 }, requiredLevel: 10, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
-                        golden_armor: { name: '金丹法袍', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldenarmor', qty: 1 }], skill: 'forging', exp: 260 }, requiredLevel: 11, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
-                        golden_pendant: { name: '金丹佩', desc: '灵晶 ×1 + 玄晶 ×3', duration: 50, output: { items: [{ id: 'goldenpendant', qty: 1 }], skill: 'forging', exp: 300 }, requiredLevel: 12, requires: { spiritcrystal: 1, crystal: 3 }, unlocked: false },
-                        yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 500 }, requiredLevel: 15, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
-                        yuanying_armor: { name: '元婴法衣', desc: '灵晶 ×4 + 玄晶 ×4', duration: 90, output: { items: [{ id: 'yuanyingarmor', qty: 1 }], skill: 'forging', exp: 560 }, requiredLevel: 16, requires: { spiritcrystal: 4, crystal: 4 }, unlocked: false },
-                        yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 17, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false },
-                        huashen_sword: { name: '化神剑', desc: '混沌石 ×3 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashensword', qty: 1 }], skill: 'forging', exp: 800 }, requiredLevel: 19, requires: { chaosstone: 3, immortalore: 2 }, unlocked: false },
-                        huashen_armor: { name: '化神法衣', desc: '混沌石 ×4 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashenarmor', qty: 1 }], skill: 'forging', exp: 880 }, requiredLevel: 20, requires: { chaosstone: 4, immortalore: 2 }, unlocked: false },
-                        huashen_pendant: { name: '化神佩', desc: '混沌石 ×2 + 灵晶 ×3', duration: 100, output: { items: [{ id: 'huashenpendant', qty: 1 }], skill: 'forging', exp: 950 }, requiredLevel: 21, requires: { chaosstone: 2, spiritcrystal: 3 }, unlocked: false },
-                        heti_sword: { name: '合体剑', desc: '天道石 ×3 + 混沌石 ×2', duration: 130, output: { items: [{ id: 'hetisword', qty: 1 }], skill: 'forging', exp: 1100 }, requiredLevel: 24, requires: { daostone: 3, chaosstone: 2 }, unlocked: false },
-                        heti_armor: { name: '合体法衣', desc: '天道石 ×4 + 混沌石 ×2', duration: 130, output: { items: [{ id: 'hetiarmor', qty: 1 }], skill: 'forging', exp: 1200 }, requiredLevel: 25, requires: { daostone: 4, chaosstone: 2 }, unlocked: false },
-                        heti_pendant: { name: '合体佩', desc: '天道石 ×2 + 灵晶 ×3', duration: 120, output: { items: [{ id: 'hetipendant', qty: 1 }], skill: 'forging', exp: 1300 }, requiredLevel: 26, requires: { daostone: 2, spiritcrystal: 3 }, unlocked: false }
+                        ironsword: { name: '铸造铁剑', desc: '铁矿石 ×3', duration: 20, output: { items: [{ id: 'sword', qty: 1 }], skill: 'forging', exp: 40 }, requiredLevel: 8, requires: { ironore: 3 }, unlocked: false },
+                        iron_armor: { name: '铁甲', desc: '铁矿石 ×5', duration: 30, output: { items: [{ id: 'ironarmor', qty: 1 }], skill: 'forging', exp: 60 }, requiredLevel: 10, requires: { ironore: 5 }, unlocked: false },
+                        iron_blade: { name: '精铁剑', desc: '铁矿石 ×6 + 碎石 ×5', duration: 35, output: { items: [{ id: 'ironblade', qty: 1 }], skill: 'forging', exp: 90 }, requiredLevel: 13, requires: { ironore: 6, stone: 5 }, unlocked: false },
+                        spirit_sword: { name: '灵剑', desc: '灵矿石 ×3 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritsword', qty: 1 }], skill: 'forging', exp: 130 }, requiredLevel: 18, requires: { spiritore: 3, crystal: 1 }, unlocked: false },
+                        spirit_armor: { name: '灵甲', desc: '灵矿石 ×4 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritarmor', qty: 1 }], skill: 'forging', exp: 150 }, requiredLevel: 20, requires: { spiritore: 4, crystal: 1 }, unlocked: false },
+                        golden_sword: { name: '金丹剑', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldensword', qty: 1 }], skill: 'forging', exp: 220 }, requiredLevel: 25, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
+                        golden_armor: { name: '金丹法袍', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldenarmor', qty: 1 }], skill: 'forging', exp: 260 }, requiredLevel: 27, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
+                        golden_pendant: { name: '金丹佩', desc: '灵晶 ×1 + 玄晶 ×3', duration: 50, output: { items: [{ id: 'goldenpendant', qty: 1 }], skill: 'forging', exp: 300 }, requiredLevel: 30, requires: { spiritcrystal: 1, crystal: 3 }, unlocked: false },
+                        yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 500 }, requiredLevel: 36, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
+                        yuanying_armor: { name: '元婴法衣', desc: '灵晶 ×4 + 玄晶 ×4', duration: 90, output: { items: [{ id: 'yuanyingarmor', qty: 1 }], skill: 'forging', exp: 560 }, requiredLevel: 39, requires: { spiritcrystal: 4, crystal: 4 }, unlocked: false },
+                        yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 40, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false },
+                        huashen_sword: { name: '化神剑', desc: '混沌石 ×3 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashensword', qty: 1 }], skill: 'forging', exp: 800 }, requiredLevel: 45, requires: { chaosstone: 3, immortalore: 2 }, unlocked: false },
+                        huashen_armor: { name: '化神法衣', desc: '混沌石 ×4 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashenarmor', qty: 1 }], skill: 'forging', exp: 880 }, requiredLevel: 48, requires: { chaosstone: 4, immortalore: 2 }, unlocked: false },
+                        huashen_pendant: { name: '化神佩', desc: '混沌石 ×2 + 灵晶 ×3', duration: 100, output: { items: [{ id: 'huashenpendant', qty: 1 }], skill: 'forging', exp: 950 }, requiredLevel: 50, requires: { chaosstone: 2, spiritcrystal: 3 }, unlocked: false },
+                        heti_sword: { name: '合体剑', desc: '天道石 ×3 + 混沌石 ×2', duration: 130, output: { items: [{ id: 'hetisword', qty: 1 }], skill: 'forging', exp: 1100 }, requiredLevel: 56, requires: { daostone: 3, chaosstone: 2 }, unlocked: false },
+                        heti_armor: { name: '合体法衣', desc: '天道石 ×4 + 混沌石 ×2', duration: 130, output: { items: [{ id: 'hetiarmor', qty: 1 }], skill: 'forging', exp: 1200 }, requiredLevel: 59, requires: { daostone: 4, chaosstone: 2 }, unlocked: false },
+                        heti_pendant: { name: '合体佩', desc: '天道石 ×2 + 灵晶 ×3', duration: 120, output: { items: [{ id: 'hetipendant', qty: 1 }], skill: 'forging', exp: 1300 }, requiredLevel: 60, requires: { daostone: 2, spiritcrystal: 3 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -324,11 +324,11 @@
                     exp: 0,
                     recipes: {
                         millet: { name: '种植灵米', desc: '食物', duration: 5, output: { items: [{ id: 'millet', qty: 1 }], skill: 'farming', exp: 10 }, requiredLevel: 1, unlocked: true },
-                        grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 20 }, requiredLevel: 2, requires: { seed_cleangrass: 1 }, unlocked: false },
-                        mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 70 }, requiredLevel: 5, requires: { seed_mushroom: 1 }, unlocked: false },
-                        tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 190 }, requiredLevel: 9, requires: { seed_tea: 1 }, unlocked: false },
-                        lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 12, requires: { seed_lotus: 1 }, unlocked: false },
-                        daofruit: { name: '种植悟道果', desc: '化神材料 需悟道果种子（太虚幻境掉落）', duration: 480, output: { items: [{ id: 'daofruit', qty: 1 }], skill: 'farming', exp: 600 }, requiredLevel: 16, requires: { seed_daofruit: 1 }, unlocked: false }
+                        grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 20 }, requiredLevel: 5, requires: { seed_cleangrass: 1 }, unlocked: false },
+                        mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 70 }, requiredLevel: 13, requires: { seed_mushroom: 1 }, unlocked: false },
+                        tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 190 }, requiredLevel: 22, requires: { seed_tea: 1 }, unlocked: false },
+                        lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 30, requires: { seed_lotus: 1 }, unlocked: false },
+                        daofruit: { name: '种植悟道果', desc: '化神材料 需悟道果种子（太虚幻境掉落）', duration: 480, output: { items: [{ id: 'daofruit', qty: 1 }], skill: 'farming', exp: 600 }, requiredLevel: 39, requires: { seed_daofruit: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -339,13 +339,13 @@
                     exp: 0,
                     recipes: {
                         stone: { name: '采石', desc: '产出碎石', duration: 5, output: { items: [{ id: 'stone', qty: 1 }], skill: 'mining', exp: 10 }, requiredLevel: 1, unlocked: true },
-                        ironore: { name: '采铁矿', desc: '产出铁矿石', duration: 8, output: { items: [{ id: 'ironore', qty: 1 }], skill: 'mining', exp: 25 }, requiredLevel: 3, unlocked: false },
-                        spiritore: { name: '采灵矿', desc: '产出灵矿石', duration: 12, output: { items: [{ id: 'spiritore', qty: 1 }], skill: 'mining', exp: 60 }, requiredLevel: 6, unlocked: false },
-                        crystal: { name: '采玄晶', desc: '产出玄晶', duration: 20, output: { items: [{ id: 'crystal', qty: 1 }], skill: 'mining', exp: 110 }, requiredLevel: 8, unlocked: false },
-                        spiritcrystal: { name: '采灵晶', desc: '产出灵晶', duration: 25, output: { items: [{ id: 'spiritcrystal', qty: 1 }], skill: 'mining', exp: 220 }, requiredLevel: 12, unlocked: false },
-                        immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 330 }, requiredLevel: 15, unlocked: false },
-                        chaosstone: { name: '采混沌石', desc: '产出混沌石', duration: 50, output: { items: [{ id: 'chaosstone', qty: 1 }], skill: 'mining', exp: 600 }, requiredLevel: 18, unlocked: false },
-                        daostone: { name: '采天道石', desc: '产出天道石（合体期材料）', duration: 60, output: { items: [{ id: 'daostone', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 22, unlocked: false }
+                        ironore: { name: '采铁矿', desc: '产出铁矿石', duration: 8, output: { items: [{ id: 'ironore', qty: 1 }], skill: 'mining', exp: 25 }, requiredLevel: 8, unlocked: false },
+                        spiritore: { name: '采灵矿', desc: '产出灵矿石', duration: 12, output: { items: [{ id: 'spiritore', qty: 1 }], skill: 'mining', exp: 60 }, requiredLevel: 15, unlocked: false },
+                        crystal: { name: '采玄晶', desc: '产出玄晶', duration: 20, output: { items: [{ id: 'crystal', qty: 1 }], skill: 'mining', exp: 110 }, requiredLevel: 20, unlocked: false },
+                        spiritcrystal: { name: '采灵晶', desc: '产出灵晶', duration: 25, output: { items: [{ id: 'spiritcrystal', qty: 1 }], skill: 'mining', exp: 220 }, requiredLevel: 30, unlocked: false },
+                        immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 330 }, requiredLevel: 36, unlocked: false },
+                        chaosstone: { name: '采混沌石', desc: '产出混沌石', duration: 50, output: { items: [{ id: 'chaosstone', qty: 1 }], skill: 'mining', exp: 600 }, requiredLevel: 43, unlocked: false },
+                        daostone: { name: '采天道石', desc: '产出天道石（合体期材料）', duration: 60, output: { items: [{ id: 'daostone', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false }
                     },
                     actions: {}
                 },
@@ -1177,11 +1177,11 @@
         // 标定：无特效玩家（桃木剑、最低境界）通关率约 65%，且敌人平均每击约打掉玩家 12% 最大生命，
         // 让防御/闪避/生命类特效在普通战斗里同样有价值（只缩放血量会变成纯输出检定，输出型灵根占尽优势）。
         const P4_AREA_SCALE = {
-            forest: { hp: 1.12, atk: 1.12 }, mountain: { hp: 1.1, atk: 1.17 }, deepMountain: { hp: 0.944, atk: 1.16 },
-            swamp: { hp: 1.08, atk: 1.33 }, abyss: { hp: 0.921, atk: 1.31 }, goldenPlains: { hp: 0.689, atk: 0.885 },
-            tribulationGround: { hp: 0.516, atk: 0.76 }, voidSea: { hp: 0.205, atk: 0.65 }, abyssRuins: { hp: 0.0705, atk: 0.512 },
-            chaosWastes: { hp: 0.0607, atk: 0.287 }, nineNether: { hp: 0.031, atk: 0.238 },
-            daoWastes: { hp: 0.0252, atk: 0.232 }, fusionVoid: { hp: 0.0213, atk: 0.229 }
+            forest: { hp: 1.12, atk: 1.12 }, mountain: { hp: 1.1, atk: 1.17 }, deepMountain: { hp: 1.218, atk: 1.844 },
+            swamp: { hp: 1.393, atk: 2.115 }, abyss: { hp: 1.087, atk: 1.782 }, goldenPlains: { hp: 1.357, atk: 2.602 },
+            tribulationGround: { hp: 0.96, atk: 2.067 }, voidSea: { hp: 0.482, atk: 2.405 }, abyssRuins: { hp: 0.1558, atk: 1.756 },
+            chaosWastes: { hp: 0.1718, atk: 1.337 }, nineNether: { hp: 0.0837, atk: 1.047 },
+            daoWastes: { hp: 0.0811, atk: 1.262 }, fusionVoid: { hp: 0.0639, atk: 1.145 }
         };
 
         const BATTLE_FORMULAS = {
@@ -1234,28 +1234,29 @@
                 name: '炼丹',
                 effectPer: 5,
                 effectType: 'quantity',
-                // 每5级产量 +1: 1-5级产1个, 6-10级产2个, 11-15级产3个
-                formula: (level) => Math.floor(1 + Math.floor((level - 1) / 5))
+                // 折算等级后每 5 级产量 +1（v6.63 起用 workEquivLevel，Lv60 ≈ 旧 Lv26）
+                formula: (level) => Math.floor(1 + Math.floor((workEquivLevel(level) - 1) / 5))
             },
             forging: {
                 name: '炼器',
                 effectPer: 0.5,
                 effectType: 'quality',
-                // 每级装备属性 +0.5%（对身上所有装备生效）: 等级21 = +10%
-                formula: (level) => 1 + (level - 1) * 0.005
+                // 折算等级后每级装备属性 +0.5%（v6.63 起用 workEquivLevel，Lv60 ≈ +13%）
+                formula: (level) => 1 + (workEquivLevel(level) - 1) * 0.005
             },
             farming: {
                 name: '灵田',
                 effectPer: 1,
                 effectType: 'speed',
-                // 每级速度 -1%: 等级50时速度×0.5(快50%)
-                formula: (level) => 1 - (level - 1) * 0.01
+                // 折算等级后每级耗时 -1%（v6.63 起用 workEquivLevel，Lv60 ≈ 耗时 ×0.74）
+                formula: (level) => 1 - (workEquivLevel(level) - 1) * 0.01
             },
             mining: {
                 name: '采矿',
                 effectPer: 2,
                 effectType: 'output',
-                formula: (level) => 1 + (level - 1) * 0.02
+                // 折算等级后每级产出 +2%（v6.63 起用 workEquivLevel，Lv60 ≈ +51%）
+                formula: (level) => 1 + (workEquivLevel(level) - 1) * 0.02
             },
             shenshi: {
                 name: '神识',
@@ -1275,6 +1276,7 @@
 
         let gameState = {
             version: 1,  // 游戏数据版本，用于自动迁移
+            workCurve: 2,  // 工作技能经验曲线版本（v6.63）；旧存档没有此字段，读档时按累计经验折算
             player: {
                 name: '',
                 gender: '男',
@@ -2469,10 +2471,12 @@
             // 手动进入时清空日志；循环续战（通关后再进）保留最近 30 条
             if (!keepLog) resetBattleLog(); else renderBattleLog(true);
 
-            // 设置初始速度
-            gameState.battleSpeed = 1;
+            // 沿用玩家已选的战斗速度（通关后循环续战、被击败后再进都不重置）；从未选过则为 1x
+            const keepSpeed = gameState.battleSpeed || 1;
+            const speedBtn = document.querySelector(`.speed-btn[data-speed="${keepSpeed}"]`);
+            gameState.battleSpeed = speedBtn ? keepSpeed : 1;
             document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('.speed-btn[data-speed="1"]').classList.add('active');
+            (speedBtn || document.querySelector('.speed-btn[data-speed="1"]')).classList.add('active');
 
             // 初始化玩家和怪物信息
             const dungeonId = gameState.dungeons.currentDungeon;
@@ -3737,27 +3741,27 @@
         // double:技能（翻倍产出）、save:技能（节省材料）、out:技能（丹火 / 神识产出）、gearPct（装备属性）、cultSpeed、atkPct、hpPct、defPct、crit、cloneSpeed。
         const SKILL_UPGRADES = [
             // 炼丹
-            { id: 'alch_room',   skill: 'alchemy', level: 5,  price: 3000,   icon: '🏠', name: '炼丹室',   effects: { 'time:alchemy': -0.05, 'exp:alchemy': 0.05 } },
-            { id: 'alch_yellow', skill: 'alchemy', level: 10, price: 12000,  icon: '🟡', name: '黄品丹炉', effects: { 'save:alchemy': 0.06 } },
-            { id: 'alch_xuan',   skill: 'alchemy', level: 15, price: 40000,  icon: '🟣', name: '玄品丹炉', effects: { 'time:alchemy': -0.06, 'double:alchemy': 0.05 } },
-            { id: 'alch_earth',  skill: 'alchemy', level: 20, price: 120000, icon: '🟤', name: '地品丹炉', effects: { 'save:alchemy': 0.08, 'exp:alchemy': 0.08 } },
-            { id: 'alch_heaven', skill: 'alchemy', level: 25, price: 300000, icon: '🔥', name: '天品丹炉', effects: { 'double:alchemy': 0.08, 'time:alchemy': -0.06 } },
+            { id: 'alch_room',   skill: 'alchemy', level: 10,  price: 3000,   icon: '🏠', name: '炼丹室',   effects: { 'time:alchemy': -0.05, 'exp:alchemy': 0.05 } },
+            { id: 'alch_yellow', skill: 'alchemy', level: 20, price: 12000,  icon: '🟡', name: '黄品丹炉', effects: { 'save:alchemy': 0.06 } },
+            { id: 'alch_xuan',   skill: 'alchemy', level: 30, price: 40000,  icon: '🟣', name: '玄品丹炉', effects: { 'time:alchemy': -0.06, 'double:alchemy': 0.05 } },
+            { id: 'alch_earth',  skill: 'alchemy', level: 40, price: 120000, icon: '🟤', name: '地品丹炉', effects: { 'save:alchemy': 0.08, 'exp:alchemy': 0.08 } },
+            { id: 'alch_heaven', skill: 'alchemy', level: 50, price: 300000, icon: '🔥', name: '天品丹炉', effects: { 'double:alchemy': 0.08, 'time:alchemy': -0.06 } },
             // 炼器
-            { id: 'forge_anvil',   skill: 'forging', level: 5,  price: 3000,   icon: '⚒️', name: '精铁砧',   effects: { 'time:forging': -0.05 } },
-            { id: 'forge_pool',    skill: 'forging', level: 10, price: 12000,  icon: '💧', name: '淬火池',   effects: { 'save:forging': 0.06 } },
-            { id: 'forge_furnace', skill: 'forging', level: 15, price: 40000,  icon: '🏭', name: '灵纹炉',   effects: { gearPct: 0.03 } },
-            { id: 'forge_god',     skill: 'forging', level: 20, price: 120000, icon: '🌋', name: '神火炉',   effects: { 'time:forging': -0.06, gearPct: 0.04 } },
-            { id: 'forge_heaven',  skill: 'forging', level: 25, price: 300000, icon: '🏛️', name: '天工台',   effects: { 'save:forging': 0.08, gearPct: 0.05 } },
+            { id: 'forge_anvil',   skill: 'forging', level: 10,  price: 3000,   icon: '⚒️', name: '精铁砧',   effects: { 'time:forging': -0.05 } },
+            { id: 'forge_pool',    skill: 'forging', level: 20, price: 12000,  icon: '💧', name: '淬火池',   effects: { 'save:forging': 0.06 } },
+            { id: 'forge_furnace', skill: 'forging', level: 30, price: 40000,  icon: '🏭', name: '灵纹炉',   effects: { gearPct: 0.03 } },
+            { id: 'forge_god',     skill: 'forging', level: 40, price: 120000, icon: '🌋', name: '神火炉',   effects: { 'time:forging': -0.06, gearPct: 0.04 } },
+            { id: 'forge_heaven',  skill: 'forging', level: 50, price: 300000, icon: '🏛️', name: '天工台',   effects: { 'save:forging': 0.08, gearPct: 0.05 } },
             // 灵田
-            { id: 'farm_spring', skill: 'farming', level: 5,  price: 3000,   icon: '⛲', name: '灵泉',     effects: { 'time:farming': -0.05 } },
-            { id: 'farm_array',  skill: 'farming', level: 10, price: 12000,  icon: '🌀', name: '聚灵阵',   effects: { 'double:farming': 0.06 } },
-            { id: 'farm_house',  skill: 'farming', level: 15, price: 40000,  icon: '🏡', name: '温室',     effects: { 'exp:farming': 0.08, 'time:farming': -0.05 } },
-            { id: 'farm_cave',   skill: 'farming', level: 20, price: 120000, icon: '⛰️', name: '洞天福地', effects: { 'double:farming': 0.08 } },
+            { id: 'farm_spring', skill: 'farming', level: 10,  price: 3000,   icon: '⛲', name: '灵泉',     effects: { 'time:farming': -0.05 } },
+            { id: 'farm_array',  skill: 'farming', level: 20, price: 12000,  icon: '🌀', name: '聚灵阵',   effects: { 'double:farming': 0.06 } },
+            { id: 'farm_house',  skill: 'farming', level: 30, price: 40000,  icon: '🏡', name: '温室',     effects: { 'exp:farming': 0.08, 'time:farming': -0.05 } },
+            { id: 'farm_cave',   skill: 'farming', level: 40, price: 120000, icon: '⛰️', name: '洞天福地', effects: { 'double:farming': 0.08 } },
             // 采矿
-            { id: 'mine_pick',  skill: 'mining', level: 5,  price: 3000,   icon: '⛏️', name: '精钢镐',   effects: { 'time:mining': -0.05 } },
-            { id: 'mine_cart',  skill: 'mining', level: 10, price: 12000,  icon: '🛒', name: '矿车',     effects: { 'double:mining': 0.06 } },
-            { id: 'mine_drill', skill: 'mining', level: 15, price: 40000,  icon: '🔩', name: '灵矿钻',   effects: { 'time:mining': -0.06, 'exp:mining': 0.08 } },
-            { id: 'mine_core',  skill: 'mining', level: 20, price: 120000, icon: '💠', name: '地脉核心', effects: { 'double:mining': 0.08 } },
+            { id: 'mine_pick',  skill: 'mining', level: 10,  price: 3000,   icon: '⛏️', name: '精钢镐',   effects: { 'time:mining': -0.05 } },
+            { id: 'mine_cart',  skill: 'mining', level: 20, price: 12000,  icon: '🛒', name: '矿车',     effects: { 'double:mining': 0.06 } },
+            { id: 'mine_drill', skill: 'mining', level: 30, price: 40000,  icon: '🔩', name: '灵矿钻',   effects: { 'time:mining': -0.06, 'exp:mining': 0.08 } },
+            { id: 'mine_core',  skill: 'mining', level: 40, price: 120000, icon: '💠', name: '地脉核心', effects: { 'double:mining': 0.08 } },
             // 修炼
             { id: 'cult_mat',   skill: 'cultivation', level: 5,  price: 3000,   icon: '🧘', name: '聚灵蒲团', effects: { cultSpeed: 0.03 } },
             { id: 'cult_room',  skill: 'cultivation', level: 10, price: 12000,  icon: '🏯', name: '静修室',   effects: { cultSpeed: 0.03 } },
@@ -4121,9 +4125,17 @@
             { level: 50, time: -0.03, main: 0.03, desc: '耗时 -3%、翻倍/节省 +3%' }
         ];
 
+        // 四个工作技能的里程碑（Lv60 封顶，效果与旧曲线上 Lv10 / 20 / 30 相当）
+        const WORK_SKILL_MILESTONES = [
+            { level: 25, exp: 0.05, desc: '技能经验 +5%' },
+            { level: 45, time: -0.03, desc: '全部配方耗时 -3%' },
+            { level: 60, main: 0.03, desc: '全部配方产出翻倍/节省材料 +3%' }
+        ];
+        function milestonesOf(skillName) { return WORK_SKILLS.includes(skillName) ? WORK_SKILL_MILESTONES : SKILL_MILESTONES; }
         function getSkillMilestones(skillName) {
             const level = (gameState.skills[skillName] || {}).level || 1;
-            return { reached: SKILL_MILESTONES.filter(m => level >= m.level), next: SKILL_MILESTONES.find(m => level < m.level) };
+            const list = milestonesOf(skillName);
+            return { reached: list.filter(m => level >= m.level), next: list.find(m => level < m.level) };
         }
 
         // 技能层面的加成 = 精通池检查点 + 技能等级里程碑（对该技能所有配方生效）
@@ -4216,10 +4228,29 @@
             }
         }
 
-        // 升到下一级所需经验（指数级: 100 × level^1.8）
-        function skillExpNeeded(level) {
+        // 升到下一级所需经验：四个工作技能（炼丹 / 炼器 / 灵田 / 采矿）每 10 级对应一个大境界（Lv1–10 练气、11–20 筑基……51–60 合体），
+        // 需 round(3.5 × level^2.05)，上限 Lv60；其余技能沿用 100 × level^1.8
+        const WORK_SKILLS = ['alchemy', 'forging', 'farming', 'mining'];
+        const WORK_SKILL_MAX_LEVEL = 60;
+        function skillExpNeeded(level, skillName = null) {
+            if (WORK_SKILLS.includes(skillName)) return Math.round(3.5 * Math.pow(level, 2.05));
             return Math.round(100 * Math.pow(level, 1.8));
         }
+        // 「同样的经验投入 = 同样的效果」：新等级折算成旧曲线上累计经验相同的等级（可带小数），等级效果公式沿用旧公式
+        const WORK_EQUIV_LEVEL = (() => {
+            const oldCum = [0, 0];   // oldCum[L] = 升到 Lv.L 累计所需经验（旧曲线）
+            for (let l = 1; l < 80; l++) oldCum[l + 1] = oldCum[l] + Math.round(100 * Math.pow(l, 1.8));
+            const table = [1, 1];
+            let cum = 0;
+            for (let L = 1; L <= WORK_SKILL_MAX_LEVEL; L++) {
+                let o = 1;
+                while (o < 79 && oldCum[o + 1] <= cum) o++;
+                table[L] = o + (cum - oldCum[o]) / (oldCum[o + 1] - oldCum[o]);
+                cum += Math.round(3.5 * Math.pow(L, 2.05));
+            }
+            return table;
+        })();
+        function workEquivLevel(level) { return WORK_EQUIV_LEVEL[Math.max(1, Math.min(WORK_SKILL_MAX_LEVEL, Math.floor(level)))]; }
 
         // 技能经验进度：当前经验、升级所需、还差多少、百分比
         function getSkillExpInfo(skillName) {
@@ -4227,7 +4258,7 @@
             if (!skill) return null;
             const level = skill.level || 1;
             const exp = Math.floor(skill.exp || 0);
-            const need = skillExpNeeded(level);
+            const need = skillExpNeeded(level, skillName);
             return { level, exp, need, remain: Math.max(0, need - exp), percent: Math.min(100, (exp / need) * 100) };
         }
 
@@ -4247,8 +4278,8 @@
                     <div class="skill-exp-text">经验 ${info.exp} / ${info.need} · 还差 <b>${info.remain}</b> 升到 Lv.${info.level + 1}</div>
                     ${LIFE_SKILLS.includes(skillName) ? (() => {
                         const sm = getSkillMilestones(skillName);
-                        const tipM = SKILL_MILESTONES.map(m => `${info.level >= m.level ? '✓' : '○'} Lv.${m.level}：${m.desc}`).join('&#10;');
-                        return `<div class="skill-pool" title="${tipM}">🏅 技能里程碑 ${sm.reached.length}/${SKILL_MILESTONES.length}${sm.next ? ` · 下一个 Lv.${sm.next.level}：${sm.next.desc}` : ' · 已全部达成'}</div>`;
+                        const tipM = milestonesOf(skillName).map(m => `${info.level >= m.level ? '✓' : '○'} Lv.${m.level}：${m.desc}`).join('&#10;');
+                        return `<div class="skill-pool" title="${tipM}">🏅 技能里程碑 ${sm.reached.length}/${milestonesOf(skillName).length}${sm.next ? ` · 下一个 Lv.${sm.next.level}：${sm.next.desc}` : ' · 已全部达成'}</div>`;
                     })() : ''}
                     ${LIFE_SKILLS.includes(skillName) ? (() => {
                         const pi = getMasteryPoolInfo(skillName);
@@ -4276,12 +4307,13 @@
             if (!skill) return;
             // 灵根/功法的经验特效 + 该配方的精通经验加成
             skill.exp += Math.round(exp * (1 + getSkillMod('exp', skillName) + getMasteryBonus(skillName, recipeKey).exp));
-            while (skill.exp >= skillExpNeeded(skill.level)) {
-                skill.exp -= skillExpNeeded(skill.level);
+            while (skill.exp >= skillExpNeeded(skill.level, skillName)) {
+                if (WORK_SKILLS.includes(skillName) && skill.level >= WORK_SKILL_MAX_LEVEL) { skill.exp = 0; break; }   // 满级
+                skill.exp -= skillExpNeeded(skill.level, skillName);
                 skill.level++;
                 const effect = calculateSkillLevelEffect(skillName, skill.level);
                 showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#6f9c8a', 'normal');
-                const ms = LIFE_SKILLS.includes(skillName) && SKILL_MILESTONES.find(m => m.level === skill.level);
+                const ms = LIFE_SKILLS.includes(skillName) && milestonesOf(skillName).find(m => m.level === skill.level);
                 if (ms) showNotification(`🏅 ${skill.name}达到 Lv.${ms.level} 里程碑：${ms.desc}`, '#b89a5b');
             }
         }
@@ -7599,10 +7631,27 @@
             }
         }
 
+        // v6.63：炼丹 / 炼器 / 灵田 / 采矿改用新经验曲线，旧存档按累计经验折算（不丢进度，超过 Lv60 的部分作废）
+        function migrateWorkSkillCurve() {
+            if (!gameState.skills || gameState.workCurve === 2) return;
+            WORK_SKILLS.forEach(name => {
+                const sk = gameState.skills[name];
+                if (!sk) return;
+                let total = sk.exp || 0;
+                for (let l = 1; l < (sk.level || 1); l++) total += Math.round(100 * Math.pow(l, 1.8));
+                let level = 1;
+                while (level < WORK_SKILL_MAX_LEVEL && total >= skillExpNeeded(level, name)) { total -= skillExpNeeded(level, name); level++; }
+                sk.level = level;
+                sk.exp = level >= WORK_SKILL_MAX_LEVEL ? 0 : Math.floor(total);
+            });
+            gameState.workCurve = 2;
+        }
+
         function migrateGameData() {
             // 版本迁移函数：自动更新旧数据以支持新配方
             if (!gameState.version) gameState.version = 0;
             invalidateLawTotals();   // 读档 / 导入后重新计算悟道法则加成
+            migrateWorkSkillCurve();
             gameState.workSpeedMultiplier = 1;   // 旧版把孤儿的 5% 存在这里且与灵玉脱钩；现在只由装备的灵玉提供（getWorkSpeedMultiplier）
             migrateEquipmentSlots();
             if (gameState.tutorialSeen === undefined) gameState.tutorialSeen = true;   // 已有存档的玩家不再自动弹出引导
