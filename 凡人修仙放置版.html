@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=13.6">
+    <link rel="stylesheet" href="style.css?v=13.10">
 
 </head>
 <body data-panel="cultivation">
@@ -118,6 +118,9 @@
                         </div>
                         <div class="cur-chip" data-cur="shenshi" style="display: none;" onclick="switchPanel('shenshi')" role="button" tabindex="0" title="神识：点击进入神识（分身强化、专注、感应）" aria-label="神识">
                             <span data-ico="shenshi">👁️</span><span class="cur-name">神识</span><b class="cur-amount">0</b>
+                        </div>
+                        <div class="cur-chip" data-cur="daoguo" style="display: none;" onclick="switchPanel('daoguo')" role="button" tabindex="0" title="道果：点击进入道果（淬体、悟法、合道）" aria-label="道果">
+                            <span data-ico="daoguo">🍎</span><span class="cur-name">道果</span><b class="cur-amount">0</b>
                         </div>
                     </div>
                     <div id="breakThroughBtn" class="btn btn-secondary" onclick="showBreakthroughModal()" style="display: none;">
@@ -272,6 +275,15 @@
                             <div id="shenshiUses" class="skill-uses"></div>
                             <div class="action-list" id="shenshiActions"></div>
                             <div class="action-detail" id="action-detail-shenshi"></div>
+                        </div>
+
+                        <!-- 道果面板（合体期解锁） -->
+                        <div id="panel-daoguo" class="panel-content hidden">
+                            <div class="panel-title">🍎 道果</div>
+                            <div class="skill-exp-header" data-skill="daoguo"></div>
+                            <div id="daoguoUses" class="skill-uses"></div>
+                            <div class="action-list" id="daoguoActions"></div>
+                            <div class="action-detail" id="action-detail-daoguo"></div>
                         </div>
 
                         <!-- 悟道面板（化神期解锁） -->
@@ -761,7 +773,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.6"></script>
+    <script src="game.js?v=13.10"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
