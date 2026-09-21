@@ -906,12 +906,12 @@
         // （保留真实的怪物属性和克制关系），最低境界平均通关率约 60%~90%。原始数值保留在 GAME_CONFIG.dungeons，
         // 调平衡只需改此表。修改装备/属性/灵根特效后需要重新标定，临界点很陡。
         const P4_MONSTER_SCALE = {
-            mysteryTower: 0.814,
-            mysteriousForest: 0.617,
-            ancientRuin: 0.763,
-            tribulationGround: 0.262,
-            huashenRealm: 0.221,
-            taixuDream: 0.1441
+            mysteryTower: 1.954,
+            mysteriousForest: 1.394,
+            ancientRuin: 1.694,
+            tribulationGround: 0.618,
+            huashenRealm: 0.488,
+            taixuDream: 0.3156
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -1195,8 +1195,11 @@
             { title: '练气中期', panel: 'cultivation', target: ['cultivation', 'small'],
               desc: '练气初期解锁了更快的「小周天」。用它修炼到修为满，突破到<b>练气中期</b>——这样就能进入第一个秘境了。',
               need: { realm: 2 }, reward: { coins: 100 } },
+            { title: '备足食物', panel: 'alchemy', target: ['alchemy', 'millet_porridge'],
+              desc: '秘境要连续打过 5 只怪，血量不会中途恢复，<b>每次通关大约要吃 10 份食物</b>（新手大概要 20 份灵米粥）。累计熬灵米粥 10 次（一次出 2 份；灵米不够就回灵田多种），备足了再去。',
+              need: { act: 'alchemy.millet_porridge', n: 10 }, reward: { coins: 60 } },
             { title: '挑战秘境', panel: 'battle', tab: 'dungeons',
-              desc: '去「战斗」页的「秘境」标签，通关<b>神秘之塔</b>。秘境要连续打过 5 只怪，血量不会中途恢复：带上灵米粥、装备好桃木剑再去；打不过就撤退，回去多修炼。通关有灵石、种子等奖励。',
+              desc: '去「战斗」页的「秘境」标签，通关<b>神秘之塔</b>。装备好桃木剑，带上灵米粥（生命低于一半会自动吃）；食物吃光了还没打完就危险了，打不过就撤退，回去多备食物、多修炼。通关有灵石、种子等奖励。',
               need: { count: 'dungeon:mysteryTower', n: 1 }, reward: { coins: 200 } }
         ];
         const NEWBIE_FINAL_REWARD = 300;   // 全部任务做完的额外奖励（灵石）
