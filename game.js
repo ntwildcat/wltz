@@ -855,7 +855,10 @@
 
         function renderDanhuoUses() {
             const el = document.getElementById('danhuoUses');
-            if (!el) return;
+            if (el) el.innerHTML = danhuoUsesHtml();
+        }
+
+        function danhuoUsesHtml() {
             const P = ensureCurrencyState();
             const forgeLv = (gameState.skills.forging || {}).level || 1;
             const temperRows = TEMPER_SLOTS.map(s => {
@@ -868,8 +871,8 @@
             const root = SPIRIT_ROOT_EFFECTS[P.spiritRoot];
             const rootEff = describeEffects(getRootEffectsScaled()).join(' · ');
             const rootRow = root ? useRow(`${ROOT_ICONS[P.spiritRoot]} ${root.name}`, `强化 Lv.${rlv}/${ROOT_MAX}`, `灵根特效整体 +${Math.round(rlv * ROOT_PER_LEVEL * 100)}%${rlv >= ROOT_MAX ? '' : ` → +${Math.round((rlv + 1) * ROOT_PER_LEVEL * 100)}%`}<br/>${rootEff}`, rootCost(rlv), 'danhuo', 'upgradeRoot()', rlv >= ROOT_MAX) : '';
-            el.innerHTML = `
-                <div class="use-balance">${DANHUO_ICON} 丹火 <b>${Math.floor(P.danhuo)}</b><small>产出：凝聚丹火 / 培育丹火（本页配方）· 金丹级战斗区域胜利 · 秘境通关。丹火不能出售，只用来变强。</small></div>
+            return `
+                <div class="use-balance">${DANHUO_ICON} 丹火 <b>${Math.floor(P.danhuo)}</b><small>产出：丹火技能的配方（凝聚 / 培育 / 提炼 / 凝练）· 金丹级战斗区域胜利 · 秘境通关。丹火不能出售，只用来变强和购买商品。</small></div>
                 <div class="use-card"><div class="use-title">🔨 淬炼台 <small>联动炼器：武器 / 护甲 / 饰品各自淬炼，每级 +${Math.round(TEMPER_PER_LEVEL * 100)}% 该部位装备属性；换装备后等级保留，与炼器等级加成（当前 Lv.${forgeLv}）相乘</small></div>${temperRows}</div>
                 <div class="use-card"><div class="use-title">🌱 强化灵根 <small>联动战斗：灵根自带的全部特效（攻击、暴击、耗时、翻倍……）整体放大，每级 +${Math.round(ROOT_PER_LEVEL * 100)}%</small></div>${rootRow}</div>
                 <div class="use-card"><div class="use-title">⚗️ 炼丹助炼 <small>联动炼丹：在炼丹页开启，每次炼丹消耗丹火，产出翻倍概率 +25%（当前${P.alchemyBoost ? '已开启' : '未开启'}）</small></div>
@@ -879,7 +882,10 @@
 
         function renderShenshiUses() {
             const el = document.getElementById('shenshiUses');
-            if (!el) return;
+            if (el) el.innerHTML = shenshiUsesHtml();
+        }
+
+        function shenshiUsesHtml() {
             const P = ensureCurrencyState();
             const rows = Object.entries(SHEN_UPGRADES).map(([kind, u]) => {
                 const lv = getShenLevel(kind);
@@ -887,8 +893,8 @@
                 return useRow(`${u.icon} ${u.name}`, `Lv.${lv}/${u.max}`, u.desc, shenCost(kind, lv), 'shenshi', `upgradeShen('${kind}')`, maxed);
             }).join('');
             const scoutOn = !!P.scoutBonus;
-            el.innerHTML = `
-                <div class="use-balance">${SHENSHI_ICON} 神识 <b>${Math.floor(P.shenshi)}</b><small>产出：凝练神识 / 培育神识 / 神识入定（本页配方）· 元婴级战斗区域胜利 · 秘境通关。神识不能出售，只用来变强。</small></div>
+            return `
+                <div class="use-balance">${SHENSHI_ICON} 神识 <b>${Math.floor(P.shenshi)}</b><small>产出：神识技能的配方（凝练 / 培育 / 提炼 / 入定）· 元婴级战斗区域胜利 · 秘境通关。神识不能出售，只用来变强和购买商品。</small></div>
                 <div class="use-card"><div class="use-title">🌀 神识强化 <small>联动分身、工作速度与战斗</small></div>${rows}</div>
                 <div class="use-card"><div class="use-title">🔍 神识探查 <small>联动秘境：花 ${SCOUT_COST} 神识，下一次通关秘境的随机掉落率 ×${SCOUT_MULT}（通关后消耗）</small></div>
                     <div class="use-row"><div class="use-main"><div class="use-effect">${scoutOn ? '✅ 已生效，通关下一个秘境后消耗' : '尚未使用'}</div></div>
@@ -901,6 +907,7 @@
             if (panel === 'danhuo') renderDanhuoUses();
             else if (panel === 'shenshi') renderShenshiUses();
             else if (panel === 'alchemy') renderAlchemyBoostBar();
+            else if (panel === 'shop' && shopTab !== 'coins') updateShop();
         }
 
 
@@ -6077,6 +6084,14 @@
             const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满', '金丹初期', '金丹中期', '金丹后期', '金丹圆满', '元婴初期', '元婴中期', '元婴后期', '元婴圆满'];
             const currentRealmIdx = gameState.player.realmIndex;
             const currentRealmName = realmNames[currentRealmIdx] || '未知';
+
+            // 丹火 / 神识商城顶部：该货币的全部强化（与丹火 / 神识技能页里的相同）
+            if (shopTab === 'danhuo' || shopTab === 'shenshi') {
+                const box = document.createElement('div');
+                box.style.cssText = 'grid-column: 1/-1;';
+                box.innerHTML = `<div class="shop-section-title">${shopTab === 'danhuo' ? '🔥 丹火强化' : '👁️ 神识强化'}</div>${shopTab === 'danhuo' ? danhuoUsesHtml() : shenshiUsesHtml()}`;
+                shopContainer.appendChild(box);
+            }
 
             Object.entries(GAME_CONFIG.shop).forEach(([category, allItems]) => {
                 const items = allItems.filter(i => (i.currency || 'coins') === shopTab);   // 只显示当前标签货币的商品

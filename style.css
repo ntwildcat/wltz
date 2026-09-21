@@ -1991,3 +1991,4 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .shop-tab:hover { background: var(--bg-l3); border-color: var(--bronze-dim); }
 .shop-tab.active { background: var(--bg-l3); border-color: var(--cinnabar-2); box-shadow: inset 0 0 0 1px var(--cinnabar); color: var(--text-l1); }
 .shop-tab .ico { width: 1.2em; height: 1.2em; vertical-align: -0.2em; }
+.shop-section-title { font-weight: bold; color: var(--patina, #6f9c8a); margin: 4px 0 8px; }
