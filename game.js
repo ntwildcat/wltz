@@ -390,6 +390,8 @@
                 // 特殊材料
                 spiritstone: { name: '灵石', icon: '💎', type: 'currency' },
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', sellPrice: 80, effect: { workSpeed: 0.95 } },
+                // 礼包码专属（测试用）：所有工作耗时 ×0.01（速度 ×100），修炼速度 ×100；只能通过礼包码获得
+                test_ring: { name: '天机灵环', icon: '💍', type: 'jewelry', effect: { workSpeed: 0.01, cultSpeed: 99 } },
 
                 // P6 丹火相关物品
                 danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed', sellPrice: 50 },
@@ -595,6 +597,7 @@
                 immortalore: svg(rock('#c9b479', '#8a743a', `<path d="M9 22L14 15L18 20L24 12" stroke="#fff2b0" stroke-width="1.8"/>${sparkle(8, 9, 2.6)}${sparkle(25, 24, 2.2)}${sparkle(23, 7, 2)}`)),
                 chaosstone: svg(`<circle cx="16" cy="16" r="12" fill="#2a2440"/><path d="M16 4A12 12 0 0 1 16 28A6 6 0 0 1 16 16A6 6 0 0 0 16 4Z" fill="#6a4fa8" stroke="none"/><circle cx="16" cy="10" r="1.8" fill="#2a2440" stroke="none"/><circle cx="16" cy="22" r="1.8" fill="#c9b8f0" stroke="none"/><circle cx="16" cy="16" r="12" stroke="#8a72c8" stroke-width=".8"/>`),
                 spiritstone: svg(`<path d="M8 10L16 4L24 10L26 21L16 28L6 21Z" fill="#59c9b0"/><path d="M8 10L16 15L24 10M16 15V28M6 21L16 15L26 21" stroke="#c6fff0" stroke-width=".9"/><path d="M8 10L6 21L16 15Z" fill="#3ea08e" stroke="none" opacity=".7"/>${sparkle(24, 5, 2.2)}`),
+                test_ring: svg(`<circle cx="16" cy="19" r="8" stroke="#e2c27a" stroke-width="3.4"/><circle cx="16" cy="19" r="8" stroke="#8a6a2a" stroke-width=".8"/><path d="M11.5 9L16 3.5L20.5 9L16 14Z" fill="#7fe0e8"/><path d="M16 3.5V14M11.5 9H20.5" stroke="#dffcff" stroke-width=".8"/>${sparkle(26, 6, 2.4)}${sparkle(6, 25, 2)}`),
                 jade: svg(`<path d="M12 4Q16 8 20 4" stroke="#c9b07a" stroke-width="1.3"/><circle cx="16" cy="18" r="10" fill="#7fc49a"/><circle cx="16" cy="18" r="3.6" fill="#1c1812" stroke-width="1"/><path d="M9 14Q11 10 15 9" stroke="#d6ffe6" stroke-width="1.4" opacity=".8"/><path d="M16 12V14M16 22V24M10 18H12M20 18H22" stroke="#4f9a72" stroke-width=".8"/>`),
                 // —— 丹药 ——
                 restpill: svg(pill('#e6e2d0', '#fff', leaf(15, 18, -30, 8, '#7fae6a'))),
@@ -1471,6 +1474,47 @@
             setTimeout(() => showTutorial(0), 300);
         }
 
+        // ==================== 礼包码 ====================
+        // 礼包码不以明文存放，只存它的哈希（cyrb53，非加密，只防随手翻源码看到）。每个存档每个礼包码只能兑换一次（player.redeemedCodes）。
+        const GIFT_CODES = {
+            '69q7k0mlje': { id: 'test_ring', label: '测试礼包', items: [{ id: 'test_ring', qty: 1 }] }
+        };
+        function giftCodeHash(str, seed = 0) {
+            let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+            for (let i = 0, ch; i < str.length; i++) {
+                ch = str.charCodeAt(i);
+                h1 = Math.imul(h1 ^ ch, 2654435761);
+                h2 = Math.imul(h2 ^ ch, 1597334677);
+            }
+            h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+            h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+            return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+        }
+
+        function redeemGiftCode() {
+            const input = document.getElementById('giftCodeInput');
+            const result = document.getElementById('giftCodeResult');
+            const say = (text, ok) => { if (result) { result.textContent = text; result.style.color = ok ? '#6fa980' : '#c4483a'; } };
+            const code = (input ? input.value : '').trim();
+            if (!code) { say('请输入礼包码', false); return; }
+            const entry = GIFT_CODES[giftCodeHash(code)];
+            if (!entry) { say('无效的礼包码', false); return; }
+            const P = gameState.player;
+            if (!Array.isArray(P.redeemedCodes)) P.redeemedCodes = [];
+            if (P.redeemedCodes.includes(entry.id)) { say('这个礼包码已经兑换过了', false); return; }
+            // 背包放不下就不兑换（不消耗礼包码）
+            const need = entry.items.filter(i => !P.inventory.find(x => x.id === i.id)).length;
+            if (P.inventory.length + need > (P.inventoryCapacity || 50)) { say('背包已满，请先腾出空位再兑换', false); return; }
+            entry.items.forEach(i => addToInventory(i.id, i.qty, true));
+            P.redeemedCodes.push(entry.id);
+            const names = entry.items.map(i => `${GAME_CONFIG.items[i.id].name}×${i.qty}`).join('、');   // 纯文字（图标是 SVG 字符串，不能放进 textContent）
+            say(`兑换成功：${names}（已放入背包）`, true);
+            showNotification(`🎁 ${entry.label}：获得 ${names}`, '#b89a5b');
+            if (input) input.value = '';
+            updateUI();
+            saveGame();
+        }
+
         // 自动保存定时器只保留一个（重开新游戏时不会叠加）
         let autoSaveTimer = null;
         function startAutoSave() {
@@ -1821,9 +1865,12 @@
                 gameState.currentActionProgress += 0.1;
                 const adjustedDuration = getAdjustedDuration(gameState.currentAction.skill, action.duration, gameState.currentAction.action);
 
-                if (gameState.currentActionProgress >= adjustedDuration) {
+                // 耗时短于一个 tick（0.1 秒，如礼包饰品的 ×100 速度）时，一个 tick 里连续完成多次
+                let guard = 0;
+                while (gameState.currentAction && adjustedDuration > 0 && gameState.currentActionProgress >= adjustedDuration && guard++ < 60) {
                     completeAction();
-                    gameState.currentActionProgress = 0;
+                    if (!gameState.currentAction) { gameState.currentActionProgress = 0; break; }
+                    gameState.currentActionProgress = adjustedDuration < 0.1 ? gameState.currentActionProgress - adjustedDuration : 0;
                 }
 
                 updateProgressBars();
@@ -3542,6 +3589,17 @@
             });
         }
 
+        // 已装备物品的 effect 数值合计（如礼包饰品的 cultSpeed）
+        function getEquippedEffectSum(key) {
+            const eq = (gameState && gameState.player && gameState.player.equipment) || {};
+            let sum = 0;
+            [eq.weapon, eq.armor, ...(eq.jewelry || [])].filter(Boolean).forEach(id => {
+                const e = GAME_CONFIG.items[id] && GAME_CONFIG.items[id].effect;
+                if (e && e[key]) sum += e[key];
+            });
+            return sum;
+        }
+
         function getMod(key) {
             const player = gameState && gameState.player;
             if (!player) return 0;
@@ -3553,6 +3611,7 @@
             if (artEffects && artEffects[key]) total += artEffects[key];
             total += getLawTotals()[key] || 0;
             total += getSkillUpgradeTotals()[key] || 0;   // 技能商店里已购置的设施
+            if (key === 'cultSpeed') total += getEquippedEffectSum('cultSpeed');   // 装备物品自带的修炼速度
             return total;
         }
 
@@ -5105,6 +5164,7 @@
             const parts = [];
             if (cfg.stats) Object.entries(cfg.stats).forEach(([k, v]) => parts.push(`${STAT_LABELS[k] || k}+${v}`));
             if (cfg.effect && cfg.effect.workSpeed) parts.push(`工作速度 +${Math.round((1 / cfg.effect.workSpeed - 1) * 100)}%`);
+            if (cfg.effect && cfg.effect.cultSpeed) parts.push(`修炼速度 +${Math.round(cfg.effect.cultSpeed * 100)}%`);
             return parts.join(' · ');
         }
 
