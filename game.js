@@ -390,6 +390,8 @@
                 // 特殊材料
                 spiritstone: { name: '灵石', icon: '💎', type: 'currency' },
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', sellPrice: 80, effect: { workSpeed: 0.95 } },
+                // 礼包码专属（测试用）：所有工作耗时 ×0.01（速度 ×100），修炼速度 ×100；只能通过礼包码获得
+                test_ring: { name: '天机灵环', icon: '💍', type: 'jewelry', effect: { workSpeed: 0.01, cultSpeed: 99 } },
 
                 // P6 丹火相关物品
                 danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed', sellPrice: 50 },
@@ -595,6 +597,7 @@
                 immortalore: svg(rock('#c9b479', '#8a743a', `<path d="M9 22L14 15L18 20L24 12" stroke="#fff2b0" stroke-width="1.8"/>${sparkle(8, 9, 2.6)}${sparkle(25, 24, 2.2)}${sparkle(23, 7, 2)}`)),
                 chaosstone: svg(`<circle cx="16" cy="16" r="12" fill="#2a2440"/><path d="M16 4A12 12 0 0 1 16 28A6 6 0 0 1 16 16A6 6 0 0 0 16 4Z" fill="#6a4fa8" stroke="none"/><circle cx="16" cy="10" r="1.8" fill="#2a2440" stroke="none"/><circle cx="16" cy="22" r="1.8" fill="#c9b8f0" stroke="none"/><circle cx="16" cy="16" r="12" stroke="#8a72c8" stroke-width=".8"/>`),
                 spiritstone: svg(`<path d="M8 10L16 4L24 10L26 21L16 28L6 21Z" fill="#59c9b0"/><path d="M8 10L16 15L24 10M16 15V28M6 21L16 15L26 21" stroke="#c6fff0" stroke-width=".9"/><path d="M8 10L6 21L16 15Z" fill="#3ea08e" stroke="none" opacity=".7"/>${sparkle(24, 5, 2.2)}`),
+                test_ring: svg(`<circle cx="16" cy="19" r="8" stroke="#e2c27a" stroke-width="3.4"/><circle cx="16" cy="19" r="8" stroke="#8a6a2a" stroke-width=".8"/><path d="M11.5 9L16 3.5L20.5 9L16 14Z" fill="#7fe0e8"/><path d="M16 3.5V14M11.5 9H20.5" stroke="#dffcff" stroke-width=".8"/>${sparkle(26, 6, 2.4)}${sparkle(6, 25, 2)}`),
                 jade: svg(`<path d="M12 4Q16 8 20 4" stroke="#c9b07a" stroke-width="1.3"/><circle cx="16" cy="18" r="10" fill="#7fc49a"/><circle cx="16" cy="18" r="3.6" fill="#1c1812" stroke-width="1"/><path d="M9 14Q11 10 15 9" stroke="#d6ffe6" stroke-width="1.4" opacity=".8"/><path d="M16 12V14M16 22V24M10 18H12M20 18H22" stroke="#4f9a72" stroke-width=".8"/>`),
                 // —— 丹药 ——
                 restpill: svg(pill('#e6e2d0', '#fff', leaf(15, 18, -30, 8, '#7fae6a'))),
@@ -673,6 +676,8 @@
             if (typeof P.rootLevel !== 'number') P.rootLevel = 0;
             if (!P.shen) P.shen = { clone: 0, focus: 0, sense: 0 };
             if (P.alchemyBoost === undefined) P.alchemyBoost = false;
+            if (!Array.isArray(P.skillUpgrades)) P.skillUpgrades = [];
+            invalidateSkillUpgrades();
             return P;
         }
         function getTemper(slot) { return ((gameState.player.temper || {})[slot]) || 0; }
@@ -855,7 +860,10 @@
 
         function renderDanhuoUses() {
             const el = document.getElementById('danhuoUses');
-            if (!el) return;
+            if (el) el.innerHTML = danhuoUsesHtml();
+        }
+
+        function danhuoUsesHtml() {
             const P = ensureCurrencyState();
             const forgeLv = (gameState.skills.forging || {}).level || 1;
             const temperRows = TEMPER_SLOTS.map(s => {
@@ -868,8 +876,8 @@
             const root = SPIRIT_ROOT_EFFECTS[P.spiritRoot];
             const rootEff = describeEffects(getRootEffectsScaled()).join(' · ');
             const rootRow = root ? useRow(`${ROOT_ICONS[P.spiritRoot]} ${root.name}`, `强化 Lv.${rlv}/${ROOT_MAX}`, `灵根特效整体 +${Math.round(rlv * ROOT_PER_LEVEL * 100)}%${rlv >= ROOT_MAX ? '' : ` → +${Math.round((rlv + 1) * ROOT_PER_LEVEL * 100)}%`}<br/>${rootEff}`, rootCost(rlv), 'danhuo', 'upgradeRoot()', rlv >= ROOT_MAX) : '';
-            el.innerHTML = `
-                <div class="use-balance">${DANHUO_ICON} 丹火 <b>${Math.floor(P.danhuo)}</b><small>产出：凝聚丹火 / 培育丹火（本页配方）· 金丹级战斗区域胜利 · 秘境通关。丹火不能出售，只用来变强。</small></div>
+            return `
+                <div class="use-balance">${DANHUO_ICON} 丹火 <b>${Math.floor(P.danhuo)}</b><small>产出：丹火技能的配方（凝聚 / 培育 / 提炼 / 凝练）· 金丹级战斗区域胜利 · 秘境通关。丹火不能出售，只用来变强和购买商品。</small></div>
                 <div class="use-card"><div class="use-title">🔨 淬炼台 <small>联动炼器：武器 / 护甲 / 饰品各自淬炼，每级 +${Math.round(TEMPER_PER_LEVEL * 100)}% 该部位装备属性；换装备后等级保留，与炼器等级加成（当前 Lv.${forgeLv}）相乘</small></div>${temperRows}</div>
                 <div class="use-card"><div class="use-title">🌱 强化灵根 <small>联动战斗：灵根自带的全部特效（攻击、暴击、耗时、翻倍……）整体放大，每级 +${Math.round(ROOT_PER_LEVEL * 100)}%</small></div>${rootRow}</div>
                 <div class="use-card"><div class="use-title">⚗️ 炼丹助炼 <small>联动炼丹：在炼丹页开启，每次炼丹消耗丹火，产出翻倍概率 +25%（当前${P.alchemyBoost ? '已开启' : '未开启'}）</small></div>
@@ -879,7 +887,10 @@
 
         function renderShenshiUses() {
             const el = document.getElementById('shenshiUses');
-            if (!el) return;
+            if (el) el.innerHTML = shenshiUsesHtml();
+        }
+
+        function shenshiUsesHtml() {
             const P = ensureCurrencyState();
             const rows = Object.entries(SHEN_UPGRADES).map(([kind, u]) => {
                 const lv = getShenLevel(kind);
@@ -887,8 +898,8 @@
                 return useRow(`${u.icon} ${u.name}`, `Lv.${lv}/${u.max}`, u.desc, shenCost(kind, lv), 'shenshi', `upgradeShen('${kind}')`, maxed);
             }).join('');
             const scoutOn = !!P.scoutBonus;
-            el.innerHTML = `
-                <div class="use-balance">${SHENSHI_ICON} 神识 <b>${Math.floor(P.shenshi)}</b><small>产出：凝练神识 / 培育神识 / 神识入定（本页配方）· 元婴级战斗区域胜利 · 秘境通关。神识不能出售，只用来变强。</small></div>
+            return `
+                <div class="use-balance">${SHENSHI_ICON} 神识 <b>${Math.floor(P.shenshi)}</b><small>产出：神识技能的配方（凝练 / 培育 / 提炼 / 入定）· 元婴级战斗区域胜利 · 秘境通关。神识不能出售，只用来变强和购买商品。</small></div>
                 <div class="use-card"><div class="use-title">🌀 神识强化 <small>联动分身、工作速度与战斗</small></div>${rows}</div>
                 <div class="use-card"><div class="use-title">🔍 神识探查 <small>联动秘境：花 ${SCOUT_COST} 神识，下一次通关秘境的随机掉落率 ×${SCOUT_MULT}（通关后消耗）</small></div>
                     <div class="use-row"><div class="use-main"><div class="use-effect">${scoutOn ? '✅ 已生效，通关下一个秘境后消耗' : '尚未使用'}</div></div>
@@ -901,6 +912,7 @@
             if (panel === 'danhuo') renderDanhuoUses();
             else if (panel === 'shenshi') renderShenshiUses();
             else if (panel === 'alchemy') renderAlchemyBoostBar();
+            else if (panel === 'shop' && shopTab !== 'coins') updateShop();
         }
 
 
@@ -927,10 +939,10 @@
         const P4_MONSTER_SCALE = {
             mysteryTower: 1.954,
             mysteriousForest: 1.394,
-            ancientRuin: 1.694,
-            tribulationGround: 0.618,
-            huashenRealm: 0.488,
-            taixuDream: 0.3156
+            ancientRuin: 1.735,
+            tribulationGround: 0.647,
+            huashenRealm: 0.534,
+            taixuDream: 0.354
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -1065,6 +1077,7 @@
                 rootLevel: 0,        // 灵根强化等级（0–10）
                 shen: { clone: 0, focus: 0, sense: 0 },        // 神识强化等级（各 0–10）
                 alchemyBoost: false, // 炼丹助炼开关
+                skillUpgrades: [],   // 技能商店里已购置的设施 id
                 scoutBonus: false,   // 神识探查：下次秘境掉落率+30%
                 // P2功能：属性系统
                 stats: {
@@ -1461,6 +1474,47 @@
             setTimeout(() => showTutorial(0), 300);
         }
 
+        // ==================== 礼包码 ====================
+        // 礼包码不以明文存放，只存它的哈希（cyrb53，非加密，只防随手翻源码看到）。每个存档每个礼包码只能兑换一次（player.redeemedCodes）。
+        const GIFT_CODES = {
+            '69q7k0mlje': { id: 'test_ring', label: '测试礼包', items: [{ id: 'test_ring', qty: 1 }] }
+        };
+        function giftCodeHash(str, seed = 0) {
+            let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+            for (let i = 0, ch; i < str.length; i++) {
+                ch = str.charCodeAt(i);
+                h1 = Math.imul(h1 ^ ch, 2654435761);
+                h2 = Math.imul(h2 ^ ch, 1597334677);
+            }
+            h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+            h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+            return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+        }
+
+        function redeemGiftCode() {
+            const input = document.getElementById('giftCodeInput');
+            const result = document.getElementById('giftCodeResult');
+            const say = (text, ok) => { if (result) { result.textContent = text; result.style.color = ok ? '#6fa980' : '#c4483a'; } };
+            const code = (input ? input.value : '').trim();
+            if (!code) { say('请输入礼包码', false); return; }
+            const entry = GIFT_CODES[giftCodeHash(code)];
+            if (!entry) { say('无效的礼包码', false); return; }
+            const P = gameState.player;
+            if (!Array.isArray(P.redeemedCodes)) P.redeemedCodes = [];
+            if (P.redeemedCodes.includes(entry.id)) { say('这个礼包码已经兑换过了', false); return; }
+            // 背包放不下就不兑换（不消耗礼包码）
+            const need = entry.items.filter(i => !P.inventory.find(x => x.id === i.id)).length;
+            if (P.inventory.length + need > (P.inventoryCapacity || 50)) { say('背包已满，请先腾出空位再兑换', false); return; }
+            entry.items.forEach(i => addToInventory(i.id, i.qty, true));
+            P.redeemedCodes.push(entry.id);
+            const names = entry.items.map(i => `${GAME_CONFIG.items[i.id].name}×${i.qty}`).join('、');   // 纯文字（图标是 SVG 字符串，不能放进 textContent）
+            say(`兑换成功：${names}（已放入背包）`, true);
+            showNotification(`🎁 ${entry.label}：获得 ${names}`, '#b89a5b');
+            if (input) input.value = '';
+            updateUI();
+            saveGame();
+        }
+
         // 自动保存定时器只保留一个（重开新游戏时不会叠加）
         let autoSaveTimer = null;
         function startAutoSave() {
@@ -1811,9 +1865,12 @@
                 gameState.currentActionProgress += 0.1;
                 const adjustedDuration = getAdjustedDuration(gameState.currentAction.skill, action.duration, gameState.currentAction.action);
 
-                if (gameState.currentActionProgress >= adjustedDuration) {
+                // 耗时短于一个 tick（0.1 秒，如礼包饰品的 ×100 速度）时，一个 tick 里连续完成多次
+                let guard = 0;
+                while (gameState.currentAction && adjustedDuration > 0 && gameState.currentActionProgress >= adjustedDuration && guard++ < 60) {
                     completeAction();
-                    gameState.currentActionProgress = 0;
+                    if (!gameState.currentAction) { gameState.currentActionProgress = 0; break; }
+                    gameState.currentActionProgress = adjustedDuration < 0.1 ? gameState.currentActionProgress - adjustedDuration : 0;
                 }
 
                 updateProgressBars();
@@ -3405,6 +3462,144 @@
         }
 
         // 当前灵根 + 当前功法 + 悟道法则提供的某项特效总和
+        // ==================== 技能商店：技能设施（永久升级，v6.57） ====================
+        // 商城「技能商店」标签：每个技能有若干件设施 / 器具，需要该技能等级达到要求才能购买，每件只能买一次，永久提供加成。
+        // 加成用与灵根 / 功法相同的特效词汇（getMod / getSkillMod 会把已购设施的特效加进去）：time:技能（耗时）、exp:技能（经验）、
+        // double:技能（翻倍产出）、save:技能（节省材料）、out:技能（丹火 / 神识产出）、gearPct（装备属性）、cultSpeed、atkPct、hpPct、defPct、crit、cloneSpeed。
+        const SKILL_UPGRADES = [
+            // 炼丹
+            { id: 'alch_room',   skill: 'alchemy', level: 5,  price: 3000,   icon: '🏠', name: '炼丹室',   effects: { 'time:alchemy': -0.05, 'exp:alchemy': 0.05 } },
+            { id: 'alch_yellow', skill: 'alchemy', level: 10, price: 12000,  icon: '🟡', name: '黄品丹炉', effects: { 'save:alchemy': 0.06 } },
+            { id: 'alch_xuan',   skill: 'alchemy', level: 15, price: 40000,  icon: '🟣', name: '玄品丹炉', effects: { 'time:alchemy': -0.06, 'double:alchemy': 0.05 } },
+            { id: 'alch_earth',  skill: 'alchemy', level: 20, price: 120000, icon: '🟤', name: '地品丹炉', effects: { 'save:alchemy': 0.08, 'exp:alchemy': 0.08 } },
+            { id: 'alch_heaven', skill: 'alchemy', level: 25, price: 300000, icon: '🔥', name: '天品丹炉', effects: { 'double:alchemy': 0.08, 'time:alchemy': -0.06 } },
+            // 炼器
+            { id: 'forge_anvil',   skill: 'forging', level: 5,  price: 3000,   icon: '⚒️', name: '精铁砧',   effects: { 'time:forging': -0.05 } },
+            { id: 'forge_pool',    skill: 'forging', level: 10, price: 12000,  icon: '💧', name: '淬火池',   effects: { 'save:forging': 0.06 } },
+            { id: 'forge_furnace', skill: 'forging', level: 15, price: 40000,  icon: '🏭', name: '灵纹炉',   effects: { gearPct: 0.03 } },
+            { id: 'forge_god',     skill: 'forging', level: 20, price: 120000, icon: '🌋', name: '神火炉',   effects: { 'time:forging': -0.06, gearPct: 0.04 } },
+            { id: 'forge_heaven',  skill: 'forging', level: 25, price: 300000, icon: '🏛️', name: '天工台',   effects: { 'save:forging': 0.08, gearPct: 0.05 } },
+            // 灵田
+            { id: 'farm_spring', skill: 'farming', level: 5,  price: 3000,   icon: '⛲', name: '灵泉',     effects: { 'time:farming': -0.05 } },
+            { id: 'farm_array',  skill: 'farming', level: 10, price: 12000,  icon: '🌀', name: '聚灵阵',   effects: { 'double:farming': 0.06 } },
+            { id: 'farm_house',  skill: 'farming', level: 15, price: 40000,  icon: '🏡', name: '温室',     effects: { 'exp:farming': 0.08, 'time:farming': -0.05 } },
+            { id: 'farm_cave',   skill: 'farming', level: 20, price: 120000, icon: '⛰️', name: '洞天福地', effects: { 'double:farming': 0.08 } },
+            // 采矿
+            { id: 'mine_pick',  skill: 'mining', level: 5,  price: 3000,   icon: '⛏️', name: '精钢镐',   effects: { 'time:mining': -0.05 } },
+            { id: 'mine_cart',  skill: 'mining', level: 10, price: 12000,  icon: '🛒', name: '矿车',     effects: { 'double:mining': 0.06 } },
+            { id: 'mine_drill', skill: 'mining', level: 15, price: 40000,  icon: '🔩', name: '灵矿钻',   effects: { 'time:mining': -0.06, 'exp:mining': 0.08 } },
+            { id: 'mine_core',  skill: 'mining', level: 20, price: 120000, icon: '💠', name: '地脉核心', effects: { 'double:mining': 0.08 } },
+            // 修炼
+            { id: 'cult_mat',   skill: 'cultivation', level: 5,  price: 3000,   icon: '🧘', name: '聚灵蒲团', effects: { cultSpeed: 0.03 } },
+            { id: 'cult_room',  skill: 'cultivation', level: 10, price: 12000,  icon: '🏯', name: '静修室',   effects: { cultSpeed: 0.03 } },
+            { id: 'cult_array', skill: 'cultivation', level: 15, price: 40000,  icon: '🔯', name: '聚灵大阵', effects: { cultSpeed: 0.04 } },
+            { id: 'cult_cave',  skill: 'cultivation', level: 20, price: 120000, icon: '🗻', name: '洞府',     effects: { cultSpeed: 0.05 } },
+            // 战斗
+            { id: 'battle_yard',   skill: 'battle', level: 5,  price: 3000,   icon: '🥋', name: '演武场',   effects: { atkPct: 0.02 } },
+            { id: 'battle_armory', skill: 'battle', level: 10, price: 12000,  icon: '🗡️', name: '兵器架',   effects: { hpPct: 0.03, crit: 0.01 } },
+            { id: 'battle_tower',  skill: 'battle', level: 15, price: 40000,  icon: '🗼', name: '锻体塔',   effects: { defPct: 0.04, hpPct: 0.03 } },
+            { id: 'battle_altar',  skill: 'battle', level: 20, price: 120000, icon: '⚔️', name: '战神坛',   effects: { atkPct: 0.03, crit: 0.01 } },
+            // 丹火
+            { id: 'fire_box',     skill: 'danhuo', level: 5,  price: 3000,   icon: '📦', name: '火种匣',   effects: { 'out:danhuo': 0.10 } },
+            { id: 'fire_room',    skill: 'danhuo', level: 10, price: 12000,  icon: '🔥', name: '地火室',   effects: { 'time:danhuo': -0.05, 'exp:danhuo': 0.08 } },
+            { id: 'fire_pot',     skill: 'danhuo', level: 15, price: 40000,  icon: '🏺', name: '聚火鼎',   effects: { 'out:danhuo': 0.15 } },
+            { id: 'fire_pit',     skill: 'danhuo', level: 20, price: 120000, icon: '☀️', name: '九阳火池', effects: { 'out:danhuo': 0.20 } },
+            // 神识
+            { id: 'sense_mat',   skill: 'shenshi', level: 5,  price: 3000,   icon: '🪷', name: '静心蒲团', effects: { 'out:shenshi': 0.10 } },
+            { id: 'sense_pool',  skill: 'shenshi', level: 10, price: 12000,  icon: '🌊', name: '洗神池',   effects: { 'time:shenshi': -0.05, 'exp:shenshi': 0.08 } },
+            { id: 'sense_lamp',  skill: 'shenshi', level: 15, price: 40000,  icon: '🏮', name: '观照灯',   effects: { 'out:shenshi': 0.15 } },
+            { id: 'sense_tower', skill: 'shenshi', level: 20, price: 120000, icon: '🔭', name: '通明台',   effects: { 'out:shenshi': 0.20, cloneSpeed: 0.05 } },
+            // 悟道
+            { id: 'law_stone',    skill: 'wudao', level: 5,  price: 20000,  icon: '🪨', name: '悟道石',   effects: { 'time:wudao': -0.05 } },
+            { id: 'law_platform', skill: 'wudao', level: 10, price: 60000,  icon: '⛩️', name: '悟道台',   effects: { 'time:wudao': -0.06 } },
+            { id: 'law_tree',     skill: 'wudao', level: 15, price: 150000, icon: '🌳', name: '悟道茶树', effects: { 'exp:wudao': 0.10 } }
+        ];
+        const SKILL_SHOP_ORDER = ['cultivation', 'alchemy', 'forging', 'farming', 'mining', 'battle', 'danhuo', 'shenshi', 'wudao'];
+
+        let skillUpgradeCache = null;
+        function invalidateSkillUpgrades() { skillUpgradeCache = null; }
+        function ownedSkillUpgrades() {
+            const owned = gameState && gameState.player && gameState.player.skillUpgrades;
+            return Array.isArray(owned) ? SKILL_UPGRADES.filter(u => owned.includes(u.id)) : [];
+        }
+        // 已购设施的特效合计（带缓存）
+        function getSkillUpgradeTotals() {
+            if (!skillUpgradeCache) {
+                skillUpgradeCache = {};
+                ownedSkillUpgrades().forEach(u => Object.entries(u.effects).forEach(([k, v]) => { skillUpgradeCache[k] = (skillUpgradeCache[k] || 0) + v; }));
+            }
+            return skillUpgradeCache;
+        }
+
+        function buySkillUpgrade(id) {
+            const u = SKILL_UPGRADES.find(x => x.id === id);
+            if (!u) return;
+            const P = gameState.player;
+            if (!Array.isArray(P.skillUpgrades)) P.skillUpgrades = [];
+            if (P.skillUpgrades.includes(id)) { showNotification('已经拥有这件设施了', '#c98a3e'); return; }
+            const lv = (gameState.skills[u.skill] || {}).level || 1;
+            if (lv < u.level) { showNotification(`🔒 需要${gameState.skills[u.skill].name} Lv.${u.level}（当前 Lv.${lv}）`, '#c98a3e'); return; }
+            if (P.coins < u.price) { showNotification(`灵石不足！需要${u.price}，拥有${P.coins}`, '#c4483a', 'error'); return; }
+            P.coins -= u.price;
+            P.skillUpgrades.push(id);
+            invalidateSkillUpgrades();
+            calculateStats();
+            showNotification(`🏛 已购置：${u.name}\n${describeEffects(u.effects).join('、')}`, '#6f9c8a');
+            trackQuest('buy');
+            updateUI();
+            saveGame();
+        }
+
+        // 技能商店标签：按技能分组，列出设施、要求、加成与价格
+        function renderSkillShop(container) {
+            const P = gameState.player;
+            const owned = P.skillUpgrades || [];
+            const intro = document.createElement('div');
+            intro.style.cssText = 'grid-column: 1/-1; color: #888; font-size: 0.85em; line-height: 1.7;';
+            intro.textContent = '技能设施是永久升级：对应技能的等级达到要求后才能购买，每件只能买一次，效果永久生效。';
+            container.appendChild(intro);
+            SKILL_SHOP_ORDER.forEach(skillName => {
+                const skill = gameState.skills[skillName];
+                const list = SKILL_UPGRADES.filter(u => u.skill === skillName);
+                if (!skill || !list.length) return;
+                if ((skillName === 'danhuo' && !isDanhuoUnlocked()) || (skillName === 'shenshi' && !isShenshiUnlocked()) || (skillName === 'wudao' && P.realmIndex < LAW_UNLOCK_REALM)) return;
+                const title = document.createElement('div');
+                title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #6f9c8a; margin-top: 10px; margin-bottom: 5px;';
+                title.textContent = `${skill.icon} ${skill.name}设施（${skill.name} Lv.${skill.level || 1}）`;
+                container.appendChild(title);
+                list.forEach(u => {
+                    const has = owned.includes(u.id);
+                    const locked = !has && (skill.level || 1) < u.level;
+                    const card = document.createElement('div');
+                    card.className = 'shop-item';
+                    let style = 'padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #555; border-radius: 4px; text-align: center;';
+                    style += has ? 'opacity: 0.55; cursor: default;' : locked ? 'opacity: 0.55; border-style: dashed; cursor: not-allowed;' : 'cursor: pointer;';
+                    card.style.cssText = style;
+                    const status = has ? '✓ 已拥有' : locked ? `🔒 需要${skill.name} Lv.${u.level}` : `${COIN_ICON} ${u.price} 灵石`;
+                    const color = has ? '#6f9c8a' : locked ? '#c98a3e' : '#c2a25f';
+                    card.innerHTML = `
+                        <div style="font-size: 24px; margin-bottom: 5px;">${u.icon}</div>
+                        <div style="font-weight: bold; color: #6f9c8a; margin-bottom: 3px;">${u.name}</div>
+                        <div style="font-size: 0.8em; color: #888; margin-bottom: 8px;">${describeEffects(u.effects).join('<br/>')}</div>
+                        <div style="color: ${color}; font-weight: bold;">${status}</div>
+                        ${locked ? `<div style="font-size: 0.75em; color: #888; margin-top: 4px;">${u.price} 灵石</div>` : ''}`;
+                    card.onclick = () => (has ? null : locked ? showNotification(`🔒 需要${skill.name} Lv.${u.level}（当前 Lv.${skill.level || 1}）`, '#c98a3e') : buySkillUpgrade(u.id));
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        // 已装备物品的 effect 数值合计（如礼包饰品的 cultSpeed）
+        function getEquippedEffectSum(key) {
+            const eq = (gameState && gameState.player && gameState.player.equipment) || {};
+            let sum = 0;
+            [eq.weapon, eq.armor, ...(eq.jewelry || [])].filter(Boolean).forEach(id => {
+                const e = GAME_CONFIG.items[id] && GAME_CONFIG.items[id].effect;
+                if (e && e[key]) sum += e[key];
+            });
+            return sum;
+        }
+
         function getMod(key) {
             const player = gameState && gameState.player;
             if (!player) return 0;
@@ -3415,6 +3610,8 @@
             const artEffects = CULTIVATION_ARTS[player.currentArt]?.effects;
             if (artEffects && artEffects[key]) total += artEffects[key];
             total += getLawTotals()[key] || 0;
+            total += getSkillUpgradeTotals()[key] || 0;   // 技能商店里已购置的设施
+            if (key === 'cultSpeed') total += getEquippedEffectSum('cultSpeed');   // 装备物品自带的修炼速度
             return total;
         }
 
@@ -3444,7 +3641,7 @@
             const fixed = {
                 atkPct: v => `攻击 ${sign(v)}`, hpPct: v => `生命 ${sign(v)}`, defPct: v => `防御 ${sign(v)}`, spdPct: v => `速度 ${sign(v)}`,
                 hit: v => `命中 ${sign(v)}`, crit: v => `暴击率 ${sign(v)}`, critDmg: v => `暴击伤害 ${sign(v)}`, dodge: v => `闪避 ${sign(v)}`,
-                foodPct: v => `食物恢复 ${sign(v)}`, dropPct: v => `秘境掉落 ${sign(v)}`,
+                foodPct: v => `食物恢复 ${sign(v)}`, gearPct: v => `装备属性 ${sign(v)}`, dropPct: v => `秘境掉落 ${sign(v)}`,
                 cultSpeed: v => `修炼速度 ${sign(v)}`, cloneSpeed: v => `分身速度 ${sign(v)}`, autoOffline: v => `离线自动战斗效率 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
             };
             return Object.entries(effects).map(([key, v]) => {
@@ -3453,6 +3650,7 @@
                 const name = EFFECT_SKILL_NAMES[skill] || skill;
                 if (kind === 'time') return `${name}耗时 ${sign(v)}`;
                 if (kind === 'exp') return `${name}经验 ${sign(v)}`;
+                if (kind === 'out') return `${name}产出 ${sign(v)}`;
                 if (kind === 'double') return `${name}产出翻倍 ${sign(v)}`;
                 if (kind === 'save') return `${name}节省材料 ${sign(v)}`;
                 return key;
@@ -3478,6 +3676,10 @@
             }
             // 悟道：已领悟的法则合计
             const lawParts = LAW_IDS.filter(id => getLawInfo(id).level > 0).map(id => `${LAW_EFFECTS[id].icon}${LAW_EFFECTS[id].name.replace('之法则', '')}Lv.${getLawInfo(id).level}`);
+            const ups = ownedSkillUpgrades();
+            if (ups.length) {
+                html += `<div><b style="color:#7fae9a">🏛 设施</b>：已购置 ${ups.length}/${SKILL_UPGRADES.length} 件（${ups.slice(-3).map(u => u.name).join('、')}${ups.length > 3 ? '…' : ''}）</div>`;
+            }
             if (lawParts.length) {
                 html += `<div><b style="color:#c084fc">☯️ 悟道</b>：${lawParts.join(' ')}</div>`;
             }
@@ -3954,8 +4156,9 @@
             // 丹火 / 神识产出：技能每级 +2%
             if ((skillName === 'danhuo' || skillName === 'shenshi') && (output.danhuo || output.shenshi)) {
                 const m = 1 + ((gameState.skills[skillName] || {}).level - 1 || 0) * 0.02;
-                if (output.danhuo) output.danhuo = Math.floor(output.danhuo * m);
-                if (output.shenshi) output.shenshi = Math.floor(output.shenshi * m);
+                const outMod = 1 + getSkillMod('out', skillName);   // 技能商店设施：丹火 / 神识产出 +x%
+                if (output.danhuo) output.danhuo = Math.floor(output.danhuo * m * outMod);
+                if (output.shenshi) output.shenshi = Math.floor(output.shenshi * m * outMod);
                 return;
             }
             const skill = gameState.skills[skillName];
@@ -4961,6 +5164,7 @@
             const parts = [];
             if (cfg.stats) Object.entries(cfg.stats).forEach(([k, v]) => parts.push(`${STAT_LABELS[k] || k}+${v}`));
             if (cfg.effect && cfg.effect.workSpeed) parts.push(`工作速度 +${Math.round((1 / cfg.effect.workSpeed - 1) * 100)}%`);
+            if (cfg.effect && cfg.effect.cultSpeed) parts.push(`修炼速度 +${Math.round(cfg.effect.cultSpeed * 100)}%`);
             return parts.join(' · ');
         }
 
@@ -6067,16 +6271,26 @@
             if ((shopTab === 'danhuo' && !isDanhuoUnlocked()) || (shopTab === 'shenshi' && !isShenshiUnlocked())) shopTab = 'coins';
             const tabsEl = document.getElementById('shopTabs');
             if (tabsEl) {
-                const tabs = [['coins', true], ['danhuo', isDanhuoUnlocked()], ['shenshi', isShenshiUnlocked()]].filter(t => t[1]);
-                tabsEl.style.display = tabs.length > 1 ? '' : 'none';
-                tabsEl.innerHTML = tabs.map(([k]) => `<button type="button" class="shop-tab${k === shopTab ? ' active' : ''}" onclick="setShopTab('${k}')">${SHOP_CURRENCIES[k].icon()} ${SHOP_CURRENCIES[k].name}商城</button>`).join('');
+                const tabs = [['coins', true], ['skills', true], ['danhuo', isDanhuoUnlocked()], ['shenshi', isShenshiUnlocked()]].filter(t => t[1]);
+                tabsEl.style.display = '';
+                tabsEl.innerHTML = tabs.map(([k]) => `<button type="button" class="shop-tab${k === shopTab ? ' active' : ''}" onclick="setShopTab('${k}')">${k === 'skills' ? '🏛 技能商店' : `${SHOP_CURRENCIES[k].icon()} ${SHOP_CURRENCIES[k].name}商城`}</button>`).join('');
             }
             const balEl = document.getElementById('shopBalance');
-            if (balEl) balEl.innerHTML = `${SHOP_CURRENCIES[shopTab].icon()} ${SHOP_CURRENCIES[shopTab].name}: <span ${shopTab === 'coins' ? 'id="shopCoin"' : ''}>${Math.floor(gameState.player[shopTab === 'coins' ? 'coins' : shopTab] || 0)}</span>`;
+            const balKey = shopTab === 'skills' ? 'coins' : shopTab;   // 技能商店用灵石
+            if (balEl) balEl.innerHTML = `${SHOP_CURRENCIES[balKey].icon()} ${SHOP_CURRENCIES[balKey].name}: <span ${balKey === 'coins' ? 'id="shopCoin"' : ''}>${Math.floor(gameState.player[balKey] || 0)}</span>`;
+            if (shopTab === 'skills') { renderSkillShop(shopContainer); return; }
 
             const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满', '金丹初期', '金丹中期', '金丹后期', '金丹圆满', '元婴初期', '元婴中期', '元婴后期', '元婴圆满'];
             const currentRealmIdx = gameState.player.realmIndex;
             const currentRealmName = realmNames[currentRealmIdx] || '未知';
+
+            // 丹火 / 神识商城顶部：该货币的全部强化（与丹火 / 神识技能页里的相同）
+            if (shopTab === 'danhuo' || shopTab === 'shenshi') {
+                const box = document.createElement('div');
+                box.style.cssText = 'grid-column: 1/-1;';
+                box.innerHTML = `<div class="shop-section-title">${shopTab === 'danhuo' ? '🔥 丹火强化' : '👁️ 神识强化'}</div>${shopTab === 'danhuo' ? danhuoUsesHtml() : shenshiUsesHtml()}`;
+                shopContainer.appendChild(box);
+            }
 
             Object.entries(GAME_CONFIG.shop).forEach(([category, allItems]) => {
                 const items = allItems.filter(i => (i.currency || 'coins') === shopTab);   // 只显示当前标签货币的商品
@@ -6287,7 +6501,7 @@
             const armor = gameState.player.equipment.armor;
             const jewelry = gameState.player.equipment.jewelry;
             // 淬炼：武器 / 护甲 / 饰品各自 +4%/级（丹火淬炼台），炼器等级 +0.5%/级（SKILL_LEVEL_EFFECTS.forging）
-            const forgeMult = SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1);
+            const forgeMult = SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1) * (1 + getMod('gearPct'));   // 炼器设施：装备属性
             const weaponMult = (1 + TEMPER_PER_LEVEL * getTemper('weapon')) * forgeMult;
             const armorMult = (1 + TEMPER_PER_LEVEL * getTemper('armor')) * forgeMult;
             const jewelryMult = (1 + TEMPER_PER_LEVEL * getTemper('jewelry')) * forgeMult;
