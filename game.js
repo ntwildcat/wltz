@@ -255,6 +255,7 @@
                         practice: { name: '打铁练习', desc: '增加技能经验', duration: 10, output: { skill: 'forging', exp: 15 }, requiredLevel: 1, unlocked: true },
                         ironsword: { name: '铸造铁剑', desc: '铁矿石 ×3', duration: 20, output: { items: [{ id: 'sword', qty: 1 }], skill: 'forging', exp: 40 }, requiredLevel: 3, requires: { ironore: 3 }, unlocked: false },
                         iron_armor: { name: '铁甲', desc: '铁矿石 ×5', duration: 30, output: { items: [{ id: 'ironarmor', qty: 1 }], skill: 'forging', exp: 60 }, requiredLevel: 4, requires: { ironore: 5 }, unlocked: false },
+                        iron_blade: { name: '精铁剑', desc: '铁矿石 ×6 + 碎石 ×5', duration: 35, output: { items: [{ id: 'ironblade', qty: 1 }], skill: 'forging', exp: 90 }, requiredLevel: 5, requires: { ironore: 6, stone: 5 }, unlocked: false },
                         spirit_sword: { name: '灵剑', desc: '灵矿石 ×3 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritsword', qty: 1 }], skill: 'forging', exp: 130 }, requiredLevel: 7, requires: { spiritore: 3, crystal: 1 }, unlocked: false },
                         spirit_armor: { name: '灵甲', desc: '灵矿石 ×4 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritarmor', qty: 1 }], skill: 'forging', exp: 150 }, requiredLevel: 8, requires: { spiritore: 4, crystal: 1 }, unlocked: false },
                         golden_sword: { name: '金丹剑', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldensword', qty: 1 }], skill: 'forging', exp: 220 }, requiredLevel: 10, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
@@ -390,12 +391,12 @@
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', sellPrice: 80, effect: { workSpeed: 0.95 } },
 
                 // P6 丹火相关物品
-                danhuo: { name: '丹火', icon: '🔥', type: 'material', sellPrice: 500 },
+                danhuo: { name: '丹火', icon: '🔥', type: 'material', sellPrice: 60 },
                 danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed', sellPrice: 50 },
                 tempered_essence: { name: '淬炼精华', icon: '✨', type: 'material', sellPrice: 100 },
 
                 // P7 神识相关物品
-                shenshi: { name: '神识', icon: '👁️', type: 'material', sellPrice: 2000 },
+                shenshi: { name: '神识', icon: '👁️', type: 'material', sellPrice: 120 },
                 shenshi_seed: { name: '神识种子', icon: '👁️', type: 'seed', sellPrice: 100 },
                 yuanyingpill: { name: '元婴丹', icon: '⭕', type: 'breakthrough_material' },
                 huashenpill: { name: '化神丹', icon: '🔮', type: 'breakthrough_material' },  // P9 突破材料
@@ -403,6 +404,7 @@
 
                 // 装备
                 sword: { name: '桃木剑', icon: '⚔️', type: 'weapon', sellPrice: 60, stats: { atk: 15 } },
+                ironblade: { name: '精铁剑', icon: '🗡️', type: 'weapon', sellPrice: 200, stats: { atk: 26 } },
                 ironarmor: { name: '铁甲', icon: '🛡️', type: 'armor', sellPrice: 120, stats: { def: 10 } },
                 spiritsword: { name: '灵剑', icon: '⚡', type: 'weapon', sellPrice: 400, stats: { atk: 40 } },
                 goldenarmor: { name: '金丹法袍', icon: '👔', type: 'armor', sellPrice: 1200, stats: { def: 25, hp: 50 } },
@@ -608,6 +610,7 @@
                 jade_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#b08d5a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#7fc4a0"/><path d="M10 18Q16 21 22 18" stroke="#d6ffe6" stroke-width="1" opacity=".7"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2)}`),
                 // —— 武器 ——
                 sword: svg(sword('#b98a5a', '#dcb586', '#8a6a3a')),
+                ironblade: svg(sword('#9aa3ad', '#e4e9ee', '#5a4a36')),
                 spiritsword: svg(sword('#bfe0ee', '#fff', '#6fa0b8', '<path d="M8 6L4 13H8L5 20" stroke="#f3d36a" stroke-width="1.4"/>')),
                 goldensword: svg(sword('#e2c27a', '#fff4c4', '#a86a2a')),
                 yuanyingsword: svg(sword('#f0b8a8', '#fff', '#d8a24a', '<path d="M6 26Q3 18 8 14Q7 19 10 21ZM26 26Q29 18 24 14Q25 19 22 21Z" fill="#e8642a" stroke="none" opacity=".8"/>')),
@@ -651,7 +654,7 @@
         // 调平衡只需改此表。修改装备/属性/灵根特效后需要重新标定，临界点很陡。
         const P4_MONSTER_SCALE = {
             mysteryTower: 0.7,
-            mysteriousForest: 0.54,
+            mysteriousForest: 0.497,
             ancientRuin: 0.416,
             tribulationGround: 0.1365,
             huashenRealm: 0.0636,
