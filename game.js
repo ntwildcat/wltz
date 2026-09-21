@@ -94,11 +94,11 @@
                     baseRealmIndex: 6,                   // 秘径内怪物的基础境界（新索引）
                     recommendedLevel: '筑基中期~筑基圆满',
                     monsters: [
-                        { name: '残魂守卫', type: '雷', hp: 450, atk: 14, spd: 45, def: 7, attackSpeed: 2.3, drop: 'coins', dropQty: 60 },
-                        { name: '空间裂隙', type: '风', hp: 405, atk: 11, spd: 65, def: 4, attackSpeed: 1.9, drop: 'coins', dropQty: 65 },
-                        { name: '冰晶傀儡', type: '冰', hp: 495, atk: 12, spd: 40, def: 8, attackSpeed: 2.4, drop: 'coins', dropQty: 70 },
-                        { name: '法则残片', type: '无', hp: 630, atk: 13, spd: 50, def: 6, attackSpeed: 2.2, drop: 'coins', dropQty: 75 },
-                        { name: '遗迹意志', type: '无', hp: 900, atk: 20, spd: 48, def: 10, attackSpeed: 3.1, isBoss: true, drop: 'coins', dropQty: 300 }
+                        { name: '残魂守卫', type: '雷', hp: 460, atk: 14, spd: 45, def: 7, attackSpeed: 2.3, drop: 'coins', dropQty: 60 },
+                        { name: '空间裂隙', type: '风', hp: 415, atk: 11, spd: 65, def: 4, attackSpeed: 1.9, drop: 'coins', dropQty: 65 },
+                        { name: '冰晶傀儡', type: '冰', hp: 505, atk: 12, spd: 40, def: 8, attackSpeed: 2.4, drop: 'coins', dropQty: 70 },
+                        { name: '法则残片', type: '无', hp: 645, atk: 13, spd: 50, def: 6, attackSpeed: 2.2, drop: 'coins', dropQty: 75 },
+                        { name: '遗迹意志', type: '无', hp: 920, atk: 20, spd: 48, def: 10, attackSpeed: 3.1, isBoss: true, drop: 'coins', dropQty: 300 }
                     ],
                     rewards: {
                         fixed: [
@@ -122,11 +122,11 @@
                     baseRealmIndex: 9,                      // 怪物境界为金丹初期
                     recommendedLevel: '筑基圆满~金丹中期',
                     monsters: [
-                        { name: '雷劫残魂', type: '雷', hp: 1200, atk: 35, spd: 55, def: 15, attackSpeed: 2.2, drop: 'coins', dropQty: 150 },
-                        { name: '天雷傀儡', type: '雷', hp: 1500, atk: 40, spd: 50, def: 18, attackSpeed: 2.3, drop: 'coins', dropQty: 180 },
-                        { name: '劫云化身', type: '风', hp: 1350, atk: 45, spd: 65, def: 12, attackSpeed: 1.8, drop: 'coins', dropQty: 200 },
-                        { name: '雷劫核心', type: '雷', hp: 1800, atk: 50, spd: 45, def: 22, attackSpeed: 2.4, drop: 'coins', dropQty: 250 },
-                        { name: '天劫意志', type: '无', hp: 3000, atk: 60, spd: 55, def: 25, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 800 }
+                        { name: '雷劫残魂', type: '雷', hp: 1190, atk: 35, spd: 55, def: 15, attackSpeed: 2.2, drop: 'coins', dropQty: 150 },
+                        { name: '天雷傀儡', type: '雷', hp: 1485, atk: 40, spd: 50, def: 18, attackSpeed: 2.3, drop: 'coins', dropQty: 180 },
+                        { name: '劫云化身', type: '风', hp: 1335, atk: 45, spd: 65, def: 12, attackSpeed: 1.8, drop: 'coins', dropQty: 200 },
+                        { name: '雷劫核心', type: '雷', hp: 1780, atk: 50, spd: 45, def: 22, attackSpeed: 2.4, drop: 'coins', dropQty: 250 },
+                        { name: '天劫意志', type: '无', hp: 2970, atk: 60, spd: 55, def: 25, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 800 }
                     ],
                     rewards: {
                         fixed: [
@@ -151,11 +151,11 @@
                     baseRealmIndex: 13,                     // 怪物境界为元婴初期
                     recommendedLevel: '金丹圆满~元婴中期',
                     monsters: [
-                        { name: '元神残影', type: '无', hp: 5000, atk: 80, spd: 60, def: 30, attackSpeed: 2.1, drop: 'coins', dropQty: 400 },
-                        { name: '虚空吞噬者', type: '风', hp: 6000, atk: 90, spd: 70, def: 25, attackSpeed: 1.8, drop: 'coins', dropQty: 450 },
-                        { name: '神识傀儡', type: '雷', hp: 5500, atk: 85, spd: 55, def: 35, attackSpeed: 2.2, drop: 'coins', dropQty: 500 },
-                        { name: '幻梦妖灵', type: '水', hp: 6500, atk: 95, spd: 65, def: 28, attackSpeed: 2.0, drop: 'coins', dropQty: 550 },
-                        { name: '化神意志', type: '无', hp: 12000, atk: 120, spd: 60, def: 40, attackSpeed: 3.3, isBoss: true, drop: 'coins', dropQty: 2000 }
+                        { name: '元神残影', type: '无', hp: 4990, atk: 80, spd: 60, def: 30, attackSpeed: 2.1, drop: 'coins', dropQty: 400 },
+                        { name: '虚空吞噬者', type: '风', hp: 5990, atk: 90, spd: 70, def: 25, attackSpeed: 1.8, drop: 'coins', dropQty: 450 },
+                        { name: '神识傀儡', type: '雷', hp: 5490, atk: 85, spd: 55, def: 35, attackSpeed: 2.2, drop: 'coins', dropQty: 500 },
+                        { name: '幻梦妖灵', type: '水', hp: 6490, atk: 95, spd: 65, def: 28, attackSpeed: 2.0, drop: 'coins', dropQty: 550 },
+                        { name: '化神意志', type: '无', hp: 11980, atk: 120, spd: 60, def: 40, attackSpeed: 3.3, isBoss: true, drop: 'coins', dropQty: 2000 }
                     ],
                     rewards: {
                         fixed: [
@@ -180,11 +180,11 @@
                     baseRealmIndex: 17,                     // 怪物境界为化神初期
                     recommendedLevel: '元婴圆满~化神中期',
                     monsters: [
-                        { name: '幻境行者', type: '风', hp: 20600, atk: 150, spd: 70, def: 50, attackSpeed: 2.0, drop: 'coins', dropQty: 800 },
-                        { name: '虚实道人', type: '水', hp: 24720, atk: 165, spd: 65, def: 55, attackSpeed: 2.1, drop: 'coins', dropQty: 900 },
-                        { name: '万象傀儡', type: '雷', hp: 22660, atk: 170, spd: 60, def: 65, attackSpeed: 2.2, drop: 'coins', dropQty: 1000 },
-                        { name: '心魔化身', type: '无', hp: 26780, atk: 180, spd: 75, def: 60, attackSpeed: 1.9, drop: 'coins', dropQty: 1100 },
-                        { name: '太虚道主', type: '无', hp: 51500, atk: 220, spd: 70, def: 70, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 4000 }
+                        { name: '幻境行者', type: '风', hp: 21630, atk: 150, spd: 70, def: 50, attackSpeed: 2.0, drop: 'coins', dropQty: 800 },
+                        { name: '虚实道人', type: '水', hp: 25955, atk: 165, spd: 65, def: 55, attackSpeed: 2.1, drop: 'coins', dropQty: 900 },
+                        { name: '万象傀儡', type: '雷', hp: 23795, atk: 170, spd: 60, def: 65, attackSpeed: 2.2, drop: 'coins', dropQty: 1000 },
+                        { name: '心魔化身', type: '无', hp: 28120, atk: 180, spd: 75, def: 60, attackSpeed: 1.9, drop: 'coins', dropQty: 1100 },
+                        { name: '太虚道主', type: '无', hp: 54075, atk: 220, spd: 70, def: 70, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 4000 }
                     ],
                     rewards: {
                         fixed: [
@@ -255,6 +255,7 @@
                         practice: { name: '打铁练习', desc: '增加技能经验', duration: 10, output: { skill: 'forging', exp: 15 }, requiredLevel: 1, unlocked: true },
                         ironsword: { name: '铸造铁剑', desc: '铁矿石 ×3', duration: 20, output: { items: [{ id: 'sword', qty: 1 }], skill: 'forging', exp: 40 }, requiredLevel: 3, requires: { ironore: 3 }, unlocked: false },
                         iron_armor: { name: '铁甲', desc: '铁矿石 ×5', duration: 30, output: { items: [{ id: 'ironarmor', qty: 1 }], skill: 'forging', exp: 60 }, requiredLevel: 4, requires: { ironore: 5 }, unlocked: false },
+                        iron_blade: { name: '精铁剑', desc: '铁矿石 ×6 + 碎石 ×5', duration: 35, output: { items: [{ id: 'ironblade', qty: 1 }], skill: 'forging', exp: 90 }, requiredLevel: 5, requires: { ironore: 6, stone: 5 }, unlocked: false },
                         spirit_sword: { name: '灵剑', desc: '灵矿石 ×3 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritsword', qty: 1 }], skill: 'forging', exp: 130 }, requiredLevel: 7, requires: { spiritore: 3, crystal: 1 }, unlocked: false },
                         spirit_armor: { name: '灵甲', desc: '灵矿石 ×4 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritarmor', qty: 1 }], skill: 'forging', exp: 150 }, requiredLevel: 8, requires: { spiritore: 4, crystal: 1 }, unlocked: false },
                         golden_sword: { name: '金丹剑', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldensword', qty: 1 }], skill: 'forging', exp: 220 }, requiredLevel: 10, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
@@ -390,12 +391,12 @@
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', sellPrice: 80, effect: { workSpeed: 0.95 } },
 
                 // P6 丹火相关物品
-                danhuo: { name: '丹火', icon: '🔥', type: 'material', sellPrice: 500 },
+                danhuo: { name: '丹火', icon: '🔥', type: 'material', sellPrice: 60 },
                 danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed', sellPrice: 50 },
                 tempered_essence: { name: '淬炼精华', icon: '✨', type: 'material', sellPrice: 100 },
 
                 // P7 神识相关物品
-                shenshi: { name: '神识', icon: '👁️', type: 'material', sellPrice: 2000 },
+                shenshi: { name: '神识', icon: '👁️', type: 'material', sellPrice: 120 },
                 shenshi_seed: { name: '神识种子', icon: '👁️', type: 'seed', sellPrice: 100 },
                 yuanyingpill: { name: '元婴丹', icon: '⭕', type: 'breakthrough_material' },
                 huashenpill: { name: '化神丹', icon: '🔮', type: 'breakthrough_material' },  // P9 突破材料
@@ -403,6 +404,7 @@
 
                 // 装备
                 sword: { name: '桃木剑', icon: '⚔️', type: 'weapon', sellPrice: 60, stats: { atk: 15 } },
+                ironblade: { name: '精铁剑', icon: '🗡️', type: 'weapon', sellPrice: 200, stats: { atk: 26 } },
                 ironarmor: { name: '铁甲', icon: '🛡️', type: 'armor', sellPrice: 120, stats: { def: 10 } },
                 spiritsword: { name: '灵剑', icon: '⚡', type: 'weapon', sellPrice: 400, stats: { atk: 40 } },
                 goldenarmor: { name: '金丹法袍', icon: '👔', type: 'armor', sellPrice: 1200, stats: { def: 25, hp: 50 } },
@@ -608,6 +610,7 @@
                 jade_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#b08d5a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#7fc4a0"/><path d="M10 18Q16 21 22 18" stroke="#d6ffe6" stroke-width="1" opacity=".7"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2)}`),
                 // —— 武器 ——
                 sword: svg(sword('#b98a5a', '#dcb586', '#8a6a3a')),
+                ironblade: svg(sword('#9aa3ad', '#e4e9ee', '#5a4a36')),
                 spiritsword: svg(sword('#bfe0ee', '#fff', '#6fa0b8', '<path d="M8 6L4 13H8L5 20" stroke="#f3d36a" stroke-width="1.4"/>')),
                 goldensword: svg(sword('#e2c27a', '#fff4c4', '#a86a2a')),
                 yuanyingsword: svg(sword('#f0b8a8', '#fff', '#d8a24a', '<path d="M6 26Q3 18 8 14Q7 19 10 21ZM26 26Q29 18 24 14Q25 19 22 21Z" fill="#e8642a" stroke="none" opacity=".8"/>')),
@@ -650,12 +653,12 @@
         // （保留真实的怪物属性和克制关系），最低境界平均通关率约 60%~90%。原始数值保留在 GAME_CONFIG.dungeons，
         // 调平衡只需改此表。修改装备/属性/灵根特效后需要重新标定，临界点很陡。
         const P4_MONSTER_SCALE = {
-            mysteryTower: 0.7,
-            mysteriousForest: 0.54,
-            ancientRuin: 0.416,
-            tribulationGround: 0.1365,
-            huashenRealm: 0.0636,
-            taixuDream: 0.03
+            mysteryTower: 0.725,
+            mysteriousForest: 0.505,
+            ancientRuin: 0.46,
+            tribulationGround: 0.1635,
+            huashenRealm: 0.0876,
+            taixuDream: 0.0467
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -670,10 +673,10 @@
         // 标定：无特效玩家（桃木剑、最低境界）通关率约 65%，且敌人平均每击约打掉玩家 12% 最大生命，
         // 让防御/闪避/生命类特效在普通战斗里同样有价值（只缩放血量会变成纯输出检定，输出型灵根占尽优势）。
         const P4_AREA_SCALE = {
-            forest: { hp: 1.071, atk: 1.071 }, mountain: { hp: 1.056, atk: 1.117 }, deepMountain: { hp: 0.876, atk: 1.079 },
-            swamp: { hp: 0.978, atk: 1.206 }, abyss: { hp: 0.775, atk: 1.104 }, goldenPlains: { hp: 0.572, atk: 0.735 },
-            tribulationGround: { hp: 0.424, atk: 0.654 }, voidSea: { hp: 0.15, atk: 0.497 }, abyssRuins: { hp: 0.047, atk: 0.353 },
-            chaosWastes: { hp: 0.037, atk: 0.18 }, nineNether: { hp: 0.0175, atk: 0.14 }
+            forest: { hp: 1.12, atk: 1.12 }, mountain: { hp: 1.1, atk: 1.17 }, deepMountain: { hp: 0.944, atk: 1.16 },
+            swamp: { hp: 1.08, atk: 1.33 }, abyss: { hp: 0.921, atk: 1.31 }, goldenPlains: { hp: 0.689, atk: 0.885 },
+            tribulationGround: { hp: 0.516, atk: 0.76 }, voidSea: { hp: 0.205, atk: 0.65 }, abyssRuins: { hp: 0.0705, atk: 0.512 },
+            chaosWastes: { hp: 0.0607, atk: 0.287 }, nineNether: { hp: 0.031, atk: 0.238 }
         };
 
         const BATTLE_FORMULAS = {
@@ -2134,9 +2137,14 @@
             battleLogEntries.push(won ? `🎉 战胜${battle.currentEnemy.name}` : (battle.playerHP.current <= 0 ? `💀 被${battle.currentEnemy.name}击败` : `⚔️ 未能击败${battle.currentEnemy.name}（超时）`));
             trimBattleLog();
             if (won) {
-                const { coins, exp } = grantNormalBattleWin(areaKey);
+                const { coins, exp, items, lost } = grantNormalBattleWin(areaKey);
                 auto.wins++; auto.coins += coins; auto.exp += exp;
                 battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验`);
+                if (items.length) battleLogEntries.push(`🎁 掉落：${formatDropList(items)}`);
+                if (lost.length) {
+                    battleLogEntries.push(`❌ 背包已满，${formatDropList(lost)} 未能获得`);
+                    showNotification('❌ 背包已满，战斗掉落无法拾取！请出售物品或扩展背包', '#c4483a', 'error');
+                }
                 trimBattleLog();
                 // 托管中不逐场弹胜利提示，统计显示在托管栏里
                 if (!auto.enabled) {
@@ -2176,7 +2184,47 @@
             enterBattleArea(areaKey, true);
         }
 
-        // 一场普通战斗取胜的奖励：精通加成后的灵石 / 经验，并获得该区域精通经验（每胜一场 10）
+        // 战斗区域掉落：每胜一场，每一项各自独立按概率判定（概率再乘该区域精通的奖励加成）。qty 是数字或 [最少, 最多]
+        // 越深的区域越偏向高阶矿石与稀有材料；种子、丹火 / 神识种子等只在深处极小概率出现
+        const BATTLE_DROPS = {
+            forest:            [{ id: 'stone', p: 0.30, qty: [1, 2] }, { id: 'millet', p: 0.15, qty: 1 }, { id: 'cleangrass', p: 0.08, qty: 1 }, { id: 'seed_cleangrass', p: 0.04, qty: 1 }],
+            mountain:          [{ id: 'stone', p: 0.30, qty: [1, 2] }, { id: 'ironore', p: 0.20, qty: 1 }, { id: 'mushroom', p: 0.06, qty: 1 }, { id: 'seed_cleangrass', p: 0.04, qty: 1 }],
+            deepMountain:      [{ id: 'ironore', p: 0.25, qty: [1, 2] }, { id: 'spiritore', p: 0.08, qty: 1 }, { id: 'mushroom', p: 0.08, qty: 1 }, { id: 'seed_mushroom', p: 0.03, qty: 1 }],
+            swamp:             [{ id: 'cleangrass', p: 0.20, qty: [1, 2] }, { id: 'mushroom', p: 0.12, qty: 1 }, { id: 'spiritore', p: 0.08, qty: 1 }, { id: 'seed_tea', p: 0.03, qty: 1 }],
+            abyss:             [{ id: 'spiritore', p: 0.20, qty: [1, 2] }, { id: 'crystal', p: 0.06, qty: 1 }, { id: 'seed_mushroom', p: 0.03, qty: 1 }],
+            goldenPlains:      [{ id: 'spiritore', p: 0.25, qty: [1, 2] }, { id: 'crystal', p: 0.12, qty: 1 }, { id: 'tea', p: 0.08, qty: 1 }, { id: 'spiritcrystal', p: 0.04, qty: 1 }],
+            tribulationGround: [{ id: 'crystal', p: 0.15, qty: 1 }, { id: 'spiritcrystal', p: 0.08, qty: 1 }, { id: 'tempered_essence', p: 0.03, qty: 1 }, { id: 'danhuo_seed', p: 0.015, qty: 1 }],
+            voidSea:           [{ id: 'crystal', p: 0.12, qty: 1 }, { id: 'spiritcrystal', p: 0.12, qty: 1 }, { id: 'immortalore', p: 0.02, qty: 1 }, { id: 'shenshi_seed', p: 0.015, qty: 1 }],
+            abyssRuins:        [{ id: 'spiritcrystal', p: 0.15, qty: [1, 2] }, { id: 'immortalore', p: 0.05, qty: 1 }, { id: 'daofruit', p: 0.02, qty: 1 }],
+            chaosWastes:       [{ id: 'immortalore', p: 0.10, qty: 1 }, { id: 'chaosstone', p: 0.04, qty: 1 }, { id: 'seed_daofruit', p: 0.02, qty: 1 }],
+            nineNether:        [{ id: 'immortalore', p: 0.15, qty: [1, 2] }, { id: 'chaosstone', p: 0.08, qty: 1 }, { id: 'daofruit', p: 0.05, qty: 1 }, { id: 'seed_daofruit', p: 0.03, qty: 1 }]
+        };
+
+        // 掉落数量文字（如 1–2 / 1）
+        function dropQtyText(q) {
+            return Array.isArray(q) ? (q[0] === q[1] ? q[0] : `${q[0]}–${q[1]}`) : q;
+        }
+
+        // 掉落列表 → 「图标 名称×数量、…」
+        function formatDropList(items) {
+            return items.map(d => {
+                const cfg = GAME_CONFIG.items[d.id] || {};
+                return `${cfg.icon || ''}${cfg.name || d.id}×${d.qty}`;
+            }).join('、');
+        }
+
+        // 判定一场胜利的掉落并放进背包（静默入包，背包放不下的记入 lost，由调用方汇总提示）
+        function rollAreaDrops(areaKey, bonus) {
+            const got = [], lost = [];
+            (BATTLE_DROPS[areaKey] || []).forEach(d => {
+                if (Math.random() >= Math.min(1, d.p * bonus)) return;
+                const qty = Array.isArray(d.qty) ? d.qty[0] + Math.floor(Math.random() * (d.qty[1] - d.qty[0] + 1)) : d.qty;
+                (addToInventory(d.id, qty, true) ? got : lost).push({ id: d.id, qty });
+            });
+            return { got, lost };
+        }
+
+        // 一场普通战斗取胜的奖励：精通加成后的灵石 / 经验 / 物品掉落，并获得该区域精通经验（每胜一场 10）
         function grantNormalBattleWin(areaKey) {
             const areaData = getAction('battle', areaKey).areaData;
             const reward = 1 + getMasteryBonus('battle', areaKey).reward;
@@ -2185,7 +2233,17 @@
             gameState.player.coins += coins;
             addSkillExp('battle', exp);
             addMasteryExp('battle', areaKey, 10);
-            return { coins, exp };
+            const { got, lost } = rollAreaDrops(areaKey, reward);
+            return { coins, exp, items: got, lost };
+        }
+
+        // 把若干次掉落合并成 { id: 数量 }
+        function mergeDrops(total, items) {
+            items.forEach(d => { total[d.id] = (total[d.id] || 0) + d.qty; });
+            return total;
+        }
+        function dropMapToList(map) {
+            return Object.entries(map).map(([id, qty]) => ({ id, qty }));
         }
 
         // ==================== 自动战斗托管 ====================
@@ -2219,7 +2277,7 @@
             const savedSpeed = gameState.battleSpeed;
             const savedTimer = gameState.player.foodUseTimer;
             gameState.battleSpeed = 5;
-            const r = { fights: 0, wins: 0, losses: 0, coins: 0, exp: 0, stopped: false };
+            const r = { fights: 0, wins: 0, losses: 0, coins: 0, exp: 0, stopped: false, drops: {}, lostDrops: {} };
             let elapsed = 0, streak = 0;
             try {
                 while (elapsed < budgetSeconds && r.fights < 20000) {
@@ -2237,6 +2295,7 @@
                     if (won) {
                         const g = grantNormalBattleWin(areaKey);
                         r.wins++; r.coins += g.coins; r.exp += g.exp; streak = 0;
+                        mergeDrops(r.drops, g.items); mergeDrops(r.lostDrops, g.lost);
                     } else {
                         r.losses++;
                         if (battle.playerHP.current <= 0) { r.died = true; break; }   // 被击败：与在线一致，循环结束
@@ -3754,7 +3813,17 @@
             }
         }
 
-        // 战斗区域奖励说明：每场灵石 / 经验（含该区域精通加成）；战斗区域目前没有物品掉落
+        // 战斗区域掉落的卡片文字：名称×数量（概率，含精通加成）
+        function areaDropText(areaKey, bonus) {
+            const list = BATTLE_DROPS[areaKey] || [];
+            if (!list.length) return '无';
+            return list.map(d => {
+                const cfg = GAME_CONFIG.items[d.id] || {};
+                return `${cfg.icon || ''}${cfg.name || d.id}×${dropQtyText(d.qty)}（${Math.round(Math.min(1, d.p * bonus) * 1000) / 10}%）`;
+            }).join('、');
+        }
+
+        // 战斗区域奖励说明：每场灵石 / 经验（含该区域精通加成）与可能掉落的物品
         function areaRewardHtml(areaKey, action) {
             const a = action.areaData;
             const bonus = 1 + getMasteryBonus('battle', areaKey).reward;
@@ -3762,7 +3831,7 @@
             return `<div class="area-reward">
                     <div>敌人：${enemies || '—'}</div>
                     <div>每场奖励：${COIN_ICON} ${Math.round(a.coins * bonus)} 灵石 · ${Math.round(a.exp * bonus)} 战斗经验${bonus > 1 ? '（含精通加成）' : ''}</div>
-                    <div class="area-drops">掉落物：无（只获得灵石与经验）</div>
+                    <div class="area-drops">可能掉落：${areaDropText(areaKey, bonus)}</div>
                 </div>`;
         }
 
@@ -4007,7 +4076,7 @@
             return null;
         }
 
-        function addToInventory(itemId, qty = 1) {
+        function addToInventory(itemId, qty = 1, silent = false) {
             // 检查背包容量
             const inventoryCount = gameState.player.inventory.length;
             const maxCapacity = gameState.player.inventoryCapacity || 50;
@@ -4017,18 +4086,18 @@
             if (existing) {
                 existing.qty += qty;
                 // 检查是否接近满载
-                if (inventoryCount >= maxCapacity * 0.9) {
+                if (!silent && inventoryCount >= maxCapacity * 0.9) {
                     showNotification(`⚠️ 背包即将满满！(${inventoryCount}/${maxCapacity}) 建议购买背包扩展`, '#c98a3e', 'warning');
                 }
             } else {
                 // 检查是否有空间添加新物品
                 if (inventoryCount >= maxCapacity) {
-                    showNotification(`❌ 背包已满无法获取 ${itemName}！请扩展背包容量`, '#c4483a', 'error');
+                    if (!silent) showNotification(`❌ 背包已满无法获取 ${itemName}！请扩展背包容量`, '#c4483a', 'error');
                     return false; // 返回false表示失败
                 }
                 gameState.player.inventory.push({ id: itemId, qty });
                 // 检查是否接近满载
-                if (inventoryCount + 1 >= maxCapacity * 0.8) {
+                if (!silent && inventoryCount + 1 >= maxCapacity * 0.8) {
                     showNotification(`⚠️ 背包容量即将满满！(${inventoryCount + 1}/${maxCapacity})`, '#c98a3e', 'warning');
                 }
             }
@@ -5527,6 +5596,8 @@
             return false;
         }
 
+        const REALM_STAT_COMPOUND = 1.03;   // 生命 / 攻击 / 防御每境界额外复利系数（速度不变）
+
         function calculateStats() {
             // P4重写：境界驱动的属性系统（替代技能等级驱动）
             const realmIndex = gameState.player.realmIndex;
@@ -5541,10 +5612,13 @@
             // - 生命 +40%/级（快速增长，提升续航）
             // - 攻击 +30%/级（显著提升）
             // - 防御 +25%/级（稳定防守）
+            // - 以上三项再乘 REALM_STAT_COMPOUND^境界（v6.40）
             // - 速度 +30%/级（战斗体验）
-            const hpMultiplier = 1 + realmIndex * 0.40;
-            const atkMultiplier = 1 + realmIndex * 0.30;
-            const defMultiplier = 1 + realmIndex * 0.25;
+            // v6.40：在线性增长上再乘一个每境界 +3% 的复利系数，使高境界的每次突破提升更明显（线性增长的相对提升越往后越小）
+            const realmGrowth = Math.pow(REALM_STAT_COMPOUND, realmIndex);
+            const hpMultiplier = (1 + realmIndex * 0.40) * realmGrowth;
+            const atkMultiplier = (1 + realmIndex * 0.30) * realmGrowth;
+            const defMultiplier = (1 + realmIndex * 0.25) * realmGrowth;
             const spdMultiplier = 1 + realmIndex * 0.30;
 
             // === 第三步：灵根 + 功法的属性百分比特效（作用于境界基础属性，先乘后取整，避免小数值被吃掉）===
@@ -6552,7 +6626,9 @@
                     const res = runOfflineAutoBattle(savedAction.action, budget);
                     gameState.lastActiveTime = now;
                     const mins = Math.max(1, Math.round(res.elapsed / 60));
-                    const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验` +
+                    const dropText = Object.keys(res.drops).length ? `\n🎁 掉落：${formatDropList(dropMapToList(res.drops))}` : '';
+                    const lostText = Object.keys(res.lostDrops).length ? `\n❌ 背包已满，${formatDropList(dropMapToList(res.lostDrops))} 未能获得` : '';
+                    const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验${dropText}${lostText}` +
                         (res.stopped ? `\n⚠️ 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，已停止（请检查装备与食物）` : '');
                     showNotification(msg + (res.died ? `
 💀 第 ${res.fights} 场被击败，循环战斗已结束（生命恢复至50%，请检查装备与食物）` : ''), (res.stopped || res.died) ? '#c98a3e' : '#6fa980');
