@@ -2184,11 +2184,11 @@
         // 战斗区域掉落：每胜一场，每一项各自独立按概率判定（概率再乘该区域精通的奖励加成）。qty 是数字或 [最少, 最多]
         // 越深的区域越偏向高阶矿石与稀有材料；种子、丹火 / 神识种子等只在深处极小概率出现
         const BATTLE_DROPS = {
-            forest:            [{ id: 'stone', p: 0.30, qty: [1, 2] }, { id: 'millet', p: 0.15, qty: 1 }, { id: 'cleangrass', p: 0.08, qty: 1 }, { id: 'seed_millet', p: 0.04, qty: 1 }],
+            forest:            [{ id: 'stone', p: 0.30, qty: [1, 2] }, { id: 'millet', p: 0.15, qty: 1 }, { id: 'cleangrass', p: 0.08, qty: 1 }, { id: 'seed_cleangrass', p: 0.04, qty: 1 }],
             mountain:          [{ id: 'stone', p: 0.30, qty: [1, 2] }, { id: 'ironore', p: 0.20, qty: 1 }, { id: 'mushroom', p: 0.06, qty: 1 }, { id: 'seed_cleangrass', p: 0.04, qty: 1 }],
             deepMountain:      [{ id: 'ironore', p: 0.25, qty: [1, 2] }, { id: 'spiritore', p: 0.08, qty: 1 }, { id: 'mushroom', p: 0.08, qty: 1 }, { id: 'seed_mushroom', p: 0.03, qty: 1 }],
             swamp:             [{ id: 'cleangrass', p: 0.20, qty: [1, 2] }, { id: 'mushroom', p: 0.12, qty: 1 }, { id: 'spiritore', p: 0.08, qty: 1 }, { id: 'seed_tea', p: 0.03, qty: 1 }],
-            abyss:             [{ id: 'spiritore', p: 0.20, qty: [1, 2] }, { id: 'crystal', p: 0.06, qty: 1 }, { id: 'gatherpill', p: 0.03, qty: 1 }],
+            abyss:             [{ id: 'spiritore', p: 0.20, qty: [1, 2] }, { id: 'crystal', p: 0.06, qty: 1 }, { id: 'seed_mushroom', p: 0.03, qty: 1 }],
             goldenPlains:      [{ id: 'spiritore', p: 0.25, qty: [1, 2] }, { id: 'crystal', p: 0.12, qty: 1 }, { id: 'tea', p: 0.08, qty: 1 }, { id: 'spiritcrystal', p: 0.04, qty: 1 }],
             tribulationGround: [{ id: 'crystal', p: 0.15, qty: 1 }, { id: 'spiritcrystal', p: 0.08, qty: 1 }, { id: 'tempered_essence', p: 0.03, qty: 1 }, { id: 'danhuo_seed', p: 0.015, qty: 1 }],
             voidSea:           [{ id: 'crystal', p: 0.12, qty: 1 }, { id: 'spiritcrystal', p: 0.12, qty: 1 }, { id: 'immortalore', p: 0.02, qty: 1 }, { id: 'shenshi_seed', p: 0.015, qty: 1 }],
