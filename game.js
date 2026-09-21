@@ -2134,9 +2134,14 @@
             battleLogEntries.push(won ? `🎉 战胜${battle.currentEnemy.name}` : (battle.playerHP.current <= 0 ? `💀 被${battle.currentEnemy.name}击败` : `⚔️ 未能击败${battle.currentEnemy.name}（超时）`));
             trimBattleLog();
             if (won) {
-                const { coins, exp } = grantNormalBattleWin(areaKey);
+                const { coins, exp, items, lost } = grantNormalBattleWin(areaKey);
                 auto.wins++; auto.coins += coins; auto.exp += exp;
                 battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验`);
+                if (items.length) battleLogEntries.push(`🎁 掉落：${formatDropList(items)}`);
+                if (lost.length) {
+                    battleLogEntries.push(`❌ 背包已满，${formatDropList(lost)} 未能获得`);
+                    showNotification('❌ 背包已满，战斗掉落无法拾取！请出售物品或扩展背包', '#c4483a', 'error');
+                }
                 trimBattleLog();
                 // 托管中不逐场弹胜利提示，统计显示在托管栏里
                 if (!auto.enabled) {
@@ -2176,7 +2181,47 @@
             enterBattleArea(areaKey, true);
         }
 
-        // 一场普通战斗取胜的奖励：精通加成后的灵石 / 经验，并获得该区域精通经验（每胜一场 10）
+        // 战斗区域掉落：每胜一场，每一项各自独立按概率判定（概率再乘该区域精通的奖励加成）。qty 是数字或 [最少, 最多]
+        // 越深的区域越偏向高阶矿石与稀有材料；种子、丹火 / 神识种子等只在深处极小概率出现
+        const BATTLE_DROPS = {
+            forest:            [{ id: 'stone', p: 0.30, qty: [1, 2] }, { id: 'millet', p: 0.15, qty: 1 }, { id: 'cleangrass', p: 0.08, qty: 1 }, { id: 'seed_millet', p: 0.04, qty: 1 }],
+            mountain:          [{ id: 'stone', p: 0.30, qty: [1, 2] }, { id: 'ironore', p: 0.20, qty: 1 }, { id: 'mushroom', p: 0.06, qty: 1 }, { id: 'seed_cleangrass', p: 0.04, qty: 1 }],
+            deepMountain:      [{ id: 'ironore', p: 0.25, qty: [1, 2] }, { id: 'spiritore', p: 0.08, qty: 1 }, { id: 'mushroom', p: 0.08, qty: 1 }, { id: 'seed_mushroom', p: 0.03, qty: 1 }],
+            swamp:             [{ id: 'cleangrass', p: 0.20, qty: [1, 2] }, { id: 'mushroom', p: 0.12, qty: 1 }, { id: 'spiritore', p: 0.08, qty: 1 }, { id: 'seed_tea', p: 0.03, qty: 1 }],
+            abyss:             [{ id: 'spiritore', p: 0.20, qty: [1, 2] }, { id: 'crystal', p: 0.06, qty: 1 }, { id: 'gatherpill', p: 0.03, qty: 1 }],
+            goldenPlains:      [{ id: 'spiritore', p: 0.25, qty: [1, 2] }, { id: 'crystal', p: 0.12, qty: 1 }, { id: 'tea', p: 0.08, qty: 1 }, { id: 'spiritcrystal', p: 0.04, qty: 1 }],
+            tribulationGround: [{ id: 'crystal', p: 0.15, qty: 1 }, { id: 'spiritcrystal', p: 0.08, qty: 1 }, { id: 'tempered_essence', p: 0.03, qty: 1 }, { id: 'danhuo_seed', p: 0.015, qty: 1 }],
+            voidSea:           [{ id: 'crystal', p: 0.12, qty: 1 }, { id: 'spiritcrystal', p: 0.12, qty: 1 }, { id: 'immortalore', p: 0.02, qty: 1 }, { id: 'shenshi_seed', p: 0.015, qty: 1 }],
+            abyssRuins:        [{ id: 'spiritcrystal', p: 0.15, qty: [1, 2] }, { id: 'immortalore', p: 0.05, qty: 1 }, { id: 'daofruit', p: 0.02, qty: 1 }],
+            chaosWastes:       [{ id: 'immortalore', p: 0.10, qty: 1 }, { id: 'chaosstone', p: 0.04, qty: 1 }, { id: 'seed_daofruit', p: 0.02, qty: 1 }],
+            nineNether:        [{ id: 'immortalore', p: 0.15, qty: [1, 2] }, { id: 'chaosstone', p: 0.08, qty: 1 }, { id: 'daofruit', p: 0.05, qty: 1 }, { id: 'seed_daofruit', p: 0.03, qty: 1 }]
+        };
+
+        // 掉落数量文字（如 1–2 / 1）
+        function dropQtyText(q) {
+            return Array.isArray(q) ? (q[0] === q[1] ? q[0] : `${q[0]}–${q[1]}`) : q;
+        }
+
+        // 掉落列表 → 「图标 名称×数量、…」
+        function formatDropList(items) {
+            return items.map(d => {
+                const cfg = GAME_CONFIG.items[d.id] || {};
+                return `${cfg.icon || ''}${cfg.name || d.id}×${d.qty}`;
+            }).join('、');
+        }
+
+        // 判定一场胜利的掉落并放进背包（静默入包，背包放不下的记入 lost，由调用方汇总提示）
+        function rollAreaDrops(areaKey, bonus) {
+            const got = [], lost = [];
+            (BATTLE_DROPS[areaKey] || []).forEach(d => {
+                if (Math.random() >= Math.min(1, d.p * bonus)) return;
+                const qty = Array.isArray(d.qty) ? d.qty[0] + Math.floor(Math.random() * (d.qty[1] - d.qty[0] + 1)) : d.qty;
+                (addToInventory(d.id, qty, true) ? got : lost).push({ id: d.id, qty });
+            });
+            return { got, lost };
+        }
+
+        // 一场普通战斗取胜的奖励：精通加成后的灵石 / 经验 / 物品掉落，并获得该区域精通经验（每胜一场 10）
         function grantNormalBattleWin(areaKey) {
             const areaData = getAction('battle', areaKey).areaData;
             const reward = 1 + getMasteryBonus('battle', areaKey).reward;
@@ -2185,7 +2230,17 @@
             gameState.player.coins += coins;
             addSkillExp('battle', exp);
             addMasteryExp('battle', areaKey, 10);
-            return { coins, exp };
+            const { got, lost } = rollAreaDrops(areaKey, reward);
+            return { coins, exp, items: got, lost };
+        }
+
+        // 把若干次掉落合并成 { id: 数量 }
+        function mergeDrops(total, items) {
+            items.forEach(d => { total[d.id] = (total[d.id] || 0) + d.qty; });
+            return total;
+        }
+        function dropMapToList(map) {
+            return Object.entries(map).map(([id, qty]) => ({ id, qty }));
         }
 
         // ==================== 自动战斗托管 ====================
@@ -2219,7 +2274,7 @@
             const savedSpeed = gameState.battleSpeed;
             const savedTimer = gameState.player.foodUseTimer;
             gameState.battleSpeed = 5;
-            const r = { fights: 0, wins: 0, losses: 0, coins: 0, exp: 0, stopped: false };
+            const r = { fights: 0, wins: 0, losses: 0, coins: 0, exp: 0, stopped: false, drops: {}, lostDrops: {} };
             let elapsed = 0, streak = 0;
             try {
                 while (elapsed < budgetSeconds && r.fights < 20000) {
@@ -2237,6 +2292,7 @@
                     if (won) {
                         const g = grantNormalBattleWin(areaKey);
                         r.wins++; r.coins += g.coins; r.exp += g.exp; streak = 0;
+                        mergeDrops(r.drops, g.items); mergeDrops(r.lostDrops, g.lost);
                     } else {
                         r.losses++;
                         if (battle.playerHP.current <= 0) { r.died = true; break; }   // 被击败：与在线一致，循环结束
@@ -3754,7 +3810,17 @@
             }
         }
 
-        // 战斗区域奖励说明：每场灵石 / 经验（含该区域精通加成）；战斗区域目前没有物品掉落
+        // 战斗区域掉落的卡片文字：名称×数量（概率，含精通加成）
+        function areaDropText(areaKey, bonus) {
+            const list = BATTLE_DROPS[areaKey] || [];
+            if (!list.length) return '无';
+            return list.map(d => {
+                const cfg = GAME_CONFIG.items[d.id] || {};
+                return `${cfg.icon || ''}${cfg.name || d.id}×${dropQtyText(d.qty)}（${Math.round(Math.min(1, d.p * bonus) * 1000) / 10}%）`;
+            }).join('、');
+        }
+
+        // 战斗区域奖励说明：每场灵石 / 经验（含该区域精通加成）与可能掉落的物品
         function areaRewardHtml(areaKey, action) {
             const a = action.areaData;
             const bonus = 1 + getMasteryBonus('battle', areaKey).reward;
@@ -3762,7 +3828,7 @@
             return `<div class="area-reward">
                     <div>敌人：${enemies || '—'}</div>
                     <div>每场奖励：${COIN_ICON} ${Math.round(a.coins * bonus)} 灵石 · ${Math.round(a.exp * bonus)} 战斗经验${bonus > 1 ? '（含精通加成）' : ''}</div>
-                    <div class="area-drops">掉落物：无（只获得灵石与经验）</div>
+                    <div class="area-drops">可能掉落：${areaDropText(areaKey, bonus)}</div>
                 </div>`;
         }
 
@@ -4007,7 +4073,7 @@
             return null;
         }
 
-        function addToInventory(itemId, qty = 1) {
+        function addToInventory(itemId, qty = 1, silent = false) {
             // 检查背包容量
             const inventoryCount = gameState.player.inventory.length;
             const maxCapacity = gameState.player.inventoryCapacity || 50;
@@ -4017,18 +4083,18 @@
             if (existing) {
                 existing.qty += qty;
                 // 检查是否接近满载
-                if (inventoryCount >= maxCapacity * 0.9) {
+                if (!silent && inventoryCount >= maxCapacity * 0.9) {
                     showNotification(`⚠️ 背包即将满满！(${inventoryCount}/${maxCapacity}) 建议购买背包扩展`, '#c98a3e', 'warning');
                 }
             } else {
                 // 检查是否有空间添加新物品
                 if (inventoryCount >= maxCapacity) {
-                    showNotification(`❌ 背包已满无法获取 ${itemName}！请扩展背包容量`, '#c4483a', 'error');
+                    if (!silent) showNotification(`❌ 背包已满无法获取 ${itemName}！请扩展背包容量`, '#c4483a', 'error');
                     return false; // 返回false表示失败
                 }
                 gameState.player.inventory.push({ id: itemId, qty });
                 // 检查是否接近满载
-                if (inventoryCount + 1 >= maxCapacity * 0.8) {
+                if (!silent && inventoryCount + 1 >= maxCapacity * 0.8) {
                     showNotification(`⚠️ 背包容量即将满满！(${inventoryCount + 1}/${maxCapacity})`, '#c98a3e', 'warning');
                 }
             }
@@ -6552,7 +6618,9 @@
                     const res = runOfflineAutoBattle(savedAction.action, budget);
                     gameState.lastActiveTime = now;
                     const mins = Math.max(1, Math.round(res.elapsed / 60));
-                    const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验` +
+                    const dropText = Object.keys(res.drops).length ? `\n🎁 掉落：${formatDropList(dropMapToList(res.drops))}` : '';
+                    const lostText = Object.keys(res.lostDrops).length ? `\n❌ 背包已满，${formatDropList(dropMapToList(res.lostDrops))} 未能获得` : '';
+                    const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验${dropText}${lostText}` +
                         (res.stopped ? `\n⚠️ 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，已停止（请检查装备与食物）` : '');
                     showNotification(msg + (res.died ? `
 💀 第 ${res.fights} 场被击败，循环战斗已结束（生命恢复至50%，请检查装备与食物）` : ''), (res.stopped || res.died) ? '#c98a3e' : '#6fa980');
