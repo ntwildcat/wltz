@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=13.0">
+    <link rel="stylesheet" href="style.css?v=13.1">
 
 </head>
 <body data-panel="cultivation">
@@ -407,9 +407,8 @@
                         <!-- 商城面板 -->
                         <div id="panel-shop" class="panel-content hidden">
                             <div class="panel-title">🏪 商城</div>
-                            <div style="margin-bottom: 15px; color: #c2a25f;">
-                                <span data-ico="coin">💎</span> 灵石: <span id="shopCoin">100</span>
-                            </div>
+                            <div id="shopTabs" class="shop-tabs" style="display: none;"></div>
+                            <div id="shopBalance" style="margin-bottom: 15px; color: #c2a25f;"></div>
                             <div class="inventory-grid" id="shopGrid"></div>
                         </div>
 
@@ -598,7 +597,7 @@
             <div style="background: rgba(0,0,0,0.2); padding: 12px 15px; border-radius: 4px; margin-bottom: 14px; line-height: 1.8em;">
                 <div><span style="color: #888;">单价:</span> <span id="buyUnitPrice">-</span></div>
                 <div><span style="color: #888;">已有:</span> <span id="buyOwned">0</span></div>
-                <div><span style="color: #888;">灵石:</span> <span id="buyCoins">0</span></div>
+                <div><span style="color: #888;" id="buyCurLabel">灵石:</span> <span id="buyCoins">0</span></div>
             </div>
             <div class="sell-qty-row" style="margin-bottom: 14px;">
                 <span>数量</span>
@@ -752,7 +751,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.0"></script>
+    <script src="game.js?v=13.1"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
