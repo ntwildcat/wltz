@@ -1900,3 +1900,27 @@ body.fx-shake .container { animation: fxShake 0.12s linear infinite; }
     .battle-speed-control { margin-left: auto !important; flex: none !important; }
     .speed-btn { min-height: 36px !important; min-width: 40px !important; }
 }
+
+/* 新手任务条 */
+.quest-banner { margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--bronze); border-left: 4px solid var(--cinnabar-2); background: var(--bg-l3); }
+.quest-banner.complete { border-color: var(--patina); border-left-color: var(--patina); background: rgba(111, 156, 138, 0.10); }
+.quest-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 6px; }
+.quest-tag { font-size: 0.8em; color: var(--text-l4); }
+.quest-title { color: var(--text-l1); font-size: 1.05em; }
+.quest-list-link { margin-left: auto; background: none; border: none; color: var(--text-l4); text-decoration: underline; cursor: pointer; font-size: 0.8em; }
+.quest-desc { color: var(--text-l3); font-size: 0.9em; line-height: 1.7; }
+.quest-desc b { color: var(--border-l1); }
+.quest-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 0.85em; }
+.quest-progress { color: var(--text-l2); }
+.quest-banner.complete .quest-progress { color: var(--patina); }
+.quest-reward { color: var(--text-l3); }
+.quest-btn { margin-left: auto; padding: 4px 16px; }
+.quest-list .quest-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 6px 4px; border-bottom: 1px solid var(--border-l3); }
+.quest-list .quest-row small { color: var(--text-l4); white-space: nowrap; }
+.quest-list .quest-row.current { color: var(--text-l1); background: rgba(184, 154, 91, 0.08); }
+.quest-list .quest-row.final { border-bottom: none; margin-top: 6px; color: var(--text-l2); }
+/* 当前任务要点的配方卡片：脉冲描边 */
+.action-item.quest-target { box-shadow: 0 0 0 2px var(--cinnabar-2), 0 0 14px rgba(196, 72, 58, 0.45); animation: questPulse 1.8s ease-in-out infinite; }
+@keyframes questPulse { 0%, 100% { box-shadow: 0 0 0 2px var(--cinnabar-2), 0 0 6px rgba(196, 72, 58, 0.25); } 50% { box-shadow: 0 0 0 2px var(--cinnabar-2), 0 0 18px rgba(196, 72, 58, 0.6); } }
+@media (prefers-reduced-motion: reduce) { .action-item.quest-target { animation: none; } }
+@media (max-width: 768px) { .quest-banner { margin: 0 0 10px; } .quest-btn { width: 100%; margin-left: 0; min-height: 40px; } }
