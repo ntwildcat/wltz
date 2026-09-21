@@ -1633,7 +1633,10 @@
                 c.progress += 0.1;
                 const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
                 if (c.progress >= duration) {
-                    completeAction(c.action, { double: getCloneDoubleBonus() });
+                    const fast = duration < FAST_ACTION_SECONDS;
+                    if (fast) notifyMuted = true;
+                    try { completeAction(c.action, { double: getCloneDoubleBonus(), batch: fast }); } finally { notifyMuted = false; }
+                    if (fast) flushFastUI();
                     c.progress = 0;
                 }
                 tickCloneBar(slot, duration);
@@ -1770,7 +1773,10 @@
             f.progress += 0.1;
             const duration = getAdjustedDuration('farming', action.duration, f.action.action);
             if (f.progress >= duration) {
-                completeAction(f.action);
+                const fast = duration < FAST_ACTION_SECONDS;
+                if (fast) notifyMuted = true;
+                try { completeAction(f.action, { batch: fast }); } finally { notifyMuted = false; }
+                if (fast) flushFastUI();
                 f.progress = 0;
             }
             tickPlotBar(duration);
@@ -1866,11 +1872,22 @@
                 const adjustedDuration = getAdjustedDuration(gameState.currentAction.skill, action.duration, gameState.currentAction.action);
 
                 // 耗时短于一个 tick（0.1 秒，如礼包饰品的 ×100 速度）时，一个 tick 里连续完成多次
-                let guard = 0;
-                while (gameState.currentAction && adjustedDuration > 0 && gameState.currentActionProgress >= adjustedDuration && guard++ < 60) {
-                    completeAction();
-                    if (!gameState.currentAction) { gameState.currentActionProgress = 0; break; }
-                    gameState.currentActionProgress = adjustedDuration < 0.1 ? gameState.currentActionProgress - adjustedDuration : 0;
+                const fast = adjustedDuration < FAST_ACTION_SECONDS;
+                let guard = 0, did = 0;
+                if (fast) notifyMuted = true;
+                try {
+                    while (gameState.currentAction && adjustedDuration > 0 && gameState.currentActionProgress >= adjustedDuration && guard++ < 60) {
+                        completeAction(gameState.currentAction, { batch: fast });
+                        did++;
+                        if (!gameState.currentAction) { gameState.currentActionProgress = 0; break; }
+                        gameState.currentActionProgress = adjustedDuration < 0.1 ? gameState.currentActionProgress - adjustedDuration : 0;
+                    }
+                } finally {
+                    notifyMuted = false;
+                }
+                if (fast && did) {
+                    flushFastUI();
+                    if (!gameState.currentAction) { showNotification('⏹ 行动已自动停止（修为已满、材料用完或已至上限）', '#c98a3e'); updateUI(); saveGame(); }   // 停止时立刻刷新并提示
                 }
 
                 updateProgressBars();
@@ -4011,6 +4028,15 @@
             }
         }
 
+        // 极速行动（如礼包饰品 ×100 速度）：连续完成时静音通知，界面每 0.4 秒刷新一次、存档每 5 秒一次
+        const FAST_ACTION_SECONDS = 0.5;
+        let notifyMuted = false, fastUiTs = 0, fastSaveTs = 0;
+        function flushFastUI() {
+            const now = Date.now();
+            if (now - fastUiTs > 400) { fastUiTs = now; updateUI(); }
+            if (now - fastSaveTs > 5000) { fastSaveTs = now; saveGame(); }
+        }
+
         function completeAction(act = gameState.currentAction, bonus = {}) {
             const action = getAction(act.skill, act.action);
             if (!action.output) return;
@@ -4121,6 +4147,7 @@
             }
 
             trackQuest('act:' + act.skill + '.' + actionKey);
+            if (bonus.batch) return;   // 极速行动（耗时 < 0.5 秒）：由调用方节流刷新界面 / 存档，否则每秒几十次全界面重绘会卡死页面
             updateUI();
             saveGame();
         }
@@ -5866,6 +5893,7 @@
         // 通知关闭时仍要显示的「重要提示」：类型为 error / danger / warning，或使用了警示 / 错误色的通知
         const IMPORTANT_NOTIFICATION_COLORS = ['#c4483a', '#c98a3e', '#ef4444', '#f59e0b', '#ff6b6b', '#f39c12'];
         function showNotification(message, color = '#6f9c8a', type = 'normal') {
+            if (notifyMuted && !['error', 'danger'].includes(type)) return;   // 极速行动连续完成时不刷屏
             const st = (gameState && gameState.settings) || {};
             if (st.enableNotifications === false && !['error', 'danger', 'warning'].includes(type) &&
                 !IMPORTANT_NOTIFICATION_COLORS.includes(String(color).toLowerCase())) {
