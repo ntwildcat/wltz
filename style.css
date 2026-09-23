@@ -1534,6 +1534,9 @@ display: none !important;
 .law-effects { font-size: 0.8em; color: var(--border-l2); line-height: 1.6; min-height: 1.6em; }
 .law-next { font-size: 0.72em; color: var(--text-l4); margin-top: 4px; line-height: 1.5; }
 .law-resonant { font-size: 0.7em; color: #c084fc; margin-left: 6px; }
+.law-huaxu { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 6px; }
+.law-huaxu-btn { padding: 3px 8px; font-size: 0.72em; }
+.law-huaxu-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .law-capped { opacity: 0.85; }
 
 /* 装备界面 */
