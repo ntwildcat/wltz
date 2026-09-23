@@ -38,7 +38,13 @@
                 { name: '合体初期', nextReq: 312000 },
                 { name: '合体中期', nextReq: 345000 },
                 { name: '合体后期', nextReq: 379000 },
-                { name: '合体圆满', nextReq: 415000 }
+                { name: '合体圆满', nextReq: 415000 },
+                // 大乘期（索引29-32，沿曲线 100 × n^2.5，v6.69）：灵界至高战力。核心是「元婴蜕变」——不断把灵力注入元婴，
+                // 从婴儿形态练到青年形态，元婴离体助战；以及道则「本源品」——法则之力更进一步，初步可以压制群敌
+                { name: '大乘初期', nextReq: 453000 },
+                { name: '大乘中期', nextReq: 493000 },
+                { name: '大乘后期', nextReq: 535000 },
+                { name: '大乘圆满', nextReq: 579000 }
             ],
             // P2功能：秘境系统
             dungeons: {
@@ -275,6 +281,37 @@
                         skillExp: 1000
                     }
                 },
+                // 大乘期秘境：太乙圣域（入口合体圆满，怪物大乘初期）
+                taiyiRealm: {
+                    id: 'taiyiRealm',
+                    name: '太乙圣域',
+                    desc: '灵界至高战力的试炼场·通关掉落太乙精华与元婴精魄',
+                    icon: '🌟',
+                    minRealmIndex: 28,                      // 最低合体圆满
+                    baseRealmIndex: 29,                     // 怪物境界为大乘初期
+                    recommendedLevel: '合体圆满~大乘后期',
+                    monsters: [
+                        { name: '太乙游神', type: '无', hp: 240000, atk: 620, spd: 92, def: 190, attackSpeed: 2.2, drop: 'coins', dropQty: 6000 },
+                        { name: '元婴化影', type: '无', hp: 280000, atk: 660, spd: 88, def: 210, attackSpeed: 2.3, drop: 'coins', dropQty: 6800 },
+                        { name: '法则执者', type: '雷', hp: 260000, atk: 700, spd: 100, def: 180, attackSpeed: 2.1, drop: 'coins', dropQty: 7500 },
+                        { name: '灵界残将', type: '无', hp: 310000, atk: 730, spd: 90, def: 230, attackSpeed: 2.4, drop: 'coins', dropQty: 8200 },
+                        { name: '灵界至尊', type: '无', hp: 600000, atk: 880, spd: 92, def: 260, attackSpeed: 3.4, isBoss: true, drop: 'coins', dropQty: 26000 }
+                    ],
+                    rewards: {
+                        fixed: [
+                            { id: 'nascentsoul_essence', qty: [3, 6] }
+                        ],
+                        random: [
+                            { id: 'taiyiessence', qty: [3, 5], probability: 1 },
+                            { id: 'voidcrystal', qty: [4, 7], probability: 1 }
+                        ],
+                        coins: [26000, 42000],
+                        danhuo: [550, 950],
+                        shenshi: [480, 820],
+                        daoguo: [80, 130],
+                        skillExp: 2200
+                    }
+                },
                 // 炼虚期天劫（v6.68）：每个炼虚小境界各一场，不在秘境列表里显示，只能通过突破弹窗的「渡劫」进入；
                 // 通关后 gameState.dungeons[id].completed 标记为已渡劫，不会像普通秘境那样循环挑战（见 completeDungeon 的 isTribulation 分支）
                 tribulation21: {
@@ -333,7 +370,11 @@
                         // 炼虚期配方（索引21–23解锁）
                         lianxu_main: { name: '炼虚归元', desc: '炼虚初期主力', duration: 200, output: { cultivation: 15000, skill: 'cultivation', exp: 1000 }, requiredRealmIndex: 21, unlocked: false },
                         huaxu_unity: { name: '化虚合真', desc: '炼虚中期高产', duration: 300, output: { cultivation: 27000, skill: 'cultivation', exp: 1500 }, requiredRealmIndex: 22, unlocked: false },
-                        taixu_manifest: { name: '太虚显化', desc: '炼虚期最终修炼法', duration: 450, output: { cultivation: 50000, skill: 'cultivation', exp: 2200 }, requiredRealmIndex: 23, unlocked: false }
+                        taixu_manifest: { name: '太虚显化', desc: '炼虚期最终修炼法', duration: 450, output: { cultivation: 50000, skill: 'cultivation', exp: 2200 }, requiredRealmIndex: 23, unlocked: false },
+                        // 大乘期配方（索引29-31解锁）
+                        dacheng_convergence: { name: '大乘归一', desc: '大乘初期主力', duration: 260, output: { cultivation: 170000, skill: 'cultivation', exp: 4800 }, requiredRealmIndex: 29, unlocked: false },
+                        yuanying_growth: { name: '元婴蜕变', desc: '大乘中期高产', duration: 380, output: { cultivation: 320000, skill: 'cultivation', exp: 6000 }, requiredRealmIndex: 30, unlocked: false },
+                        fadao_suppress: { name: '法则镇伏', desc: '大乘期最终修炼法', duration: 540, output: { cultivation: 560000, skill: 'cultivation', exp: 7500 }, requiredRealmIndex: 31, unlocked: false }
                     },
                     actions: {}
                 },
@@ -357,7 +398,10 @@
                         jade_marrow: { name: '玉髓琼浆', desc: '悟道果 ×3 + 悟道茶 ×4 + 天道石 ×1（战斗食物：恢复5000生命）', duration: 130, output: { items: [{ id: 'jade_marrow', qty: 2 }], skill: 'alchemy', exp: 2200 }, requiredLevel: 63, requires: { daofruit: 3, tea: 4, daostone: 1 }, unlocked: false },
                         // 炼虚期炼丹（索引60/63解锁）
                         huaxu_pill_alchemy: { name: '化虚丹', desc: '九叶莲 ×10 + 悟道茶 ×12 + 天道石 ×3（化神圆满突破必需）', duration: 150, output: { items: [{ id: 'huaxupill', qty: 1 }], skill: 'alchemy', exp: 1100 }, requiredLevel: 50, requires: { lotus: 10, tea: 12, daostone: 3 }, unlocked: false },
-                        void_nectar: { name: '虚无仙酿', desc: '悟道果 ×4 + 悟道茶 ×5 + 虚晶 ×1（战斗食物：恢复3500生命）', duration: 100, output: { items: [{ id: 'void_nectar', qty: 2 }], skill: 'alchemy', exp: 1300 }, requiredLevel: 54, requires: { daofruit: 4, tea: 5, voidcrystal: 1 }, unlocked: false }
+                        void_nectar: { name: '虚无仙酿', desc: '悟道果 ×4 + 悟道茶 ×5 + 虚晶 ×1（战斗食物：恢复3500生命）', duration: 100, output: { items: [{ id: 'void_nectar', qty: 2 }], skill: 'alchemy', exp: 1300 }, requiredLevel: 54, requires: { daofruit: 4, tea: 5, voidcrystal: 1 }, unlocked: false },
+                        // 大乘期炼丹（索引70/74解锁）
+                        dacheng_pill_alchemy: { name: '大乘丹', desc: '九叶莲 ×12 + 悟道茶 ×14 + 太乙精华 ×3（合体圆满突破必需）', duration: 210, output: { items: [{ id: 'dachengpill', qty: 1 }], skill: 'alchemy', exp: 2600 }, requiredLevel: 70, requires: { lotus: 12, tea: 14, taiyiessence: 3 }, unlocked: false },
+                        taiyi_nectar: { name: '太乙琼浆', desc: '悟道果 ×5 + 悟道茶 ×6 + 太乙精华 ×1（战斗食物：恢复6500生命）', duration: 150, output: { items: [{ id: 'taiyi_nectar', qty: 2 }], skill: 'alchemy', exp: 3000 }, requiredLevel: 74, requires: { daofruit: 5, tea: 6, taiyiessence: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -388,7 +432,11 @@
                         // 炼虚期炼器（索引64-66解锁）
                         lianxu_sword: { name: '炼虚剑', desc: '虚晶 ×3 + 混沌石 ×3', duration: 130, output: { items: [{ id: 'lianxusword', qty: 1 }], skill: 'forging', exp: 1100 }, requiredLevel: 56, requires: { voidcrystal: 3, chaosstone: 3 }, unlocked: false },
                         lianxu_armor: { name: '炼虚法衣', desc: '虚晶 ×4 + 混沌石 ×3', duration: 130, output: { items: [{ id: 'lianxuarmor', qty: 1 }], skill: 'forging', exp: 1200 }, requiredLevel: 59, requires: { voidcrystal: 4, chaosstone: 3 }, unlocked: false },
-                        lianxu_pendant: { name: '炼虚佩', desc: '虚晶 ×2 + 灵晶 ×4', duration: 120, output: { items: [{ id: 'lianxupendant', qty: 1 }], skill: 'forging', exp: 1300 }, requiredLevel: 60, requires: { voidcrystal: 2, spiritcrystal: 4 }, unlocked: false }
+                        lianxu_pendant: { name: '炼虚佩', desc: '虚晶 ×2 + 灵晶 ×4', duration: 120, output: { items: [{ id: 'lianxupendant', qty: 1 }], skill: 'forging', exp: 1300 }, requiredLevel: 60, requires: { voidcrystal: 2, spiritcrystal: 4 }, unlocked: false },
+                        // 大乘期炼器（索引76-80解锁）
+                        dacheng_sword: { name: '大乘剑', desc: '太乙精华 ×4 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengsword', qty: 1 }], skill: 'forging', exp: 3400 }, requiredLevel: 76, requires: { taiyiessence: 4, chaosstone: 4 }, unlocked: false },
+                        dacheng_armor: { name: '大乘法衣', desc: '太乙精华 ×5 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengarmor', qty: 1 }], skill: 'forging', exp: 3600 }, requiredLevel: 78, requires: { taiyiessence: 5, chaosstone: 4 }, unlocked: false },
+                        dacheng_pendant: { name: '大乘佩', desc: '太乙精华 ×3 + 灵晶 ×5', duration: 170, output: { items: [{ id: 'dachengpendant', qty: 1 }], skill: 'forging', exp: 3800 }, requiredLevel: 80, requires: { taiyiessence: 3, spiritcrystal: 5 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -421,7 +469,8 @@
                         immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 330 }, requiredLevel: 36, unlocked: false },
                         chaosstone: { name: '采混沌石', desc: '产出混沌石', duration: 50, output: { items: [{ id: 'chaosstone', qty: 1 }], skill: 'mining', exp: 600 }, requiredLevel: 43, unlocked: false },
                         daostone: { name: '采天道石', desc: '产出天道石（化虚丹与合体级装备的共用材料）', duration: 60, output: { items: [{ id: 'daostone', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false },
-                        voidcrystal: { name: '采虚晶', desc: '产出虚晶（炼虚期材料，化虚 / 炼虚装备）', duration: 60, output: { items: [{ id: 'voidcrystal', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false }
+                        voidcrystal: { name: '采虚晶', desc: '产出虚晶（炼虚期材料，化虚 / 炼虚装备）', duration: 60, output: { items: [{ id: 'voidcrystal', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false },
+                        taiyiessence: { name: '采太乙精华', desc: '产出太乙精华（大乘期材料）', duration: 75, output: { items: [{ id: 'taiyiessence', qty: 1 }], skill: 'mining', exp: 1300 }, requiredLevel: 72, unlocked: false }
                     },
                     actions: {}
                 },
@@ -570,6 +619,14 @@
                 lianxuarmor: { name: '炼虚法衣', icon: '🥼', type: 'armor', sellPrice: 8000, stats: { def: 85, hp: 230 } },
                 lianxupendant: { name: '炼虚佩', icon: '📿', type: 'jewelry', sellPrice: 5000, stats: { spd: 19, hp: 150 } },
                 void_nectar: { name: '虚无仙酿', icon: '🍶', type: 'food', sellPrice: 3000 },
+                // 大乘期新物品
+                taiyiessence: { name: '太乙精华', icon: '💠', type: 'ore', sellPrice: 3500 },
+                dachengpill: { name: '大乘丹', icon: '🔮', type: 'breakthrough_material', sellPrice: 12000 },
+                dachengsword: { name: '大乘剑', icon: '🗡️', type: 'weapon', sellPrice: 14000, stats: { atk: 320 } },
+                dachengarmor: { name: '大乘法衣', icon: '🥼', type: 'armor', sellPrice: 15500, stats: { def: 175, hp: 480 } },
+                dachengpendant: { name: '大乘佩', icon: '📿', type: 'jewelry', sellPrice: 10000, stats: { spd: 36, hp: 310 } },
+                taiyi_nectar: { name: '太乙琼浆', icon: '🍶', type: 'food', sellPrice: 6000 },
+                nascentsoul_essence: { name: '元婴精魄', icon: '👁️', type: 'material', sellPrice: 2000 },
 
                 // P6/P7 新作物
                 // 战斗食物（在炼丹中制作；在战斗中HP低于50%时自动食用）
@@ -649,7 +706,9 @@
                     { id: 'lianxu_art', name: '炼虚真经', icon: '📖', price: 800000, desc: '修炼速度 ×5', minRealmIndex: 21, type: 'art' },
                     { id: 'taixuhuashi_art', name: '太虚化实经', icon: '🕮', price: 2000000, desc: '修炼速度 ×6.2', minRealmIndex: 23, type: 'art' },
                     { id: 'heti_art', name: '合体真经', icon: '📖', price: 2000000, desc: '修炼速度 ×8', minRealmIndex: 25, type: 'art' },
-                    { id: 'dao_art', name: '太上合道经', icon: '🕮', price: 5000000, desc: '修炼速度 ×9.5', minRealmIndex: 27, type: 'art' }
+                    { id: 'dao_art', name: '太上合道经', icon: '🕮', price: 5000000, desc: '修炼速度 ×9.5', minRealmIndex: 27, type: 'art' },
+                    { id: 'dacheng_art', name: '大乘真经', icon: '📖', price: 12000000, desc: '修炼速度 ×12', minRealmIndex: 29, type: 'art' },
+                    { id: 'taiyi_art', name: '太乙化元经', icon: '🕮', price: 30000000, desc: '修炼速度 ×15', minRealmIndex: 31, type: 'art' }
                 ]
             }
         };
@@ -724,6 +783,15 @@
                     cooldown: 3.0,
                     minRealm: 21,             // 炼虚初期
                     description: '炼虚修士以虚晶入酿，化虚为实，恢复量远超此前的战斗食物'
+                },
+                taiyi_nectar: {
+                    id: 'taiyi_nectar',
+                    name: '太乙琼浆',
+                    icon: '🍶',
+                    hpRestore: 6500,          // 恢复HP
+                    cooldown: 3.0,
+                    minRealm: 29,             // 大乘初期
+                    description: '大乘修士以太乙精华炼制，灵界至高一脉的战斗补给，恢复量远超此前一切战斗食物'
                 }
             },
             // 默认食物配置
@@ -835,7 +903,15 @@
                 lianxusword: svg(sword('#e6ddf6', '#fff', '#8a6ad8', '<circle cx="16" cy="16" r="14" stroke="#c8b8f0" stroke-width="1" opacity=".7"/>')),
                 lianxuarmor: svg(robe('#e6ddf6', '#8a6ad8', '<path d="M12 24Q14 22 16 24Q18 22 20 24" stroke="#b8a8e0" stroke-width="1"/>')),
                 lianxupendant: svg(pendant('#c8b8f0', '#e6ddf6', `${sparkle(25, 22, 2.4)}<circle cx="16" cy="20" r="8" stroke="#c8b8f0" stroke-width=".8" opacity=".7"/>`)),
-                void_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#6a5a8a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#b8a0e0"/><path d="M10 18Q16 21 22 18" stroke="#f0e6ff" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2)}`)
+                void_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#6a5a8a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#b8a0e0"/><path d="M10 18Q16 21 22 18" stroke="#f0e6ff" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2)}`),
+                // —— 大乘期新物品 ——
+                taiyiessence: svg(rock('#f3d36a', '#8a6a1a', `<path d="M16 5V27M9 12L23 20M23 12L9 20" stroke="#fff8dc" stroke-width="1" opacity=".8"/>${sparkle(8, 9, 2.6)}${sparkle(25, 24, 2.2)}${sparkle(16, 16, 2)}`)),
+                dachengpill: svg(pill('#fff4d8', '#fff', '<g fill="#e8b84a" stroke="none"><circle cx="16" cy="16" r="3.4"/></g><path d="M16 8V13M16 19V24M8 16H13M19 16H24" stroke="#e8b84a" stroke-width="1.5"/>', '<circle cx="16" cy="16" r="14" stroke="#f3d36a" stroke-width="1.6" opacity=".9"/>')),
+                dachengsword: svg(sword('#fff4d8', '#fff', '#e8b84a', '<circle cx="16" cy="16" r="15" stroke="#f3d36a" stroke-width="1.2" opacity=".8"/>')),
+                dachengarmor: svg(robe('#fff4d8', '#e8b84a', '<path d="M12 24Q14 22 16 24Q18 22 20 24" stroke="#f0d888" stroke-width="1"/>')),
+                dachengpendant: svg(pendant('#f3d36a', '#fff4d8', `${sparkle(25, 22, 2.6)}<circle cx="16" cy="20" r="8" stroke="#f3d36a" stroke-width=".9" opacity=".8"/>`)),
+                taiyi_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#8a6a1a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#f3d36a"/><path d="M10 18Q16 21 22 18" stroke="#fff8dc" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2)}${sparkle(9, 9, 1.8)}`),
+                nascentsoul_essence: svg(`<circle cx="16" cy="16" r="11" fill="#e6e0f8" opacity=".85"/><circle cx="16" cy="16" r="7" fill="#b39ddb"/><circle cx="16" cy="16" r="3" fill="#3a1a6a" stroke="none"/><circle cx="14" cy="14" r="1.2" fill="#fff" stroke="none"/>${sparkle(25, 8, 2.2)}${sparkle(7, 24, 2)}`)
             };
         })();
 
@@ -876,6 +952,7 @@
             if (typeof P.daoguo !== 'number') P.daoguo = 0;
             if (typeof P.daoBody !== 'number') P.daoBody = 0;
             if (typeof P.daoLaw !== 'number') P.daoLaw = 0;
+            if (typeof P.nascentSoul !== 'number') P.nascentSoul = 0;
             if (!P.temper) P.temper = { weapon: 0, armor: 0, jewelry: 0 };
             if (typeof P.rootLevel !== 'number') P.rootLevel = 0;
             if (!P.shen) P.shen = { clone: 0, focus: 0, sense: 0 };
@@ -1010,7 +1087,9 @@
             daoWastes:         { danhuo: [10, 14], shenshi: [8, 11], daoguo: [3, 5] },
             fusionVoid:        { danhuo: [13, 18], shenshi: [10, 14], daoguo: [4, 6] },
             voidAbyss:         { danhuo: [6, 9], shenshi: [5, 7], daoguo: [1, 2] },
-            huashiRealm:       { danhuo: [8, 12], shenshi: [6, 9], daoguo: [2, 4] }
+            huashiRealm:       { danhuo: [8, 12], shenshi: [6, 9], daoguo: [2, 4] },
+            taiyiField:        { danhuo: [18, 26], shenshi: [15, 22], daoguo: [5, 8] },
+            lingjieAbyss:      { danhuo: [24, 34], shenshi: [20, 30], daoguo: [7, 11] }
         };
         function rollAreaCurrency(areaKey, bonus) {
             const cfg = BATTLE_CURRENCY[areaKey] || {};
@@ -1204,6 +1283,7 @@
             return `
                 <div class="use-balance">${DAOGUO_ICON} 道果 <b>${Math.floor(P.daoguo)}</b><small>产出：道果技能的配方（凝练 / 培育 / 提炼 / 归元）· 合体级战斗区域胜利 · 天道秘境通关 · 丹火与神识融合。道果不能出售，只用来变强和购买商品。</small></div>
                 <div class="use-card"><div class="use-title">🌟 合道 <small>合体期的核心选择：收回分身，换取主行动的质变</small></div>${fusedCard}</div>
+                ${nascentUsesHtml()}
                 <div class="use-card"><div class="use-title">🍎 道果淬体 <small>永久提升生命 / 攻击 / 防御，每级 +${Math.round(DAO_BODY_PER_LEVEL * 100)}%</small></div>${useRow('🍎 淬体', `Lv.${bl}/${DAO_BODY_MAX}`, `当前 +${Math.round(bl * DAO_BODY_PER_LEVEL * 100)}%${bl >= DAO_BODY_MAX ? '' : ` → +${Math.round((bl + 1) * DAO_BODY_PER_LEVEL * 100)}%`}`, daoBodyCost(bl), 'daoguo', 'upgradeDaoBody()', bl >= DAO_BODY_MAX)}</div>
                 <div class="use-card"><div class="use-title">☯️ 道果悟法 <small>永久放大全部悟道法则的效果，每级 +${Math.round(DAO_LAW_PER_LEVEL * 100)}%</small></div>${useRow('☯️ 悟法', `Lv.${ll}/${DAO_LAW_MAX}`, `当前 +${Math.round(ll * DAO_LAW_PER_LEVEL * 100)}%${ll >= DAO_LAW_MAX ? '' : ` → +${Math.round((ll + 1) * DAO_LAW_PER_LEVEL * 100)}%`}`, daoLawCost(ll), 'daoguo', 'upgradeDaoLaw()', ll >= DAO_LAW_MAX)}</div>
                 <div class="use-card"><div class="use-title">🔥👁️ 融合凝练 <small>丹火 ${FUSE_COST.danhuo} + 神识 ${FUSE_COST.shenshi} → 道果 1（把用不完的丹火和神识变成道果）</small></div>
@@ -1237,26 +1317,27 @@
         // 兑换成一枚「道则」（实体物品），镶嵌进新增的「道基」槽后提供比留着法则等级更集中的定向加成。
         function isVoidUnlocked() { return gameState.player.realmIndex >= 21; }
 
-        const DAOZE_TIER_NAMES = ['下品', '中品', '上品', '极品'];
-        const DAOZE_TIER_LEVEL_COST = [5, 10, 15, 20];
-        const DAOZE_TIER_DAOGUO_COST = [20, 70, 145, 243];
-        const DAOZE_TIER_VOID_COST = [8, 28, 58, 97];
+        // 第 5 品「本源品」大乘初期（索引29）起才能化虚，需要 isDachengUnlocked()
+        const DAOZE_TIER_NAMES = ['下品', '中品', '上品', '极品', '本源品'];
+        const DAOZE_TIER_LEVEL_COST = [5, 10, 15, 20, 28];
+        const DAOZE_TIER_DAOGUO_COST = [20, 70, 145, 243, 420];
+        const DAOZE_TIER_VOID_COST = [8, 28, 58, 97, 170];
         // 每种法则对应一枚道则：主效果贴合法则本身的方向，副效果联动一个生活技能或战斗维度；数值按品阶（下/中/上/极品）递增
         const DAOZE_DEF = {
-            metal:   { name: '金之道则', color: '#d8c078', primary: { key: 'atkPct',         values: [0.03, 0.06, 0.10, 0.15] }, secondary: { key: 'critDmg',        values: [0.02, 0.04, 0.07, 0.11] } },
-            wood:    { name: '木之道则', color: '#7fae9a', primary: { key: 'hpPct',          values: [0.03, 0.06, 0.10, 0.15] }, secondary: { key: 'regen',          values: [0.0008, 0.0015, 0.0025, 0.004] } },
-            water:   { name: '水之道则', color: '#7d9bb5', primary: { key: 'foodPct',        values: [0.03, 0.06, 0.10, 0.15] }, secondary: { key: 'double:alchemy', values: [0.02, 0.04, 0.07, 0.11] } },
-            fire:    { name: '火之道则', color: '#d9614f', primary: { key: 'crit',           values: [0.02, 0.04, 0.06, 0.09] }, secondary: { key: 'out:danhuo',     values: [0.02, 0.04, 0.07, 0.11] } },
-            earth:   { name: '土之道则', color: '#b08d5a', primary: { key: 'defPct',         values: [0.03, 0.06, 0.10, 0.15] }, secondary: { key: 'double:mining',  values: [0.02, 0.04, 0.07, 0.11] } },
-            wind:    { name: '风之道则', color: '#b7c9c2', primary: { key: 'spdPct',         values: [0.03, 0.06, 0.10, 0.15] }, secondary: { key: 'time:life',      values: [-0.02, -0.04, -0.07, -0.11] } },
-            thunder: { name: '雷之道则', color: '#b39ddb', primary: { key: 'hit',            values: [0.02, 0.04, 0.06, 0.09] }, secondary: { key: 'dropPct',        values: [0.02, 0.04, 0.07, 0.11] } },
-            ice:     { name: '冰之道则', color: '#a8d8e8', primary: { key: 'dodge',          values: [0.02, 0.04, 0.06, 0.09] }, secondary: { key: 'cultSpeed',      values: [0.02, 0.04, 0.07, 0.11] } }
+            metal:   { name: '金之道则', color: '#d8c078', primary: { key: 'atkPct',         values: [0.03, 0.06, 0.10, 0.15, 0.22] }, secondary: { key: 'critDmg',        values: [0.02, 0.04, 0.07, 0.11, 0.16] } },
+            wood:    { name: '木之道则', color: '#7fae9a', primary: { key: 'hpPct',          values: [0.03, 0.06, 0.10, 0.15, 0.22] }, secondary: { key: 'regen',          values: [0.0008, 0.0015, 0.0025, 0.004, 0.006] } },
+            water:   { name: '水之道则', color: '#7d9bb5', primary: { key: 'foodPct',        values: [0.03, 0.06, 0.10, 0.15, 0.22] }, secondary: { key: 'double:alchemy', values: [0.02, 0.04, 0.07, 0.11, 0.16] } },
+            fire:    { name: '火之道则', color: '#d9614f', primary: { key: 'crit',           values: [0.02, 0.04, 0.06, 0.09, 0.13] }, secondary: { key: 'out:danhuo',     values: [0.02, 0.04, 0.07, 0.11, 0.16] } },
+            earth:   { name: '土之道则', color: '#b08d5a', primary: { key: 'defPct',         values: [0.03, 0.06, 0.10, 0.15, 0.22] }, secondary: { key: 'double:mining',  values: [0.02, 0.04, 0.07, 0.11, 0.16] } },
+            wind:    { name: '风之道则', color: '#b7c9c2', primary: { key: 'spdPct',         values: [0.03, 0.06, 0.10, 0.15, 0.22] }, secondary: { key: 'time:life',      values: [-0.02, -0.04, -0.07, -0.11, -0.16] } },
+            thunder: { name: '雷之道则', color: '#b39ddb', primary: { key: 'hit',            values: [0.02, 0.04, 0.06, 0.09, 0.13] }, secondary: { key: 'dropPct',        values: [0.02, 0.04, 0.07, 0.11, 0.16] } },
+            ice:     { name: '冰之道则', color: '#a8d8e8', primary: { key: 'dodge',          values: [0.02, 0.04, 0.06, 0.09, 0.13] }, secondary: { key: 'cultSpeed',      values: [0.02, 0.04, 0.07, 0.11, 0.16] } }
         };
         function daozeItemId(lawId, tier) { return `daoze_${lawId}_${tier}`; }
 
         // 生成 32 件道则物品（8 法则 × 4 品阶），效果走标准特效词汇（getMod 会自动通过 getEquippedEffectSum 读取已镶嵌的道则）
         (function buildDaozeItems() {
-            const sellPrices = [800, 2200, 5000, 10000];
+            const sellPrices = [800, 2200, 5000, 10000, 22000];
             // 道则图标：一枚按法则染色的晶石，四个品阶共用同一个形状（品阶体现在名字与光晕）
             const gemIcon = (c, glow) => icoSvg(`<path d="M16 3L27 12L23 29H9L5 12Z" fill="${c}" opacity="${glow}"/><path d="M16 3L27 12L16 16Z" fill="${c}" opacity="1"/><path d="M16 3L5 12L16 16Z" fill="${c}" opacity=".85"/><path d="M9 29L16 16L23 29Z" fill="${c}" opacity=".7"/>${icoSparkle(16, 7, 1.8)}`);
             Object.entries(DAOZE_DEF).forEach(([lawId, def]) => {
@@ -1285,9 +1366,12 @@
             invalidateLawTotals();
         }
 
-        // 化虚：把某个法则的 n 级（对应 tier 0-3）兑成一枚道则，扣道果 + 虚晶
+        function isDachengUnlocked() { return gameState.player.realmIndex >= 29; }
+
+        // 化虚：把某个法则的 n 级（对应 tier 0-4，第 5 品「本源品」需大乘初期）兑成一枚道则，扣道果 + 虚晶
         function huaxuLaw(lawId, tier) {
             if (!isVoidUnlocked()) { showNotification('炼虚初期才能化虚', '#c98a3e'); return; }
+            if (tier >= 4 && !isDachengUnlocked()) { showNotification('本源品要到大乘初期才能化虚', '#c98a3e'); return; }
             const def = LAW_EFFECTS[lawId];
             const daoze = DAOZE_DEF[lawId];
             if (!def || !daoze) return;
@@ -1318,7 +1402,8 @@
             const info = getLawInfo(lawId);
             const P = gameState.player;
             const voidHave = (P.inventory.find(i => i.id === 'voidcrystal') || { qty: 0 }).qty;
-            const btns = DAOZE_TIER_NAMES.map((name, i) => {
+            const tierNames = isDachengUnlocked() ? DAOZE_TIER_NAMES : DAOZE_TIER_NAMES.slice(0, 4);   // 本源品要大乘初期才显示
+            const btns = tierNames.map((name, i) => {
                 const can = info.level >= DAOZE_TIER_LEVEL_COST[i] && (P.daoguo || 0) >= DAOZE_TIER_DAOGUO_COST[i] && voidHave >= DAOZE_TIER_VOID_COST[i];
                 return `<button type="button" class="btn ${can ? 'btn-secondary' : 'btn-secondary'} law-huaxu-btn" ${can ? '' : 'disabled'} title="消耗 ${DAOZE_TIER_LEVEL_COST[i]} 级 + 道果 ${DAOZE_TIER_DAOGUO_COST[i]} + 虚晶 ${DAOZE_TIER_VOID_COST[i]}" onclick="event.stopPropagation(); huaxuLaw('${lawId}', ${i})">☯️ ${name}</button>`;
             }).join('');
@@ -1393,6 +1478,61 @@
             saveGame();
         }
 
+        // ---- 大乘期：元婴蜕变与离体助战（v6.69） ----
+        // 原著设定：大乘修士需将灵力不断注入元婴，使其从婴儿形态蜕变为青年形态，蜕变越深，元婴离体助战的威力越强。
+        // 游戏化：大乘初期（索引29）起解锁，花道果 + 元婴精魄（大乘级秘境 / 战斗区域掉落）把元婴蜕变等级从 0 升到 10 级，
+        // 每级增加元婴离体助战的攻击 / 暴击伤害加成（并入 getMod，战斗、修炼、生活技能全自动生效，和道则、渡劫一样不用逐处改代码）。
+        const NASCENT_MAX = 10;
+        const NASCENT_ATK_PER_LEVEL = 0.02;      // 元婴离体助战：攻击 +2%/级
+        const NASCENT_CRITDMG_PER_LEVEL = 0.02;   // 元婴离体助战：暴击伤害 +2%/级
+        function getNascentSoul() { return gameState.player.nascentSoul || 0; }
+        function nascentCost(level) { return { daoguo: Math.round(60 * Math.pow(level + 1, 1.5)), essence: level + 1 }; }
+        function nascentStageName(level) {
+            if (level >= 8) return '青年形态';
+            if (level >= 4) return '少年形态';
+            return '婴儿形态';
+        }
+        function getNascentMod(key) {
+            if (key !== 'atkPct' && key !== 'critDmg') return 0;
+            const lv = getNascentSoul();
+            return key === 'atkPct' ? lv * NASCENT_ATK_PER_LEVEL : lv * NASCENT_CRITDMG_PER_LEVEL;
+        }
+
+        function upgradeNascentSoul() {
+            const P = ensureCurrencyState();
+            const lv = getNascentSoul();
+            if (lv >= NASCENT_MAX) { showNotification('元婴已蜕变至青年形态巅峰', '#c98a3e'); return; }
+            const cost = nascentCost(lv);
+            if (P.daoguo < cost.daoguo) { spendNotify('daoguo', cost.daoguo); return; }
+            const have = (P.inventory.find(i => i.id === 'nascentsoul_essence') || { qty: 0 }).qty;
+            if (have < cost.essence) { showNotification(`元婴精魄不足：需要 ${cost.essence}，现有 ${have}`, '#c4483a', 'error'); return; }
+            P.daoguo -= cost.daoguo;
+            consumeItem('nascentsoul_essence', cost.essence);
+            P.nascentSoul = lv + 1;
+            showNotification(`👁️ 元婴蜕变成功！${nascentStageName(lv + 1)}，离体助战攻击 +${Math.round((lv + 1) * NASCENT_ATK_PER_LEVEL * 100)}%、暴击伤害 +${Math.round((lv + 1) * NASCENT_CRITDMG_PER_LEVEL * 100)}%`, '#b39ddb');
+            calculateStats();
+            updateUI();
+            renderSkillUses();
+            saveGame();
+        }
+
+        // 道果页面「元婴」卡片：大乘初期起显示在合道卡片下方
+        function nascentUsesHtml() {
+            if (!isDachengUnlocked()) return '';
+            const P = gameState.player;
+            const lv = getNascentSoul();
+            const maxed = lv >= NASCENT_MAX;
+            const cost = nascentCost(lv);
+            const have = (P.inventory.find(i => i.id === 'nascentsoul_essence') || { qty: 0 }).qty;
+            const affordable = !maxed && P.daoguo >= cost.daoguo && have >= cost.essence;
+            return `<div class="use-card"><div class="use-title">👁️ 元婴蜕变 <small>元婴离体助战：${nascentStageName(lv)}（Lv.${lv}/${NASCENT_MAX}），攻击 +${Math.round(lv * NASCENT_ATK_PER_LEVEL * 100)}%、暴击伤害 +${Math.round(lv * NASCENT_CRITDMG_PER_LEVEL * 100)}%</small></div>
+                <div class="use-row"><div class="use-main"><b>👁️ 蜕变</b> <span class="use-lv">Lv.${lv}/${NASCENT_MAX}</span>
+                    <div class="use-effect">${maxed ? '已至青年形态巅峰' : `下一级 → 攻击 +${Math.round((lv + 1) * NASCENT_ATK_PER_LEVEL * 100)}%、暴击伤害 +${Math.round((lv + 1) * NASCENT_CRITDMG_PER_LEVEL * 100)}%`}</div></div>
+                    ${maxed ? '<span class="use-max">已满级</span>'
+                        : `<button type="button" class="btn ${affordable ? '' : 'btn-secondary'} use-btn" onclick="upgradeNascentSoul()">${affordable ? '蜕变' : '不足'} ${DAOGUO_ICON}${cost.daoguo} + 👁️${cost.essence}</button>`}
+                </div></div>`;
+        }
+
         // 当前打开的是丹火 / 神识 / 炼丹面板时刷新对应的「用途」区
         function renderSkillUses() {
             const panel = document.body.dataset.panel;
@@ -1432,7 +1572,8 @@
             huashenRealm: 0.935,
             taixuDream: 0.496,
             tiandaoRealm: 0.525,
-            voidRealm: 0.538
+            voidRealm: 0.538,
+            taiyiRealm: 0.33
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -1452,7 +1593,8 @@
             tribulationGround: { hp: 0.96, atk: 2.067 }, voidSea: { hp: 0.482, atk: 2.405 }, abyssRuins: { hp: 0.1558, atk: 1.756 },
             chaosWastes: { hp: 0.1718, atk: 1.337 }, nineNether: { hp: 0.0837, atk: 1.047 },
             daoWastes: { hp: 0.04, atk: 3.2 }, fusionVoid: { hp: 0.028, atk: 2.6 },
-            voidAbyss: { hp: 0.0811, atk: 1.262 }, huashiRealm: { hp: 0.0639, atk: 1.145 }
+            voidAbyss: { hp: 0.0811, atk: 1.262 }, huashiRealm: { hp: 0.0639, atk: 1.145 },
+            taiyiField: { hp: 0.0425, atk: 0.85 }, lingjieAbyss: { hp: 0.0328, atk: 0.738 }
         };
 
         const BATTLE_FORMULAS = {
@@ -3304,7 +3446,9 @@
             daoWastes:         [{ id: 'voidcrystal', p: 0.12, qty: 1 }, { id: 'chaosstone', p: 0.10, qty: 1 }, { id: 'voidcrystal_seed', p: 0.02, qty: 1 }],
             fusionVoid:        [{ id: 'voidcrystal', p: 0.20, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'voidcrystal_seed', p: 0.03, qty: 1 }],
             voidAbyss:         [{ id: 'daostone', p: 0.10, qty: 1 }, { id: 'chaosstone', p: 0.12, qty: 1 }, { id: 'daofruit', p: 0.06, qty: 1 }, { id: 'seed_daofruit', p: 0.03, qty: 1 }],
-            huashiRealm:       [{ id: 'daostone', p: 0.18, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'daoguo_seed', p: 0.015, qty: 1 }]
+            huashiRealm:       [{ id: 'daostone', p: 0.18, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'daoguo_seed', p: 0.015, qty: 1 }],
+            taiyiField:        [{ id: 'taiyiessence', p: 0.12, qty: 1 }, { id: 'chaosstone', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.02, qty: 1 }],
+            lingjieAbyss:      [{ id: 'taiyiessence', p: 0.20, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.03, qty: 1 }]
         };
 
         // 掉落数量文字（如 1–2 / 1）
@@ -3574,7 +3718,8 @@
             12: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 },  // P7 金丹圆满(索引12)→元婴初期(索引13)
             16: { pillId: 'huashenpill', pillName: '化神丹', qty: 1 },   // P9 元婴圆满(索引16)→化神初期(索引17)
             20: { pillId: 'huaxupill', pillName: '化虚丹', qty: 1 },   // 化神圆满(索引20)→炼虚初期(索引21)
-            24: { pillId: 'hetipill', pillName: '合体丹', qty: 1 }        // 炼虚圆满(索引24)→合体初期(索引25)，且必须已「合道」（见 attemptBreakthrough）
+            24: { pillId: 'hetipill', pillName: '合体丹', qty: 1 },       // 炼虚圆满(索引24)→合体初期(索引25)，且必须已「合道」（见 attemptBreakthrough）
+            28: { pillId: 'dachengpill', pillName: '大乘丹', qty: 1 }    // 合体圆满(索引28)→大乘初期(索引29)
         };
 
         // 功法系统（绑定到角色出身，影响修炼速度）
@@ -3730,6 +3875,24 @@
                 speedMultiplier: 6.2,               // 修炼速度快520%
                 effects: { hpPct: 0.15, 'exp:life': 0.15, 'out:daoguo': 0.15 },
                 description: '炼虚期最终法门，虚实之间再无分别，一念可化万法为实体。',
+                origin: null
+            },
+            dacheng_art: {
+                id: 'dacheng_art',
+                name: '大乘真经',
+                tier: 13,
+                speedMultiplier: 12.0,               // 修炼速度快1100%
+                effects: { atkPct: 0.16, defPct: 0.14, 'out:daoguo': 0.14 },
+                description: '灵界至高一脉的根本大典，元婴与法则之力同修并进。',
+                origin: null
+            },
+            taiyi_art: {
+                id: 'taiyi_art',
+                name: '太乙化元经',
+                tier: 14,
+                speedMultiplier: 15.0,               // 修炼速度快1400%
+                effects: { hpPct: 0.20, defPct: 0.16, 'time:life': -0.12 },
+                description: '大乘期最终法门，元婴离体，法则随心，灵界罕有人能修至此境。',
                 origin: null
             }
         };
@@ -4145,6 +4308,7 @@
             total += getEquippedEffectSum(key);   // 装备物品自带的特效（含武器/护甲的修炼速度、道基镶嵌的道则）
             total += getDaoMod(key);   // 道果淬体 / 合道
             total += getTribulationMod(key);   // 渡劫：身与天地相融，每渡过一劫永久 +2.5% 生命 / 防御
+            total += getNascentMod(key);   // 元婴蜕变：元婴离体助战，攻击 / 暴击伤害随蜕变等级增长
             return total;
         }
 
@@ -4384,7 +4548,8 @@
             { level: 25, exp: 0.05, desc: '技能经验 +5%' },
             { level: 45, time: -0.03, desc: '全部配方耗时 -3%' },
             { level: 60, main: 0.03, desc: '全部配方产出翻倍/节省材料 +3%' },
-            { level: 70, time: -0.03, main: 0.03, desc: '耗时 -3%、翻倍/节省 +3%（炼虚期）' }
+            { level: 70, time: -0.03, main: 0.03, desc: '耗时 -3%、翻倍/节省 +3%（炼虚期）' },
+            { level: 80, exp: 0.05, time: -0.03, main: 0.03, desc: '经验 +5%、耗时 -3%、翻倍/节省 +3%（大乘期）' }
         ];
         function milestonesOf(skillName) { return WORK_SKILLS.includes(skillName) ? WORK_SKILL_MILESTONES : SKILL_MILESTONES; }
         function getSkillMilestones(skillName) {
@@ -4486,7 +4651,7 @@
         // 升到下一级所需经验：四个工作技能（炼丹 / 炼器 / 灵田 / 采矿）每 10 级对应一个大境界（Lv1–10 练气、11–20 筑基……51–60 合体），
         // 需 round(3.5 × level^2.05)，上限 Lv60；其余技能沿用 100 × level^1.8
         const WORK_SKILLS = ['alchemy', 'forging', 'farming', 'mining'];
-        const WORK_SKILL_MAX_LEVEL = 70;   // v6.66 起：炼虚期把 61-70 也纳入（采虚晶 / 化虚丹 / 炼虚装备）
+        const WORK_SKILL_MAX_LEVEL = 80;   // v6.69 起：大乘期把 71-80 也纳入（采太乙精华 / 大乘丹 / 大乘装备）
         function skillExpNeeded(level, skillName = null) {
             if (WORK_SKILLS.includes(skillName)) return Math.round(3.5 * Math.pow(level, 2.05));
             return Math.round(100 * Math.pow(level, 1.8));
@@ -5978,7 +6143,9 @@
                 daoWastes: { name: '道痕荒原', desc: '大道崩落之地', minLevel: 25, maxLevel: 26, enemies: ['dao-shade', 'law-puppet'], coins: 64000, exp: 25600 },
                 fusionVoid: { name: '合一虚境', desc: '万法归一的尽头', minLevel: 27, maxLevel: 28, enemies: ['void-beast', 'fusion-lord'], coins: 128000, exp: 51200 },
                 voidAbyss: { name: '虚渊', desc: '虚实交界的深渊', minLevel: 21, maxLevel: 22, enemies: ['void-beast', 'huaxu-demon'], coins: 16000, exp: 6400 },
-                huashiRealm: { name: '化实之界', desc: '道则具现之地', minLevel: 23, maxLevel: 24, enemies: ['shidao-walker', 'taixu-lord'], coins: 32000, exp: 12800 }
+                huashiRealm: { name: '化实之界', desc: '道则具现之地', minLevel: 23, maxLevel: 24, enemies: ['shidao-walker', 'taixu-lord'], coins: 32000, exp: 12800 },
+                taiyiField: { name: '太虚战场', desc: '灵界各族交锋之地', minLevel: 29, maxLevel: 30, enemies: ['taiyi-warrior', 'lingjie-guard'], coins: 260000, exp: 102400 },
+                lingjieAbyss: { name: '灵界绝境', desc: '大乘期最险恶的死地', minLevel: 31, maxLevel: 32, enemies: ['lingjie-fiend', 'daozu-shadow'], coins: 520000, exp: 204800 }
             };
 
             const actions = {};
@@ -6157,6 +6324,14 @@
                 huashiRealm: [
                     { name: '实道行者', hp: 10500, atk: 520, def: 170, spd: 55, icon: '👤' },
                     { name: '太虚尊者', hp: 9800, atk: 560, def: 160, spd: 65, icon: '😈' }
+                ],
+                taiyiField: [
+                    { name: '太乙战修', hp: 34000, atk: 1350, def: 420, spd: 100, icon: '👤' },
+                    { name: '灵界守卫', hp: 39500, atk: 1450, def: 470, spd: 90, icon: '🤖' }
+                ],
+                lingjieAbyss: [
+                    { name: '灵界凶兽', hp: 50000, atk: 1750, def: 540, spd: 105, icon: '🐉' },
+                    { name: '道祖之影', hp: 46000, atk: 1900, def: 500, spd: 115, icon: '😈' }
                 ]
             };
 
@@ -6285,7 +6460,16 @@
                 劫云傀儡: svg(golem('#5a5a7a', '#b39ddb', '<circle cx="16" cy="8.5" r="2" fill="#b39ddb"/><circle cx="16" cy="8.5" r=".8" fill="#2a2a3a" stroke="none"/>')),
                 本心魔影: svg(shadowFace()),
                 雷劫化身: svg(willEye('#8a78c8', '#e8e0ff')),
-                大天劫化身: svg(demon('#241a30', '#b39ddb', '#e0d0ff', true))
+                大天劫化身: svg(demon('#241a30', '#b39ddb', '#e0d0ff', true)),
+                太乙游神: svg(soulFig('#f3d36a')),
+                元婴化影: svg(willEye('#b39ddb', '#f0e8ff')),
+                法则执者: svg(golem('#8a6a1a', '#fff4d8', '<circle cx="16" cy="8.5" r="2" fill="#fff4d8"/><circle cx="16" cy="8.5" r=".8" fill="#4a3a0a" stroke="none"/>')),
+                灵界残将: svg(hood('#4a3a1a', '#f3d36a', '#12100a')),
+                灵界至尊: svg(supremeSage()),
+                太乙战修: svg(hood('#5a4a1a', '#fff4d8', '#1a1408')),
+                灵界守卫: svg(golem('#7a6a2a', '#fff4d8', '<circle cx="16" cy="8.5" r="2" fill="#fff4d8"/><circle cx="16" cy="8.5" r=".8" fill="#3a2a0a" stroke="none"/>')),
+                灵界凶兽: svg(ancient()),
+                道祖之影: svg(demon('#241a30', '#f3d36a', '#fff4d8', true))
             };
         })();
 
@@ -6310,6 +6494,8 @@
                 dao_art: svg(book('#e8dcc0', '#8a7a5a', m('<path d="M0 -5.4L4.6 2.6H-4.6Z" stroke="#8a6a2a" stroke-width="1" fill="#f3d36a"/><circle r="1.2" fill="#8a6a2a" stroke="none"/>')) + sparkle(25, 5, 2.4) + sparkle(8, 26, 2)),
                 lianxu_art: svg(book('#8a6ad8', '#4a2f8a', m('<path d="M0 -5.4Q4.6 -3 4.6 1Q4.6 5.4 0 5.4Q-4.6 5.4 -4.6 1Q-4.6 -3 0 -5.4Z" fill="#c8b8f0" stroke="#4a2f8a" stroke-width=".9"/><circle r="1.4" fill="#4a2f8a" stroke="none"/>')) + sparkle(25, 5, 2.4)),
                 taixuhuashi_art: svg(book('#d8d0e8', '#6a5a8a', m('<path d="M0 -5A5 5 0 0 1 0 5A2.5 2.5 0 0 1 0 0A2.5 2.5 0 0 0 0 -5Z" fill="#3a2f56" stroke="none"/><path d="M0 -5A5 5 0 0 0 0 5A2.5 2.5 0 0 0 0 0A2.5 2.5 0 0 1 0 -5Z" fill="#f0ecf8" stroke="none"/><circle r="5" stroke="#6a5a8a" stroke-width=".9"/>')) + sparkle(25, 5, 2.2) + sparkle(9, 25, 1.8)),
+                dacheng_art: svg(book('#e8b84a', '#8a6a1a', m('<circle r="5" fill="#fff4d8" stroke="#8a6a1a" stroke-width="1"/><circle r="2.2" fill="#e8b84a" stroke="none"/>')) + sparkle(25, 5, 2.6) + sparkle(9, 26, 2)),
+                taiyi_art: svg(book('#3a2f0a', '#151005', m('<path d="M0 -5.4L4.6 2.6H-4.6Z" fill="#f3d36a" stroke="#151005" stroke-width="1"/><circle r="5" stroke="#f3d36a" stroke-width=".8" opacity=".8"/>')) + sparkle(25, 5, 2.6) + sparkle(9, 26, 2.2) + sparkle(16, 3, 2)),
                 primordial_art: svg(book('#2a2a3a', '#111118', m('<path d="M0 -5A5 5 0 0 1 0 5A2.5 2.5 0 0 1 0 0A2.5 2.5 0 0 0 0 -5Z" fill="#1c1c26" stroke="none"/><path d="M0 -5A5 5 0 0 0 0 5A2.5 2.5 0 0 0 0 0A2.5 2.5 0 0 1 0 -5Z" fill="#fff" stroke="none"/><circle r="5" stroke="#1c1c26" stroke-width=".9"/>')) + sparkle(25, 5, 2.4))
             };
         })();
@@ -7413,7 +7599,8 @@
             13: { name: '元婴', line: '元神出窍，神游太虚', kind: 'nascent', dur: 4.4 },
             17: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 },
             21: { name: '炼虚', line: '化虚为实，道则显形', kind: 'voidfx', dur: 5.0 },
-            25: { name: '合体', line: '天人合一，万法归宗', kind: 'unity', dur: 4.8 }
+            25: { name: '合体', line: '天人合一，万法归宗', kind: 'unity', dur: 4.8 },
+            29: { name: '大乘', line: '元婴离体，法则随心', kind: 'dacheng', dur: 5.4 }
         };
         // 灵根对应的颜色（灵气入体特效用你自己的灵根色）
         const ROOT_FX_COLORS = { metal: '#d8c078', wood: '#7fae9a', water: '#7d9bb5', fire: '#d9614f', earth: '#b08d5a', wind: '#b7c9c2', thunder: '#b39ddb', ice: '#a8d8e8' };
@@ -7868,6 +8055,55 @@
             }
         }
 
+        // 大乘：元婴离体升起，八种法则符文绕元婴旋转，最后金紫两色光芒汇聚炸裂——元婴离体、法则随心
+        function fxDrawDacheng(ctx, W, H, t, s) {
+            const cx = W / 2, cy = H * 0.34, R = Math.min(W, H) * 0.13;
+            const fade = t > 4.7 ? Math.max(0, (5.4 - t) / 0.7) : 1;
+            ctx.fillStyle = `rgba(10, 8, 14, ${0.72 * Math.min(1, t / 0.4) * fade})`;
+            ctx.fillRect(0, 0, W, H);
+            // 元婴离体：一道人形光影从下方升起，定格在中心
+            const rise = fxEase(Math.min(1, t / 1.6));
+            const by = H * 0.62 - rise * H * 0.28;
+            if (rise > 0) {
+                ctx.save(); ctx.globalAlpha = fade * (0.5 + rise * 0.5);
+                const g = ctx.createRadialGradient(cx, by, 0, cx, by, R * 2.4);
+                g.addColorStop(0, 'rgba(255, 244, 214, 0.55)'); g.addColorStop(1, 'rgba(200, 160, 240, 0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, by, R * 2.4, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#f3e6c8';
+                ctx.beginPath(); ctx.arc(cx, by - R * 0.9, R * 0.4, 0, Math.PI * 2); ctx.fill();   // 头
+                ctx.beginPath(); ctx.moveTo(cx - R * 0.5, by + R * 0.7); ctx.quadraticCurveTo(cx, by - R * 0.6, cx + R * 0.5, by + R * 0.7); ctx.closePath(); ctx.fill();   // 身
+                ctx.restore();
+            }
+            // 八种法则符文绕元婴旋转
+            const runeK = fxEase((t - 1.2) / 1.2);
+            if (runeK > 0) {
+                const rr = R * 3.2;
+                ctx.font = `bold ${Math.round(Math.min(W, H) * 0.055)}px KaiTi, STKaiti, serif`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                LAW_RUNES.forEach(([ch, col], i) => {
+                    const a = (i / 8) * Math.PI * 2 + t * 1.1;
+                    ctx.save();
+                    ctx.globalAlpha = runeK * fade;
+                    ctx.shadowColor = col; ctx.shadowBlur = 16;
+                    ctx.fillStyle = col;
+                    ctx.fillText(ch, cx + Math.cos(a) * rr, by + Math.sin(a) * rr * 0.7);
+                    ctx.restore();
+                });
+            }
+            // 金紫两色光芒汇聚炸裂
+            const burstK = (t - 3.3) / 1.6;
+            if (burstK > 0 && burstK < 1) {
+                if (!s.rays) s.rays = Array.from({ length: 40 }, () => ({ a: fxRand(0, 6.28), v: fxRand(0.4, 1), gold: Math.random() < 0.5 }));
+                s.rays.forEach(p => {
+                    ctx.fillStyle = p.gold ? `rgba(243, 211, 106, ${0.9 * (1 - burstK) * fade})` : `rgba(179, 157, 219, ${0.9 * (1 - burstK) * fade})`;
+                    ctx.beginPath(); ctx.arc(cx + Math.cos(p.a) * fxEase(burstK) * Math.max(W, H) * 0.5 * p.v, by + Math.sin(p.a) * fxEase(burstK) * Math.max(W, H) * 0.5 * p.v, 2.8, 0, Math.PI * 2); ctx.fill();
+                });
+                ctx.strokeStyle = `rgba(243, 211, 106, ${0.75 * (1 - burstK)})`;
+                ctx.lineWidth = 5 * (1 - burstK) + 1;
+                ctx.beginPath(); ctx.arc(cx, by, R + fxEase(burstK) * Math.max(W, H) * 0.55, 0, Math.PI * 2); ctx.stroke();
+            }
+        }
+
         // 设置里的「突破特效回放」：只列出已经突破过的大境界（含凡人入练气）
         function renderFxReplay() {
             const box = document.getElementById('fxReplayList');
@@ -7883,7 +8119,7 @@
             playBreakthroughEffect(idx, true, true);
         }
 
-        const FX_DRAWERS = { minor: fxDrawMinor, qi: fxDrawQi, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw, unity: fxDrawUnity, voidfx: fxDrawVoid };
+        const FX_DRAWERS = { minor: fxDrawMinor, qi: fxDrawQi, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw, unity: fxDrawUnity, voidfx: fxDrawVoid, dacheng: fxDrawDacheng };
 
         // 播放突破特效：newRealmIndex = 突破后的境界索引；major = 是否大境界突破
         // force = true：设置里「回放」时使用，即使关闭了突破特效也播放
