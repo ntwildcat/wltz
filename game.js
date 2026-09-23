@@ -4984,8 +4984,10 @@
                 // 灵石输出加成
                 output.coins = Math.floor(output.coins * multiplier);
             } else if (effect.effectType === 'quantity' && output.items) {
-                // 产量加成：物品数量+1每5级
-                const bonusQty = Math.floor((skill.level - 1) / 5);
+                // 产量加成：折算等级（workEquivLevel）每 5 级 +1，直接复用上面已经算好的 multiplier，
+                // 不要在这里重新用未折算的 skill.level 算一遍——v6.63 工作技能等级重排后两套等级尺度不一样，
+                // 重新算会把「不该加成的等级」也算出好几个额外产出（这个 bug 曾经把 Lv11 炼丹算出 bonusQty=2）
+                const bonusQty = multiplier - 1;
                 if (bonusQty > 0) {
                     output.items.forEach(item => {
                         item.qty += bonusQty;
