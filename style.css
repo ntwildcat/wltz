@@ -1534,6 +1534,9 @@ display: none !important;
 .law-effects { font-size: 0.8em; color: var(--border-l2); line-height: 1.6; min-height: 1.6em; }
 .law-next { font-size: 0.72em; color: var(--text-l4); margin-top: 4px; line-height: 1.5; }
 .law-resonant { font-size: 0.7em; color: #c084fc; margin-left: 6px; }
+.law-huaxu { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 6px; }
+.law-huaxu-btn { padding: 3px 8px; font-size: 0.72em; }
+.law-huaxu-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .law-capped { opacity: 0.85; }
 
 /* 装备界面 */
@@ -1992,5 +1995,9 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .shop-tab.active { background: var(--bg-l3); border-color: var(--cinnabar-2); box-shadow: inset 0 0 0 1px var(--cinnabar); color: var(--text-l1); }
 .shop-tab .ico { width: 1.2em; height: 1.2em; vertical-align: -0.2em; }
 .shop-section-title { font-weight: bold; color: var(--patina, #6f9c8a); margin: 4px 0 8px; }
-.gift-input { flex: 1; min-width: 0; padding: 6px 10px; background: var(--bg-l1); border: 1px solid var(--border-l3); color: var(--text-l1); font-family: inherit; }
-.gift-input:focus { outline: 1px solid var(--bronze); }
+
+/* 手机：战斗双方卡片（玩家 / 怪物）不撑破一行——列可收缩、属性小块允许换行 */
+.battle-status { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.combatant { min-width: 0; }
+.combatant-stats { flex-wrap: wrap; }
+@media (max-width: 768px) { .battle-status { gap: var(--spacing-sm); } .combatant { padding: var(--spacing-sm); } .combatant-stats span { padding: 2px 6px; } }

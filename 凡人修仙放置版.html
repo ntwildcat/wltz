@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=13.13">
+    <link rel="stylesheet" href="style.css?v=13.26">
 
 </head>
 <body data-panel="cultivation">
@@ -450,16 +450,6 @@
                                 </div>
                             </div>
 
-                            <!-- 礼包码 -->
-                            <div class="stat-panel">
-                                <div class="stat-title">🎁 礼包码</div>
-                                <div class="stat-row" style="gap: 8px;">
-                                    <input type="text" id="giftCodeInput" class="gift-input" placeholder="输入礼包码" autocomplete="off" spellcheck="false" aria-label="礼包码" onkeydown="if (event.key === 'Enter') redeemGiftCode()">
-                                    <button class="btn" onclick="redeemGiftCode()" style="padding: 6px 16px;">兑换</button>
-                                </div>
-                                <div id="giftCodeResult" style="font-size: 0.85em; margin-top: 6px; min-height: 1.4em;"></div>
-                            </div>
-
                             <!-- 通知设置 -->
                             <div class="stat-panel">
                                 <div class="stat-title">🔔 通知设置</div>
@@ -697,6 +687,8 @@
                     </div>
                     <div id="btPillGuide" class="bt-guide" style="display: none;"></div>
                 </div>
+                <!-- 炼虚 21-24：渡劫入口（默认隐藏，见 renderTribulationGate） -->
+                <div id="btTribulation" style="display: none; margin-top: 15px; padding: 10px; background: rgba(179, 157, 219, 0.12); border: 1px solid #b39ddb; border-radius: 4px;"></div>
             </div>
             <button class="btn" id="btButton" onclick="attemptBreakthrough()" style="width: 100%; margin-top: 20px;">
                 🌟 开始突破 🌟
@@ -773,7 +765,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.13"></script>
+    <script src="game.js?v=13.27"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
