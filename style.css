@@ -1040,10 +1040,57 @@ input:focus, select:focus {
     display: none;
 }
 
+/* 战斗独立界面（v6.73）：进入战斗时隐藏侧边栏 / 顶部信息栏 / 右侧属性栏，
+   战斗容器占满可视空间，退出战斗（撤退 / 被击败）后恢复常规布局 */
+body.in-battle .sidebar,
+body.in-battle .header,
+body.in-battle #questBanner,
+body.in-battle .side-panel {
+    display: none !important;
+}
+/* main-panel 里除了战斗容器本身，其余常驻内容（全局进度条、分身条等）战斗时也不需要看到 */
+body.in-battle .main-panel > *:not(#battleContainer) {
+    display: none !important;
+}
+body.in-battle .panel-container {
+    grid-template-columns: 1fr;
+}
+body.in-battle .main-content {
+    padding: var(--spacing-lg);
+}
+body.in-battle .battle-container {
+    max-width: 640px;
+    margin: 0 auto;
+    min-height: calc(100vh - var(--spacing-lg) * 2 - 4px);
+    justify-content: center;
+}
+
+.dungeon-progress {
+    color: var(--text-l4);
+    font-size: 0.8em;
+    margin-top: 2px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+.dungeon-progress .pip {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 3px;
+    background: var(--bg-l1);
+    border: 1px solid var(--border-l3);
+    vertical-align: middle;
+}
+.dungeon-progress .pip.done { background: var(--patina); border-color: var(--patina); }
+.dungeon-progress .pip.current { background: var(--cinnabar-2); border-color: var(--cinnabar-2); }
+
 .battle-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
     padding: var(--spacing-md) var(--spacing-lg);
     background: var(--bg-l3);
     border: 1px solid var(--border-l2);
@@ -1117,6 +1164,26 @@ input:focus, select:focus {
     text-shadow: 1px 1px 2px #000;
     font-family: var(--font-mono);
 }
+.atk-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-l1);
+    border: 1px solid var(--border-l3);
+    border-radius: var(--radius-xs);
+    overflow: hidden;
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+.atk-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--bronze-dim), var(--bronze));
+    transition: width 0.1s linear;
+}
+.atk-fill.ready {
+    background: linear-gradient(90deg, var(--bronze), #fff4d8);
+    box-shadow: 0 0 6px var(--bronze);
+}
+
 .combatant-stats {
     display: flex;
     gap: var(--spacing-sm);
