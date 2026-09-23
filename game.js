@@ -576,7 +576,7 @@
                 spiritstone: { name: '灵石', icon: '💎', type: 'currency' },
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', sellPrice: 80, effect: { workSpeed: 0.95 } },
                 // 礼包码专属（测试用）：所有工作耗时 ×0.01（速度 ×100），修炼速度 ×100；只能通过礼包码获得
-                test_ring: { name: '天机灵环', icon: '💍', type: 'jewelry', effect: { workSpeed: 0.01, cultSpeed: 99 } },
+                test_ring: { name: '天机灵环', icon: '💍', type: 'jewelry', sellPrice: 10000, effect: { workSpeed: 0.01, cultSpeed: 99 } },
 
                 // P6 丹火相关物品
                 danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed', sellPrice: 50 },
