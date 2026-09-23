@@ -274,6 +274,32 @@
                         daoguo: [35, 60],
                         skillExp: 1000
                     }
+                },
+                // 炼虚期天劫（v6.68）：每个炼虚小境界各一场，不在秘境列表里显示，只能通过突破弹窗的「渡劫」进入；
+                // 通关后 gameState.dungeons[id].completed 标记为已渡劫，不会像普通秘境那样循环挑战（见 completeDungeon 的 isTribulation 分支）
+                tribulation21: {
+                    id: 'tribulation21', name: '初劫', desc: '融入天地元气的第一道劫——道心不稳，招来的第一场考验', icon: '⚡',
+                    isTribulation: true, tribulationRealm: 21, minRealmIndex: 21,
+                    monsters: [{ name: '劫云傀儡', type: '雷', hp: 127500, atk: 975, spd: 68, def: 90, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 1800 }],
+                    rewards: { coins: [4000, 6000], danhuo: [80, 140], shenshi: [70, 120], skillExp: 500 }
+                },
+                tribulation22: {
+                    id: 'tribulation22', name: '心魔劫', desc: '劫中生出心魔幻象，照见修行路上的执念', icon: '👁️',
+                    isTribulation: true, tribulationRealm: 22, minRealmIndex: 22,
+                    monsters: [{ name: '本心魔影', type: '无', hp: 155020, atk: 1011, spd: 74, def: 105, attackSpeed: 2.3, isBoss: true, drop: 'coins', dropQty: 2400 }],
+                    rewards: { coins: [5500, 8000], danhuo: [110, 180], shenshi: [95, 160], skillExp: 700 }
+                },
+                tribulation23: {
+                    id: 'tribulation23', name: '雷劫', desc: '九天玄雷劈落，涤荡道基中的驳杂之气', icon: '🌩️',
+                    isTribulation: true, tribulationRealm: 23, minRealmIndex: 23,
+                    monsters: [{ name: '雷劫化身', type: '雷', hp: 184760, atk: 1028, spd: 82, def: 120, attackSpeed: 2.1, isBoss: true, drop: 'coins', dropQty: 3200 }],
+                    rewards: { coins: [7500, 11000], danhuo: [150, 240], shenshi: [130, 210], skillExp: 950 }
+                },
+                tribulation24: {
+                    id: 'tribulation24', name: '大天劫', desc: '炼虚圆满前的终极考验：身与天地相融的最后一步，威力远胜前三劫', icon: '☄️',
+                    isTribulation: true, tribulationRealm: 24, minRealmIndex: 24,
+                    monsters: [{ name: '大天劫化身', type: '无', hp: 239200, atk: 1053, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 4500 }],
+                    rewards: { coins: [10000, 15000], danhuo: [200, 320], shenshi: [180, 280], skillExp: 1300 }
                 }
             },
             skills: {
@@ -1297,6 +1323,74 @@
                 return `<button type="button" class="btn ${can ? 'btn-secondary' : 'btn-secondary'} law-huaxu-btn" ${can ? '' : 'disabled'} title="消耗 ${DAOZE_TIER_LEVEL_COST[i]} 级 + 道果 ${DAOZE_TIER_DAOGUO_COST[i]} + 虚晶 ${DAOZE_TIER_VOID_COST[i]}" onclick="event.stopPropagation(); huaxuLaw('${lawId}', ${i})">☯️ ${name}</button>`;
             }).join('');
             return `<div class="law-huaxu">${btns}</div>`;
+        }
+
+        // ---- 炼虚期：天劫（v6.68） ----
+        // 原著设定：炼虚修士与天地元气相融，理论寿元无穷，但每 3000 年要渡一次大天劫，威力逐次递增，纵有无限寿元也可能陨落于劫数。
+        // 游戏化：炼虚 21-24 每个小境界各一场天劫（tribulation21-24，GAME_CONFIG.dungeons 里 isTribulation:true 的特殊单体 Boss 战），
+        // 不在秘境列表里出现，只能从突破弹窗的「⚡ 渡劫」进入；渡过一次永久生效（不会像普通秘境那样清空重来）。
+        // 失败沿用秘境战败的既有惩罚（损失 10% 修为、50% 食物、气血回到 50%），可以重新挑战，不会卡死进度。
+        const TRIBULATION_REALMS = [21, 22, 23, 24];
+        const TRIBULATION_HP_PCT = 0.03;   // 渡劫：每渡一劫永久生命 / 防御 +3%（身与天地相融，越来越难杀；4 劫渡满 +12%）
+        function tribulationIdFor(realmIndex) { return `tribulation${realmIndex}`; }
+        function hasSurvivedTribulation(realmIndex) {
+            const rec = gameState.dungeons && gameState.dungeons[tribulationIdFor(realmIndex)];
+            return !!(rec && rec.completed);
+        }
+        function getTribulationClearCount() {
+            return TRIBULATION_REALMS.filter(r => hasSurvivedTribulation(r)).length;
+        }
+        function getTribulationMod(key) {
+            if (key !== 'hpPct' && key !== 'defPct') return 0;
+            return getTribulationClearCount() * TRIBULATION_HP_PCT;
+        }
+
+        // 突破弹窗里的「渡劫」入口：当前境界在 21-24 且这一劫还没渡过时显示
+        function renderTribulationGate() {
+            const box = document.getElementById('btTribulation');
+            if (!box) return;
+            const realmIndex = gameState.player.realmIndex;
+            if (!TRIBULATION_REALMS.includes(realmIndex) || hasSurvivedTribulation(realmIndex)) { box.style.display = 'none'; return; }
+            const dungeon = GAME_CONFIG.dungeons[tribulationIdFor(realmIndex)];
+            box.style.display = 'block';
+            box.innerHTML = `<div class="bt-guide-title">⚡ 需先渡过本境界的天劫</div>
+                <div class="bt-guide-line">${dungeon.icon} ${dungeon.name}：${dungeon.desc}</div>
+                <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); enterDungeon('${tribulationIdFor(realmIndex)}');">⚡ 渡劫</button>`;
+        }
+
+        // 天劫通关：不像普通秘境那样循环挑战，标记渡过即可，额外弹一条永久加成提示
+        function completeTribulation(dungeonId) {
+            const battleContainer = document.getElementById('battleContainer');
+            if (battleContainer) battleContainer.classList.add('hidden');
+            const dungeon = GAME_CONFIG.dungeons[dungeonId];
+            gameState.dungeons[dungeonId].completed = true;
+            gameState.dungeons.currentDungeon = null;
+            gameState.currentAction = null;
+            gameState.currentActionProgress = 0;
+
+            const rewards = dungeon.rewards;
+            let rewardMsg = `⚡ 渡过${dungeon.name}！身与天地相融更进一步（生命 / 防御 永久 +${Math.round(TRIBULATION_HP_PCT * 100)}%）\n`;
+            if (rewards.coins) {
+                const coins = rewards.coins[0] + Math.floor(Math.random() * (rewards.coins[1] - rewards.coins[0] + 1));
+                gameState.player.coins += coins;
+                rewardMsg += `+ ${coins} 灵石\n`;
+            }
+            [['danhuo', '丹火'], ['shenshi', '神识']].forEach(([kind, label]) => {
+                const range = rewards[kind];
+                if (!range) return;
+                const amount = range[0] + Math.floor(Math.random() * (range[1] - range[0] + 1));
+                addCurrency({ [kind]: amount });
+                rewardMsg += `+ ${amount} ${label}\n`;
+            });
+            if (rewards.skillExp) {
+                addSkillExp('battle', rewards.skillExp);
+                rewardMsg += `+ 战斗经验 x${rewards.skillExp}`;
+            }
+            trackQuest('dungeon:' + dungeonId);
+            calculateStats();
+            showNotification(rewardMsg.trim(), '#b39ddb');
+            updateUI();
+            saveGame();
         }
 
         // 当前打开的是丹火 / 神识 / 炼丹面板时刷新对应的「用途」区
@@ -3330,13 +3424,15 @@
 
         // 秘境完成处理
         function completeDungeon(dungeonId) {
+            const dungeon = GAME_CONFIG.dungeons[dungeonId];
+            if (dungeon.isTribulation) { completeTribulation(dungeonId); return; }   // 天劫：渡过一次即可，不循环挑战
+
             // 隐藏战斗UI
             const battleContainer = document.getElementById('battleContainer');
             if (battleContainer) {
                 battleContainer.classList.add('hidden');
             }
 
-            const dungeon = GAME_CONFIG.dungeons[dungeonId];
             const rewards = dungeon.rewards;
 
             // 标记秘境为完成
@@ -4048,6 +4144,7 @@
             total += getSkillUpgradeTotals()[key] || 0;   // 技能商店里已购置的设施
             total += getEquippedEffectSum(key);   // 装备物品自带的特效（含武器/护甲的修炼速度、道基镶嵌的道则）
             total += getDaoMod(key);   // 道果淬体 / 合道
+            total += getTribulationMod(key);   // 渡劫：身与天地相融，每渡过一劫永久 +2.5% 生命 / 防御
             return total;
         }
 
@@ -5957,7 +6054,7 @@
             const container = document.getElementById('dungeonActions');
             container.innerHTML = '';
 
-            const dungeonIds = Object.keys(GAME_CONFIG.dungeons);
+            const dungeonIds = Object.keys(GAME_CONFIG.dungeons).filter(id => !GAME_CONFIG.dungeons[id].isTribulation);   // 天劫不进普通秘境列表，只能从突破弹窗的「渡劫」进入
 
             dungeonIds.forEach(dungeonId => {
                 const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -6184,7 +6281,11 @@
                 虚渊兽: svg(hood('#2a3a56', '#9adfe8', '#0a1018')),
                 化虚魔: svg(demon('#241a30', '#8a6ad8', '#d8c8ff', false)),
                 实道行者: svg(yinSage()),
-                太虚尊者: svg(demon('#3a2a4a', '#f3d36a', '#fff4c4', true))
+                太虚尊者: svg(demon('#3a2a4a', '#f3d36a', '#fff4c4', true)),
+                劫云傀儡: svg(golem('#5a5a7a', '#b39ddb', '<circle cx="16" cy="8.5" r="2" fill="#b39ddb"/><circle cx="16" cy="8.5" r=".8" fill="#2a2a3a" stroke="none"/>')),
+                本心魔影: svg(shadowFace()),
+                雷劫化身: svg(willEye('#8a78c8', '#e8e0ff')),
+                大天劫化身: svg(demon('#241a30', '#b39ddb', '#e0d0ff', true))
             };
         })();
 
@@ -7247,6 +7348,7 @@
                 document.getElementById('btButton').textContent = '🌟 开始突破 🌟';
             }
 
+            renderTribulationGate();
             document.getElementById('breakthroughModal').classList.add('show');
         }
 
@@ -7274,6 +7376,13 @@
             // 合体圆满（FUSION_REQUIRED_REALM）起必须已合道才能晋升下一境界（大乘期，预留）
             if (realmIndex >= FUSION_REQUIRED_REALM && !isFused()) {
                 showNotification('晋升下一境界必须先合道（在「道果」页面选择合道，不可逆）', '#c98a3e', 'warning');
+                return;
+            }
+
+            // 炼虚 21-24：每个小境界先渡过对应的天劫才能突破（见「渡劫」入口）
+            if (TRIBULATION_REALMS.includes(realmIndex) && !hasSurvivedTribulation(realmIndex)) {
+                showNotification('修为已满，但还未渡过本境界的天劫，请先「渡劫」', '#c98a3e', 'warning');
+                showBreakthroughModal();
                 return;
             }
 
