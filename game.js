@@ -1701,47 +1701,6 @@
             setTimeout(() => showTutorial(0), 300);
         }
 
-        // ==================== 礼包码 ====================
-        // 礼包码不以明文存放，只存它的哈希（cyrb53，非加密，只防随手翻源码看到）。每个存档每个礼包码只能兑换一次（player.redeemedCodes）。
-        const GIFT_CODES = {
-            '69q7k0mlje': { id: 'test_ring', label: '测试礼包', items: [{ id: 'test_ring', qty: 1 }] }
-        };
-        function giftCodeHash(str, seed = 0) {
-            let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-            for (let i = 0, ch; i < str.length; i++) {
-                ch = str.charCodeAt(i);
-                h1 = Math.imul(h1 ^ ch, 2654435761);
-                h2 = Math.imul(h2 ^ ch, 1597334677);
-            }
-            h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-            h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-            return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
-        }
-
-        function redeemGiftCode() {
-            const input = document.getElementById('giftCodeInput');
-            const result = document.getElementById('giftCodeResult');
-            const say = (text, ok) => { if (result) { result.textContent = text; result.style.color = ok ? '#6fa980' : '#c4483a'; } };
-            const code = (input ? input.value : '').trim();
-            if (!code) { say('请输入礼包码', false); return; }
-            const entry = GIFT_CODES[giftCodeHash(code)];
-            if (!entry) { say('无效的礼包码', false); return; }
-            const P = gameState.player;
-            if (!Array.isArray(P.redeemedCodes)) P.redeemedCodes = [];
-            if (P.redeemedCodes.includes(entry.id)) { say('这个礼包码已经兑换过了', false); return; }
-            // 背包放不下就不兑换（不消耗礼包码）
-            const need = entry.items.filter(i => !P.inventory.find(x => x.id === i.id)).length;
-            if (P.inventory.length + need > (P.inventoryCapacity || 50)) { say('背包已满，请先腾出空位再兑换', false); return; }
-            entry.items.forEach(i => addToInventory(i.id, i.qty, true));
-            P.redeemedCodes.push(entry.id);
-            const names = entry.items.map(i => `${GAME_CONFIG.items[i.id].name}×${i.qty}`).join('、');   // 纯文字（图标是 SVG 字符串，不能放进 textContent）
-            say(`兑换成功：${names}（已放入背包）`, true);
-            showNotification(`🎁 ${entry.label}：获得 ${names}`, '#b89a5b');
-            if (input) input.value = '';
-            updateUI();
-            saveGame();
-        }
-
         // 自动保存定时器只保留一个（重开新游戏时不会叠加）
         let autoSaveTimer = null;
         function startAutoSave() {
