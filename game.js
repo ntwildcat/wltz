@@ -1447,6 +1447,7 @@
         function completeTribulation(dungeonId) {
             const battleContainer = document.getElementById('battleContainer');
             if (battleContainer) battleContainer.classList.add('hidden');
+            syncBattleMode();
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
             gameState.dungeons[dungeonId].completed = true;
             gameState.dungeons.currentDungeon = null;
@@ -2834,6 +2835,7 @@
             // 隐藏所有面板，显示战斗UI
             document.querySelectorAll('.panel-content').forEach(el => el.classList.add('hidden'));
             battleContainer.classList.remove('hidden');
+            syncBattleMode();
             document.getElementById('battleTitle').textContent = '⚔️ 秘境战斗中';
 
             // 初始化HP条
@@ -2902,6 +2904,8 @@
             const monsterInterval = monster.attackSpeed || 2.5;
             updateAtkBar('playerAtkBar', gameState.player.attackTimer || 0, playerInterval);
             updateAtkBar('monsterAtkBar', gameState.dungeons.monsterAttackTimer || 0, monsterInterval);
+
+            updateDungeonProgress();
         }
 
         // 玩家攻击间隔（秒）：速度越高，间隔越短，出手越快
@@ -2916,6 +2920,31 @@
             const pct = Math.max(0, Math.min(100, (timer / interval) * 100));
             bar.style.width = pct + '%';
             bar.classList.toggle('ready', pct >= 99);
+        }
+
+        // 战斗独立界面（v6.73）：body.in-battle 时 CSS 隐藏侧边栏 / 顶部栏 / 右侧属性栏，战斗容器占满可视空间。
+        // 状态源是 battleContainer 是否 hidden——只要调用这个函数就能把 body class 同步过去，
+        // 不用在每一个进入 / 退出战斗的分支里都记得手动加减 class，也不怕漏掉某个分支。
+        function syncBattleMode() {
+            const bc = document.getElementById('battleContainer');
+            document.body.classList.toggle('in-battle', !!(bc && !bc.classList.contains('hidden')));
+        }
+
+        // 秘境战斗顶部的「第 N/M 只」进度指示：一排小圆点，已击败/当前/未遇到三种状态
+        function updateDungeonProgress() {
+            const el = document.getElementById('dungeonProgress');
+            if (!el) return;
+            const dungeonId = gameState.dungeons.currentDungeon;
+            const dungeon = dungeonId && GAME_CONFIG.dungeons[dungeonId];
+            if (!dungeon) { el.style.display = 'none'; return; }
+            const idx = gameState.dungeons.currentMonsterIndex;
+            const total = dungeon.monsters.length;
+            const pips = dungeon.monsters.map((m, i) => {
+                const cls = i < idx ? 'done' : (i === idx ? 'current' : '');
+                return `<span class="pip ${cls}" title="${m.name}"></span>`;
+            }).join('');
+            el.innerHTML = `第 ${idx + 1}/${total} 只 ${pips}`;
+            el.style.display = '';
         }
 
         // P1-1 显示伤害飘字
@@ -3078,6 +3107,7 @@
             if (battleContainer) {
                 battleContainer.classList.add('hidden');
             }
+            syncBattleMode();
         }
 
         // P1-4 从秘径撤退（模态对话框版本）
@@ -3460,6 +3490,7 @@
             const died = !won && battle.playerHP.current <= 0;
             if (died) {
                 showNotification('💀 你被击败了，本轮循环战斗结束', '#c4483a');
+                syncBattleMode();
                 switchPanel('battle');
                 switchBattleTab('areas');
                 renderAutoBattleBar();
@@ -5659,6 +5690,7 @@
                     battleContainer.classList.add('hidden');
                 }
                 gameState.battles = null;
+                syncBattleMode();
             }
 
             gameState.currentAction = null;
@@ -6599,6 +6631,9 @@
             if (battleContainer) {
                 battleContainer.classList.remove('hidden');
             }
+            syncBattleMode();
+            const dungeonProgressEl = document.getElementById('dungeonProgress');
+            if (dungeonProgressEl) dungeonProgressEl.style.display = 'none';   // 普通战斗区域没有「第N/M只」这个概念
 
             // 手动进入时重置本次托管统计；自动续战不弹进入提示，避免每场刷屏
             if (!auto) {
@@ -6688,6 +6723,7 @@
         }
 
         function updateUI() {
+            syncBattleMode();   // 保险：万一某个战斗退出分支漏调用了，这里兜底纠正
             if (getCloneSlotCount() >= 2 && !gameState.cloneUnlockNotified2) {
                 gameState.cloneUnlockNotified2 = true;
                 gameState.cloneUnlockNotified = true;
@@ -8631,6 +8667,7 @@
                     gameState.currentActionProgress = 0;
                     const battleContainer = document.getElementById('battleContainer');
                     if (battleContainer) battleContainer.classList.add('hidden');
+                    syncBattleMode();
                 }
                 gameState.lastActiveTime = now;
                 showNotification('⚔️ 上次的战斗因离开游戏而中断', '#c98a3e');

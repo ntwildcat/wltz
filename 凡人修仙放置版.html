@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=13.28">
+    <link rel="stylesheet" href="style.css?v=13.31">
 
 </head>
 <body data-panel="cultivation">
@@ -329,7 +329,10 @@
                         <div id="battleContainer" class="battle-container hidden">
                             <!-- 战斗顶部栏 -->
                             <div class="battle-header">
-                                <div class="battle-title" id="battleTitle">⚔️ 秘境战斗中</div>
+                                <div>
+                                    <div class="battle-title" id="battleTitle">⚔️ 秘境战斗中</div>
+                                    <div id="dungeonProgress" class="dungeon-progress" style="display: none;"></div>
+                                </div>
                                 <div class="battle-controls">
                                     <span id="autoBattleStatus" class="auto-battle-status"></span><button id="btn-retreat" class="btn-retreat" onclick="retreatFromDungeon()">撤退</button>
                                 </div>
@@ -767,7 +770,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.28"></script>
+    <script src="game.js?v=13.31"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
