@@ -27,17 +27,18 @@
                 { name: '化神中期', nextReq: 136000 },
                 { name: '化神后期', nextReq: 158000 },
                 { name: '化神圆满', nextReq: 182000 },
-                // 合体期（索引21-24，沿曲线 100 × n^2.5）：合体初期起可「合道」（收回分身，换取主行动大幅加速）；合体圆满（24）预留炼虚期入口
-                { name: '合体初期', nextReq: 202000 },
-                { name: '合体中期', nextReq: 227000 },
-                { name: '合体后期', nextReq: 254000 },
-                { name: '合体圆满', nextReq: 282000 },
-                // 炼虚期（索引25-28，沿曲线 100 × n^2.5）：核心是「化虚」——悟道法则的等级可以兑成实体「道则」镶嵌进新增的道基槽，
-                // 是「加成」变成「可操作物品」的一层；炼虚初期起必须已合道（FUSION_REQUIRED_REALM = 24）
-                { name: '炼虚初期', nextReq: 312000 },
-                { name: '炼虚中期', nextReq: 345000 },
-                { name: '炼虚后期', nextReq: 379000 },
-                { name: '炼虚圆满', nextReq: 415000 }
+                // 炼虚期（索引21-24，沿曲线 100 × n^2.5，v6.67 起按《凡人修仙传》原著顺序排在合体期之前）：
+                // 核心是「化虚」——悟道法则的等级可以兑成实体「道则」镶嵌进道基槽，是「加成」变成「可操作物品」的一层
+                { name: '炼虚初期', nextReq: 202000 },
+                { name: '炼虚中期', nextReq: 227000 },
+                { name: '炼虚后期', nextReq: 254000 },
+                { name: '炼虚圆满', nextReq: 282000 },
+                // 合体期（索引25-28，沿曲线 100 × n^2.5）：合体初期起可「合道」（收回分身，换取主行动大幅加速）；
+                // 合体圆满（28）预留下一境界（大乘期）入口，必须已合道（FUSION_REQUIRED_REALM = 28）
+                { name: '合体初期', nextReq: 312000 },
+                { name: '合体中期', nextReq: 345000 },
+                { name: '合体后期', nextReq: 379000 },
+                { name: '合体圆满', nextReq: 415000 }
             ],
             // P2功能：秘境系统
             dungeons: {
@@ -212,52 +213,52 @@
                         skillExp: 400
                     }
                 },
-                // P11 炼虚期秘境：虚界（入口合体圆满，怪物为炼虚初期）
+                // 炼虚期秘境：虚界（入口化神圆满，怪物为炼虚初期）
                 voidRealm: {
                     id: 'voidRealm',
                     name: '虚界',
                     desc: '虚实交界·通关掉落虚晶与道则残料',
                     icon: '🌫️',
-                    minRealmIndex: 24,                      // 最低合体圆满
-                    baseRealmIndex: 25,                     // 怪物境界为炼虚初期
-                    recommendedLevel: '合体圆满~炼虚后期',
+                    minRealmIndex: 20,                      // 最低化神圆满
+                    baseRealmIndex: 21,                     // 怪物境界为炼虚初期
+                    recommendedLevel: '化神圆满~炼虚中期',
                     monsters: [
-                        { name: '虚灵游魂', type: '无', hp: 58000, atk: 400, spd: 78, def: 115, attackSpeed: 2.1, drop: 'coins', dropQty: 2400 },
-                        { name: '化虚傀儡', type: '土', hp: 68000, atk: 430, spd: 70, def: 135, attackSpeed: 2.3, drop: 'coins', dropQty: 2700 },
-                        { name: '虚境行者', type: '风', hp: 64000, atk: 460, spd: 90, def: 110, attackSpeed: 2.0, drop: 'coins', dropQty: 3000 },
-                        { name: '太虚意志', type: '无', hp: 75000, atk: 480, spd: 82, def: 150, attackSpeed: 2.4, drop: 'coins', dropQty: 3300 },
-                        { name: '虚无道尊', type: '无', hp: 148000, atk: 580, spd: 78, def: 175, attackSpeed: 3.4, isBoss: true, drop: 'coins', dropQty: 11000 }
+                        { name: '虚灵游魂', type: '无', hp: 36000, atk: 250, spd: 78, def: 70, attackSpeed: 2.1, drop: 'coins', dropQty: 1400 },
+                        { name: '化虚傀儡', type: '土', hp: 43000, atk: 270, spd: 70, def: 80, attackSpeed: 2.3, drop: 'coins', dropQty: 1600 },
+                        { name: '虚境行者', type: '风', hp: 40000, atk: 285, spd: 90, def: 65, attackSpeed: 2.0, drop: 'coins', dropQty: 1800 },
+                        { name: '太虚意志', type: '无', hp: 47000, atk: 300, spd: 82, def: 90, attackSpeed: 2.4, drop: 'coins', dropQty: 2000 },
+                        { name: '虚无道尊', type: '无', hp: 90000, atk: 360, spd: 78, def: 105, attackSpeed: 3.3, isBoss: true, drop: 'coins', dropQty: 7000 }
                     ],
                     rewards: {
                         fixed: [
                             { id: 'voidcrystal_seed', qty: [3, 6] }
                         ],
                         random: [
-                            { id: 'voidcrystal', qty: [3, 5], probability: 1 },
-                            { id: 'daostone', qty: [2, 4], probability: 1 }
+                            { id: 'voidcrystal', qty: [2, 4], probability: 1 },
+                            { id: 'daostone', qty: [3, 5], probability: 1 }
                         ],
-                        coins: [11000, 19000],
-                        danhuo: [250, 450],
-                        shenshi: [220, 400],
-                        daoguo: [35, 60],
-                        skillExp: 1000
+                        coins: [6000, 11000],
+                        danhuo: [150, 300],
+                        shenshi: [120, 240],
+                        daoguo: [20, 40],
+                        skillExp: 600
                     }
                 },
-                // P10 合体期秘境：天道秘境（入口化神圆满，怪物为合体初期）
+                // 合体期秘境：天道秘境（入口炼虚圆满，怪物为合体初期）
                 tiandaoRealm: {
                     id: 'tiandaoRealm',
                     name: '天道秘境',
                     desc: '天道试炼·通关掉落天道石与道果种子',
                     icon: '🌌',
-                    minRealmIndex: 20,                      // 最低化神圆满
-                    baseRealmIndex: 21,                     // 怪物境界为合体初期
-                    recommendedLevel: '化神圆满~合体中期',
+                    minRealmIndex: 24,                      // 最低炼虚圆满
+                    baseRealmIndex: 25,                     // 怪物境界为合体初期
+                    recommendedLevel: '炼虚圆满~合体后期',
                     monsters: [
-                        { name: '天道残影', type: '无', hp: 36000, atk: 250, spd: 70, def: 70, attackSpeed: 2.2, drop: 'coins', dropQty: 1400 },
-                        { name: '法则傀儡', type: '雷', hp: 43000, atk: 270, spd: 65, def: 80, attackSpeed: 2.3, drop: 'coins', dropQty: 1600 },
-                        { name: '道影行者', type: '风', hp: 40000, atk: 285, spd: 80, def: 65, attackSpeed: 2.0, drop: 'coins', dropQty: 1800 },
-                        { name: '天道意志', type: '无', hp: 47000, atk: 300, spd: 75, def: 90, attackSpeed: 2.4, drop: 'coins', dropQty: 2000 },
-                        { name: '天道化身', type: '无', hp: 90000, atk: 360, spd: 70, def: 105, attackSpeed: 3.3, isBoss: true, drop: 'coins', dropQty: 7000 }
+                        { name: '天道残影', type: '无', hp: 58000, atk: 400, spd: 70, def: 115, attackSpeed: 2.2, drop: 'coins', dropQty: 2400 },
+                        { name: '法则傀儡', type: '雷', hp: 68000, atk: 430, spd: 65, def: 135, attackSpeed: 2.3, drop: 'coins', dropQty: 2700 },
+                        { name: '道影行者', type: '风', hp: 64000, atk: 460, spd: 80, def: 110, attackSpeed: 2.0, drop: 'coins', dropQty: 3000 },
+                        { name: '天道意志', type: '无', hp: 75000, atk: 480, spd: 75, def: 150, attackSpeed: 2.4, drop: 'coins', dropQty: 3300 },
+                        { name: '天道化身', type: '无', hp: 148000, atk: 580, spd: 70, def: 175, attackSpeed: 3.3, isBoss: true, drop: 'coins', dropQty: 11000 }
                     ],
                     rewards: {
                         fixed: [
@@ -267,11 +268,11 @@
                             { id: 'daostone', qty: [2, 4], probability: 1 },
                             { id: 'immortalore', qty: [3, 5], probability: 1 }
                         ],
-                        coins: [6000, 11000],
-                        danhuo: [150, 300],
-                        shenshi: [120, 240],
-                        daoguo: [20, 40],
-                        skillExp: 600
+                        coins: [11000, 19000],
+                        danhuo: [250, 450],
+                        shenshi: [220, 400],
+                        daoguo: [35, 60],
+                        skillExp: 1000
                     }
                 }
             },
@@ -300,13 +301,13 @@
                         yuanshen_huaxu: { name: '元神化虚', desc: '化神中期高产', duration: 80, output: { cultivation: 4200, skill: 'cultivation', exp: 650 }, requiredRealmIndex: 18, unlocked: false },
                         tiandi_gongming: { name: '天地共鸣', desc: '化神期最终法', duration: 150, output: { cultivation: 9000, skill: 'cultivation', exp: 900 }, requiredRealmIndex: 19, unlocked: false },
                         // 合体期配方（索引21–23解锁；修为 / 秒高于化神期的 60，配合合体期功法）
-                        heti_unity: { name: '合体归一', desc: '合体初期主力', duration: 200, output: { cultivation: 15000, skill: 'cultivation', exp: 1000 }, requiredRealmIndex: 21, unlocked: false },
-                        dao_body: { name: '道果炼体', desc: '合体中期高产', duration: 300, output: { cultivation: 27000, skill: 'cultivation', exp: 1500 }, requiredRealmIndex: 22, unlocked: false },
-                        dao_perfect: { name: '合道圆满', desc: '合体期最终修炼法', duration: 450, output: { cultivation: 50000, skill: 'cultivation', exp: 2200 }, requiredRealmIndex: 23, unlocked: false },
-                        // 炼虚期配方（索引25–27解锁）
-                        lianxu_main: { name: '炼虚归元', desc: '炼虚初期主力', duration: 220, output: { cultivation: 28000, skill: 'cultivation', exp: 2600 }, requiredRealmIndex: 25, unlocked: false },
-                        huaxu_unity: { name: '化虚合真', desc: '炼虚中期高产', duration: 320, output: { cultivation: 52000, skill: 'cultivation', exp: 3200 }, requiredRealmIndex: 26, unlocked: false },
-                        taixu_manifest: { name: '太虚显化', desc: '炼虚期最终修炼法', duration: 420, output: { cultivation: 90000, skill: 'cultivation', exp: 4000 }, requiredRealmIndex: 27, unlocked: false }
+                        heti_unity: { name: '合体归一', desc: '合体初期主力', duration: 220, output: { cultivation: 28000, skill: 'cultivation', exp: 2600 }, requiredRealmIndex: 25, unlocked: false },
+                        dao_body: { name: '道果炼体', desc: '合体中期高产', duration: 320, output: { cultivation: 52000, skill: 'cultivation', exp: 3200 }, requiredRealmIndex: 26, unlocked: false },
+                        dao_perfect: { name: '合道圆满', desc: '合体期最终修炼法', duration: 420, output: { cultivation: 90000, skill: 'cultivation', exp: 4000 }, requiredRealmIndex: 27, unlocked: false },
+                        // 炼虚期配方（索引21–23解锁）
+                        lianxu_main: { name: '炼虚归元', desc: '炼虚初期主力', duration: 200, output: { cultivation: 15000, skill: 'cultivation', exp: 1000 }, requiredRealmIndex: 21, unlocked: false },
+                        huaxu_unity: { name: '化虚合真', desc: '炼虚中期高产', duration: 300, output: { cultivation: 27000, skill: 'cultivation', exp: 1500 }, requiredRealmIndex: 22, unlocked: false },
+                        taixu_manifest: { name: '太虚显化', desc: '炼虚期最终修炼法', duration: 450, output: { cultivation: 50000, skill: 'cultivation', exp: 2200 }, requiredRealmIndex: 23, unlocked: false }
                     },
                     actions: {}
                 },
@@ -326,11 +327,11 @@
                         huashen_pill_alchemy: { name: '化神丹', desc: '九叶莲 ×5 + 悟道茶 ×8 + 仙矿 ×2（元婴圆满突破必需）', duration: 120, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'alchemy', exp: 700 }, requiredLevel: 40, requires: { lotus: 5, tea: 8, immortalore: 2 }, unlocked: false },
                         immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 34, requires: { tea: 3, mushroom: 2 }, unlocked: false },
                         jade_nectar: { name: '琼浆玉液', desc: '悟道果 ×2 + 悟道茶 ×3（战斗食物：恢复2000生命，冷却更短）', duration: 80, output: { items: [{ id: 'jade_nectar', qty: 2 }], skill: 'alchemy', exp: 900 }, requiredLevel: 45, requires: { daofruit: 2, tea: 3 }, unlocked: false },
-                        heti_pill_alchemy: { name: '合体丹', desc: '九叶莲 ×8 + 悟道茶 ×10 + 天道石 ×2（化神圆满突破必需）', duration: 150, output: { items: [{ id: 'hetipill', qty: 1 }], skill: 'alchemy', exp: 1100 }, requiredLevel: 50, requires: { lotus: 8, tea: 10, daostone: 2 }, unlocked: false },
-                        jade_marrow: { name: '玉髓琼浆', desc: '悟道果 ×3 + 悟道茶 ×4 + 天道石 ×1（战斗食物：恢复3500生命）', duration: 100, output: { items: [{ id: 'jade_marrow', qty: 2 }], skill: 'alchemy', exp: 1300 }, requiredLevel: 54, requires: { daofruit: 3, tea: 4, daostone: 1 }, unlocked: false },
+                        heti_pill_alchemy: { name: '合体丹', desc: '九叶莲 ×8 + 悟道茶 ×10 + 天道石 ×2（炼虚圆满突破必需）', duration: 180, output: { items: [{ id: 'hetipill', qty: 1 }], skill: 'alchemy', exp: 1800 }, requiredLevel: 60, requires: { lotus: 8, tea: 10, daostone: 2 }, unlocked: false },
+                        jade_marrow: { name: '玉髓琼浆', desc: '悟道果 ×3 + 悟道茶 ×4 + 天道石 ×1（战斗食物：恢复5000生命）', duration: 130, output: { items: [{ id: 'jade_marrow', qty: 2 }], skill: 'alchemy', exp: 2200 }, requiredLevel: 63, requires: { daofruit: 3, tea: 4, daostone: 1 }, unlocked: false },
                         // 炼虚期炼丹（索引60/63解锁）
-                        huaxu_pill_alchemy: { name: '化虚丹', desc: '九叶莲 ×10 + 悟道茶 ×12 + 天道石 ×3（合体圆满突破必需）', duration: 180, output: { items: [{ id: 'huaxupill', qty: 1 }], skill: 'alchemy', exp: 1800 }, requiredLevel: 60, requires: { lotus: 10, tea: 12, daostone: 3 }, unlocked: false },
-                        void_nectar: { name: '虚无仙酿', desc: '悟道果 ×4 + 悟道茶 ×5 + 虚晶 ×1（战斗食物：恢复5000生命）', duration: 130, output: { items: [{ id: 'void_nectar', qty: 2 }], skill: 'alchemy', exp: 2200 }, requiredLevel: 63, requires: { daofruit: 4, tea: 5, voidcrystal: 1 }, unlocked: false }
+                        huaxu_pill_alchemy: { name: '化虚丹', desc: '九叶莲 ×10 + 悟道茶 ×12 + 天道石 ×3（化神圆满突破必需）', duration: 150, output: { items: [{ id: 'huaxupill', qty: 1 }], skill: 'alchemy', exp: 1100 }, requiredLevel: 50, requires: { lotus: 10, tea: 12, daostone: 3 }, unlocked: false },
+                        void_nectar: { name: '虚无仙酿', desc: '悟道果 ×4 + 悟道茶 ×5 + 虚晶 ×1（战斗食物：恢复3500生命）', duration: 100, output: { items: [{ id: 'void_nectar', qty: 2 }], skill: 'alchemy', exp: 1300 }, requiredLevel: 54, requires: { daofruit: 4, tea: 5, voidcrystal: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -355,13 +356,13 @@
                         huashen_sword: { name: '化神剑', desc: '混沌石 ×3 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashensword', qty: 1 }], skill: 'forging', exp: 800 }, requiredLevel: 45, requires: { chaosstone: 3, immortalore: 2 }, unlocked: false },
                         huashen_armor: { name: '化神法衣', desc: '混沌石 ×4 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashenarmor', qty: 1 }], skill: 'forging', exp: 880 }, requiredLevel: 48, requires: { chaosstone: 4, immortalore: 2 }, unlocked: false },
                         huashen_pendant: { name: '化神佩', desc: '混沌石 ×2 + 灵晶 ×3', duration: 100, output: { items: [{ id: 'huashenpendant', qty: 1 }], skill: 'forging', exp: 950 }, requiredLevel: 50, requires: { chaosstone: 2, spiritcrystal: 3 }, unlocked: false },
-                        heti_sword: { name: '合体剑', desc: '天道石 ×3 + 混沌石 ×2', duration: 130, output: { items: [{ id: 'hetisword', qty: 1 }], skill: 'forging', exp: 1100 }, requiredLevel: 56, requires: { daostone: 3, chaosstone: 2 }, unlocked: false },
-                        heti_armor: { name: '合体法衣', desc: '天道石 ×4 + 混沌石 ×2', duration: 130, output: { items: [{ id: 'hetiarmor', qty: 1 }], skill: 'forging', exp: 1200 }, requiredLevel: 59, requires: { daostone: 4, chaosstone: 2 }, unlocked: false },
-                        heti_pendant: { name: '合体佩', desc: '天道石 ×2 + 灵晶 ×3', duration: 120, output: { items: [{ id: 'hetipendant', qty: 1 }], skill: 'forging', exp: 1300 }, requiredLevel: 60, requires: { daostone: 2, spiritcrystal: 3 }, unlocked: false },
+                        heti_sword: { name: '合体剑', desc: '天道石 ×3 + 混沌石 ×2', duration: 150, output: { items: [{ id: 'hetisword', qty: 1 }], skill: 'forging', exp: 2400 }, requiredLevel: 64, requires: { daostone: 3, chaosstone: 2 }, unlocked: false },
+                        heti_armor: { name: '合体法衣', desc: '天道石 ×4 + 混沌石 ×2', duration: 150, output: { items: [{ id: 'hetiarmor', qty: 1 }], skill: 'forging', exp: 2600 }, requiredLevel: 65, requires: { daostone: 4, chaosstone: 2 }, unlocked: false },
+                        heti_pendant: { name: '合体佩', desc: '天道石 ×2 + 灵晶 ×3', duration: 140, output: { items: [{ id: 'hetipendant', qty: 1 }], skill: 'forging', exp: 2800 }, requiredLevel: 66, requires: { daostone: 2, spiritcrystal: 3 }, unlocked: false },
                         // 炼虚期炼器（索引64-66解锁）
-                        lianxu_sword: { name: '炼虚剑', desc: '虚晶 ×3 + 混沌石 ×3', duration: 150, output: { items: [{ id: 'lianxusword', qty: 1 }], skill: 'forging', exp: 2400 }, requiredLevel: 64, requires: { voidcrystal: 3, chaosstone: 3 }, unlocked: false },
-                        lianxu_armor: { name: '炼虚法衣', desc: '虚晶 ×4 + 混沌石 ×3', duration: 150, output: { items: [{ id: 'lianxuarmor', qty: 1 }], skill: 'forging', exp: 2600 }, requiredLevel: 65, requires: { voidcrystal: 4, chaosstone: 3 }, unlocked: false },
-                        lianxu_pendant: { name: '炼虚佩', desc: '虚晶 ×2 + 灵晶 ×4', duration: 140, output: { items: [{ id: 'lianxupendant', qty: 1 }], skill: 'forging', exp: 2800 }, requiredLevel: 66, requires: { voidcrystal: 2, spiritcrystal: 4 }, unlocked: false }
+                        lianxu_sword: { name: '炼虚剑', desc: '虚晶 ×3 + 混沌石 ×3', duration: 130, output: { items: [{ id: 'lianxusword', qty: 1 }], skill: 'forging', exp: 1100 }, requiredLevel: 56, requires: { voidcrystal: 3, chaosstone: 3 }, unlocked: false },
+                        lianxu_armor: { name: '炼虚法衣', desc: '虚晶 ×4 + 混沌石 ×3', duration: 130, output: { items: [{ id: 'lianxuarmor', qty: 1 }], skill: 'forging', exp: 1200 }, requiredLevel: 59, requires: { voidcrystal: 4, chaosstone: 3 }, unlocked: false },
+                        lianxu_pendant: { name: '炼虚佩', desc: '虚晶 ×2 + 灵晶 ×4', duration: 120, output: { items: [{ id: 'lianxupendant', qty: 1 }], skill: 'forging', exp: 1300 }, requiredLevel: 60, requires: { voidcrystal: 2, spiritcrystal: 4 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -393,8 +394,8 @@
                         spiritcrystal: { name: '采灵晶', desc: '产出灵晶', duration: 25, output: { items: [{ id: 'spiritcrystal', qty: 1 }], skill: 'mining', exp: 220 }, requiredLevel: 30, unlocked: false },
                         immortalore: { name: '采仙矿', desc: '产出仙矿', duration: 35, output: { items: [{ id: 'immortalore', qty: 1 }], skill: 'mining', exp: 330 }, requiredLevel: 36, unlocked: false },
                         chaosstone: { name: '采混沌石', desc: '产出混沌石', duration: 50, output: { items: [{ id: 'chaosstone', qty: 1 }], skill: 'mining', exp: 600 }, requiredLevel: 43, unlocked: false },
-                        daostone: { name: '采天道石', desc: '产出天道石（合体期材料）', duration: 60, output: { items: [{ id: 'daostone', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false },
-                        voidcrystal: { name: '采虚晶', desc: '产出虚晶（炼虚期材料，化虚 / 炼虚装备）', duration: 70, output: { items: [{ id: 'voidcrystal', qty: 1 }], skill: 'mining', exp: 1000 }, requiredLevel: 62, unlocked: false }
+                        daostone: { name: '采天道石', desc: '产出天道石（化虚丹与合体级装备的共用材料）', duration: 60, output: { items: [{ id: 'daostone', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false },
+                        voidcrystal: { name: '采虚晶', desc: '产出虚晶（炼虚期材料，化虚 / 炼虚装备）', duration: 60, output: { items: [{ id: 'voidcrystal', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false }
                     },
                     actions: {}
                 },
@@ -530,19 +531,19 @@
                 // 合体期新物品
                 daostone: { name: '天道石', icon: '🔶', type: 'ore', sellPrice: 2000 },
                 daoguo_seed: { name: '道果种子', icon: '🌰', type: 'seed', sellPrice: 500 },
-                hetipill: { name: '合体丹', icon: '🔮', type: 'breakthrough_material', sellPrice: 6000 },
-                hetisword: { name: '合体剑', icon: '🗡️', type: 'weapon', sellPrice: 7000, stats: { atk: 150 } },
-                hetiarmor: { name: '合体法衣', icon: '🥼', type: 'armor', sellPrice: 8000, stats: { def: 85, hp: 230 } },
-                hetipendant: { name: '合体佩', icon: '📿', type: 'jewelry', sellPrice: 5000, stats: { spd: 19, hp: 150 } },
-                jade_marrow: { name: '玉髓琼浆', icon: '🍶', type: 'food', sellPrice: 3000 },
+                hetipill: { name: '合体丹', icon: '🔮', type: 'breakthrough_material', sellPrice: 8000 },
+                hetisword: { name: '合体剑', icon: '🗡️', type: 'weapon', sellPrice: 9000, stats: { atk: 220 } },
+                hetiarmor: { name: '合体法衣', icon: '🥼', type: 'armor', sellPrice: 10000, stats: { def: 120, hp: 340 } },
+                hetipendant: { name: '合体佩', icon: '📿', type: 'jewelry', sellPrice: 6500, stats: { spd: 26, hp: 220 } },
+                jade_marrow: { name: '玉髓琼浆', icon: '🍶', type: 'food', sellPrice: 4000 },
                 // 炼虚期新物品
                 voidcrystal: { name: '虚晶', icon: '💠', type: 'ore', sellPrice: 2500 },
                 voidcrystal_seed: { name: '虚晶种子', icon: '🌰', type: 'seed', sellPrice: 700 },
-                huaxupill: { name: '化虚丹', icon: '🔮', type: 'breakthrough_material', sellPrice: 8000 },
-                lianxusword: { name: '炼虚剑', icon: '🗡️', type: 'weapon', sellPrice: 9000, stats: { atk: 220 } },
-                lianxuarmor: { name: '炼虚法衣', icon: '🥼', type: 'armor', sellPrice: 10000, stats: { def: 120, hp: 340 } },
-                lianxupendant: { name: '炼虚佩', icon: '📿', type: 'jewelry', sellPrice: 6500, stats: { spd: 26, hp: 220 } },
-                void_nectar: { name: '虚无仙酿', icon: '🍶', type: 'food', sellPrice: 4000 },
+                huaxupill: { name: '化虚丹', icon: '🔮', type: 'breakthrough_material', sellPrice: 6000 },
+                lianxusword: { name: '炼虚剑', icon: '🗡️', type: 'weapon', sellPrice: 7000, stats: { atk: 150 } },
+                lianxuarmor: { name: '炼虚法衣', icon: '🥼', type: 'armor', sellPrice: 8000, stats: { def: 85, hp: 230 } },
+                lianxupendant: { name: '炼虚佩', icon: '📿', type: 'jewelry', sellPrice: 5000, stats: { spd: 19, hp: 150 } },
+                void_nectar: { name: '虚无仙酿', icon: '🍶', type: 'food', sellPrice: 3000 },
 
                 // P6/P7 新作物
                 // 战斗食物（在炼丹中制作；在战斗中HP低于50%时自动食用）
@@ -566,8 +567,8 @@
                     { id: 'inventory_slot', name: '背包扩展', icon: '📦', price: 100, desc: '+5格容量', type: 'upgrade', bought: false },
                     { id: 'farming_slot', name: '第二块灵田', icon: '🌾', price: 5000, desc: '解锁第二块灵田：可与主角同时种植灵田配方，速度相同，可种同一种作物（只能买一次）', type: 'upgrade', bought: false },
                     { id: 'jewelry_slot2', name: '第二饰品栏位', icon: '💍', price: 8000, desc: '解锁第二个饰品栏位（可同时佩戴两件不同的饰品）', minRealmIndex: 9, type: 'upgrade', bought: false },
-                    { id: 'daoze_slot2', name: '第二道基槽位', icon: '☯️', price: 15000, desc: '解锁第二个道基槽位（可同时镶嵌两枚不同法则的道则）', minRealmIndex: 25, type: 'upgrade', bought: false },
-                    { id: 'daoze_slot3', name: '第三道基槽位', icon: '☯️', price: 35000, desc: '解锁第三个道基槽位', minRealmIndex: 27, type: 'upgrade', bought: false }
+                    { id: 'daoze_slot2', name: '第二道基槽位', icon: '☯️', price: 15000, desc: '解锁第二个道基槽位（可同时镶嵌两枚不同法则的道则）', minRealmIndex: 21, type: 'upgrade', bought: false },
+                    { id: 'daoze_slot3', name: '第三道基槽位', icon: '☯️', price: 35000, desc: '解锁第三个道基槽位', minRealmIndex: 23, type: 'upgrade', bought: false }
                 ],
                 food: [
                     { id: 'millet', name: '灵米', icon: '🌾', price: 10, desc: '普通食物' },
@@ -600,13 +601,13 @@
                     { id: 'lotus', name: '九叶莲 ×2', icon: '🌸', price: 40, currency: 'shenshi', bundle: 2, desc: '炼丹材料', minRealmIndex: 13 }
                 ],
                 daoguo_shop: [
-                    { id: 'jade_marrow', name: '玉髓琼浆 ×2', icon: '🍶', price: 30, currency: 'daoguo', bundle: 2, desc: '战斗食物（合体初期起，恢复 3500 生命）', minRealmIndex: 21 },
-                    { id: 'daostone', name: '天道石 ×2', icon: '🪨', price: 40, currency: 'daoguo', bundle: 2, desc: '合体级矿石（合体丹 / 合体装备材料）', minRealmIndex: 21 },
-                    { id: 'chaosstone', name: '混沌石 ×2', icon: '🌑', price: 30, currency: 'daoguo', bundle: 2, desc: '合体装备材料', minRealmIndex: 21 },
-                    { id: 'immortalore', name: '仙矿 ×3', icon: '✨', price: 30, currency: 'daoguo', bundle: 3, desc: '顶级材料', minRealmIndex: 21 },
-                    { id: 'daofruit', name: '悟道果 ×2', icon: '🍇', price: 35, currency: 'daoguo', bundle: 2, desc: '炼丹 / 玉髓琼浆 / 道果技能材料', minRealmIndex: 21 },
-                    { id: 'lotus', name: '九叶莲 ×3', icon: '🌸', price: 35, currency: 'daoguo', bundle: 3, desc: '炼丹材料', minRealmIndex: 21 },
-                    { id: 'voidcrystal', name: '虚晶 ×2', icon: '💠', price: 45, currency: 'daoguo', bundle: 2, desc: '炼虚级矿石（化虚 / 炼虚装备材料）', minRealmIndex: 21 }
+                    { id: 'jade_marrow', name: '玉髓琼浆 ×2', icon: '🍶', price: 30, currency: 'daoguo', bundle: 2, desc: '战斗食物（合体初期起，恢复 5000 生命）', minRealmIndex: 25 },
+                    { id: 'daostone', name: '天道石 ×2', icon: '🪨', price: 40, currency: 'daoguo', bundle: 2, desc: '合体级矿石（合体丹 / 合体装备材料）', minRealmIndex: 25 },
+                    { id: 'chaosstone', name: '混沌石 ×2', icon: '🌑', price: 30, currency: 'daoguo', bundle: 2, desc: '合体装备材料', minRealmIndex: 25 },
+                    { id: 'immortalore', name: '仙矿 ×3', icon: '✨', price: 30, currency: 'daoguo', bundle: 3, desc: '顶级材料', minRealmIndex: 25 },
+                    { id: 'daofruit', name: '悟道果 ×2', icon: '🍇', price: 35, currency: 'daoguo', bundle: 2, desc: '炼丹 / 玉髓琼浆 / 道果技能材料', minRealmIndex: 25 },
+                    { id: 'lotus', name: '九叶莲 ×3', icon: '🌸', price: 35, currency: 'daoguo', bundle: 3, desc: '炼丹材料', minRealmIndex: 25 },
+                    { id: 'voidcrystal', name: '虚晶 ×2', icon: '💠', price: 45, currency: 'daoguo', bundle: 2, desc: '炼虚级矿石（化虚 / 炼虚装备材料）', minRealmIndex: 25 }
                 ],
                 arts: [
                     { id: 'qingmu_art', name: '青木诀', icon: '🌿', price: 200, desc: '修炼速度 ×1.1', minRealmIndex: 1, type: 'art' },
@@ -619,10 +620,10 @@
                     { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' },
                 { id: 'huashen_art', name: '化神真经', icon: '📖', price: 120000, desc: '修炼速度 ×3.4', minRealmIndex: 17, type: 'art' },
                 { id: 'primordial_art', name: '太初混元诀', icon: '☯️', price: 300000, desc: '修炼速度 ×4.2', minRealmIndex: 19, type: 'art' },
-                    { id: 'heti_art', name: '合体真经', icon: '📖', price: 800000, desc: '修炼速度 ×5', minRealmIndex: 21, type: 'art' },
-                    { id: 'dao_art', name: '太上合道经', icon: '🕮', price: 2000000, desc: '修炼速度 ×6.2', minRealmIndex: 23, type: 'art' },
-                    { id: 'lianxu_art', name: '炼虚真经', icon: '📖', price: 2000000, desc: '修炼速度 ×8', minRealmIndex: 25, type: 'art' },
-                    { id: 'taixuhuashi_art', name: '太虚化实经', icon: '🕮', price: 5000000, desc: '修炼速度 ×9.5', minRealmIndex: 27, type: 'art' }
+                    { id: 'lianxu_art', name: '炼虚真经', icon: '📖', price: 800000, desc: '修炼速度 ×5', minRealmIndex: 21, type: 'art' },
+                    { id: 'taixuhuashi_art', name: '太虚化实经', icon: '🕮', price: 2000000, desc: '修炼速度 ×6.2', minRealmIndex: 23, type: 'art' },
+                    { id: 'heti_art', name: '合体真经', icon: '📖', price: 2000000, desc: '修炼速度 ×8', minRealmIndex: 25, type: 'art' },
+                    { id: 'dao_art', name: '太上合道经', icon: '🕮', price: 5000000, desc: '修炼速度 ×9.5', minRealmIndex: 27, type: 'art' }
                 ]
             }
         };
@@ -684,19 +685,19 @@
                     id: 'jade_marrow',
                     name: '玉髓琼浆',
                     icon: '🍶',
-                    hpRestore: 3500,          // 恢复HP
+                    hpRestore: 5000,          // 恢复HP
                     cooldown: 3.0,
-                    minRealm: 21,             // 合体初期
-                    description: '合体修士的玉髓，肉身与元神共鸣，恢复量远超琼浆玉液'
+                    minRealm: 25,             // 合体初期
+                    description: '合体修士的玉髓，肉身与元神共鸣，恢复量远超玉髓琼浆之前的一切战斗食物'
                 },
                 void_nectar: {
                     id: 'void_nectar',
                     name: '虚无仙酿',
                     icon: '🍶',
-                    hpRestore: 5000,          // 恢复HP
+                    hpRestore: 3500,          // 恢复HP
                     cooldown: 3.0,
-                    minRealm: 25,             // 炼虚初期
-                    description: '炼虚修士以虚晶入酿，化虚为实，恢复量远超玉髓琼浆'
+                    minRealm: 21,             // 炼虚初期
+                    description: '炼虚修士以虚晶入酿，化虚为实，恢复量远超此前的战斗食物'
                 }
             },
             // 默认食物配置
@@ -980,10 +981,10 @@
             abyssRuins:        { danhuo: [3, 5], shenshi: [2, 3] },
             chaosWastes:       { danhuo: [4, 6], shenshi: [3, 4] },
             nineNether:        { danhuo: [5, 8], shenshi: [4, 6] },
-            daoWastes:         { danhuo: [6, 9], shenshi: [5, 7], daoguo: [1, 2] },
-            fusionVoid:        { danhuo: [8, 12], shenshi: [6, 9], daoguo: [2, 4] },
-            voidAbyss:         { danhuo: [10, 14], shenshi: [8, 11], daoguo: [3, 5] },
-            huashiRealm:       { danhuo: [13, 18], shenshi: [10, 14], daoguo: [4, 6] }
+            daoWastes:         { danhuo: [10, 14], shenshi: [8, 11], daoguo: [3, 5] },
+            fusionVoid:        { danhuo: [13, 18], shenshi: [10, 14], daoguo: [4, 6] },
+            voidAbyss:         { danhuo: [6, 9], shenshi: [5, 7], daoguo: [1, 2] },
+            huashiRealm:       { danhuo: [8, 12], shenshi: [6, 9], daoguo: [2, 4] }
         };
         function rollAreaCurrency(areaKey, bonus) {
             const cfg = BATTLE_CURRENCY[areaKey] || {};
@@ -1104,10 +1105,10 @@
             outShenshi: 0.5,     // 神识产出 +50%
             outDaoguo: 0.3       // 道果产出 +30%
         };
-        const FUSION_REQUIRED_REALM = 24;   // 合体圆满：晋升炼虚期（预留）必须已合道
+        const FUSION_REQUIRED_REALM = 28;   // 合体圆满（现索引28）：晋升下一境界必须已合道
         function daoBodyCost(level) { return Math.round(10 * Math.pow(level + 1, 1.5)); }
         function daoLawCost(level) { return Math.round(25 * Math.pow(level + 1, 1.5)); }
-        function isDaoguoUnlocked() { return gameState.player.realmIndex >= 21; }
+        function isDaoguoUnlocked() { return gameState.player.realmIndex >= 25; }
         function isFused() { return !!(gameState.player.fusion && gameState.player.fusion.active); }
         function getDaoBody() { return gameState.player.daoBody || 0; }
         function getDaoLaw() { return gameState.player.daoLaw || 0; }
@@ -1208,7 +1209,7 @@
         // ---- 炼虚期：化虚（法则实体化）与道则（v6.66） ----
         // 炼虚初期（索引25）起解锁。核心取舍：消耗悟道法则的等级（可逆，参悟可以再练回来）+ 道果/虚晶，
         // 兑换成一枚「道则」（实体物品），镶嵌进新增的「道基」槽后提供比留着法则等级更集中的定向加成。
-        function isVoidUnlocked() { return gameState.player.realmIndex >= 25; }
+        function isVoidUnlocked() { return gameState.player.realmIndex >= 21; }
 
         const DAOZE_TIER_NAMES = ['下品', '中品', '上品', '极品'];
         const DAOZE_TIER_LEVEL_COST = [5, 10, 15, 20];
@@ -1336,8 +1337,8 @@
             tribulationGround: 1.39,
             huashenRealm: 0.935,
             taixuDream: 0.496,
-            tiandaoRealm: 0.48,
-            voidRealm: 0.525
+            tiandaoRealm: 0.525,
+            voidRealm: 0.538
         };
         Object.entries(P4_MONSTER_SCALE).forEach(([dungeonId, scale]) => {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
@@ -1356,8 +1357,8 @@
             swamp: { hp: 1.393, atk: 2.115 }, abyss: { hp: 1.087, atk: 1.782 }, goldenPlains: { hp: 1.357, atk: 2.602 },
             tribulationGround: { hp: 0.96, atk: 2.067 }, voidSea: { hp: 0.482, atk: 2.405 }, abyssRuins: { hp: 0.1558, atk: 1.756 },
             chaosWastes: { hp: 0.1718, atk: 1.337 }, nineNether: { hp: 0.0837, atk: 1.047 },
-            daoWastes: { hp: 0.0811, atk: 1.262 }, fusionVoid: { hp: 0.0639, atk: 1.145 },
-            voidAbyss: { hp: 0.04, atk: 3.2 }, huashiRealm: { hp: 0.028, atk: 2.6 }
+            daoWastes: { hp: 0.04, atk: 3.2 }, fusionVoid: { hp: 0.028, atk: 2.6 },
+            voidAbyss: { hp: 0.0811, atk: 1.262 }, huashiRealm: { hp: 0.0639, atk: 1.145 }
         };
 
         const BATTLE_FORMULAS = {
@@ -3206,10 +3207,10 @@
             abyssRuins:        [{ id: 'spiritcrystal', p: 0.15, qty: [1, 2] }, { id: 'immortalore', p: 0.05, qty: 1 }, { id: 'daofruit', p: 0.02, qty: 1 }],
             chaosWastes:       [{ id: 'immortalore', p: 0.10, qty: 1 }, { id: 'chaosstone', p: 0.04, qty: 1 }, { id: 'seed_daofruit', p: 0.02, qty: 1 }],
             nineNether:        [{ id: 'immortalore', p: 0.15, qty: [1, 2] }, { id: 'chaosstone', p: 0.08, qty: 1 }, { id: 'daofruit', p: 0.05, qty: 1 }, { id: 'seed_daofruit', p: 0.03, qty: 1 }],
-            daoWastes:         [{ id: 'daostone', p: 0.10, qty: 1 }, { id: 'chaosstone', p: 0.12, qty: 1 }, { id: 'daofruit', p: 0.06, qty: 1 }, { id: 'seed_daofruit', p: 0.03, qty: 1 }],
-            fusionVoid:        [{ id: 'daostone', p: 0.18, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'daoguo_seed', p: 0.015, qty: 1 }],
-            voidAbyss:         [{ id: 'voidcrystal', p: 0.12, qty: 1 }, { id: 'chaosstone', p: 0.10, qty: 1 }, { id: 'voidcrystal_seed', p: 0.02, qty: 1 }],
-            huashiRealm:       [{ id: 'voidcrystal', p: 0.20, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'voidcrystal_seed', p: 0.03, qty: 1 }]
+            daoWastes:         [{ id: 'voidcrystal', p: 0.12, qty: 1 }, { id: 'chaosstone', p: 0.10, qty: 1 }, { id: 'voidcrystal_seed', p: 0.02, qty: 1 }],
+            fusionVoid:        [{ id: 'voidcrystal', p: 0.20, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'voidcrystal_seed', p: 0.03, qty: 1 }],
+            voidAbyss:         [{ id: 'daostone', p: 0.10, qty: 1 }, { id: 'chaosstone', p: 0.12, qty: 1 }, { id: 'daofruit', p: 0.06, qty: 1 }, { id: 'seed_daofruit', p: 0.03, qty: 1 }],
+            huashiRealm:       [{ id: 'daostone', p: 0.18, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'daoguo_seed', p: 0.015, qty: 1 }]
         };
 
         // 掉落数量文字（如 1–2 / 1）
@@ -3476,8 +3477,8 @@
             8: { pillId: 'goldenpill', pillName: '金丹秘药', qty: 1 },  // P6 筑基圆满(索引8)→金丹初期(索引9)
             12: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 },  // P7 金丹圆满(索引12)→元婴初期(索引13)
             16: { pillId: 'huashenpill', pillName: '化神丹', qty: 1 },   // P9 元婴圆满(索引16)→化神初期(索引17)
-            20: { pillId: 'hetipill', pillName: '合体丹', qty: 1 },      // P10 化神圆满(索引20)→合体初期(索引21)
-            24: { pillId: 'huaxupill', pillName: '化虚丹', qty: 1 }   // P11 合体圆满(索引24)→炼虚初期(索引25)，且必须已「合道」（见 attemptBreakthrough）
+            20: { pillId: 'huaxupill', pillName: '化虚丹', qty: 1 },   // 化神圆满(索引20)→炼虚初期(索引21)
+            24: { pillId: 'hetipill', pillName: '合体丹', qty: 1 }        // 炼虚圆满(索引24)→合体初期(索引25)，且必须已「合道」（见 attemptBreakthrough）
         };
 
         // 功法系统（绑定到角色出身，影响修炼速度）
@@ -3601,9 +3602,9 @@
             heti_art: {
                 id: 'heti_art',
                 name: '合体真经',
-                tier: 9,
-                speedMultiplier: 5.0,               // 修炼速度快400%
-                effects: { atkPct: 0.12, defPct: 0.10, 'out:daoguo': 0.10 },
+                tier: 11,
+                speedMultiplier: 8.0,               // 修炼速度快700%
+                effects: { atkPct: 0.14, defPct: 0.12, 'out:daoguo': 0.12 },
                 description: '合体修士的根本大典，肉身与元神合一，出手沉稳，凝道更快。',
                 origin: null
             },
@@ -3611,27 +3612,27 @@
             dao_art: {
                 id: 'dao_art',
                 name: '太上合道经',
-                tier: 10,
-                speedMultiplier: 6.2,               // 修炼速度快520%
-                effects: { hpPct: 0.15, 'exp:life': 0.15, 'out:daoguo': 0.15 },
+                tier: 12,
+                speedMultiplier: 9.5,               // 修炼速度快750%
+                effects: { hpPct: 0.18, defPct: 0.14, 'time:life': -0.10 },
                 description: '太上宗门不传之秘，直接吞吐天地大道，修行一日千里。',
                 origin: null
             },
             lianxu_art: {
                 id: 'lianxu_art',
                 name: '炼虚真经',
-                tier: 11,
-                speedMultiplier: 8.0,               // 修炼速度快700%
-                effects: { atkPct: 0.14, defPct: 0.12, 'out:daoguo': 0.12 },
+                tier: 9,
+                speedMultiplier: 5.0,               // 修炼速度快400%
+                effects: { atkPct: 0.12, defPct: 0.10, 'out:daoguo': 0.10 },
                 description: '化虚为实的根本法门，法则不再只是加成，而是可以握在手中的力量。',
                 origin: null
             },
             taixuhuashi_art: {
                 id: 'taixuhuashi_art',
                 name: '太虚化实经',
-                tier: 12,
-                speedMultiplier: 9.5,               // 修炼速度快750%
-                effects: { hpPct: 0.18, defPct: 0.14, 'time:life': -0.10 },
+                tier: 10,
+                speedMultiplier: 6.2,               // 修炼速度快520%
+                effects: { hpPct: 0.15, 'exp:life': 0.15, 'out:daoguo': 0.15 },
                 description: '炼虚期最终法门，虚实之间再无分别，一念可化万法为实体。',
                 origin: null
             }
@@ -4753,7 +4754,7 @@
             const realmIdx = gameState.player.realmIndex;
             if (realmIdx >= 9) skills.push('danhuo');
             if (realmIdx >= 13) skills.push('shenshi');
-            if (realmIdx >= 21) skills.push('daoguo');
+            if (realmIdx >= 25) skills.push('daoguo');
             if (realmIdx >= LAW_UNLOCK_REALM) skills.push('wudao');
             return skills.filter(name => gameState.skills[name]);
         }
@@ -5877,10 +5878,10 @@
                 chaosWastes: { name: '混沌荒原', desc: '化神修士的试炼场', minLevel: 17, maxLevel: 18, enemies: ['chaos-beast', 'void-walker'], coins: 4000, exp: 1600 },
                 nineNether: { name: '九幽冥渊', desc: '幽冥深处的绝地', minLevel: 19, maxLevel: 20, enemies: ['nether-lord', 'ghost-emperor'], coins: 8000, exp: 3200 },
                 // P10 合体期新增
-                daoWastes: { name: '道痕荒原', desc: '大道崩落之地', minLevel: 21, maxLevel: 22, enemies: ['dao-shade', 'law-puppet'], coins: 16000, exp: 6400 },
-                fusionVoid: { name: '合一虚境', desc: '万法归一的尽头', minLevel: 23, maxLevel: 24, enemies: ['void-beast', 'fusion-lord'], coins: 32000, exp: 12800 },
-                voidAbyss: { name: '虚渊', desc: '虚实交界的深渊', minLevel: 25, maxLevel: 26, enemies: ['void-beast', 'huaxu-demon'], coins: 64000, exp: 25600 },
-                huashiRealm: { name: '化实之界', desc: '道则具现之地', minLevel: 27, maxLevel: 28, enemies: ['shidao-walker', 'taixu-lord'], coins: 128000, exp: 51200 }
+                daoWastes: { name: '道痕荒原', desc: '大道崩落之地', minLevel: 25, maxLevel: 26, enemies: ['dao-shade', 'law-puppet'], coins: 64000, exp: 25600 },
+                fusionVoid: { name: '合一虚境', desc: '万法归一的尽头', minLevel: 27, maxLevel: 28, enemies: ['void-beast', 'fusion-lord'], coins: 128000, exp: 51200 },
+                voidAbyss: { name: '虚渊', desc: '虚实交界的深渊', minLevel: 21, maxLevel: 22, enemies: ['void-beast', 'huaxu-demon'], coins: 16000, exp: 6400 },
+                huashiRealm: { name: '化实之界', desc: '道则具现之地', minLevel: 23, maxLevel: 24, enemies: ['shidao-walker', 'taixu-lord'], coins: 32000, exp: 12800 }
             };
 
             const actions = {};
@@ -6045,20 +6046,20 @@
                     { name: '幽冥鬼帝', hp: 5200, atk: 350, def: 110, spd: 55, icon: '💀' }
                 ],
                 daoWastes: [
-                    { name: '道影行者', hp: 7000, atk: 420, def: 130, spd: 60, icon: '👤' },
-                    { name: '法则傀儡', hp: 8200, atk: 450, def: 150, spd: 50, icon: '🤖' }
+                    { name: '道影行者', hp: 13500, atk: 660, def: 195, spd: 60, icon: '👤' },
+                    { name: '法则傀儡', hp: 15800, atk: 710, def: 210, spd: 70, icon: '🤖' }
                 ],
                 fusionVoid: [
-                    { name: '归墟古兽', hp: 10500, atk: 520, def: 170, spd: 55, icon: '🐉' },
-                    { name: '合一魔尊', hp: 9800, atk: 560, def: 160, spd: 65, icon: '😈' }
+                    { name: '归墟古兽', hp: 19500, atk: 860, def: 235, spd: 65, icon: '🐉' },
+                    { name: '合一魔尊', hp: 21500, atk: 920, def: 255, spd: 75, icon: '😈' }
                 ],
                 voidAbyss: [
-                    { name: '虚渊兽', hp: 13500, atk: 660, def: 195, spd: 60, icon: '🐉' },
-                    { name: '化虚魔', hp: 15800, atk: 710, def: 210, spd: 70, icon: '😈' }
+                    { name: '虚渊兽', hp: 7000, atk: 420, def: 130, spd: 60, icon: '🐉' },
+                    { name: '化虚魔', hp: 8200, atk: 450, def: 150, spd: 50, icon: '😈' }
                 ],
                 huashiRealm: [
-                    { name: '实道行者', hp: 19500, atk: 860, def: 235, spd: 65, icon: '👤' },
-                    { name: '太虚尊者', hp: 21500, atk: 920, def: 255, spd: 75, icon: '😈' }
+                    { name: '实道行者', hp: 10500, atk: 520, def: 170, spd: 55, icon: '👤' },
+                    { name: '太虚尊者', hp: 9800, atk: 560, def: 160, spd: 65, icon: '😈' }
                 ]
             };
 
@@ -7270,9 +7271,9 @@
                 return;
             }
 
-            // 炼虚期（预留）：合体圆满起必须已合道才能晋升
+            // 合体圆满（FUSION_REQUIRED_REALM）起必须已合道才能晋升下一境界（大乘期，预留）
             if (realmIndex >= FUSION_REQUIRED_REALM && !isFused()) {
-                showNotification('晋升炼虚期必须先合道（在「道果」页面选择合道，不可逆）', '#c98a3e', 'warning');
+                showNotification('晋升下一境界必须先合道（在「道果」页面选择合道，不可逆）', '#c98a3e', 'warning');
                 return;
             }
 
@@ -7302,8 +7303,8 @@
             9:  { name: '金丹', line: '丹成九转，金光内蕴', kind: 'core', dur: 4.2 },
             13: { name: '元婴', line: '元神出窍，神游太虚', kind: 'nascent', dur: 4.4 },
             17: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 },
-            21: { name: '合体', line: '天人合一，万法归宗', kind: 'unity', dur: 4.8 },
-            25: { name: '炼虚', line: '化虚为实，道则显形', kind: 'voidfx', dur: 5.0 }
+            21: { name: '炼虚', line: '化虚为实，道则显形', kind: 'voidfx', dur: 5.0 },
+            25: { name: '合体', line: '天人合一，万法归宗', kind: 'unity', dur: 4.8 }
         };
         // 灵根对应的颜色（灵气入体特效用你自己的灵根色）
         const ROOT_FX_COLORS = { metal: '#d8c078', wood: '#7fae9a', water: '#7d9bb5', fire: '#d9614f', earth: '#b08d5a', wind: '#b7c9c2', thunder: '#b39ddb', ice: '#a8d8e8' };
