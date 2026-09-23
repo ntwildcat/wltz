@@ -1592,9 +1592,9 @@
             swamp: { hp: 1.393, atk: 2.115 }, abyss: { hp: 1.087, atk: 1.782 }, goldenPlains: { hp: 1.357, atk: 2.602 },
             tribulationGround: { hp: 0.96, atk: 2.067 }, voidSea: { hp: 0.482, atk: 2.405 }, abyssRuins: { hp: 0.1558, atk: 1.756 },
             chaosWastes: { hp: 0.1718, atk: 1.337 }, nineNether: { hp: 0.0837, atk: 1.047 },
-            daoWastes: { hp: 0.04, atk: 3.2 }, fusionVoid: { hp: 0.028, atk: 2.6 },
+            daoWastes: { hp: 0.04, atk: 1.6 }, fusionVoid: { hp: 0.028, atk: 1.56 },
             voidAbyss: { hp: 0.0811, atk: 1.262 }, huashiRealm: { hp: 0.0639, atk: 1.145 },
-            taiyiField: { hp: 0.0425, atk: 0.85 }, lingjieAbyss: { hp: 0.0328, atk: 0.738 }
+            taiyiField: { hp: 0.0425, atk: 0.4675 }, lingjieAbyss: { hp: 0.0328, atk: 0.3321 }
         };
 
         const BATTLE_FORMULAS = {
@@ -2896,6 +2896,26 @@
             document.getElementById('monsterDef').textContent = Math.floor(monster.def);
             document.getElementById('playerHit').textContent = Math.round(getDungeonPlayerHit(monster).hitChance * 100) + '%';
             document.getElementById('monsterHit').textContent = Math.round(getDungeonMonsterHit(monster).hitChance * 100) + '%';
+
+            // 攻击蓄力进度条：双方各自独立的攻速节奏，谁的条先蓄满谁先出手
+            const playerInterval = getPlayerAttackInterval();
+            const monsterInterval = monster.attackSpeed || 2.5;
+            updateAtkBar('playerAtkBar', gameState.player.attackTimer || 0, playerInterval);
+            updateAtkBar('monsterAtkBar', gameState.dungeons.monsterAttackTimer || 0, monsterInterval);
+        }
+
+        // 玩家攻击间隔（秒）：速度越高，间隔越短，出手越快
+        function getPlayerAttackInterval() {
+            return 2.0 / (1 + gameState.player.stats.spd / 100);
+        }
+
+        // 更新攻击蓄力进度条（0~100%，蓄满时高亮，下一 tick 出手后清零重新蓄力）
+        function updateAtkBar(elId, timer, interval) {
+            const bar = document.getElementById(elId);
+            if (!bar) return;
+            const pct = Math.max(0, Math.min(100, (timer / interval) * 100));
+            bar.style.width = pct + '%';
+            bar.classList.toggle('ready', pct >= 99);
         }
 
         // P1-1 显示伤害飘字
@@ -3175,7 +3195,7 @@
             applyRegen(gameState.player.stats.hp, timeDelta);   // 灵根/功法的战斗回复特效
 
             // 定义攻击间隔（秒）
-            const playerAttackInterval = 2.0 / (1 + gameState.player.stats.spd / 100);
+            const playerAttackInterval = getPlayerAttackInterval();
             const monsterAttackInterval = monster.attackSpeed || 2.5;
 
             // 1. 玩家攻击计时
@@ -3219,23 +3239,31 @@
             updateProgressBars();
         }
 
-        // 普通战斗处理（P1-5扩展：简化版，10秒自动完成）
-        // 普通战斗推进一步（0.1 秒 × 战斗速度）：计时、双方回合结算、自动进食；不含任何界面更新
+        // 普通战斗超时保护（v6.72）：双方独立攻速后单场时长不再固定，正常情况下几秒到二十几秒内分胜负；
+        // 这个值只是异常兜底（极端低攻速差距时避免战斗无限拖长），不是常规平衡手段
+        const NORMAL_BATTLE_TIMEOUT_SECONDS = 60;
+
+        // 普通战斗处理（v6.72：双方独立攻速，不再是固定2秒同步回合——与秘境战斗的节奏统一，speed 属性对双方都真实生效）
+        // 普通战斗推进一步（0.1 秒 × 战斗速度）：计时、双方各自独立结算、自动进食；不含任何界面更新
         // 在线战斗与离线自动战斗共用，保证两者规则一致
         function stepNormalBattle(battle) {
-            const timeDelta = 0.1;
+            const timeDelta = 0.1 * (gameState.battleSpeed || 1);
 
-            // 增加战斗计时（受战斗速度按钮影响）
-            const prevRound = Math.floor((battle.turnCount || 0) / 2);
-            battle.turnCount = (battle.turnCount || 0) + timeDelta * (gameState.battleSpeed || 1);
-            applyRegen(battle.playerHP, timeDelta * (gameState.battleSpeed || 1));   // 灵根/功法的战斗回复特效
+            // battle.turnCount 继续沿用：现在只表示「已经过去的秒数」，用于超时保护和离线模拟的时间换算
+            battle.turnCount = (battle.turnCount || 0) + timeDelta;
+            applyRegen(battle.playerHP, timeDelta);   // 灵根/功法的战斗回复特效
 
-            // 每2秒一个回合：双方按真实属性结算（命中、防御减伤、境界压制）
-            if (Math.floor(battle.turnCount / 2) > prevRound) {
-                const enemy = battle.currentEnemy;
-                const areaRealm = getAction('battle', battle.currentArea).areaData.minLevel;
-                const playerStats = gameState.player.stats;
+            const enemy = battle.currentEnemy;
+            const areaRealm = getAction('battle', battle.currentArea).areaData.minLevel;
+            const playerStats = gameState.player.stats;
 
+            // 双方各自独立的攻击间隔：公式与秘境战斗一致，速度越高出手越快
+            const playerInterval = getPlayerAttackInterval();
+            const enemyInterval = 2.0 / (1 + (enemy.spd || 40) / 100);
+
+            battle.playerAttackTimer = (battle.playerAttackTimer || 0) + timeDelta;
+            if (battle.playerAttackTimer >= playerInterval) {
+                battle.playerAttackTimer -= playerInterval;
                 const toEnemy = rollNormalAttack(playerStats, enemy, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm),
                     { hit: getMod('hit'), crit: BASE_CRIT.rate + getMod('crit'), critMult: BASE_CRIT.dmg + getMod('critDmg'),
                       dmgMult: (1 + getMasteryBonus('battle', battle.currentArea).dmg) * getBattleSkillDmgMult() });
@@ -3245,8 +3273,13 @@
                 } else {
                     battle.log.push('玩家攻击落空');
                 }
+                trimBattleLog(battle.log);
+            }
 
-                if (enemy.currentHP > 0) {
+            if (enemy.currentHP > 0) {
+                battle.enemyAttackTimer = (battle.enemyAttackTimer || 0) + timeDelta;
+                if (battle.enemyAttackTimer >= enemyInterval) {
+                    battle.enemyAttackTimer -= enemyInterval;
                     const toPlayer = rollNormalAttack(enemy, playerStats, REALM_SUPPRESSION.calculate(areaRealm, gameState.player.realmIndex),
                         { dodge: getMod('dodge') });
                     if (toPlayer.hit) {
@@ -3255,8 +3288,8 @@
                     } else {
                         battle.log.push(`${enemy.name}攻击落空`);
                     }
+                    trimBattleLog(battle.log);
                 }
-                trimBattleLog(battle.log);
             }
 
             // 战斗食物：生命低于阈值时自动进食（恢复战斗内的生命值）
@@ -3273,8 +3306,8 @@
             // 更新UI
             updateNormalBattleUI();
 
-            // 战斗完成：敌人HP <= 0、玩家倒下 或 10秒经过
-            if (battle.currentEnemy.currentHP <= 0 || battle.playerHP.current <= 0 || battle.turnCount >= 10) {
+            // 战斗完成：敌人HP <= 0、玩家倒下 或 超时兜底
+            if (battle.currentEnemy.currentHP <= 0 || battle.playerHP.current <= 0 || battle.turnCount >= NORMAL_BATTLE_TIMEOUT_SECONDS) {
                 completeNormalBattle();
             }
         }
@@ -3343,6 +3376,12 @@
                 const ph1 = document.getElementById('playerHit'), eh1 = document.getElementById('monsterHit');
                 if (ph1) ph1.textContent = Math.round(ph * 100) + '%';
                 if (eh1) eh1.textContent = Math.round(eh * 100) + '%';
+
+                // 攻击蓄力进度条：双方各自独立的攻速节奏
+                const playerInterval = getPlayerAttackInterval();
+                const enemyInterval = 2.0 / (1 + (e.spd || 40) / 100);
+                updateAtkBar('playerAtkBar', battle.playerAttackTimer || 0, playerInterval);
+                updateAtkBar('monsterAtkBar', battle.enemyAttackTimer || 0, enemyInterval);
             }
 
             // 标题、双方攻防、怪物图标
@@ -3541,7 +3580,7 @@
                     pickBestFood();
                     do {
                         stepNormalBattle(battle);
-                    } while (battle.currentEnemy.currentHP > 0 && battle.playerHP.current > 0 && battle.turnCount < 10);
+                    } while (battle.currentEnemy.currentHP > 0 && battle.playerHP.current > 0 && battle.turnCount < NORMAL_BATTLE_TIMEOUT_SECONDS);
                     elapsed += battle.turnCount / Math.min(1, AUTO_BATTLE_OFFLINE_EFFICIENCY + getMod('autoOffline'));   // 每场按 1/效率 倍时间计（基础 0.8，悟道·冰之法则可提高）
                     r.fights++;
                     const won = battle.currentEnemy.currentHP <= 0;

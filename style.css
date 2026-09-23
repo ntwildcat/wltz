@@ -1117,6 +1117,26 @@ input:focus, select:focus {
     text-shadow: 1px 1px 2px #000;
     font-family: var(--font-mono);
 }
+.atk-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-l1);
+    border: 1px solid var(--border-l3);
+    border-radius: var(--radius-xs);
+    overflow: hidden;
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+.atk-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--bronze-dim), var(--bronze));
+    transition: width 0.1s linear;
+}
+.atk-fill.ready {
+    background: linear-gradient(90deg, var(--bronze), #fff4d8);
+    box-shadow: 0 0 6px var(--bronze);
+}
+
 .combatant-stats {
     display: flex;
     gap: var(--spacing-sm);
