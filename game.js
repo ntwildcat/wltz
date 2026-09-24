@@ -5552,8 +5552,16 @@
 
         /**
          * 格式化产出显示
+         * skillName 传入时按技能等级加成（+ 丹火/神识/道果的设施「产出+x%」）折算成玩家实际会拿到的数量，
+         * 不然配方卡片永远显示 GAME_CONFIG 里的原始基础值——等级越高，卡片写的和实际炼出来的差得越多
+         * （翻倍/节省材料这类每次随机的效果仍不算进卡片的固定数字里，跟游戏内其它随机效果的展示方式一致，
+         * 只在触发时弹 toast）
          */
-        function formatRecipeOutput(output) {
+        function formatRecipeOutput(output, skillName) {
+            if (skillName) {
+                output = JSON.parse(JSON.stringify(output));
+                applySkillLevelBonus(skillName, output);
+            }
             const parts = [];
 
             if (output.cultivation) {
@@ -5665,7 +5673,7 @@
                 ? `境界要求：${getRealmName(unlockState.requiredValue)}`
                 : `等级要求：Lv.${unlockState.requiredValue}`;
 
-            const outputStr = formatRecipeOutput(recipe.output || {});
+            const outputStr = formatRecipeOutput(recipe.output || {}, skillName);
             // 产出是装备时直接显示属性，方便对比
             const outEquip = ((recipe.output && recipe.output.items) || []).find(i => isEquipmentItem(i.id));
             const equipStatsHtml = outEquip
