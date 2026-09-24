@@ -1912,6 +1912,72 @@
             }
         }
 
+        // ==================== 境界解锁提示（v6.79） ====================
+        // 每次突破后，如果这个境界解锁了新秘境 / 战斗区域 / 系统，播放完突破特效再弹一个小提示——
+        // 不是每个境界索引都有条目：中间过渡的小境界（比如练气中期→后期）如果没有新内容就不出现在这里，
+        // 也就不会弹提示。同一份数据也用在「设置 → 玩法介绍 → 境界解锁一览」里，完整列出全部境界当预告。
+        const REALM_UNLOCKS = {
+            1:  ['⚔️ 可以参与战斗了，森林战斗区域开放'],
+            2:  ['🔮 神秘之塔秘境开放'],
+            3:  ['⚔️ 十万大山外围战斗区域开放'],
+            4:  ['🌲 诡异森林秘境开放', '💊 可炼制筑基丹，突破练气巅峰前记得备好'],
+            5:  ['⚔️ 十万大山核心 / 妖兽沼泽战斗区域开放'],
+            6:  ['⚱️ 古老遗迹秘境开放'],
+            7:  ['⚔️ 魔窟深渊战斗区域开放'],
+            8:  ['⚡ 天劫之地秘境开放', '💊 可炼制金丹秘药，突破筑基圆满前记得备好'],
+            9:  ['🔥 丹火系统解锁（新增「丹火」技能页，产出的是货币，用于淬炼装备、强化灵根）', '⚔️ 金丹平原战斗区域开放'],
+            10: ['⚔️ 天劫之地战斗区域开放'],
+            12: ['🌌 元婴秘境开放', '💊 可炼制元婴丹，突破金丹圆满前记得备好'],
+            13: ['👁️ 神识系统解锁（新增「神识」技能页）', '🌀 第一个分身解锁，可以让分身并行做生活技能', '⚔️ 虚空之海战斗区域开放'],
+            15: ['⚔️ 深渊遗迹战斗区域开放'],
+            16: ['🌠 太虚幻境秘境开放', '💊 可炼制化神丹，突破元婴圆满前记得备好'],
+            17: ['☯️ 悟道系统解锁（八种法则，新增「悟道」技能页）', '🌀 第二个分身解锁', '🌀 灵域解锁，进入战斗前可以选一个（战斗页）', '👤 身外化身解锁（神识商城）', '⚔️ 混沌荒原战斗区域开放'],
+            19: ['⚔️ 九幽冥渊战斗区域开放'],
+            20: ['🌫️ 虚界秘境开放', '💊 可炼制化虚丹，突破化神圆满前记得备好'],
+            21: ['🌀 化虚 / 道则系统解锁，悟道法则可以兑成实体道则镶嵌（悟道页）', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：往后每个小境界突破前都要先在突破弹窗里渡劫'],
+            23: ['⚔️ 化实之界战斗区域开放'],
+            24: ['🌌 天道秘境开放', '💊 可炼制合体丹，突破炼虚圆满前记得备好'],
+            25: ['🍎 道果系统解锁（新增「道果」技能页）', '🌟 可以合道了（道果页操作，不可逆；晋升炼虚期前必须做）', '⚔️ 道痕荒原战斗区域开放'],
+            27: ['⚔️ 合一虚境战斗区域开放'],
+            28: ['🌟 太乙圣域秘境开放', '💊 可炼制大乘丹（需已合道），突破合体圆满前记得备好'],
+            29: ['👁️ 元婴蜕变解锁，离体助战（道果页操作）', '☯️ 道则「本源品」解锁，比极品更强一档', '⚔️ 太虚战场战斗区域开放'],
+            31: ['⚔️ 灵界绝境战斗区域开放'],
+            32: ['🏁 大道尽头——灵界至高战力，暂无下一境界']
+        };
+
+        function showRealmUnlockModal(realmIndex) {
+            const unlocks = REALM_UNLOCKS[realmIndex];
+            if (!unlocks || !unlocks.length) return;
+            document.getElementById('realmUnlockContent').innerHTML = `
+                <div class="tutorial-title">✨ ${getRealmName(realmIndex)} ✨</div>
+                <div class="tutorial-body">新解锁：<br/><br/>${unlocks.map(u => `• ${u}`).join('<br/>')}</div>
+                <div class="tutorial-actions">
+                    <button class="btn" onclick="closeRealmUnlockModal()">知道了</button>
+                </div>`;
+            document.getElementById('realmUnlockModal').classList.add('show');
+        }
+        function closeRealmUnlockModal() {
+            document.getElementById('realmUnlockModal').classList.remove('show');
+        }
+        // 设置 → 玩法介绍：完整列出全部有解锁内容的境界，已到达的正常显示，还没到的灰显当预告
+        function showRealmUnlockList() {
+            const cur = gameState.player.realmIndex;
+            const rows = Object.keys(REALM_UNLOCKS).map(Number).sort((a, b) => a - b).map(idx => {
+                const reached = cur >= idx;
+                return `<div class="use-row"${reached ? '' : ' style="opacity:0.55;"'}>
+                    <div class="use-main"><b>${reached ? '✓' : '🔒'} ${getRealmName(idx)}</b>
+                    <div class="use-effect">${REALM_UNLOCKS[idx].join('<br/>')}</div></div>
+                </div>`;
+            }).join('');
+            document.getElementById('realmUnlockContent').innerHTML = `
+                <div class="tutorial-title">📜 境界解锁一览</div>
+                <div style="max-height:55vh;overflow-y:auto;margin:12px 0;">${rows}</div>
+                <div class="tutorial-actions">
+                    <button class="btn" onclick="closeRealmUnlockModal()">关闭</button>
+                </div>`;
+            document.getElementById('realmUnlockModal').classList.add('show');
+        }
+
         // ==================== 新手任务 ====================
         // 一串连续的小任务，带新玩家把每个基础玩法（六个基础技能、出售 / 购买、装备、战斗、秘境）都用一遍；每个任务完成后
         // 点「领取奖励」得灵石（个别送物品），全部做完再告诉玩家游戏目标。进度靠 gameState.tally（累计事件计数）和当前状态判断，
@@ -2389,7 +2455,7 @@
             }
             if (n > 0) {
                 const per = JSON.parse(JSON.stringify(action.output));
-                applySkillLevelBonus(skill, per);
+                applySkillLevelBonus(skill, per, 'raw');
                 const isClone = durationFn === getCloneDuration;
                 const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double + (isClone ? getCloneDoubleBonus() : 0) + applyAlchemyBoostBatch(skill, action, n);
                 gameState.player.coins += (per.coins || 0) * n;
@@ -5199,7 +5265,13 @@
         }
 
         // 应用技能等级加成到产出
-        function applySkillLevelBonus(skillName, output) {
+        // mode='commit'（默认，真正产出时用）：采矿等 qty=1 基础产出的加成会持久化到 gameState.player.qtyCarry
+        //   里累积小数进度，攒够 1 才多产 1 个，不然 Math.floor(1×multiplier) 在等级上限内 multiplier 长期 <2
+        //   会永远向下取整回原值，等级加成形同虚设（这是 v6.80 发现的真实 bug：采矿说明写「Lv60≈+51%」，实测完全不生效）
+        // mode='peek'（配方卡片展示用）：读当前余量算「这次会拿到几个」但不消耗余量，不然打开面板刷新卡片就把余量吃掉
+        // mode='raw'（离线 / 分身批量结算用）：不取整，倍率原样乘成小数，交给外层按 completions 批量取整——
+        //   大量完成次数汇总后一次性取整，精度足够，且不会跟 commit 模式的持久余量打架
+        function applySkillLevelBonus(skillName, output, mode = 'commit') {
             // 丹火 / 神识产出：技能每级 +2%
             if ((skillName === 'danhuo' || skillName === 'shenshi' || skillName === 'daoguo') && (output.danhuo || output.shenshi || output.daoguo)) {
                 const m = 1 + ((gameState.skills[skillName] || {}).level - 1 || 0) * 0.02;
@@ -5234,10 +5306,23 @@
                     });
                 }
             } else if (effect.effectType === 'output' && output.items) {
-                // 采矿等输出加成
-                output.items.forEach(item => {
-                    item.qty = Math.floor(item.qty * multiplier);
-                });
+                // 采矿等输出加成：见函数顶部注释，qty=1 的基础产出必须走累积余量才能真正生效
+                if (mode === 'raw') {
+                    output.items.forEach(item => { item.qty = item.qty * multiplier; });
+                } else {
+                    const P = gameState.player;
+                    const carryMap = P.qtyCarry || {};
+                    output.items.forEach(item => {
+                        const key = skillName + ':' + item.id;
+                        const bonusExact = item.qty * (multiplier - 1) + (carryMap[key] || 0);
+                        const bonusWhole = Math.floor(bonusExact + 1e-9);
+                        if (mode === 'commit') {
+                            if (!P.qtyCarry) P.qtyCarry = {};
+                            P.qtyCarry[key] = bonusExact - bonusWhole;
+                        }
+                        item.qty += bonusWhole;
+                    });
+                }
             }
         }
 
@@ -5486,8 +5571,16 @@
 
         /**
          * 格式化产出显示
+         * skillName 传入时按技能等级加成（+ 丹火/神识/道果的设施「产出+x%」）折算成玩家实际会拿到的数量，
+         * 不然配方卡片永远显示 GAME_CONFIG 里的原始基础值——等级越高，卡片写的和实际炼出来的差得越多
+         * （翻倍/节省材料这类每次随机的效果仍不算进卡片的固定数字里，跟游戏内其它随机效果的展示方式一致，
+         * 只在触发时弹 toast）
          */
-        function formatRecipeOutput(output) {
+        function formatRecipeOutput(output, skillName) {
+            if (skillName) {
+                output = JSON.parse(JSON.stringify(output));
+                applySkillLevelBonus(skillName, output, 'peek');
+            }
             const parts = [];
 
             if (output.cultivation) {
@@ -5599,7 +5692,7 @@
                 ? `境界要求：${getRealmName(unlockState.requiredValue)}`
                 : `等级要求：Lv.${unlockState.requiredValue}`;
 
-            const outputStr = formatRecipeOutput(recipe.output || {});
+            const outputStr = formatRecipeOutput(recipe.output || {}, skillName);
             // 产出是装备时直接显示属性，方便对比
             const outEquip = ((recipe.output && recipe.output.items) || []).find(i => isEquipmentItem(i.id));
             const equipStatsHtml = outEquip
@@ -5821,6 +5914,13 @@
         }
 
         function selectAction(skill, action) {
+            // 点击「当前正在做的这个配方」＝停止，不是重新开始——之前点哪个配方卡片都会先 stopAction()
+            // 再立刻开始同一个配方，等于白点；现在再点一次正在进行的配方直接停下来
+            if (gameState.currentAction && gameState.currentAction.skill === skill && gameState.currentAction.action === action) {
+                stopAction();
+                return;
+            }
+
             // 凡人无法参与战斗
             if (gameState.player.realmIndex === 0 && skill === 'battle') {
                 showNotification('凡人无法参与战斗，请先突破到练气初期', '#c98a3e', 'warning');
@@ -7945,7 +8045,9 @@
             clearTimeout(fxState.timer);
             fxState.el.remove();
             document.body.classList.remove('fx-shake');
+            const onDone = fxState.onDone;   // 特效自然播完、被点击跳过、或者干脆没播放，都从这里统一退出
             fxState = null;
+            if (onDone) onDone();
         }
 
         const fxEase = t => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
@@ -8454,9 +8556,11 @@
         const FX_DRAWERS = { minor: fxDrawMinor, qi: fxDrawQi, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw, unity: fxDrawUnity, voidfx: fxDrawVoid, dacheng: fxDrawDacheng };
 
         // 播放突破特效：newRealmIndex = 突破后的境界索引；major = 是否大境界突破
-        // force = true：设置里「回放」时使用，即使关闭了突破特效也播放
-        function playBreakthroughEffect(newRealmIndex, major, force = false) {
-            if (!force && gameState.settings && gameState.settings.breakthroughFx === false) return;
+        // force = true：设置里「回放」时使用，即使关闭了突破特效也播放（不传 onDone，回放不触发境界解锁提示）
+        // onDone：特效结束（播完 / 被跳过 / 特效被关闭直接跳过）后调用，performBreakthrough 用它来弹境界解锁提示，
+        // 不用 setTimeout 猜时长——玩家随时可能点击跳过特效，猜的时长会不准
+        function playBreakthroughEffect(newRealmIndex, major, force = false, onDone = null) {
+            if (!force && gameState.settings && gameState.settings.breakthroughFx === false) { if (onDone) onDone(); return; }
             stopBreakthroughFx();
             const realmName = getRealmName(newRealmIndex);
             let cfg = major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null;
@@ -8470,7 +8574,7 @@
                 ? `<div class="fx-text"><div class="fx-title">${cfg.name.split('').join(' ')}</div><div class="fx-sub">${realmName} · ${cfg.line}</div><div class="fx-skip">点击任意处跳过</div></div>`
                 : `<div class="fx-text"><div class="fx-title">突 破</div><div class="fx-sub">${realmName}</div><div class="fx-seal">破</div></div>`);
             document.body.appendChild(el);
-            fxState = { el, raf: 0, timer: 0, draw: null, dur };
+            fxState = { el, raf: 0, timer: 0, draw: null, dur, onDone };
             if (major) el.addEventListener('click', stopBreakthroughFx);
             if (reduce) {
                 fxState.timer = setTimeout(stopBreakthroughFx, major ? 2600 : 1600);
@@ -8517,7 +8621,8 @@
             closeBreakthroughModal();
             updateUI();
             saveGame();
-            playBreakthroughEffect(nextRealmIndex, wasMajor || nextRealmIndex === 1);   // 凡人 → 练气也是「入道」大事件
+            // 凡人 → 练气也是「入道」大事件；特效结束后再弹境界解锁提示，两个视觉效果不抢注意力
+            playBreakthroughEffect(nextRealmIndex, wasMajor || nextRealmIndex === 1, false, () => showRealmUnlockModal(nextRealmIndex));
         }
 
         function performMajorBreakthrough() {
@@ -8986,8 +9091,10 @@
             };
 
             // 与在线 completeAction 一致：先对单次产出应用技能等级加成，再乘以完成次数
+            // 'raw'：采矿等 qty=1 基础产出的加成不在这里取整（离线是批量结算，取整放到下面乘完 completions 之后一次性做，
+            // 不跟在线单次结算共用同一份持久余量 qtyCarry，避免互相冲掉进度）
             const perAction = JSON.parse(JSON.stringify(action.output));
-            applySkillLevelBonus(savedAction.skill, perAction);
+            applySkillLevelBonus(savedAction.skill, perAction, 'raw');
             offlineRewards.coins = (perAction.coins || 0) * completions;
             offlineRewards.danhuo = (perAction.danhuo || 0) * completions;
             offlineRewards.shenshi = (perAction.shenshi || 0) * completions;
