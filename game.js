@@ -2455,7 +2455,7 @@
             }
             if (n > 0) {
                 const per = JSON.parse(JSON.stringify(action.output));
-                applySkillLevelBonus(skill, per);
+                applySkillLevelBonus(skill, per, 'raw');
                 const isClone = durationFn === getCloneDuration;
                 const doubleRate = getSkillMod('double', skill) + getMasteryBonus(skill, key).double + (isClone ? getCloneDoubleBonus() : 0) + applyAlchemyBoostBatch(skill, action, n);
                 gameState.player.coins += (per.coins || 0) * n;
@@ -5265,7 +5265,13 @@
         }
 
         // 应用技能等级加成到产出
-        function applySkillLevelBonus(skillName, output) {
+        // mode='commit'（默认，真正产出时用）：采矿等 qty=1 基础产出的加成会持久化到 gameState.player.qtyCarry
+        //   里累积小数进度，攒够 1 才多产 1 个，不然 Math.floor(1×multiplier) 在等级上限内 multiplier 长期 <2
+        //   会永远向下取整回原值，等级加成形同虚设（这是 v6.80 发现的真实 bug：采矿说明写「Lv60≈+51%」，实测完全不生效）
+        // mode='peek'（配方卡片展示用）：读当前余量算「这次会拿到几个」但不消耗余量，不然打开面板刷新卡片就把余量吃掉
+        // mode='raw'（离线 / 分身批量结算用）：不取整，倍率原样乘成小数，交给外层按 completions 批量取整——
+        //   大量完成次数汇总后一次性取整，精度足够，且不会跟 commit 模式的持久余量打架
+        function applySkillLevelBonus(skillName, output, mode = 'commit') {
             // 丹火 / 神识产出：技能每级 +2%
             if ((skillName === 'danhuo' || skillName === 'shenshi' || skillName === 'daoguo') && (output.danhuo || output.shenshi || output.daoguo)) {
                 const m = 1 + ((gameState.skills[skillName] || {}).level - 1 || 0) * 0.02;
@@ -5300,10 +5306,23 @@
                     });
                 }
             } else if (effect.effectType === 'output' && output.items) {
-                // 采矿等输出加成
-                output.items.forEach(item => {
-                    item.qty = Math.floor(item.qty * multiplier);
-                });
+                // 采矿等输出加成：见函数顶部注释，qty=1 的基础产出必须走累积余量才能真正生效
+                if (mode === 'raw') {
+                    output.items.forEach(item => { item.qty = item.qty * multiplier; });
+                } else {
+                    const P = gameState.player;
+                    const carryMap = P.qtyCarry || {};
+                    output.items.forEach(item => {
+                        const key = skillName + ':' + item.id;
+                        const bonusExact = item.qty * (multiplier - 1) + (carryMap[key] || 0);
+                        const bonusWhole = Math.floor(bonusExact + 1e-9);
+                        if (mode === 'commit') {
+                            if (!P.qtyCarry) P.qtyCarry = {};
+                            P.qtyCarry[key] = bonusExact - bonusWhole;
+                        }
+                        item.qty += bonusWhole;
+                    });
+                }
             }
         }
 
@@ -5560,7 +5579,7 @@
         function formatRecipeOutput(output, skillName) {
             if (skillName) {
                 output = JSON.parse(JSON.stringify(output));
-                applySkillLevelBonus(skillName, output);
+                applySkillLevelBonus(skillName, output, 'peek');
             }
             const parts = [];
 
@@ -9072,8 +9091,10 @@
             };
 
             // 与在线 completeAction 一致：先对单次产出应用技能等级加成，再乘以完成次数
+            // 'raw'：采矿等 qty=1 基础产出的加成不在这里取整（离线是批量结算，取整放到下面乘完 completions 之后一次性做，
+            // 不跟在线单次结算共用同一份持久余量 qtyCarry，避免互相冲掉进度）
             const perAction = JSON.parse(JSON.stringify(action.output));
-            applySkillLevelBonus(savedAction.skill, perAction);
+            applySkillLevelBonus(savedAction.skill, perAction, 'raw');
             offlineRewards.coins = (perAction.coins || 0) * completions;
             offlineRewards.danhuo = (perAction.danhuo || 0) * completions;
             offlineRewards.shenshi = (perAction.shenshi || 0) * completions;
