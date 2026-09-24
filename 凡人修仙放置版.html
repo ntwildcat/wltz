@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=13.32">
+    <link rel="stylesheet" href="style.css?v=13.33">
 
 </head>
 <body data-panel="cultivation">
@@ -701,6 +701,22 @@
         </div>
     </div>
 
+    <!-- 灵域选择模态框（化神期起，进入战斗前选一个，v6.77） -->
+    <div id="domainSelectModal" class="modal">
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <button type="button" class="modal-close" onclick="confirmDomainChoice(null)" aria-label="不使用灵域">&times;</button>
+            <div class="modal-title">🌀 选择灵域 🌀</div>
+            <p style="color: var(--text-l4, #888); margin-bottom: 14px; font-size: 0.9em;">
+                灵域对战斗双方同时生效，整场战斗（循环挑战期间）持续、中途不可更换。
+                激活消耗 <span data-ico="shenshi">👁️</span> 神识 <b id="domainShenshiCost"></b>（现有 <b id="domainShenshiBalance">0</b>）。
+            </p>
+            <div id="domainSelectList" class="domain-grid"></div>
+            <button class="btn btn-secondary" onclick="confirmDomainChoice(null)" style="width: 100%; margin-top: 16px;">
+                不使用灵域，直接进入
+            </button>
+        </div>
+    </div>
+
     <!-- 离线结算模态框 -->
     <div id="offlineModal" class="modal">
         <div class="modal-content" role="dialog" aria-modal="true">
@@ -770,7 +786,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.35"></script>
+    <script src="game.js?v=13.36"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

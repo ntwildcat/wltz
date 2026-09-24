@@ -1099,6 +1099,35 @@ body.in-battle .battle-container {
     pointer-events: none;
 }
 
+/* 灵域选择卡片（v6.77） */
+.domain-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.domain-card {
+    background: var(--bg-l3);
+    border: 1px solid var(--border-l3);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.domain-card:hover {
+    border-color: var(--bronze, var(--border-l1));
+    box-shadow: 0 0 8px rgba(201, 169, 97, 0.25);
+}
+.domain-card.unaffordable {
+    opacity: 0.55;
+}
+.domain-icon { font-size: 1.4em; margin-bottom: 4px; }
+.domain-name { font-weight: bold; color: var(--text-l1); margin-bottom: 4px; }
+.domain-desc { font-size: 0.78em; color: var(--text-l4); line-height: 1.4; }
+@media (max-width: 480px) {
+    .domain-grid { grid-template-columns: 1fr; }
+}
+
 .battle-header {
     display: flex;
     justify-content: space-between;
