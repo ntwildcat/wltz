@@ -2052,9 +2052,10 @@
                         { name: '森林之心', type: '木', hp: 300, atk: 18, spd: 42, def: 8, attackSpeed: 3.0, isBoss: true, drop: 'coins', dropQty: 200 }
                     ],
                     rewards: {
-                        fixed: [],  // 种子只从战斗区域掉落
+                        fixed: [],
                         random: [
-                            { id: 'cleangrass', qty: [3, 5], probability: 1 }
+                            { id: 'cleangrass', qty: [3, 5], probability: 1 },
+                            { id: 'yaodan', qty: [1, 2], probability: 0.5 }
                         ],
                         coins: [500, 1200],
                         skillExp: 50
@@ -2076,9 +2077,10 @@
                         { name: '遗迹意志', type: '无', hp: 900, atk: 20, spd: 48, def: 10, attackSpeed: 3.1, isBoss: true, drop: 'coins', dropQty: 300 }
                     ],
                     rewards: {
-                        fixed: [],  // 种子只从战斗区域掉落
+                        fixed: [],
                         random: [
-                            { id: 'crystal', qty: [2, 3], probability: 1 }
+                            { id: 'crystal', qty: [2, 3], probability: 1 },
+                            { id: 'yaodan', qty: [1, 3], probability: 0.8 }
                         ],
                         coins: [1000, 2000],
                         skillExp: 80
@@ -2176,13 +2178,15 @@
                         restore: { name: '回气丹', desc: '灵米 ×2', duration: 8, output: { items: [{ id: 'restpill', qty: 1 }], skill: 'alchemy', exp: 18 }, requiredLevel: 2, requires: { millet: 2 }, unlocked: false },
                         breakthrough: { name: '筑基丹', desc: '清灵草 ×3', duration: 12, output: { items: [{ id: 'pill', qty: 1 }], skill: 'alchemy', exp: 25 }, requiredLevel: 5, requires: { cleangrass: 3 }, unlocked: false },
                         gather: { name: '聚灵丹', desc: '清灵草 ×2 + 灵米 ×1', duration: 15, output: { items: [{ id: 'gatherpill', qty: 1 }], skill: 'alchemy', exp: 30 }, requiredLevel: 8, requires: { cleangrass: 2, millet: 1 }, unlocked: false },
-                        realm: { name: '破境丹', desc: '清灵草 ×5 + 妖丹 ×1', duration: 25, output: { items: [{ id: 'realmpill', qty: 1 }], skill: 'alchemy', exp: 50 }, requiredLevel: 15, requires: { cleangrass: 5 }, unlocked: false },
-                        marrow: { name: '洗髓丹', desc: '妖丹 ×2 + 灵玉粉 ×1', duration: 30, output: { items: [{ id: 'marrpill', qty: 1 }], skill: 'alchemy', exp: 70 }, requiredLevel: 25, requires: {}, unlocked: false },
+                        realm: { name: '破境丹', desc: '清灵草 ×5 + 妖丹 ×1', duration: 25, output: { items: [{ id: 'realmpill', qty: 1 }], skill: 'alchemy', exp: 50 }, requiredLevel: 15, requires: { cleangrass: 5, yaodan: 1 }, unlocked: false },
+                        marrow: { name: '洗髓丹', desc: '妖丹 ×2 + 灵玉粉 ×1', duration: 30, output: { items: [{ id: 'marrpill', qty: 1 }], skill: 'alchemy', exp: 70 }, requiredLevel: 25, requires: { yaodan: 2, jadepowder: 1 }, unlocked: false },
                         // P6 金丹期配方
                         golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 丹火 ×2', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 120 }, requiredLevel: 30, requires: { mushroom: 3, crystal: 1, danhuo: 2 }, unlocked: false },
                         spirit_pill: { name: '聚灵丹（高级）', desc: '灵芝 ×5 + 玄晶 ×2', duration: 45, output: { items: [{ id: 'spiritpill', qty: 1 }], skill: 'alchemy', exp: 150 }, requiredLevel: 35, requires: { mushroom: 5, crystal: 2 }, unlocked: false },
                         // P7 元婴期配方
                         yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 神识 ×2', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 40, requires: { lotus: 3, tea: 5, shenshi: 2 }, unlocked: false },
+                        // 辅材配方
+                        grind_jade: { name: '研磨灵玉', desc: '灵玉 ×1 → 灵玉粉 ×3', duration: 15, output: { items: [{ id: 'jadepowder', qty: 3 }], skill: 'alchemy', exp: 20 }, requiredLevel: 10, requires: { jade: 1 }, unlocked: false },
                         // 食物配方
                         cook_porridge: { name: '熬制灵米粥', desc: '灵米 ×3', duration: 10, output: { items: [{ id: 'millet_porridge', qty: 3 }], skill: 'alchemy', exp: 12 }, requiredLevel: 1, requires: { millet: 3 }, unlocked: true },
                         cook_herb_soup: { name: '炼制灵草汤', desc: '清灵草 ×2 + 灵米 ×1', duration: 20, output: { items: [{ id: 'herb_soup', qty: 2 }], skill: 'alchemy', exp: 30 }, requiredLevel: 8, requires: { cleangrass: 2, millet: 1 }, unlocked: false },
@@ -2317,6 +2321,8 @@
                 // 特殊材料
                 spiritstone: { name: '灵石', icon: '💎', type: 'currency' },
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', effect: { workSpeed: 0.95 } },
+                yaodan: { name: '妖丹', icon: '🔴', type: 'material', desc: '妖兽核心，秘境掉落' },
+                jadepowder: { name: '灵玉粉', icon: '✨', type: 'material', desc: '灵玉研磨所得' },
 
                 // P6 丹火相关物品
                 danhuo: { name: '丹火', icon: '🔥', type: 'material' },
@@ -5154,9 +5160,15 @@
                 byType[itemConfig.type].push(item);
             });
 
-            // 按类型显示
-            const typeNames = { material: '材料', ore: '矿石', consumable: '丹药', weapon: '装备', jewelry: '首饰' };
-            Object.entries(byType).forEach(([type, items]) => {
+            // 按类型显示（顺序控制展示顺序）
+            const typeOrder = ['consumable', 'food', 'weapon', 'armor', 'jewelry', 'material', 'ore', 'seed'];
+            const typeNames = { material: '材料', ore: '矿石', consumable: '丹药', weapon: '武器', armor: '防具', jewelry: '首饰', seed: '种子', food: '食物' };
+            // 按预定顺序排列类型
+            const orderedEntries = typeOrder
+                .filter(t => byType[t])
+                .map(t => [t, byType[t]])
+                .concat(Object.entries(byType).filter(([t]) => !typeOrder.includes(t)));
+            orderedEntries.forEach(([type, items]) => {
                 const typeLabel = document.createElement('div');
                 typeLabel.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #16a34a; margin-top: 10px; margin-bottom: 5px;';
                 typeLabel.textContent = typeNames[type] || type;
