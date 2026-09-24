@@ -2209,26 +2209,24 @@
                     level: 1,
                     exp: 0,
                     recipes: {
-                        // 灵米：产出灵米，不需要种子，不产出种子（保持原样）
+                        // 灵米：产出灵米，不需要种子
                         millet: { name: '种植灵米', desc: '食物', duration: 5, output: { items: [{ id: 'millet', qty: 1 }], skill: 'farming', exp: 10 }, requiredLevel: 1, unlocked: true },
 
-                        // 清灵草：消耗种子，产出灵药+种子（循环自给）
-                        grass: { name: '种植清灵草', desc: '产出灵药+种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }, { id: 'seed_cleangrass', qty: 1 }], skill: 'farming', exp: 15 }, requiredLevel: 2, requires: { seed_cleangrass: 1 }, unlocked: false },
+                        // === 种植配方：消耗1种子→产出1灵药 ===
+                        grass:        { name: '种植清灵草', desc: '消耗种子→产出灵药', duration: 10,  output: { items: [{ id: 'cleangrass',  qty: 1 }], skill: 'farming', exp: 15  }, requiredLevel: 2,  requires: { seed_cleangrass:  1 }, unlocked: false },
+                        mushroom:     { name: '种植灵芝',   desc: '消耗种子→产出灵药', duration: 30,  output: { items: [{ id: 'mushroom',    qty: 1 }], skill: 'farming', exp: 25  }, requiredLevel: 10, requires: { seed_mushroom:    1 }, unlocked: false },
+                        tea:          { name: '种植悟道茶', desc: '消耗种子→产出灵药', duration: 60,  output: { items: [{ id: 'tea',         qty: 1 }], skill: 'farming', exp: 40  }, requiredLevel: 20, requires: { seed_tea:         1 }, unlocked: false },
+                        spirit_fruit: { name: '种植灵果',   desc: '消耗种子→产出灵药', duration: 120, output: { items: [{ id: 'spiritfruit', qty: 1 }], skill: 'farming', exp: 50  }, requiredLevel: 15, requires: { seed_spiritfruit: 1 }, unlocked: false },
+                        golden_grass: { name: '种植金灵草', desc: '消耗种子→产出灵药', duration: 180, output: { items: [{ id: 'goldengrass', qty: 1 }], skill: 'farming', exp: 100 }, requiredLevel: 30, requires: { seed_goldengrass: 1 }, unlocked: false },
+                        lotus:        { name: '种植九叶莲', desc: '消耗种子→产出灵药', duration: 300, output: { items: [{ id: 'lotus',       qty: 1 }], skill: 'farming', exp: 80  }, requiredLevel: 40, requires: { seed_lotus:       1 }, unlocked: false },
 
-                        // 灵芝：消耗种子，产出灵药+种子（循环自给）
-                        mushroom: { name: '种植灵芝', desc: '产出灵药+种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }, { id: 'seed_mushroom', qty: 1 }], skill: 'farming', exp: 25 }, requiredLevel: 10, requires: { seed_mushroom: 1 }, unlocked: false },
-
-                        // 悟道茶：消耗种子，产出灵药+种子（循环自给）
-                        tea: { name: '种植悟道茶', desc: '产出灵药+种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }, { id: 'seed_tea', qty: 1 }], skill: 'farming', exp: 40 }, requiredLevel: 20, requires: { seed_tea: 1 }, unlocked: false },
-
-                        // 灵果：消耗种子，产出灵药+种子（循环自给）
-                        spirit_fruit: { name: '种植灵果', desc: '产出灵药+种子', duration: 120, output: { items: [{ id: 'spiritfruit', qty: 1 }, { id: 'seed_spiritfruit', qty: 1 }], skill: 'farming', exp: 50 }, requiredLevel: 15, requires: { seed_spiritfruit: 1 }, unlocked: false },
-
-                        // 金灵草：消耗种子，产出灵药+种子（循环自给）
-                        golden_grass: { name: '种植金灵草', desc: '产出灵药+种子', duration: 180, output: { items: [{ id: 'goldengrass', qty: 1 }, { id: 'seed_goldengrass', qty: 1 }], skill: 'farming', exp: 100 }, requiredLevel: 30, requires: { seed_goldengrass: 1 }, unlocked: false },
-
-                        // 九叶莲：消耗种子，产出灵药+种子（循环自给）
-                        lotus: { name: '种植九叶莲', desc: '产出灵药+种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }, { id: 'seed_lotus', qty: 1 }], skill: 'farming', exp: 80 }, requiredLevel: 40, requires: { seed_lotus: 1 }, unlocked: false }
+                        // === 分解配方：1灵药→2种子（扩充种子池） ===
+                        decompose_grass:        { name: '分解清灵草', desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_cleangrass',  qty: 2 }], skill: 'farming', exp: 5  }, requiredLevel: 2,  requires: { cleangrass:  1 }, unlocked: false },
+                        decompose_mushroom:     { name: '分解灵芝',   desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_mushroom',    qty: 2 }], skill: 'farming', exp: 8  }, requiredLevel: 10, requires: { mushroom:    1 }, unlocked: false },
+                        decompose_tea:          { name: '分解悟道茶', desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_tea',         qty: 2 }], skill: 'farming', exp: 12 }, requiredLevel: 20, requires: { tea:         1 }, unlocked: false },
+                        decompose_spirit_fruit: { name: '分解灵果',   desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_spiritfruit', qty: 2 }], skill: 'farming', exp: 10 }, requiredLevel: 15, requires: { spiritfruit: 1 }, unlocked: false },
+                        decompose_golden_grass: { name: '分解金灵草', desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_goldengrass', qty: 2 }], skill: 'farming', exp: 20 }, requiredLevel: 30, requires: { goldengrass: 1 }, unlocked: false },
+                        decompose_lotus:        { name: '分解九叶莲', desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_lotus',       qty: 2 }], skill: 'farming', exp: 15 }, requiredLevel: 40, requires: { lotus:       1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -3441,10 +3439,17 @@
                 });
             }
 
-            // 1% 概率掉落灵田种子（只有战斗区域，不是秘径）
-            const farmingSeeds = ['seed_cleangrass', 'seed_mushroom', 'seed_tea', 'seed_spiritfruit', 'seed_goldengrass', 'seed_lotus'];
-            if (Math.random() < 0.01) {  // 1% 概率
-                const randomSeed = farmingSeeds[Math.floor(Math.random() * farmingSeeds.length)];
+            // 5% 概率掉落灵田种子（按秘境难度给对应等级种子）
+            const dungeonSeedMap = {
+                mysteryTower:      ['seed_cleangrass', 'seed_mushroom'],
+                mysteriousForest:  ['seed_mushroom', 'seed_tea', 'seed_spiritfruit'],
+                ancientRuin:       ['seed_tea', 'seed_spiritfruit', 'seed_goldengrass'],
+                tribulationGround: ['seed_goldengrass', 'seed_lotus'],
+                huashenRealm:      ['seed_lotus', 'seed_goldengrass'],
+            };
+            const seedPool = dungeonSeedMap[dungeonId] || ['seed_cleangrass', 'seed_mushroom'];
+            if (Math.random() < 0.05) {  // 5% 概率
+                const randomSeed = seedPool[Math.floor(Math.random() * seedPool.length)];
                 addToInventory(randomSeed, 1);
                 const seedItem = GAME_CONFIG.items[randomSeed];
                 rewardMsg += `+ ${seedItem.name} x1\n`;
