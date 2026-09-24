@@ -1272,8 +1272,22 @@ body.in-battle .battle-container {
     animation: floatUp 1.5s ease-out forwards;
 }
 @keyframes floatUp {
-    0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(-100px); opacity: 0; }
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-100px) scale(1); opacity: 0; }
+}
+/* 暴击飘字：字号放大、金色、多一下弹出缩放，跟普通伤害拉开视觉差异——不然只有战斗日志里一句
+   「暴击！」文字能看出区别，很容易被忽略（正反馈诊断 C-1） */
+.damage-float.crit {
+    font-size: 2.1em;
+    color: #f3c34d;
+    text-shadow: 0 0 6px rgba(243,195,77,0.7), 2px 2px 4px #000;
+    animation: critFloatUp 1.5s ease-out forwards;
+}
+@keyframes critFloatUp {
+    0% { transform: translateY(0) scale(0.4); opacity: 1; }
+    18% { transform: translateY(-10px) scale(1.3); opacity: 1; }
+    32% { transform: translateY(-16px) scale(1); opacity: 1; }
+    100% { transform: translateY(-110px) scale(1); opacity: 0; }
 }
 
 .battle-log {
@@ -1878,6 +1892,16 @@ body::before {
     box-shadow: var(--shadow-lg);
 }
 .notification button { background: transparent !important; color: var(--text-l3) !important; border: 1px solid var(--border-l3) !important; border-radius: 2px !important; }
+/* 稀有触发（产出翻倍/材料节省）：边框加粗 + 轻微脉冲发光，跟"材料不足"这类日常提示拉开层级（正反馈诊断 C-1） */
+.notification.notification-rare {
+    border-left-width: 6px;
+    border-color: var(--accent, var(--bronze));
+    animation: slideIn 0.3s, noticeRarePulse 1.6s ease-in-out 0.3s 2;
+}
+@keyframes noticeRarePulse {
+    0%, 100% { box-shadow: var(--shadow-lg); }
+    50% { box-shadow: var(--shadow-lg), 0 0 14px 2px var(--accent, var(--bronze)); }
+}
 
 /* 输入 */
 input, select { background: #0e0d0a; border: 1px solid var(--border-l3); border-radius: 2px; color: var(--text-l1); }

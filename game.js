@@ -2704,7 +2704,7 @@
                 gameState.dungeons.currentMonsterHP -= playerDmg;
 
                 // P1-1 显示伤害飘字和日志
-                showDamageFloat(-playerDmg, false);
+                showDamageFloat(-playerDmg, false, isCrit);
                 addBattleLog(`${isCrit ? '暴击！' : ''}造成${playerDmg}点伤害`, 'player-hit');
             } else {
                 // P1-1 显示未命中日志
@@ -2741,7 +2741,7 @@
                 gameState.player.stats.hp.current -= monsterDmg;
 
                 // P1-1 显示伤害飘字和日志
-                showDamageFloat(-monsterDmg, true);
+                showDamageFloat(-monsterDmg, true, isMonsterCrit);
                 addBattleLog(`${isMonsterCrit ? '暴击！' : ''}受到${monsterDmg}点伤害`, 'monster-hit');
             } else {
                 // P1-1 显示敌人未命中日志
@@ -3107,14 +3107,17 @@
         }
 
         // P1-1 显示伤害飘字
-        function showDamageFloat(damage, isPlayer) {
+        // isCrit：暴击伤害单独加大字号+变色+弹跳动画（.damage-float.crit，样式见 style.css），
+        // 不然暴击和普通攻击视觉上完全一样，只有战斗日志里一句「暴击！」文字能看出区别，容易被忽略
+        function showDamageFloat(damage, isPlayer, isCrit = false) {
             const floatLayer = document.getElementById('damageFloatLayer');
+            if (!floatLayer) return;
             const floatDiv = document.createElement('div');
-            floatDiv.className = 'damage-float';
+            floatDiv.className = 'damage-float' + (isCrit ? ' crit' : '');
 
             if (damage < 0) {
-                floatDiv.textContent = damage;
-                floatDiv.style.color = '#c4483a';
+                floatDiv.textContent = (isCrit ? '暴击 ' : '') + damage;
+                floatDiv.style.color = isCrit ? '' : '#c4483a';
             } else {
                 floatDiv.textContent = '+' + damage;
                 floatDiv.style.color = '#7fae9a';
@@ -3445,6 +3448,11 @@
         function stepNormalBattle(battle) {
             const timeDelta = 0.1 * (gameState.battleSpeed || 1);
 
+            // 本次 tick 命中的伤害飘字信息：只写不读 DOM，离线批量模拟也会调这个函数，飘字展示放到
+            // performNormalBattleTick（只在有画面时跑）里读这两个字段再显示，避免离线模拟白白操作 DOM
+            battle._lastPlayerAttack = null;
+            battle._lastEnemyAttack = null;
+
             // battle.turnCount 继续沿用：现在只表示「已经过去的秒数」，用于超时保护和离线模拟的时间换算
             battle.turnCount = (battle.turnCount || 0) + timeDelta;
             applyRegen(battle.playerHP, timeDelta);   // 灵根/功法的战斗回复特效
@@ -3474,6 +3482,7 @@
                 if (toEnemy.hit) {
                     enemy.currentHP -= toEnemy.dmg;
                     battle.log.push(`玩家${toEnemy.crit ? '暴击！' : ''}造成${toEnemy.dmg}点伤害`);
+                    battle._lastPlayerAttack = { dmg: toEnemy.dmg, crit: toEnemy.crit };
                 } else {
                     battle.log.push('玩家攻击落空');
                 }
@@ -3490,6 +3499,7 @@
                     if (toPlayer.hit) {
                         battle.playerHP.current -= toPlayer.dmg;
                         battle.log.push(`${enemy.name}${toPlayer.crit ? '暴击！' : ''}造成${toPlayer.dmg}点伤害`);
+                        battle._lastEnemyAttack = { dmg: toPlayer.dmg, crit: toPlayer.crit };
                     } else {
                         battle.log.push(`${enemy.name}攻击落空`);
                     }
@@ -3507,6 +3517,11 @@
             const battle = gameState.battles;
 
             stepNormalBattle(battle);
+
+            // 普通战斗区域此前只有文字日志、没有飘字，跟秘境战斗的反馈强度不一致——这里补上，
+            // 只在有画面的实时 tick 里读 stepNormalBattle 写的战果字段，离线批量模拟不会走到这里
+            if (battle._lastPlayerAttack) showDamageFloat(-battle._lastPlayerAttack.dmg, false, battle._lastPlayerAttack.crit);
+            if (battle._lastEnemyAttack) showDamageFloat(-battle._lastEnemyAttack.dmg, true, battle._lastEnemyAttack.crit);
 
             // 更新UI
             updateNormalBattleUI();
@@ -5141,7 +5156,7 @@
             const actionKey = act.action;
             const mastery = getMasteryBonus(act.skill, actionKey);
             const saveMaterials = action.requires && Math.random() < getSkillMod('save', act.skill) + mastery.save;
-            if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980');
+            if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980', 'rare');
             if (action.requires && !saveMaterials) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
                     const invIndex = gameState.player.inventory.findIndex(i => i.id === itemId);
@@ -5183,7 +5198,7 @@
             // 灵根/功法的「产出翻倍」特效
             if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', act.skill) + mastery.double + boostDouble + (bonus.double || 0)) {
                 finalOutput.items.forEach(item => { item.qty *= 2; });
-                showNotification('✨ 产出翻倍！', '#6fa980');
+                showNotification('✨ 产出翻倍！', '#6fa980', 'rare');
             }
 
             // 处理输出
@@ -7142,7 +7157,9 @@
                 return;
             }
             const notification = document.createElement('div');
-            notification.className = 'notification';
+            // type: 'rare' 用于翻倍/节省这类概率触发的稀有事件，边框加粗+轻微脉冲发光，
+            // 跟"材料不足"这种日常提示拉开视觉层级（正反馈诊断 C-1），不影响静音/常驻等既有逻辑
+            notification.className = 'notification' + (type === 'rare' ? ' notification-rare' : '');
             notification.style.setProperty('--accent', color);   // 颜色只用作左侧色条，底色由样式统一
             notification.style.minWidth = '300px';
 
