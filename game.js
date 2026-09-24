@@ -3260,7 +3260,9 @@
         }
 
         // 重置战斗状态（撤退和死亡时使用）
-        function resetBattleState(newState = 'idle') {
+        // domainOutcome：不传时按 newState 推断（player_dead→died，其余→survived）；
+        // 离线中断这种「结局不明确」的场景需要显式传 'skip'，不然会被当成"活着撤退"误计入灵域存活率
+        function resetBattleState(newState = 'idle', domainOutcome) {
             gameState.dungeons.currentDungeon = null;
             gameState.currentAction = null;
             gameState.currentActionProgress = 0;
@@ -3270,7 +3272,7 @@
                 battleContainer.classList.add('hidden');
             }
             syncBattleMode();
-            clearActiveDomain();
+            clearActiveDomain(domainOutcome || (newState === 'player_dead' ? 'died' : 'survived'));
         }
 
         // P1-4 从秘径撤退（模态对话框版本）
@@ -3681,7 +3683,7 @@
             if (died) {
                 showNotification('💀 你被击败了，本轮循环战斗结束', '#c4483a');
                 syncBattleMode();
-                clearActiveDomain();
+                clearActiveDomain('died');
                 switchPanel('battle');
                 switchBattleTab('areas');
                 renderAutoBattleBar();
@@ -4313,6 +4315,15 @@
             };
         }
 
+        // 灵域个人数据：只统计「激活次数」和「存活次数」（存活 = 没有以被击败告终，撤退 / 通关 / 渡劫成功都算），
+        // 在灵域选择弹窗里给玩家一点"经营感"反馈（正反馈诊断 C-3），不是严格的"通关率"——
+        // 普通战斗是循环挑战到撤退/死亡为止，秘境是打到底，渡劫是一锤子买卖，三种内容没有统一的"关"，
+        // 用"存活"这个所有内容都适用的口径更诚实
+        function getDomainStats(domainKey) {
+            const stats = (gameState.player.domainStats || {})[domainKey];
+            return stats || { used: 0, survived: 0 };
+        }
+
         // 激活灵域：进入战斗前调用，扣神识、写入 gameState、重算玩家属性（把灵域的玩家侧加成算进去）
         function activateDomain(domainKey) {
             const P = ensureCurrencyState();
@@ -4321,15 +4332,25 @@
             if (P.shenshi < DOMAIN_SHENSHI_COST) { spendNotify('shenshi', DOMAIN_SHENSHI_COST); return false; }
             P.shenshi -= DOMAIN_SHENSHI_COST;
             P.activeDomain = domainKey;
+            if (!P.domainStats) P.domainStats = {};
+            if (!P.domainStats[domainKey]) P.domainStats[domainKey] = { used: 0, survived: 0 };
+            P.domainStats[domainKey].used++;
             calculateStats();
             showNotification(`${SPIRIT_DOMAINS[domainKey].icon} ${SPIRIT_DOMAINS[domainKey].name}已激活：${SPIRIT_DOMAINS[domainKey].desc}`, '#b39ddb');
             return true;
         }
         // 战斗结束（撤退 / 被击败 / 通关不循环）时清空，恢复玩家属性；domainDecided 一并复位，
         // 这样下一场战斗（哪怕选择了「不用灵域」）也会重新弹一次选择框，而不是被上一场的决定卡住
-        function clearActiveDomain() {
+        // outcome：'survived'（默认，撤退/通关/渡劫成功）/ 'died'（被击败）/ 'skip'（结局不明确，比如离线期间战斗被中断，不计入统计）
+        function clearActiveDomain(outcome = 'survived') {
             gameState.player.domainDecided = false;
-            if (!gameState.player.activeDomain) return;
+            const domainKey = gameState.player.activeDomain;
+            if (!domainKey) return;
+            if (outcome !== 'skip') {
+                if (!gameState.player.domainStats) gameState.player.domainStats = {};
+                if (!gameState.player.domainStats[domainKey]) gameState.player.domainStats[domainKey] = { used: 0, survived: 0 };
+                if (outcome === 'survived') gameState.player.domainStats[domainKey].survived++;
+            }
             gameState.player.activeDomain = null;
             calculateStats();
         }
@@ -4359,9 +4380,14 @@
             const P = gameState.player;
             el.innerHTML = Object.entries(SPIRIT_DOMAINS).map(([key, d]) => {
                 const affordable = P.shenshi >= DOMAIN_SHENSHI_COST;
+                const s = getDomainStats(key);
+                const statsHtml = s.used > 0
+                    ? `<div class="domain-stats">你选过 ${s.used} 次，存活 ${Math.round(s.survived / s.used * 100)}%</div>`
+                    : `<div class="domain-stats domain-stats-new">还没选过</div>`;
                 return `<div class="domain-card${affordable ? '' : ' unaffordable'}" onclick="confirmDomainChoice('${key}')">
                     <div class="domain-icon">${d.icon}</div>
                     <div class="domain-name">${d.name}</div>
+                    ${statsHtml}
                     <div class="domain-desc">${d.desc}</div>
                 </div>`;
             }).join('');
@@ -9050,12 +9076,12 @@
 
             if (savedAction && (savedAction.isBattle || savedAction.isDungeon)) {
                 if (savedAction.isDungeon) {
-                    resetBattleState('idle');
+                    resetBattleState('idle', 'skip');
                 } else {
                     gameState.battles = null;
                     gameState.currentAction = null;
                     gameState.currentActionProgress = 0;
-                    clearActiveDomain();
+                    clearActiveDomain('skip');
                     const battleContainer = document.getElementById('battleContainer');
                     if (battleContainer) battleContainer.classList.add('hidden');
                     syncBattleMode();

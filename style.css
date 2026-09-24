@@ -1124,6 +1124,9 @@ body.in-battle .battle-container {
 .domain-icon { font-size: 1.4em; margin-bottom: 4px; }
 .domain-name { font-weight: bold; color: var(--text-l1); margin-bottom: 4px; }
 .domain-desc { font-size: 0.78em; color: var(--text-l4); line-height: 1.4; }
+/* 灵域个人数据：给唯一的高密度决策点加一层"经营感"反馈（正反馈诊断 C-3） */
+.domain-stats { font-size: 0.72em; color: var(--bronze, #b3711f); margin-bottom: 4px; }
+.domain-stats.domain-stats-new { color: var(--text-l4); font-style: italic; }
 @media (max-width: 480px) {
     .domain-grid { grid-template-columns: 1fr; }
 }
