@@ -1912,6 +1912,72 @@
             }
         }
 
+        // ==================== 境界解锁提示（v6.79） ====================
+        // 每次突破后，如果这个境界解锁了新秘境 / 战斗区域 / 系统，播放完突破特效再弹一个小提示——
+        // 不是每个境界索引都有条目：中间过渡的小境界（比如练气中期→后期）如果没有新内容就不出现在这里，
+        // 也就不会弹提示。同一份数据也用在「设置 → 玩法介绍 → 境界解锁一览」里，完整列出全部境界当预告。
+        const REALM_UNLOCKS = {
+            1:  ['⚔️ 可以参与战斗了，森林战斗区域开放'],
+            2:  ['🔮 神秘之塔秘境开放'],
+            3:  ['⚔️ 十万大山外围战斗区域开放'],
+            4:  ['🌲 诡异森林秘境开放', '💊 可炼制筑基丹，突破练气巅峰前记得备好'],
+            5:  ['⚔️ 十万大山核心 / 妖兽沼泽战斗区域开放'],
+            6:  ['⚱️ 古老遗迹秘境开放'],
+            7:  ['⚔️ 魔窟深渊战斗区域开放'],
+            8:  ['⚡ 天劫之地秘境开放', '💊 可炼制金丹秘药，突破筑基圆满前记得备好'],
+            9:  ['🔥 丹火系统解锁（新增「丹火」技能页，产出的是货币，用于淬炼装备、强化灵根）', '⚔️ 金丹平原战斗区域开放'],
+            10: ['⚔️ 天劫之地战斗区域开放'],
+            12: ['🌌 元婴秘境开放', '💊 可炼制元婴丹，突破金丹圆满前记得备好'],
+            13: ['👁️ 神识系统解锁（新增「神识」技能页）', '🌀 第一个分身解锁，可以让分身并行做生活技能', '⚔️ 虚空之海战斗区域开放'],
+            15: ['⚔️ 深渊遗迹战斗区域开放'],
+            16: ['🌠 太虚幻境秘境开放', '💊 可炼制化神丹，突破元婴圆满前记得备好'],
+            17: ['☯️ 悟道系统解锁（八种法则，新增「悟道」技能页）', '🌀 第二个分身解锁', '🌀 灵域解锁，进入战斗前可以选一个（战斗页）', '👤 身外化身解锁（神识商城）', '⚔️ 混沌荒原战斗区域开放'],
+            19: ['⚔️ 九幽冥渊战斗区域开放'],
+            20: ['🌫️ 虚界秘境开放', '💊 可炼制化虚丹，突破化神圆满前记得备好'],
+            21: ['🌀 化虚 / 道则系统解锁，悟道法则可以兑成实体道则镶嵌（悟道页）', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：往后每个小境界突破前都要先在突破弹窗里渡劫'],
+            23: ['⚔️ 化实之界战斗区域开放'],
+            24: ['🌌 天道秘境开放', '💊 可炼制合体丹，突破炼虚圆满前记得备好'],
+            25: ['🍎 道果系统解锁（新增「道果」技能页）', '🌟 可以合道了（道果页操作，不可逆；晋升炼虚期前必须做）', '⚔️ 道痕荒原战斗区域开放'],
+            27: ['⚔️ 合一虚境战斗区域开放'],
+            28: ['🌟 太乙圣域秘境开放', '💊 可炼制大乘丹（需已合道），突破合体圆满前记得备好'],
+            29: ['👁️ 元婴蜕变解锁，离体助战（道果页操作）', '☯️ 道则「本源品」解锁，比极品更强一档', '⚔️ 太虚战场战斗区域开放'],
+            31: ['⚔️ 灵界绝境战斗区域开放'],
+            32: ['🏁 大道尽头——灵界至高战力，暂无下一境界']
+        };
+
+        function showRealmUnlockModal(realmIndex) {
+            const unlocks = REALM_UNLOCKS[realmIndex];
+            if (!unlocks || !unlocks.length) return;
+            document.getElementById('realmUnlockContent').innerHTML = `
+                <div class="tutorial-title">✨ ${getRealmName(realmIndex)} ✨</div>
+                <div class="tutorial-body">新解锁：<br/><br/>${unlocks.map(u => `• ${u}`).join('<br/>')}</div>
+                <div class="tutorial-actions">
+                    <button class="btn" onclick="closeRealmUnlockModal()">知道了</button>
+                </div>`;
+            document.getElementById('realmUnlockModal').classList.add('show');
+        }
+        function closeRealmUnlockModal() {
+            document.getElementById('realmUnlockModal').classList.remove('show');
+        }
+        // 设置 → 玩法介绍：完整列出全部有解锁内容的境界，已到达的正常显示，还没到的灰显当预告
+        function showRealmUnlockList() {
+            const cur = gameState.player.realmIndex;
+            const rows = Object.keys(REALM_UNLOCKS).map(Number).sort((a, b) => a - b).map(idx => {
+                const reached = cur >= idx;
+                return `<div class="use-row"${reached ? '' : ' style="opacity:0.55;"'}>
+                    <div class="use-main"><b>${reached ? '✓' : '🔒'} ${getRealmName(idx)}</b>
+                    <div class="use-effect">${REALM_UNLOCKS[idx].join('<br/>')}</div></div>
+                </div>`;
+            }).join('');
+            document.getElementById('realmUnlockContent').innerHTML = `
+                <div class="tutorial-title">📜 境界解锁一览</div>
+                <div style="max-height:55vh;overflow-y:auto;margin:12px 0;">${rows}</div>
+                <div class="tutorial-actions">
+                    <button class="btn" onclick="closeRealmUnlockModal()">关闭</button>
+                </div>`;
+            document.getElementById('realmUnlockModal').classList.add('show');
+        }
+
         // ==================== 新手任务 ====================
         // 一串连续的小任务，带新玩家把每个基础玩法（六个基础技能、出售 / 购买、装备、战斗、秘境）都用一遍；每个任务完成后
         // 点「领取奖励」得灵石（个别送物品），全部做完再告诉玩家游戏目标。进度靠 gameState.tally（累计事件计数）和当前状态判断，
@@ -7952,7 +8018,9 @@
             clearTimeout(fxState.timer);
             fxState.el.remove();
             document.body.classList.remove('fx-shake');
+            const onDone = fxState.onDone;   // 特效自然播完、被点击跳过、或者干脆没播放，都从这里统一退出
             fxState = null;
+            if (onDone) onDone();
         }
 
         const fxEase = t => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
@@ -8461,9 +8529,11 @@
         const FX_DRAWERS = { minor: fxDrawMinor, qi: fxDrawQi, foundation: fxDrawFoundation, core: fxDrawCore, nascent: fxDrawNascent, law: fxDrawLaw, unity: fxDrawUnity, voidfx: fxDrawVoid, dacheng: fxDrawDacheng };
 
         // 播放突破特效：newRealmIndex = 突破后的境界索引；major = 是否大境界突破
-        // force = true：设置里「回放」时使用，即使关闭了突破特效也播放
-        function playBreakthroughEffect(newRealmIndex, major, force = false) {
-            if (!force && gameState.settings && gameState.settings.breakthroughFx === false) return;
+        // force = true：设置里「回放」时使用，即使关闭了突破特效也播放（不传 onDone，回放不触发境界解锁提示）
+        // onDone：特效结束（播完 / 被跳过 / 特效被关闭直接跳过）后调用，performBreakthrough 用它来弹境界解锁提示，
+        // 不用 setTimeout 猜时长——玩家随时可能点击跳过特效，猜的时长会不准
+        function playBreakthroughEffect(newRealmIndex, major, force = false, onDone = null) {
+            if (!force && gameState.settings && gameState.settings.breakthroughFx === false) { if (onDone) onDone(); return; }
             stopBreakthroughFx();
             const realmName = getRealmName(newRealmIndex);
             let cfg = major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null;
@@ -8477,7 +8547,7 @@
                 ? `<div class="fx-text"><div class="fx-title">${cfg.name.split('').join(' ')}</div><div class="fx-sub">${realmName} · ${cfg.line}</div><div class="fx-skip">点击任意处跳过</div></div>`
                 : `<div class="fx-text"><div class="fx-title">突 破</div><div class="fx-sub">${realmName}</div><div class="fx-seal">破</div></div>`);
             document.body.appendChild(el);
-            fxState = { el, raf: 0, timer: 0, draw: null, dur };
+            fxState = { el, raf: 0, timer: 0, draw: null, dur, onDone };
             if (major) el.addEventListener('click', stopBreakthroughFx);
             if (reduce) {
                 fxState.timer = setTimeout(stopBreakthroughFx, major ? 2600 : 1600);
@@ -8524,7 +8594,8 @@
             closeBreakthroughModal();
             updateUI();
             saveGame();
-            playBreakthroughEffect(nextRealmIndex, wasMajor || nextRealmIndex === 1);   // 凡人 → 练气也是「入道」大事件
+            // 凡人 → 练气也是「入道」大事件；特效结束后再弹境界解锁提示，两个视觉效果不抢注意力
+            playBreakthroughEffect(nextRealmIndex, wasMajor || nextRealmIndex === 1, false, () => showRealmUnlockModal(nextRealmIndex));
         }
 
         function performMajorBreakthrough() {

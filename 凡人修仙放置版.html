@@ -453,6 +453,10 @@
                                     <span class="stat-label">新手任务:</span>
                                     <button class="btn" onclick="showQuestList()" style="padding: 6px 16px;">查看任务</button>
                                 </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">境界解锁一览:</span>
+                                    <button class="btn" onclick="showRealmUnlockList()" style="padding: 6px 16px;">查看</button>
+                                </div>
                             </div>
 
                             <!-- 通知设置 -->
@@ -747,6 +751,14 @@
         </div>
     </div>
 
+    <!-- 境界解锁提示 / 境界解锁一览（v6.79） -->
+    <div id="realmUnlockModal" class="modal">
+        <div class="modal-content tutorial-modal" role="dialog" aria-modal="true">
+            <button type="button" class="modal-close" onclick="closeRealmUnlockModal()" aria-label="关闭">&times;</button>
+            <div id="realmUnlockContent"></div>
+        </div>
+    </div>
+
     <div id="counterSystemModal" class="modal">
         <div class="modal-content" role="dialog" aria-modal="true" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
             <button type="button" class="modal-close" onclick="closeCounterSystemModal()" aria-label="关闭">&times;</button>
@@ -786,7 +798,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.37"></script>
+    <script src="game.js?v=13.38"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
