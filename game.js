@@ -4507,6 +4507,7 @@
                 const isMs = LAW_MILESTONE_LEVELS.includes(after);
                 const msText = isMs ? '（里程碑：' + describeEffects(def.milestones[after]).join('、') + '）' : '';
                 showNotification(`${def.icon} ${def.name} 领悟到 Lv.${after}${msText}`, '#b89a5b');
+                if (isMs) showQuickCelebration(`${def.icon} ${def.name} 里程碑 Lv.${after}`);
             }
             if (document.body.dataset.panel === 'wudao') generateLawList();
             return after >= cap;
@@ -5062,6 +5063,7 @@
                 const name = (getAction(skillName, key) || {}).name || key;
                 const milestone = MASTERY_MILESTONES.includes(after) ? '（里程碑！）' : '';
                 showNotification(`🎓 ${name} 精通 Lv.${after}${milestone}`, '#b89a5b');
+                showQuickCelebration(`🎓 ${name} 精通 Lv.${after}`);
             }
         }
 
@@ -7181,6 +7183,27 @@
                     updateFunctions[update]();
                 }
             });
+        }
+
+        // 精通升级 / 法则里程碑这类数值跃迁太频繁，不适合用需要点确认的重弹窗（境界解锁提示那种），
+        // 但完全静默（只有一条会被刷掉的 toast）又感知不到——加一个屏幕中央短暂浮现、自动消失、不挡手的小庆祝，
+        // 复用同一个 DOM 节点：连续触发时只重置文字和计时器，不会叠好几个气泡（正反馈诊断 C-5）
+        let quickCelebrationTimer = null;
+        function showQuickCelebration(text) {
+            if (gameState.settings && gameState.settings.enableNotifications === false) return;
+            let el = document.getElementById('quickCelebration');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'quickCelebration';
+                el.className = 'quick-celebration';
+                document.body.appendChild(el);
+            }
+            el.textContent = text;
+            el.classList.remove('show');
+            void el.offsetWidth;   // 强制重排，确保连续触发时动画能重新播放一次
+            el.classList.add('show');
+            clearTimeout(quickCelebrationTimer);
+            quickCelebrationTimer = setTimeout(() => el.classList.remove('show'), 800);
         }
 
         // 通知类型系统（P1功能）

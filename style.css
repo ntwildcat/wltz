@@ -1260,6 +1260,30 @@ body.in-battle .battle-container {
     user-select: none;
     text-shadow: 2px 2px 4px #000;
 }
+/* 精通升级 / 法则里程碑的轻量庆祝：屏幕中央短暂浮现，不挡手、不用点确认（正反馈诊断 C-5） */
+.quick-celebration {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.85);
+    z-index: 1200;
+    pointer-events: none;
+    background: var(--inkstone-2, rgba(20,17,10,0.92));
+    border: 1px solid var(--bronze, #b3711f);
+    color: var(--text-l1, #fff);
+    font-weight: bold;
+    padding: 10px 22px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(179,113,31,0.4), var(--shadow-lg);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+}
+.quick-celebration.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
 /* 配方卡片「本次完成次数」角标：纯前端展示，每次配方完成重新渲染时播放一下弹出动画（正反馈诊断 C-4） */
 .recipe-session-count {
     position: absolute;
