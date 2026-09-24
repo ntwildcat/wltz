@@ -1085,6 +1085,49 @@ body.in-battle .battle-container {
 .dungeon-progress .pip.done { background: var(--patina); border-color: var(--patina); }
 .dungeon-progress .pip.current { background: var(--cinnabar-2); border-color: var(--cinnabar-2); }
 
+/* 背包快满提示角标（v6.76）：容量占用≥90%时在导航「背包」按钮上常驻显示，不用等东西已经丢了才知道 */
+.nav-mini, .mobile-tab-item { position: relative; }
+.badge-dot {
+    position: absolute;
+    top: 4px;
+    right: 10px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--cinnabar-2);
+    box-shadow: 0 0 4px rgba(196, 72, 58, 0.7);
+    pointer-events: none;
+}
+
+/* 灵域选择卡片（v6.77） */
+.domain-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.domain-card {
+    background: var(--bg-l3);
+    border: 1px solid var(--border-l3);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.domain-card:hover {
+    border-color: var(--bronze, var(--border-l1));
+    box-shadow: 0 0 8px rgba(201, 169, 97, 0.25);
+}
+.domain-card.unaffordable {
+    opacity: 0.55;
+}
+.domain-icon { font-size: 1.4em; margin-bottom: 4px; }
+.domain-name { font-weight: bold; color: var(--text-l1); margin-bottom: 4px; }
+.domain-desc { font-size: 0.78em; color: var(--text-l4); line-height: 1.4; }
+@media (max-width: 480px) {
+    .domain-grid { grid-template-columns: 1fr; }
+}
+
 .battle-header {
     display: flex;
     justify-content: space-between;

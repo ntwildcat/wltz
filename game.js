@@ -448,10 +448,15 @@
                     recipes: {
                         millet: { name: '种植灵米', desc: '食物', duration: 5, output: { items: [{ id: 'millet', qty: 1 }], skill: 'farming', exp: 10 }, requiredLevel: 1, unlocked: true },
                         grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 20 }, requiredLevel: 5, requires: { seed_cleangrass: 1 }, unlocked: false },
+                        decompose_grass: { name: '分解清灵草', desc: '清灵草 ×1 换回 清灵草种子 ×2', duration: 15, output: { items: [{ id: 'seed_cleangrass', qty: 2 }], skill: 'farming', exp: 15 }, requiredLevel: 5, requires: { cleangrass: 1 }, unlocked: false },
                         mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 70 }, requiredLevel: 13, requires: { seed_mushroom: 1 }, unlocked: false },
+                        decompose_mushroom: { name: '分解灵芝', desc: '灵芝 ×1 换回 灵芝种子 ×2', duration: 40, output: { items: [{ id: 'seed_mushroom', qty: 2 }], skill: 'farming', exp: 40 }, requiredLevel: 13, requires: { mushroom: 1 }, unlocked: false },
                         tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 190 }, requiredLevel: 22, requires: { seed_tea: 1 }, unlocked: false },
+                        decompose_tea: { name: '分解悟道茶', desc: '悟道茶 ×1 换回 悟道茶种子 ×2', duration: 80, output: { items: [{ id: 'seed_tea', qty: 2 }], skill: 'farming', exp: 100 }, requiredLevel: 22, requires: { tea: 1 }, unlocked: false },
                         lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 30, requires: { seed_lotus: 1 }, unlocked: false },
-                        daofruit: { name: '种植悟道果', desc: '化神材料 需悟道果种子（太虚幻境掉落）', duration: 480, output: { items: [{ id: 'daofruit', qty: 1 }], skill: 'farming', exp: 600 }, requiredLevel: 39, requires: { seed_daofruit: 1 }, unlocked: false }
+                        decompose_lotus: { name: '分解九叶莲', desc: '九叶莲 ×1 换回 九叶莲种子 ×2', duration: 360, output: { items: [{ id: 'seed_lotus', qty: 2 }], skill: 'farming', exp: 180 }, requiredLevel: 30, requires: { lotus: 1 }, unlocked: false },
+                        daofruit: { name: '种植悟道果', desc: '化神材料 需悟道果种子（太虚幻境掉落）', duration: 480, output: { items: [{ id: 'daofruit', qty: 1 }], skill: 'farming', exp: 600 }, requiredLevel: 39, requires: { seed_daofruit: 1 }, unlocked: false },
+                        decompose_daofruit: { name: '分解悟道果', desc: '悟道果 ×1 换回 悟道果种子 ×2', duration: 560, output: { items: [{ id: 'seed_daofruit', qty: 2 }], skill: 'farming', exp: 320 }, requiredLevel: 39, requires: { daofruit: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -953,6 +958,9 @@
             if (typeof P.daoBody !== 'number') P.daoBody = 0;
             if (typeof P.daoLaw !== 'number') P.daoLaw = 0;
             if (typeof P.nascentSoul !== 'number') P.nascentSoul = 0;
+            if (typeof P.coinRefine !== 'number') P.coinRefine = 0;
+            if (P.activeDomain === undefined) P.activeDomain = null;
+            if (typeof P.avatarLevel !== 'number') P.avatarLevel = 0;
             if (!P.temper) P.temper = { weapon: 0, armor: 0, jewelry: 0 };
             if (typeof P.rootLevel !== 'number') P.rootLevel = 0;
             if (!P.shen) P.shen = { clone: 0, focus: 0, sense: 0 };
@@ -1075,7 +1083,7 @@
         }
 
         const CURRENCY_NAMES = { danhuo: '丹火', shenshi: '神识', daoguo: '道果' };
-        const CURRENCY_ICONS = { danhuo: () => DANHUO_ICON, shenshi: () => SHENSHI_ICON, daoguo: () => DAOGUO_ICON };
+        const CURRENCY_ICONS = { coins: () => COIN_ICON, danhuo: () => DANHUO_ICON, shenshi: () => SHENSHI_ICON, daoguo: () => DAOGUO_ICON };
         // 战斗区域胜利掉落的丹火 / 神识（金丹级战斗区域起掉丹火，元婴级起掉神识；乘该区域精通的奖励加成）
         const BATTLE_CURRENCY = {
             goldenPlains:      { danhuo: [1, 2] },
@@ -1180,6 +1188,39 @@
             if (el) el.innerHTML = shenshiUsesHtml();
         }
 
+        // ---- 化神期：身外化身（v6.77，被动加成） ----
+        // 原著：化神期修士可炼制身外化身，调动部分天地之力——游戏化为化神初期起解锁的被动养成轨道，
+        // 花神识把化身等级从 0 升到 10 级，永久小幅提升攻击 / 防御（并入 getMod，跟元婴蜕变、道果淬体一个模式）
+        const AVATAR_MAX = 10;
+        const AVATAR_ATK_PER_LEVEL = 0.015;
+        const AVATAR_DEF_PER_LEVEL = 0.015;
+        function getAvatarLevel() { return gameState.player.avatarLevel || 0; }
+        function avatarCost(level) { return Math.round(30 * Math.pow(level + 1, 1.5)); }
+        function getAvatarMod(key) {
+            if (key !== 'atkPct' && key !== 'defPct') return 0;
+            const lv = getAvatarLevel();
+            return key === 'atkPct' ? lv * AVATAR_ATK_PER_LEVEL : lv * AVATAR_DEF_PER_LEVEL;
+        }
+        function upgradeAvatar() {
+            const P = ensureCurrencyState();
+            const lv = getAvatarLevel();
+            if (lv >= AVATAR_MAX) { showNotification('身外化身已炼至大成', '#c98a3e'); return; }
+            const cost = avatarCost(lv);
+            if (P.shenshi < cost) { spendNotify('shenshi', cost); return; }
+            P.shenshi -= cost;
+            P.avatarLevel = lv + 1;
+            showNotification(`👤 身外化身更进一步！攻击 / 防御 +${Math.round((lv + 1) * AVATAR_ATK_PER_LEVEL * 100)}%`, '#7d9bb5');
+            calculateStats();
+            updateUI();
+            saveGame();
+        }
+        function avatarUsesHtml() {
+            if (!isDomainUnlocked()) return '';
+            const lv = getAvatarLevel();
+            const maxed = lv >= AVATAR_MAX;
+            return `<div class="use-card"><div class="use-title">👤 身外化身 <small>调动部分天地之力，永久 +攻击 / 防御，每级各 +${(AVATAR_ATK_PER_LEVEL * 100).toFixed(1)}%</small></div>${useRow('👤 化身', `Lv.${lv}/${AVATAR_MAX}`, `当前 +${(lv * AVATAR_ATK_PER_LEVEL * 100).toFixed(1)}%${maxed ? '' : ` → +${((lv + 1) * AVATAR_ATK_PER_LEVEL * 100).toFixed(1)}%`}`, avatarCost(lv), 'shenshi', 'upgradeAvatar()', maxed)}</div>`;
+        }
+
         function shenshiUsesHtml() {
             const P = ensureCurrencyState();
             const rows = Object.entries(SHEN_UPGRADES).map(([kind, u]) => {
@@ -1191,6 +1232,7 @@
             return `
                 <div class="use-balance">${SHENSHI_ICON} 神识 <b>${Math.floor(P.shenshi)}</b><small>产出：神识技能的配方（凝练 / 培育 / 提炼 / 入定）· 元婴级战斗区域胜利 · 秘境通关。神识不能出售，只用来变强和购买商品。</small></div>
                 <div class="use-card"><div class="use-title">🌀 神识强化 <small>联动分身、工作速度与战斗</small></div>${rows}</div>
+                ${avatarUsesHtml()}
                 <div class="use-card"><div class="use-title">🔍 神识探查 <small>联动秘境：花 ${SCOUT_COST} 神识，下一次通关秘境的随机掉落率 ×${SCOUT_MULT}（通关后消耗）</small></div>
                     <div class="use-row"><div class="use-main"><div class="use-effect">${scoutOn ? '✅ 已生效，通关下一个秘境后消耗' : '尚未使用'}</div></div>
                     <button type="button" class="btn ${scoutOn || P.shenshi < SCOUT_COST ? 'btn-secondary' : ''} use-btn" onclick="castScout()">${scoutOn ? '已生效' : `探查 ${SHENSHI_ICON}${SCOUT_COST}`}</button></div></div>`;
@@ -1211,6 +1253,37 @@
             outDaoguo: 0.3       // 道果产出 +30%
         };
         const FUSION_REQUIRED_REALM = 28;   // 合体圆满（现索引28）：晋升下一境界必须已合道
+        // 聚灵培元（v6.76）：灵石的软性无底洞。技能设施买完之后灵石在大乘期完全没处花，
+        // 加这个无等级上限、每级涨价的永久小额加成——价格指数增长（×1.15/级），买得越多越贵，
+        // 早期几万灵石就能买、后期要吞掉大量灵石，让「灵石多到花不完」始终有地方去，
+        // 单级幅度刻意压低（0.5%），避免它变成最优刷分策略、抢了装备/技能路线的地位
+        const COIN_REFINE_PER_LEVEL = 0.005;
+        const COIN_REFINE_BASE = 50000;
+        const COIN_REFINE_GROWTH = 1.15;
+        function coinRefineCost(level) { return Math.round(COIN_REFINE_BASE * Math.pow(COIN_REFINE_GROWTH, level)); }
+        function getCoinRefine() { return gameState.player.coinRefine || 0; }
+        function getCoinRefineMod(key) {
+            if (key !== 'hpPct' && key !== 'atkPct' && key !== 'defPct') return 0;
+            return getCoinRefine() * COIN_REFINE_PER_LEVEL;
+        }
+        function upgradeCoinRefine(times = 1) {
+            const P = gameState.player;
+            let bought = 0;
+            const n = times === 'max' ? Infinity : times;
+            while (bought < n) {
+                const cost = coinRefineCost(getCoinRefine());
+                if (P.coins < cost) break;
+                P.coins -= cost;
+                P.coinRefine = getCoinRefine() + 1;
+                bought++;
+            }
+            if (bought === 0) { showNotification(`灵石不足：聚灵培元下一级需要 ${coinRefineCost(getCoinRefine())}`, '#c4483a', 'error'); return; }
+            showNotification(`💎 聚灵培元 ${bought > 1 ? `×${bought}，` : ''}当前 Lv.${getCoinRefine()}：生命 / 攻击 / 防御 +${Math.round(getCoinRefine() * COIN_REFINE_PER_LEVEL * 100)}%`, '#6f9c8a');
+            calculateStats();
+            updateUI();
+            saveGame();
+        }
+
         function daoBodyCost(level) { return Math.round(10 * Math.pow(level + 1, 1.5)); }
         function daoLawCost(level) { return Math.round(25 * Math.pow(level + 1, 1.5)); }
         function isDaoguoUnlocked() { return gameState.player.realmIndex >= 25; }
@@ -1295,6 +1368,15 @@
         function renderDaoguoUses() {
             const el = document.getElementById('daoguoUses');
             if (el) el.innerHTML = daoguoUsesHtml();
+        }
+
+        // 灵石商城顶部的「聚灵培元」卡片：跟丹火/神识/道果商城顶部的强化区一个风格
+        function coinRefineUsesHtml() {
+            const lv = getCoinRefine();
+            const cost = coinRefineCost(lv);
+            const curPct = (lv * COIN_REFINE_PER_LEVEL * 100).toFixed(1);
+            const nextPct = ((lv + 1) * COIN_REFINE_PER_LEVEL * 100).toFixed(1);
+            return `<div class="use-card"><div class="use-title">💎 聚灵培元 <small>永久提升生命 / 攻击 / 防御，每级 +${(COIN_REFINE_PER_LEVEL * 100).toFixed(1)}%，无等级上限，越买越贵</small></div>${useRow('💎 培元', `Lv.${lv}`, `当前 +${curPct}% → +${nextPct}%`, cost, 'coins', 'upgradeCoinRefine(1)', false)}</div>`;
         }
 
 
@@ -1440,7 +1522,7 @@
             box.style.display = 'block';
             box.innerHTML = `<div class="bt-guide-title">⚡ 需先渡过本境界的天劫</div>
                 <div class="bt-guide-line">${dungeon.icon} ${dungeon.name}：${dungeon.desc}</div>
-                <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); enterDungeon('${tribulationIdFor(realmIndex)}');">⚡ 渡劫</button>`;
+                <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); maybeSelectDomainThenEnter(() => enterDungeon('${tribulationIdFor(realmIndex)}'));">⚡ 渡劫</button>`;
         }
 
         // 天劫通关：不像普通秘境那样循环挑战，标记渡过即可，额外弹一条永久加成提示
@@ -1448,6 +1530,7 @@
             const battleContainer = document.getElementById('battleContainer');
             if (battleContainer) battleContainer.classList.add('hidden');
             syncBattleMode();
+            clearActiveDomain();
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
             gameState.dungeons[dungeonId].completed = true;
             gameState.dungeons.currentDungeon = null;
@@ -2521,7 +2604,8 @@
 
         // 秘境：怪物命中玩家的概率（含反向境界压制、克制、玩家闪避特效）
         function getDungeonMonsterHit(monster) {
-            const monsterSPD = monster.spd || 40;
+            const eff = getMonsterEffectiveStats(monster);
+            const monsterSPD = eff.spd || 40;
             const playerSPD = gameState.player.stats.spd || 50;
             let hitChance = BATTLE_FORMULAS.calculateHitChance(monsterSPD, playerSPD);
             const monsterRealmIndex = GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon].baseRealmIndex || 0;
@@ -2530,21 +2614,23 @@
             const monsterTypeId = SPIRIT_ROOT_MAPPING[monster.type] || monster.type;
             const counterModifier = COUNTER_SYSTEM.getCounterModifier(monsterTypeId, gameState.player.spiritRoot);
             hitChance *= counterModifier.hit;
-            hitChance *= 1 - Math.min(0.6, getMod('dodge'));   // 灵根 / 功法闪避特效：降低被命中率
+            hitChance += getDomainMod('hit');   // 灵域：双方命中率同时提升，怪物这一侧单独加算
+            if (!isDomainDodgeVoid()) hitChance *= 1 - Math.min(0.6, getMod('dodge'));   // 灵根 / 功法 / 灵域闪避特效：降低被命中率；雷域下闪避失效
             hitChance = Math.max(0.05, Math.min(0.95, hitChance));
             return { hitChance, realmSuppression, counterModifier };
         }
 
         function performPlayerAttack(monster) {
             const { hitChance, realmSuppression, counterModifier } = getDungeonPlayerHit(monster);
+            const eff = getMonsterEffectiveStats(monster);
 
             if (Math.random() < hitChance) {
                 const baseDmg = gameState.player.stats.atk || 20;
-                let playerDmg = BATTLE_FORMULAS.calculateDamage({ atk: baseDmg }, { def: monster.def || 0 });
+                let playerDmg = BATTLE_FORMULAS.calculateDamage({ atk: baseDmg }, { def: eff.def || 0 });
                 playerDmg = Math.floor(playerDmg * realmSuppression.dmgMod);
                 playerDmg = Math.floor(playerDmg * counterModifier.damage);
                 playerDmg = Math.floor(playerDmg * getBattleSkillDmgMult());   // 战斗技能等级加成
-                // 暴击（基础5%、×1.5，灵根/功法可提高）
+                // 暴击（基础5%、×1.5，灵根/功法/灵域可提高）
                 const isCrit = Math.random() < BASE_CRIT.rate + getMod('crit');
                 if (isCrit) playerDmg = Math.floor(playerDmg * (BASE_CRIT.dmg + getMod('critDmg')));
                 playerDmg = Math.max(1, playerDmg);
@@ -2563,9 +2649,10 @@
         // 计算怪物对玩家的伤害
         function performMonsterAttack(monster) {
             const { hitChance, realmSuppression, counterModifier } = getDungeonMonsterHit(monster);
+            const eff = getMonsterEffectiveStats(monster);
 
             if (Math.random() < hitChance) {
-                const baseDmg = monster.atk || 10;
+                const baseDmg = eff.atk || 10;
                 let monsterDmg = baseDmg + Math.random() * baseDmg * 0.3 - baseDmg * 0.15;
 
                 // 玩家防御减伤
@@ -2578,13 +2665,18 @@
 
                 // 克制修正
                 monsterDmg = Math.floor(monsterDmg * counterModifier.damage);
+
+                // 灵域暴击：平时怪物不会暴击，只有灵域给了 crit 加成（目前只有金域）才可能触发
+                const domainCrit = getDomainMod('crit');
+                const isMonsterCrit = domainCrit > 0 && Math.random() < domainCrit;
+                if (isMonsterCrit) monsterDmg *= (BASE_CRIT.dmg + getDomainMod('critDmg'));
                 monsterDmg = Math.max(1, Math.floor(monsterDmg));
 
                 gameState.player.stats.hp.current -= monsterDmg;
 
                 // P1-1 显示伤害飘字和日志
                 showDamageFloat(-monsterDmg, true);
-                addBattleLog(`受到${monsterDmg}点伤害`, 'monster-hit');
+                addBattleLog(`${isMonsterCrit ? '暴击！' : ''}受到${monsterDmg}点伤害`, 'monster-hit');
             } else {
                 // P1-1 显示敌人未命中日志
                 addBattleLog(`${monster.name}的攻击落空`, 'miss');
@@ -2910,7 +3002,8 @@
 
         // 玩家攻击间隔（秒）：速度越高，间隔越短，出手越快
         function getPlayerAttackInterval() {
-            return 2.0 / (1 + gameState.player.stats.spd / 100);
+            const base = 2.0 / (1 + gameState.player.stats.spd / 100);
+            return Math.max(MIN_ATTACK_INTERVAL, base + getDomainIntervalAdd());
         }
 
         // 更新攻击蓄力进度条（0~100%，蓄满时高亮，下一 tick 出手后清零重新蓄力）
@@ -3108,6 +3201,7 @@
                 battleContainer.classList.add('hidden');
             }
             syncBattleMode();
+            clearActiveDomain();
         }
 
         // P1-4 从秘径撤退（模态对话框版本）
@@ -3224,9 +3318,15 @@
             const timeDelta = 0.1 * speedMultiplier;
             applyRegen(gameState.player.stats.hp, timeDelta);   // 灵根/功法的战斗回复特效
 
+            // 灵域对双方同时生效：木域回血也要作用在怪物身上，不然「双方」就只剩玩家单方面受益
+            const domainRegen = getDomainMod('regen');
+            if (domainRegen > 0 && gameState.dungeons.currentMonsterHP > 0 && gameState.dungeons.currentMonsterHP < monster.hp) {
+                gameState.dungeons.currentMonsterHP = Math.min(monster.hp, gameState.dungeons.currentMonsterHP + monster.hp * domainRegen * timeDelta);
+            }
+
             // 定义攻击间隔（秒）
             const playerAttackInterval = getPlayerAttackInterval();
-            const monsterAttackInterval = monster.attackSpeed || 2.5;
+            const monsterAttackInterval = Math.max(MIN_ATTACK_INTERVAL, (monster.attackSpeed || 2.5) + getDomainIntervalAdd());
 
             // 1. 玩家攻击计时
             gameState.player.attackTimer += timeDelta;
@@ -3286,17 +3386,25 @@
             const enemy = battle.currentEnemy;
             const areaRealm = getAction('battle', battle.currentArea).areaData.minLevel;
             const playerStats = gameState.player.stats;
+            const enemyEff = getMonsterEffectiveStats(enemy);   // 灵域对双方同时生效：敌方也要打上同一份补丁
 
             // 双方各自独立的攻击间隔：公式与秘境战斗一致，速度越高出手越快
             const playerInterval = getPlayerAttackInterval();
-            const enemyInterval = 2.0 / (1 + (enemy.spd || 40) / 100);
+            const enemyInterval = Math.max(MIN_ATTACK_INTERVAL, 2.0 / (1 + enemyEff.spd / 100) + getDomainIntervalAdd());
+
+            // 灵域木域回血：敌方也要回，不然「双方」就只剩玩家单方面受益
+            const domainRegen = getDomainMod('regen');
+            if (domainRegen > 0 && enemy.currentHP > 0 && enemy.currentHP < enemy.hp) {
+                enemy.currentHP = Math.min(enemy.hp, enemy.currentHP + enemy.hp * domainRegen * timeDelta);
+            }
 
             battle.playerAttackTimer = (battle.playerAttackTimer || 0) + timeDelta;
             if (battle.playerAttackTimer >= playerInterval) {
                 battle.playerAttackTimer -= playerInterval;
-                const toEnemy = rollNormalAttack(playerStats, enemy, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm),
+                const toEnemy = rollNormalAttack(playerStats, { ...enemy, def: enemyEff.def, spd: enemyEff.spd }, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm),
                     { hit: getMod('hit'), crit: BASE_CRIT.rate + getMod('crit'), critMult: BASE_CRIT.dmg + getMod('critDmg'),
-                      dmgMult: (1 + getMasteryBonus('battle', battle.currentArea).dmg) * getBattleSkillDmgMult() });
+                      dmgMult: (1 + getMasteryBonus('battle', battle.currentArea).dmg) * getBattleSkillDmgMult(),
+                      dodge: isDomainDodgeVoid() ? 0 : getDomainMod('dodge') });   // 水域：敌方也获得闪避
                 if (toEnemy.hit) {
                     enemy.currentHP -= toEnemy.dmg;
                     battle.log.push(`玩家${toEnemy.crit ? '暴击！' : ''}造成${toEnemy.dmg}点伤害`);
@@ -3310,11 +3418,12 @@
                 battle.enemyAttackTimer = (battle.enemyAttackTimer || 0) + timeDelta;
                 if (battle.enemyAttackTimer >= enemyInterval) {
                     battle.enemyAttackTimer -= enemyInterval;
-                    const toPlayer = rollNormalAttack(enemy, playerStats, REALM_SUPPRESSION.calculate(areaRealm, gameState.player.realmIndex),
-                        { dodge: getMod('dodge') });
+                    const toPlayer = rollNormalAttack({ ...enemy, atk: enemyEff.atk, spd: enemyEff.spd }, playerStats, REALM_SUPPRESSION.calculate(areaRealm, gameState.player.realmIndex),
+                        { dodge: isDomainDodgeVoid() ? 0 : getMod('dodge'),
+                          hit: getDomainMod('hit'), crit: getDomainMod('crit'), critMult: BASE_CRIT.dmg + getDomainMod('critDmg') });   // 金域：敌方也可能暴击，平时 crit=0 不会触发
                     if (toPlayer.hit) {
                         battle.playerHP.current -= toPlayer.dmg;
-                        battle.log.push(`${enemy.name}造成${toPlayer.dmg}点伤害`);
+                        battle.log.push(`${enemy.name}${toPlayer.crit ? '暴击！' : ''}造成${toPlayer.dmg}点伤害`);
                     } else {
                         battle.log.push(`${enemy.name}攻击落空`);
                     }
@@ -3491,6 +3600,7 @@
             if (died) {
                 showNotification('💀 你被击败了，本轮循环战斗结束', '#c4483a');
                 syncBattleMode();
+                clearActiveDomain();
                 switchPanel('battle');
                 switchBattleTab('areas');
                 renderAutoBattleBar();
@@ -4068,6 +4178,118 @@
 
         const EFFECT_SKILL_NAMES = { cultivation: '修炼', alchemy: '炼丹', forging: '炼器', farming: '灵田', mining: '采矿', danhuo: '丹火', shenshi: '神识', daoguo: '道果', battle: '战斗', wudao: '悟道', life: '所有生活技能' };
 
+        // ==================== 化神期：灵域（v6.77） ====================
+        // 原著：化神修士与五行之力相融，可施展「灵域」——领域之内的战斗规则被改写。
+        // 游戏化：化神初期起，每次进入战斗（秘境 / 普通战斗区域）前可选一个灵域，消耗神识激活，
+        // 整场战斗（循环挑战期间）持续生效，中途不可更换；灵域对战斗双方同时生效，不是单方面增益，
+        // 所以除了玩家侧数值（走 getMod，calculateStats 时自动应用），怪物侧的攻防/速度/命中/闪避/暴击
+        // 也要在两套战斗代码里分别接入——见 getMonsterEffectiveStats() 和 rollNormalAttack 的调用处。
+        const SPIRIT_DOMAINS = {
+            metal:   { name: '金域', icon: '⚔️', desc: '双方暴击率 +20%、暴击伤害 +50%', effects: { crit: 0.20, critDmg: 0.50 } },
+            wood:    { name: '木域', icon: '🌿', desc: '双方每秒恢复 1.5% 最大生命', effects: { regen: 0.015 } },
+            water:   { name: '水域', icon: '💧', desc: '双方闪避率 +15%', effects: { dodge: 0.15 } },
+            fire:    { name: '火域', icon: '🔥', desc: '双方攻击力 +25%、防御力 -30%', effects: { atkPct: 0.25, defPct: -0.30 } },
+            earth:   { name: '土域', icon: '⛰️', desc: '双方防御力 +40%、速度 -20%', effects: { defPct: 0.40, spdPct: -0.20 } },
+            thunder: { name: '雷域', icon: '⚡', desc: '双方命中率 +20%，闪避失效', effects: { hit: 0.20 }, dodgeVoid: true },
+            ice:     { name: '冰域', icon: '❄️', desc: '双方速度 -30%，攻击间隔 +0.5 秒', effects: { spdPct: -0.30 }, intervalAdd: 0.5 },
+            wind:    { name: '风域', icon: '🌪️', desc: '双方攻击间隔 -0.5 秒', effects: {}, intervalAdd: -0.5 }
+        };
+        const DOMAIN_SHENSHI_COST = 15;   // 每次进入战斗激活一次：化神期神识产出约 0.3/秒，15 点约合半分钟产出，有真实成本但不至于用不起
+        const MIN_ATTACK_INTERVAL = 0.3;   // 攻击间隔下限，防止冰域 / 装备叠加把间隔压到 0 或负数
+
+        function isDomainUnlocked() { return gameState.player.realmIndex >= 17; }
+        function getActiveDomain() { return SPIRIT_DOMAINS[gameState.player.activeDomain] || null; }
+
+        // 玩家侧灵域效果：走 getMod 统一体系，calculateStats 时自动应用到 atk/def/hp/spd，
+        // 战斗代码不用再额外处理玩家自己这一侧
+        function getDomainMod(key) {
+            const domain = getActiveDomain();
+            if (!domain || !domain.effects) return 0;
+            return domain.effects[key] || 0;
+        }
+        // 攻击间隔的灵域修正：绝对秒数加算，不是百分比，所以不走 getMod，单独在两套战斗代码的间隔计算处调用
+        function getDomainIntervalAdd() {
+            const domain = getActiveDomain();
+            return domain ? (domain.intervalAdd || 0) : 0;
+        }
+        function isDomainDodgeVoid() {
+            const domain = getActiveDomain();
+            return !!(domain && domain.dodgeVoid);
+        }
+
+        // 怪物侧的有效攻防速度：灵域对双方同时生效，但怪物没有 getMod 体系，
+        // 所以在战斗计算时用这个函数现算一份「打了灵域补丁」的怪物属性，不修改原始配置对象
+        function getMonsterEffectiveStats(monster) {
+            const domain = getActiveDomain();
+            if (!domain) return { atk: monster.atk, def: monster.def, spd: monster.spd };
+            const atkMod = 1 + (domain.effects.atkPct || 0);
+            const defMod = 1 + (domain.effects.defPct || 0);
+            const spdMod = 1 + (domain.effects.spdPct || 0);
+            return {
+                atk: Math.max(1, Math.round(monster.atk * atkMod)),
+                def: Math.max(0, Math.round(monster.def * defMod)),
+                spd: Math.max(1, Math.round(monster.spd * spdMod))
+            };
+        }
+
+        // 激活灵域：进入战斗前调用，扣神识、写入 gameState、重算玩家属性（把灵域的玩家侧加成算进去）
+        function activateDomain(domainKey) {
+            const P = ensureCurrencyState();
+            if (!domainKey) { gameState.player.activeDomain = null; calculateStats(); return true; }
+            if (!SPIRIT_DOMAINS[domainKey]) return false;
+            if (P.shenshi < DOMAIN_SHENSHI_COST) { spendNotify('shenshi', DOMAIN_SHENSHI_COST); return false; }
+            P.shenshi -= DOMAIN_SHENSHI_COST;
+            P.activeDomain = domainKey;
+            calculateStats();
+            showNotification(`${SPIRIT_DOMAINS[domainKey].icon} ${SPIRIT_DOMAINS[domainKey].name}已激活：${SPIRIT_DOMAINS[domainKey].desc}`, '#b39ddb');
+            return true;
+        }
+        // 战斗结束（撤退 / 被击败 / 通关不循环）时清空，恢复玩家属性；domainDecided 一并复位，
+        // 这样下一场战斗（哪怕选择了「不用灵域」）也会重新弹一次选择框，而不是被上一场的决定卡住
+        function clearActiveDomain() {
+            gameState.player.domainDecided = false;
+            if (!gameState.player.activeDomain) return;
+            gameState.player.activeDomain = null;
+            calculateStats();
+        }
+
+        // 进入战斗前的灵域选择：化神期起、本场还没决定过灵域时，先弹窗让玩家选，选完（或跳过）再真正进入战斗；
+        // 没到化神期、或本场已经决定过（循环续战/同一场重进），直接放行，不打断已有的进入流程
+        let __pendingDomainEnter = null;
+        function maybeSelectDomainThenEnter(enterFn) {
+            if (!isDomainUnlocked() || gameState.player.domainDecided) { enterFn(); return; }
+            __pendingDomainEnter = enterFn;
+            renderDomainSelectModal();
+            const modal = document.getElementById('domainSelectModal');
+            if (modal) modal.classList.add('show'); else enterFn();   // 万一 HTML 还没这个弹窗（老缓存），直接放行不卡住玩家
+        }
+        function confirmDomainChoice(key) {
+            if (key && !activateDomain(key)) return;   // 神识不够时 activateDomain 已经弹过提示，弹窗留着让玩家换一个或点跳过
+            if (!key) activateDomain(null);
+            const modal = document.getElementById('domainSelectModal');
+            if (modal) modal.classList.remove('show');
+            const fn = __pendingDomainEnter;
+            __pendingDomainEnter = null;
+            if (fn) fn();
+        }
+        function renderDomainSelectModal() {
+            const el = document.getElementById('domainSelectList');
+            if (!el) return;
+            const P = gameState.player;
+            el.innerHTML = Object.entries(SPIRIT_DOMAINS).map(([key, d]) => {
+                const affordable = P.shenshi >= DOMAIN_SHENSHI_COST;
+                return `<div class="domain-card${affordable ? '' : ' unaffordable'}" onclick="confirmDomainChoice('${key}')">
+                    <div class="domain-icon">${d.icon}</div>
+                    <div class="domain-name">${d.name}</div>
+                    <div class="domain-desc">${d.desc}</div>
+                </div>`;
+            }).join('');
+            const balEl = document.getElementById('domainShenshiBalance');
+            if (balEl) balEl.textContent = Math.floor(P.shenshi || 0);
+            const costEl = document.getElementById('domainShenshiCost');
+            if (costEl) costEl.textContent = DOMAIN_SHENSHI_COST;
+        }
+
         // ==================== 悟道：八种法则 ====================
         // 化神初期起可用。每种法则有独立的领悟等级（累计经验推算，不单独存等级），效果 = 每级效果 × 等级 + 各里程碑加成，
         // 通过 getMod() 统一接入战斗 / 生活技能 / 全局加成。等级上限随境界提高（化神初期 10，每高一个境界 +5，最高 30）。
@@ -4379,6 +4601,9 @@
             total += getDaoMod(key);   // 道果淬体 / 合道
             total += getTribulationMod(key);   // 渡劫：身与天地相融，每渡过一劫永久 +2.5% 生命 / 防御
             total += getNascentMod(key);   // 元婴蜕变：元婴离体助战，攻击 / 暴击伤害随蜕变等级增长
+            total += getCoinRefineMod(key);   // 聚灵培元：灵石的软性无底洞，永久小幅 +生命/攻击/防御
+            total += getDomainMod(key);   // 化神期灵域：战斗中对双方同时生效的领域规则（玩家侧这一半）
+            total += getAvatarMod(key);   // 化神期身外化身：永久小幅 +攻击/防御
             return total;
         }
 
@@ -4462,6 +4687,20 @@
                 .join('<br/>');
         }
 
+        // 灵根一句话倾向标签（v6.76）：开局选灵根是新手唯一的一次性重大决策，
+        // 但完整数值列表信息密度太高，第一次打开游戏的人很难在没有任何游戏体验的情况下读懂
+        // 一串百分比再做选择——加个人话总结放在最前面，完整数值仍然保留在后面给老玩家核对
+        const ROOT_QUICK_TAG = {
+            metal:   '⚔️ 偏战斗·稳定输出',
+            wood:    '🌾 偏种田',
+            water:   '🧪 偏炼丹·耐久',
+            fire:    '⚔️ 偏战斗·爆发输出',
+            earth:   '🛡️ 偏坦克',
+            thunder: '📈 偏养成',
+            ice:     '🧪 偏炼丹·省料',
+            wind:    '⚖️ 均衡全能'
+        };
+
         // 创建角色时的灵根选项：写明克制关系与特效
         function populateRootOptions() {
             const select = document.getElementById('playerSpiritRoot');
@@ -4471,7 +4710,8 @@
                 if (!root) return;
                 const counter = COUNTER_RELATIONS[option.value];
                 const counterText = counter ? `克制${SPIRIT_ROOT_EFFECTS[counter].name}` : '无克制';
-                option.textContent = `${root.name} - ${counterText}｜${describeEffects(root.effects).join('、')}`;
+                const tag = ROOT_QUICK_TAG[option.value];
+                option.textContent = `${root.name}【${tag}】- ${counterText}｜${describeEffects(root.effects).join('、')}`;
             });
         }
 
@@ -5655,7 +5895,7 @@
 
             // 普通战斗启用实时战斗UI
             if (skill === 'battle') {
-                enterBattleArea(action);
+                maybeSelectDomainThenEnter(() => enterBattleArea(action));
                 return;
             }
 
@@ -5693,6 +5933,7 @@
                 }
                 gameState.battles = null;
                 syncBattleMode();
+                clearActiveDomain();
             }
 
             gameState.currentAction = null;
@@ -5751,6 +5992,19 @@
                 }
             }
             return true; // 返回true表示成功
+        }
+
+        // 背包快满提示角标（v6.76）：容量占用≥90%时常驻显示在导航「背包」按钮上，
+        // 跟 addToInventory 里那次性的 toast 通知不同——挂机/托管时很容易错过 toast，
+        // 常驻角标能让玩家下次瞄一眼界面就发现，而不是等东西已经悄悄丢了才后知后觉
+        function updateInventoryBadge() {
+            const P = gameState.player;
+            const cap = P.inventoryCapacity || 50;
+            const full = P.inventory.length / cap >= 0.9;
+            const desktop = document.getElementById('invBadgeDesktop');
+            const mobile = document.getElementById('invBadgeMobile');
+            if (desktop) desktop.hidden = !full;
+            if (mobile) mobile.hidden = !full;
         }
 
         // ==================== 物品交互系统（P1功能）====================
@@ -6311,7 +6565,7 @@
                 actionDiv.className = 'action-row';
                 actionDiv.style.opacity = meetsRequirement ? '1' : '0.5';
                 actionDiv.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="enterDungeon('${dungeonId}')">
+                    <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${dungeonId}'))">
                         <span style="font-size: 24px;">${dungeon.icon}</span>
                         <div style="flex: 1;">
                             <div style="font-weight: bold; color: #c2a25f;">${dungeon.name}</div>
@@ -6726,6 +6980,7 @@
 
         function updateUI() {
             syncBattleMode();   // 保险：万一某个战斗退出分支漏调用了，这里兜底纠正
+            updateInventoryBadge();
             if (getCloneSlotCount() >= 2 && !gameState.cloneUnlockNotified2) {
                 gameState.cloneUnlockNotified2 = true;
                 gameState.cloneUnlockNotified = true;
@@ -7203,12 +7458,12 @@
             const currentRealmIdx = gameState.player.realmIndex;
             const currentRealmName = realmNames[currentRealmIdx] || '未知';
 
-            // 丹火 / 神识商城顶部：该货币的全部强化（与丹火 / 神识技能页里的相同）
-            if (shopTab === 'danhuo' || shopTab === 'shenshi' || shopTab === 'daoguo') {
+            // 灵石 / 丹火 / 神识 / 道果商城顶部：该货币的全部强化（与丹火 / 神识技能页里的相同）
+            if (shopTab === 'coins' || shopTab === 'danhuo' || shopTab === 'shenshi' || shopTab === 'daoguo') {
                 const box = document.createElement('div');
                 box.style.cssText = 'grid-column: 1/-1;';
-                const usesTitle = { danhuo: '🔥 丹火强化', shenshi: '👁️ 神识强化', daoguo: '🍎 道果强化' }[shopTab];
-                const usesHtml = { danhuo: danhuoUsesHtml, shenshi: shenshiUsesHtml, daoguo: daoguoUsesHtml }[shopTab]();
+                const usesTitle = { coins: '💎 灵石强化', danhuo: '🔥 丹火强化', shenshi: '👁️ 神识强化', daoguo: '🍎 道果强化' }[shopTab];
+                const usesHtml = { coins: coinRefineUsesHtml, danhuo: danhuoUsesHtml, shenshi: shenshiUsesHtml, daoguo: daoguoUsesHtml }[shopTab]();
                 box.innerHTML = `<div class="shop-section-title">${usesTitle}</div>${usesHtml}`;
                 shopContainer.appendChild(box);
             }
@@ -8667,6 +8922,7 @@
                     gameState.battles = null;
                     gameState.currentAction = null;
                     gameState.currentActionProgress = 0;
+                    clearActiveDomain();
                     const battleContainer = document.getElementById('battleContainer');
                     if (battleContainer) battleContainer.classList.add('hidden');
                     syncBattleMode();
