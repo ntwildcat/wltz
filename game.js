@@ -448,10 +448,15 @@
                     recipes: {
                         millet: { name: '种植灵米', desc: '食物', duration: 5, output: { items: [{ id: 'millet', qty: 1 }], skill: 'farming', exp: 10 }, requiredLevel: 1, unlocked: true },
                         grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 20 }, requiredLevel: 5, requires: { seed_cleangrass: 1 }, unlocked: false },
+                        decompose_grass: { name: '分解清灵草', desc: '清灵草 ×1 换回 清灵草种子 ×2', duration: 15, output: { items: [{ id: 'seed_cleangrass', qty: 2 }], skill: 'farming', exp: 15 }, requiredLevel: 5, requires: { cleangrass: 1 }, unlocked: false },
                         mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 70 }, requiredLevel: 13, requires: { seed_mushroom: 1 }, unlocked: false },
+                        decompose_mushroom: { name: '分解灵芝', desc: '灵芝 ×1 换回 灵芝种子 ×2', duration: 40, output: { items: [{ id: 'seed_mushroom', qty: 2 }], skill: 'farming', exp: 40 }, requiredLevel: 13, requires: { mushroom: 1 }, unlocked: false },
                         tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 190 }, requiredLevel: 22, requires: { seed_tea: 1 }, unlocked: false },
+                        decompose_tea: { name: '分解悟道茶', desc: '悟道茶 ×1 换回 悟道茶种子 ×2', duration: 80, output: { items: [{ id: 'seed_tea', qty: 2 }], skill: 'farming', exp: 100 }, requiredLevel: 22, requires: { tea: 1 }, unlocked: false },
                         lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 30, requires: { seed_lotus: 1 }, unlocked: false },
-                        daofruit: { name: '种植悟道果', desc: '化神材料 需悟道果种子（太虚幻境掉落）', duration: 480, output: { items: [{ id: 'daofruit', qty: 1 }], skill: 'farming', exp: 600 }, requiredLevel: 39, requires: { seed_daofruit: 1 }, unlocked: false }
+                        decompose_lotus: { name: '分解九叶莲', desc: '九叶莲 ×1 换回 九叶莲种子 ×2', duration: 360, output: { items: [{ id: 'seed_lotus', qty: 2 }], skill: 'farming', exp: 180 }, requiredLevel: 30, requires: { lotus: 1 }, unlocked: false },
+                        daofruit: { name: '种植悟道果', desc: '化神材料 需悟道果种子（太虚幻境掉落）', duration: 480, output: { items: [{ id: 'daofruit', qty: 1 }], skill: 'farming', exp: 600 }, requiredLevel: 39, requires: { seed_daofruit: 1 }, unlocked: false },
+                        decompose_daofruit: { name: '分解悟道果', desc: '悟道果 ×1 换回 悟道果种子 ×2', duration: 560, output: { items: [{ id: 'seed_daofruit', qty: 2 }], skill: 'farming', exp: 320 }, requiredLevel: 39, requires: { daofruit: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
