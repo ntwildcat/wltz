@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=13.31">
+    <link rel="stylesheet" href="style.css?v=13.32">
 
 </head>
 <body data-panel="cultivation">
@@ -19,7 +19,7 @@
             <div class="logo" onclick="showStartScreen()" aria-label="返回存档选择">仙</div>
             <div class="skill-tree" id="skillTree"></div>
             <div class="nav-grid">
-                <button type="button" class="nav-mini" data-nav="inventory" onclick="switchPanel('inventory')" title="背包"><span class="nav-ico">🎒</span><span>背包</span></button>
+                <button type="button" class="nav-mini" data-nav="inventory" onclick="switchPanel('inventory')" title="背包"><span class="nav-ico">🎒</span><span>背包</span><span class="badge-dot" id="invBadgeDesktop" title="背包快满了" hidden></span></button>
                 <button type="button" class="nav-mini" data-nav="equipment" onclick="switchPanel('equipment')" title="装备"><span class="nav-ico">🎽</span><span>装备</span></button>
                 <button type="button" class="nav-mini" data-nav="shop" onclick="switchPanel('shop')" title="商城"><span class="nav-ico">🏪</span><span>商城</span></button>
                 <button type="button" class="nav-mini" data-nav="settings" onclick="switchPanel('settings')" title="设置"><span class="nav-ico">⚙️</span><span>设置</span></button>
@@ -68,14 +68,14 @@
                             <label for="playerSpiritRoot">灵根属性 *</label>
                             <select id="playerSpiritRoot" name="playerSpiritRoot" autocomplete="off">
                                 <option value="">选择灵根</option>
-                                <option value="metal">金灵根 - 克制木灵根</option>
-                                <option value="wood">木灵根 - 克制土灵根</option>
-                                <option value="water">水灵根 - 克制火灵根</option>
-                                <option value="fire">火灵根 - 克制金灵根</option>
-                                <option value="earth">土灵根 - 克制水灵根</option>
-                                <option value="wind">风灵根 - 无克制，攻速+10%</option>
-                                <option value="thunder">雷灵根 - 克制冰灵根</option>
-                                <option value="ice">冰灵根 - 克制雷灵根</option>
+                                <option value="metal">金灵根【⚔️ 偏战斗·稳定输出】- 克制木灵根</option>
+                                <option value="wood">木灵根【🌾 偏种田】- 克制土灵根</option>
+                                <option value="water">水灵根【🧪 偏炼丹·耐久】- 克制火灵根</option>
+                                <option value="fire">火灵根【⚔️ 偏战斗·爆发输出】- 克制金灵根</option>
+                                <option value="earth">土灵根【🛡️ 偏坦克】- 克制水灵根</option>
+                                <option value="wind">风灵根【⚖️ 均衡全能】- 无克制，攻速+10%</option>
+                                <option value="thunder">雷灵根【📈 偏养成】- 克制冰灵根</option>
+                                <option value="ice">冰灵根【🧪 偏炼丹·省料】- 克制雷灵根</option>
                             </select>
                         </div>
 
@@ -770,7 +770,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.33"></script>
+    <script src="game.js?v=13.35"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
@@ -793,6 +793,7 @@
         <div class="mobile-tab-item" data-tab="inventory" onclick="switchMobileTab('inventory')">
             <div class="icon">🎒</div>
             <div>背包</div>
+            <span class="badge-dot" id="invBadgeMobile" hidden></span>
         </div>
     </div>
 

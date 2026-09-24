@@ -958,6 +958,7 @@
             if (typeof P.daoBody !== 'number') P.daoBody = 0;
             if (typeof P.daoLaw !== 'number') P.daoLaw = 0;
             if (typeof P.nascentSoul !== 'number') P.nascentSoul = 0;
+            if (typeof P.coinRefine !== 'number') P.coinRefine = 0;
             if (!P.temper) P.temper = { weapon: 0, armor: 0, jewelry: 0 };
             if (typeof P.rootLevel !== 'number') P.rootLevel = 0;
             if (!P.shen) P.shen = { clone: 0, focus: 0, sense: 0 };
@@ -1080,7 +1081,7 @@
         }
 
         const CURRENCY_NAMES = { danhuo: '丹火', shenshi: '神识', daoguo: '道果' };
-        const CURRENCY_ICONS = { danhuo: () => DANHUO_ICON, shenshi: () => SHENSHI_ICON, daoguo: () => DAOGUO_ICON };
+        const CURRENCY_ICONS = { coins: () => COIN_ICON, danhuo: () => DANHUO_ICON, shenshi: () => SHENSHI_ICON, daoguo: () => DAOGUO_ICON };
         // 战斗区域胜利掉落的丹火 / 神识（金丹级战斗区域起掉丹火，元婴级起掉神识；乘该区域精通的奖励加成）
         const BATTLE_CURRENCY = {
             goldenPlains:      { danhuo: [1, 2] },
@@ -1216,6 +1217,37 @@
             outDaoguo: 0.3       // 道果产出 +30%
         };
         const FUSION_REQUIRED_REALM = 28;   // 合体圆满（现索引28）：晋升下一境界必须已合道
+        // 聚灵培元（v6.76）：灵石的软性无底洞。技能设施买完之后灵石在大乘期完全没处花，
+        // 加这个无等级上限、每级涨价的永久小额加成——价格指数增长（×1.15/级），买得越多越贵，
+        // 早期几万灵石就能买、后期要吞掉大量灵石，让「灵石多到花不完」始终有地方去，
+        // 单级幅度刻意压低（0.5%），避免它变成最优刷分策略、抢了装备/技能路线的地位
+        const COIN_REFINE_PER_LEVEL = 0.005;
+        const COIN_REFINE_BASE = 50000;
+        const COIN_REFINE_GROWTH = 1.15;
+        function coinRefineCost(level) { return Math.round(COIN_REFINE_BASE * Math.pow(COIN_REFINE_GROWTH, level)); }
+        function getCoinRefine() { return gameState.player.coinRefine || 0; }
+        function getCoinRefineMod(key) {
+            if (key !== 'hpPct' && key !== 'atkPct' && key !== 'defPct') return 0;
+            return getCoinRefine() * COIN_REFINE_PER_LEVEL;
+        }
+        function upgradeCoinRefine(times = 1) {
+            const P = gameState.player;
+            let bought = 0;
+            const n = times === 'max' ? Infinity : times;
+            while (bought < n) {
+                const cost = coinRefineCost(getCoinRefine());
+                if (P.coins < cost) break;
+                P.coins -= cost;
+                P.coinRefine = getCoinRefine() + 1;
+                bought++;
+            }
+            if (bought === 0) { showNotification(`灵石不足：聚灵培元下一级需要 ${coinRefineCost(getCoinRefine())}`, '#c4483a', 'error'); return; }
+            showNotification(`💎 聚灵培元 ${bought > 1 ? `×${bought}，` : ''}当前 Lv.${getCoinRefine()}：生命 / 攻击 / 防御 +${Math.round(getCoinRefine() * COIN_REFINE_PER_LEVEL * 100)}%`, '#6f9c8a');
+            calculateStats();
+            updateUI();
+            saveGame();
+        }
+
         function daoBodyCost(level) { return Math.round(10 * Math.pow(level + 1, 1.5)); }
         function daoLawCost(level) { return Math.round(25 * Math.pow(level + 1, 1.5)); }
         function isDaoguoUnlocked() { return gameState.player.realmIndex >= 25; }
@@ -1300,6 +1332,15 @@
         function renderDaoguoUses() {
             const el = document.getElementById('daoguoUses');
             if (el) el.innerHTML = daoguoUsesHtml();
+        }
+
+        // 灵石商城顶部的「聚灵培元」卡片：跟丹火/神识/道果商城顶部的强化区一个风格
+        function coinRefineUsesHtml() {
+            const lv = getCoinRefine();
+            const cost = coinRefineCost(lv);
+            const curPct = (lv * COIN_REFINE_PER_LEVEL * 100).toFixed(1);
+            const nextPct = ((lv + 1) * COIN_REFINE_PER_LEVEL * 100).toFixed(1);
+            return `<div class="use-card"><div class="use-title">💎 聚灵培元 <small>永久提升生命 / 攻击 / 防御，每级 +${(COIN_REFINE_PER_LEVEL * 100).toFixed(1)}%，无等级上限，越买越贵</small></div>${useRow('💎 培元', `Lv.${lv}`, `当前 +${curPct}% → +${nextPct}%`, cost, 'coins', 'upgradeCoinRefine(1)', false)}</div>`;
         }
 
 
@@ -4384,6 +4425,7 @@
             total += getDaoMod(key);   // 道果淬体 / 合道
             total += getTribulationMod(key);   // 渡劫：身与天地相融，每渡过一劫永久 +2.5% 生命 / 防御
             total += getNascentMod(key);   // 元婴蜕变：元婴离体助战，攻击 / 暴击伤害随蜕变等级增长
+            total += getCoinRefineMod(key);   // 聚灵培元：灵石的软性无底洞，永久小幅 +生命/攻击/防御
             return total;
         }
 
@@ -4467,6 +4509,20 @@
                 .join('<br/>');
         }
 
+        // 灵根一句话倾向标签（v6.76）：开局选灵根是新手唯一的一次性重大决策，
+        // 但完整数值列表信息密度太高，第一次打开游戏的人很难在没有任何游戏体验的情况下读懂
+        // 一串百分比再做选择——加个人话总结放在最前面，完整数值仍然保留在后面给老玩家核对
+        const ROOT_QUICK_TAG = {
+            metal:   '⚔️ 偏战斗·稳定输出',
+            wood:    '🌾 偏种田',
+            water:   '🧪 偏炼丹·耐久',
+            fire:    '⚔️ 偏战斗·爆发输出',
+            earth:   '🛡️ 偏坦克',
+            thunder: '📈 偏养成',
+            ice:     '🧪 偏炼丹·省料',
+            wind:    '⚖️ 均衡全能'
+        };
+
         // 创建角色时的灵根选项：写明克制关系与特效
         function populateRootOptions() {
             const select = document.getElementById('playerSpiritRoot');
@@ -4476,7 +4532,8 @@
                 if (!root) return;
                 const counter = COUNTER_RELATIONS[option.value];
                 const counterText = counter ? `克制${SPIRIT_ROOT_EFFECTS[counter].name}` : '无克制';
-                option.textContent = `${root.name} - ${counterText}｜${describeEffects(root.effects).join('、')}`;
+                const tag = ROOT_QUICK_TAG[option.value];
+                option.textContent = `${root.name}【${tag}】- ${counterText}｜${describeEffects(root.effects).join('、')}`;
             });
         }
 
@@ -5758,6 +5815,19 @@
             return true; // 返回true表示成功
         }
 
+        // 背包快满提示角标（v6.76）：容量占用≥90%时常驻显示在导航「背包」按钮上，
+        // 跟 addToInventory 里那次性的 toast 通知不同——挂机/托管时很容易错过 toast，
+        // 常驻角标能让玩家下次瞄一眼界面就发现，而不是等东西已经悄悄丢了才后知后觉
+        function updateInventoryBadge() {
+            const P = gameState.player;
+            const cap = P.inventoryCapacity || 50;
+            const full = P.inventory.length / cap >= 0.9;
+            const desktop = document.getElementById('invBadgeDesktop');
+            const mobile = document.getElementById('invBadgeMobile');
+            if (desktop) desktop.hidden = !full;
+            if (mobile) mobile.hidden = !full;
+        }
+
         // ==================== 物品交互系统（P1功能）====================
         function showItemDetail(itemId, qty) {
             const itemConfig = GAME_CONFIG.items[itemId];
@@ -6731,6 +6801,7 @@
 
         function updateUI() {
             syncBattleMode();   // 保险：万一某个战斗退出分支漏调用了，这里兜底纠正
+            updateInventoryBadge();
             if (getCloneSlotCount() >= 2 && !gameState.cloneUnlockNotified2) {
                 gameState.cloneUnlockNotified2 = true;
                 gameState.cloneUnlockNotified = true;
@@ -7208,12 +7279,12 @@
             const currentRealmIdx = gameState.player.realmIndex;
             const currentRealmName = realmNames[currentRealmIdx] || '未知';
 
-            // 丹火 / 神识商城顶部：该货币的全部强化（与丹火 / 神识技能页里的相同）
-            if (shopTab === 'danhuo' || shopTab === 'shenshi' || shopTab === 'daoguo') {
+            // 灵石 / 丹火 / 神识 / 道果商城顶部：该货币的全部强化（与丹火 / 神识技能页里的相同）
+            if (shopTab === 'coins' || shopTab === 'danhuo' || shopTab === 'shenshi' || shopTab === 'daoguo') {
                 const box = document.createElement('div');
                 box.style.cssText = 'grid-column: 1/-1;';
-                const usesTitle = { danhuo: '🔥 丹火强化', shenshi: '👁️ 神识强化', daoguo: '🍎 道果强化' }[shopTab];
-                const usesHtml = { danhuo: danhuoUsesHtml, shenshi: shenshiUsesHtml, daoguo: daoguoUsesHtml }[shopTab]();
+                const usesTitle = { coins: '💎 灵石强化', danhuo: '🔥 丹火强化', shenshi: '👁️ 神识强化', daoguo: '🍎 道果强化' }[shopTab];
+                const usesHtml = { coins: coinRefineUsesHtml, danhuo: danhuoUsesHtml, shenshi: shenshiUsesHtml, daoguo: daoguoUsesHtml }[shopTab]();
                 box.innerHTML = `<div class="shop-section-title">${usesTitle}</div>${usesHtml}`;
                 shopContainer.appendChild(box);
             }
