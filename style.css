@@ -1124,6 +1124,9 @@ body.in-battle .battle-container {
 .domain-icon { font-size: 1.4em; margin-bottom: 4px; }
 .domain-name { font-weight: bold; color: var(--text-l1); margin-bottom: 4px; }
 .domain-desc { font-size: 0.78em; color: var(--text-l4); line-height: 1.4; }
+/* 灵域个人数据：给唯一的高密度决策点加一层"经营感"反馈（正反馈诊断 C-3） */
+.domain-stats { font-size: 0.72em; color: var(--bronze, #b3711f); margin-bottom: 4px; }
+.domain-stats.domain-stats-new { color: var(--text-l4); font-style: italic; }
 @media (max-width: 480px) {
     .domain-grid { grid-template-columns: 1fr; }
 }
@@ -1257,6 +1260,51 @@ body.in-battle .battle-container {
     user-select: none;
     text-shadow: 2px 2px 4px #000;
 }
+/* 精通升级 / 法则里程碑的轻量庆祝：屏幕中央短暂浮现，不挡手、不用点确认（正反馈诊断 C-5） */
+.quick-celebration {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.85);
+    z-index: 1200;
+    pointer-events: none;
+    background: var(--inkstone-2, rgba(20,17,10,0.92));
+    border: 1px solid var(--bronze, #b3711f);
+    color: var(--text-l1, #fff);
+    font-weight: bold;
+    padding: 10px 22px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(179,113,31,0.4), var(--shadow-lg);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+}
+.quick-celebration.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* 配方卡片「本次完成次数」角标：纯前端展示，每次配方完成重新渲染时播放一下弹出动画（正反馈诊断 C-4） */
+.recipe-session-count {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 0.7em;
+    font-weight: bold;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--bg-l1);
+    border: 1px solid var(--border-l3);
+    color: var(--text-l3);
+    animation: sessionCountPop 0.3s ease-out;
+    z-index: 1;
+}
+@keyframes sessionCountPop {
+    0% { transform: scale(0.6); opacity: 0.4; }
+    60% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
 .damage-float-layer {
     position: absolute;
     top: 0; left: 0;
@@ -1272,8 +1320,22 @@ body.in-battle .battle-container {
     animation: floatUp 1.5s ease-out forwards;
 }
 @keyframes floatUp {
-    0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(-100px); opacity: 0; }
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-100px) scale(1); opacity: 0; }
+}
+/* 暴击飘字：字号放大、金色、多一下弹出缩放，跟普通伤害拉开视觉差异——不然只有战斗日志里一句
+   「暴击！」文字能看出区别，很容易被忽略（正反馈诊断 C-1） */
+.damage-float.crit {
+    font-size: 2.1em;
+    color: #f3c34d;
+    text-shadow: 0 0 6px rgba(243,195,77,0.7), 2px 2px 4px #000;
+    animation: critFloatUp 1.5s ease-out forwards;
+}
+@keyframes critFloatUp {
+    0% { transform: translateY(0) scale(0.4); opacity: 1; }
+    18% { transform: translateY(-10px) scale(1.3); opacity: 1; }
+    32% { transform: translateY(-16px) scale(1); opacity: 1; }
+    100% { transform: translateY(-110px) scale(1); opacity: 0; }
 }
 
 .battle-log {
@@ -1878,6 +1940,16 @@ body::before {
     box-shadow: var(--shadow-lg);
 }
 .notification button { background: transparent !important; color: var(--text-l3) !important; border: 1px solid var(--border-l3) !important; border-radius: 2px !important; }
+/* 稀有触发（产出翻倍/材料节省）：边框加粗 + 轻微脉冲发光，跟"材料不足"这类日常提示拉开层级（正反馈诊断 C-1） */
+.notification.notification-rare {
+    border-left-width: 6px;
+    border-color: var(--accent, var(--bronze));
+    animation: slideIn 0.3s, noticeRarePulse 1.6s ease-in-out 0.3s 2;
+}
+@keyframes noticeRarePulse {
+    0%, 100% { box-shadow: var(--shadow-lg); }
+    50% { box-shadow: var(--shadow-lg), 0 0 14px 2px var(--accent, var(--bronze)); }
+}
 
 /* 输入 */
 input, select { background: #0e0d0a; border: 1px solid var(--border-l3); border-radius: 2px; color: var(--text-l1); }

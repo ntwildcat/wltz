@@ -1334,7 +1334,7 @@
             const P = ensureCurrencyState();
             if (!isDaoguoUnlocked()) { showNotification('合体初期才能合道', '#c98a3e'); return; }
             if (isFused()) { showNotification('你已经合道了', '#c98a3e'); return; }
-            const ok = confirm('确定要合道吗？\n\n合道后你的分身将永久消失，且不可逆（无法解除、无法再召回分身，神识里的「分身强化」也会失效）。\n\n换来的是：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・神识产出 +50%、道果产出 +30%\n\n注意：晋升炼虚期必须已合道。');
+            const ok = confirm('确定要合道吗？\n\n合道后你的分身将永久消失，且不可逆（无法解除、无法再召回分身，神识里的「分身强化」也会失效）。\n\n换来的是：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・神识产出 +50%、道果产出 +30%\n\n注意：晋升大乘期必须已合道。');
             if (!ok) return;
             P.fusion = { active: true, at: Date.now() };
             getClones().forEach(c => { c.action = null; c.progress = 0; });
@@ -1351,7 +1351,7 @@
             const bl = getDaoBody(), ll = getDaoLaw();
             const fusedCard = isFused()
                 ? `<div class="use-row"><div class="use-main"><b>🌟 已合道</b><div class="use-effect">所有主行动速度 +100% · 生命 / 攻击 / 防御 / 速度 +15% · 神识产出 +50% · 道果产出 +30%<br/>分身已收回体内，不可逆。</div></div><span class="use-max">已合道</span></div>`
-                : `<div class="use-row"><div class="use-main"><b>🌟 合道（不可逆）</b><div class="use-effect">收回你的分身：所有主行动速度 +100%、生命 / 攻击 / 防御 / 速度 +15%、神识产出 +50%、道果产出 +30%。<br/>代价：分身永久消失，无法解除。<b>晋升炼虚期必须先合道。</b></div></div><button type="button" class="btn use-btn" onclick="startFusion()">合道</button></div>`;
+                : `<div class="use-row"><div class="use-main"><b>🌟 合道（不可逆）</b><div class="use-effect">收回你的分身：所有主行动速度 +100%、生命 / 攻击 / 防御 / 速度 +15%、神识产出 +50%、道果产出 +30%。<br/>代价：分身永久消失，无法解除。<b>晋升大乘期必须先合道。</b></div></div><button type="button" class="btn use-btn" onclick="startFusion()">合道</button></div>`;
             const maxTimes = Math.floor(Math.min(P.danhuo / FUSE_COST.danhuo, P.shenshi / FUSE_COST.shenshi));
             return `
                 <div class="use-balance">${DAOGUO_ICON} 道果 <b>${Math.floor(P.daoguo)}</b><small>产出：道果技能的配方（凝练 / 培育 / 提炼 / 归元）· 合体级战斗区域胜利 · 天道秘境通关 · 丹火与神识融合。道果不能出售，只用来变强和购买商品。</small></div>
@@ -1395,7 +1395,7 @@
         }
 
         // ---- 炼虚期：化虚（法则实体化）与道则（v6.66） ----
-        // 炼虚初期（索引25）起解锁。核心取舍：消耗悟道法则的等级（可逆，参悟可以再练回来）+ 道果/虚晶，
+        // 炼虚初期（索引21）起解锁。核心取舍：消耗悟道法则的等级（可逆，参悟可以再练回来）+ 道果/虚晶，
         // 兑换成一枚「道则」（实体物品），镶嵌进新增的「道基」槽后提供比留着法则等级更集中的定向加成。
         function isVoidUnlocked() { return gameState.player.realmIndex >= 21; }
 
@@ -1916,31 +1916,33 @@
         // 每次突破后，如果这个境界解锁了新秘境 / 战斗区域 / 系统，播放完突破特效再弹一个小提示——
         // 不是每个境界索引都有条目：中间过渡的小境界（比如练气中期→后期）如果没有新内容就不出现在这里，
         // 也就不会弹提示。同一份数据也用在「设置 → 玩法介绍 → 境界解锁一览」里，完整列出全部境界当预告。
+        // 每条尽量说清楚「是什么 / 在哪操作 / 关键机制或代价」，不只是一个名词——早期版本只写名词，
+        // 玩家到了新境界经常不知道这个新东西具体怎么玩（用户反馈：到了炼虚期不知道道则怎么用）
         const REALM_UNLOCKS = {
-            1:  ['⚔️ 可以参与战斗了，森林战斗区域开放'],
-            2:  ['🔮 神秘之塔秘境开放'],
+            1:  ['⚔️ 可以参与战斗了，战斗页「战斗区域」标签下森林开放。战斗区域是循环挑战（打完一场自动开下一场，直到点「撤退」），跟秘境「打到底」不一样；记得先在炼丹页做点战斗食物带上，生命不会自动恢复只能靠食物'],
+            2:  ['🔮 神秘之塔秘境开放（战斗页「秘境」标签）。秘境是连续几只怪一次性打到底，通关拿固定+随机奖励'],
             3:  ['⚔️ 十万大山外围战斗区域开放'],
-            4:  ['🌲 诡异森林秘境开放', '💊 可炼制筑基丹，突破练气巅峰前记得备好'],
+            4:  ['🌲 诡异森林秘境开放', '💊 炼丹页解锁筑基丹配方（材料清灵草×3），趁早炼够——练气巅峰突破筑基必须要这个丹'],
             5:  ['⚔️ 十万大山核心 / 妖兽沼泽战斗区域开放'],
             6:  ['⚱️ 古老遗迹秘境开放'],
             7:  ['⚔️ 魔窟深渊战斗区域开放'],
-            8:  ['⚡ 天劫之地秘境开放', '💊 可炼制金丹秘药，突破筑基圆满前记得备好'],
-            9:  ['🔥 丹火系统解锁（新增「丹火」技能页，产出的是货币，用于淬炼装备、强化灵根）', '⚔️ 金丹平原战斗区域开放'],
+            8:  ['⚡ 天劫之地秘境开放', '💊 金丹秘药配方解锁，突破筑基圆满前记得炼够'],
+            9:  ['🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 金丹平原战斗区域开放'],
             10: ['⚔️ 天劫之地战斗区域开放'],
-            12: ['🌌 元婴秘境开放', '💊 可炼制元婴丹，突破金丹圆满前记得备好'],
-            13: ['👁️ 神识系统解锁（新增「神识」技能页）', '🌀 第一个分身解锁，可以让分身并行做生活技能', '⚔️ 虚空之海战斗区域开放'],
+            12: ['🌌 元婴秘境开放', '💊 元婴丹配方解锁，突破金丹圆满前记得炼够'],
+            13: ['👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
             15: ['⚔️ 深渊遗迹战斗区域开放'],
-            16: ['🌠 太虚幻境秘境开放', '💊 可炼制化神丹，突破元婴圆满前记得备好'],
-            17: ['☯️ 悟道系统解锁（八种法则，新增「悟道」技能页）', '🌀 第二个分身解锁', '🌀 灵域解锁，进入战斗前可以选一个（战斗页）', '👤 身外化身解锁（神识商城）', '⚔️ 混沌荒原战斗区域开放'],
+            16: ['🌠 太虚幻境秘境开放', '💊 化神丹配方解锁，突破元婴圆满前记得炼够'],
+            17: ['☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
             19: ['⚔️ 九幽冥渊战斗区域开放'],
-            20: ['🌫️ 虚界秘境开放', '💊 可炼制化虚丹，突破化神圆满前记得备好'],
-            21: ['🌀 化虚 / 道则系统解锁，悟道法则可以兑成实体道则镶嵌（悟道页）', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：往后每个小境界突破前都要先在突破弹窗里渡劫'],
+            20: ['🌫️ 虚界秘境开放', '💊 化虚丹配方解锁，突破化神圆满前记得炼够'],
+            21: ['🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：从这个境界起，每次突破小境界前，突破弹窗会先要求「渡劫」——去对应的天劫秘境打赢，回来才能真正突破'],
             23: ['⚔️ 化实之界战斗区域开放'],
-            24: ['🌌 天道秘境开放', '💊 可炼制合体丹，突破炼虚圆满前记得备好'],
-            25: ['🍎 道果系统解锁（新增「道果」技能页）', '🌟 可以合道了（道果页操作，不可逆；晋升炼虚期前必须做）', '⚔️ 道痕荒原战斗区域开放'],
+            24: ['🌌 天道秘境开放', '💊 合体丹配方解锁，突破炼虚圆满前记得炼够'],
+            25: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 道果页可以「合道」：收回全部分身（不可逆，之后不能再用分身），换所有主行动速度 +100%、生命/攻击/防御/速度 +15%、神识与道果产出提升——这个操作不急着现在做，但合体圆满突破到大乘期之前必须做', '⚔️ 道痕荒原战斗区域开放'],
             27: ['⚔️ 合一虚境战斗区域开放'],
-            28: ['🌟 太乙圣域秘境开放', '💊 可炼制大乘丹（需已合道），突破合体圆满前记得备好'],
-            29: ['👁️ 元婴蜕变解锁，离体助战（道果页操作）', '☯️ 道则「本源品」解锁，比极品更强一档', '⚔️ 太虚战场战斗区域开放'],
+            28: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁（前提是已经合道），本境界圆满后必须先合道才能突破到大乘期'],
+            29: ['👁️ 元婴蜕变解锁：道果页花道果 + 元婴精魄升级（最多10级），从婴儿形态练到青年形态，被动加攻击和暴击伤害，不用手动操作', '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
             31: ['⚔️ 灵界绝境战斗区域开放'],
             32: ['🏁 大道尽头——灵界至高战力，暂无下一境界']
         };
@@ -2704,7 +2706,7 @@
                 gameState.dungeons.currentMonsterHP -= playerDmg;
 
                 // P1-1 显示伤害飘字和日志
-                showDamageFloat(-playerDmg, false);
+                showDamageFloat(-playerDmg, false, isCrit);
                 addBattleLog(`${isCrit ? '暴击！' : ''}造成${playerDmg}点伤害`, 'player-hit');
             } else {
                 // P1-1 显示未命中日志
@@ -2741,7 +2743,7 @@
                 gameState.player.stats.hp.current -= monsterDmg;
 
                 // P1-1 显示伤害飘字和日志
-                showDamageFloat(-monsterDmg, true);
+                showDamageFloat(-monsterDmg, true, isMonsterCrit);
                 addBattleLog(`${isMonsterCrit ? '暴击！' : ''}受到${monsterDmg}点伤害`, 'monster-hit');
             } else {
                 // P1-1 显示敌人未命中日志
@@ -3107,14 +3109,17 @@
         }
 
         // P1-1 显示伤害飘字
-        function showDamageFloat(damage, isPlayer) {
+        // isCrit：暴击伤害单独加大字号+变色+弹跳动画（.damage-float.crit，样式见 style.css），
+        // 不然暴击和普通攻击视觉上完全一样，只有战斗日志里一句「暴击！」文字能看出区别，容易被忽略
+        function showDamageFloat(damage, isPlayer, isCrit = false) {
             const floatLayer = document.getElementById('damageFloatLayer');
+            if (!floatLayer) return;
             const floatDiv = document.createElement('div');
-            floatDiv.className = 'damage-float';
+            floatDiv.className = 'damage-float' + (isCrit ? ' crit' : '');
 
             if (damage < 0) {
-                floatDiv.textContent = damage;
-                floatDiv.style.color = '#c4483a';
+                floatDiv.textContent = (isCrit ? '暴击 ' : '') + damage;
+                floatDiv.style.color = isCrit ? '' : '#c4483a';
             } else {
                 floatDiv.textContent = '+' + damage;
                 floatDiv.style.color = '#7fae9a';
@@ -3257,7 +3262,9 @@
         }
 
         // 重置战斗状态（撤退和死亡时使用）
-        function resetBattleState(newState = 'idle') {
+        // domainOutcome：不传时按 newState 推断（player_dead→died，其余→survived）；
+        // 离线中断这种「结局不明确」的场景需要显式传 'skip'，不然会被当成"活着撤退"误计入灵域存活率
+        function resetBattleState(newState = 'idle', domainOutcome) {
             gameState.dungeons.currentDungeon = null;
             gameState.currentAction = null;
             gameState.currentActionProgress = 0;
@@ -3267,7 +3274,7 @@
                 battleContainer.classList.add('hidden');
             }
             syncBattleMode();
-            clearActiveDomain();
+            clearActiveDomain(domainOutcome || (newState === 'player_dead' ? 'died' : 'survived'));
         }
 
         // P1-4 从秘径撤退（模态对话框版本）
@@ -3445,6 +3452,11 @@
         function stepNormalBattle(battle) {
             const timeDelta = 0.1 * (gameState.battleSpeed || 1);
 
+            // 本次 tick 命中的伤害飘字信息：只写不读 DOM，离线批量模拟也会调这个函数，飘字展示放到
+            // performNormalBattleTick（只在有画面时跑）里读这两个字段再显示，避免离线模拟白白操作 DOM
+            battle._lastPlayerAttack = null;
+            battle._lastEnemyAttack = null;
+
             // battle.turnCount 继续沿用：现在只表示「已经过去的秒数」，用于超时保护和离线模拟的时间换算
             battle.turnCount = (battle.turnCount || 0) + timeDelta;
             applyRegen(battle.playerHP, timeDelta);   // 灵根/功法的战斗回复特效
@@ -3474,6 +3486,7 @@
                 if (toEnemy.hit) {
                     enemy.currentHP -= toEnemy.dmg;
                     battle.log.push(`玩家${toEnemy.crit ? '暴击！' : ''}造成${toEnemy.dmg}点伤害`);
+                    battle._lastPlayerAttack = { dmg: toEnemy.dmg, crit: toEnemy.crit };
                 } else {
                     battle.log.push('玩家攻击落空');
                 }
@@ -3490,6 +3503,7 @@
                     if (toPlayer.hit) {
                         battle.playerHP.current -= toPlayer.dmg;
                         battle.log.push(`${enemy.name}${toPlayer.crit ? '暴击！' : ''}造成${toPlayer.dmg}点伤害`);
+                        battle._lastEnemyAttack = { dmg: toPlayer.dmg, crit: toPlayer.crit };
                     } else {
                         battle.log.push(`${enemy.name}攻击落空`);
                     }
@@ -3507,6 +3521,11 @@
             const battle = gameState.battles;
 
             stepNormalBattle(battle);
+
+            // 普通战斗区域此前只有文字日志、没有飘字，跟秘境战斗的反馈强度不一致——这里补上，
+            // 只在有画面的实时 tick 里读 stepNormalBattle 写的战果字段，离线批量模拟不会走到这里
+            if (battle._lastPlayerAttack) showDamageFloat(-battle._lastPlayerAttack.dmg, false, battle._lastPlayerAttack.crit);
+            if (battle._lastEnemyAttack) showDamageFloat(-battle._lastEnemyAttack.dmg, true, battle._lastEnemyAttack.crit);
 
             // 更新UI
             updateNormalBattleUI();
@@ -3666,7 +3685,7 @@
             if (died) {
                 showNotification('💀 你被击败了，本轮循环战斗结束', '#c4483a');
                 syncBattleMode();
-                clearActiveDomain();
+                clearActiveDomain('died');
                 switchPanel('battle');
                 switchBattleTab('areas');
                 renderAutoBattleBar();
@@ -4298,6 +4317,15 @@
             };
         }
 
+        // 灵域个人数据：只统计「激活次数」和「存活次数」（存活 = 没有以被击败告终，撤退 / 通关 / 渡劫成功都算），
+        // 在灵域选择弹窗里给玩家一点"经营感"反馈（正反馈诊断 C-3），不是严格的"通关率"——
+        // 普通战斗是循环挑战到撤退/死亡为止，秘境是打到底，渡劫是一锤子买卖，三种内容没有统一的"关"，
+        // 用"存活"这个所有内容都适用的口径更诚实
+        function getDomainStats(domainKey) {
+            const stats = (gameState.player.domainStats || {})[domainKey];
+            return stats || { used: 0, survived: 0 };
+        }
+
         // 激活灵域：进入战斗前调用，扣神识、写入 gameState、重算玩家属性（把灵域的玩家侧加成算进去）
         function activateDomain(domainKey) {
             const P = ensureCurrencyState();
@@ -4306,15 +4334,25 @@
             if (P.shenshi < DOMAIN_SHENSHI_COST) { spendNotify('shenshi', DOMAIN_SHENSHI_COST); return false; }
             P.shenshi -= DOMAIN_SHENSHI_COST;
             P.activeDomain = domainKey;
+            if (!P.domainStats) P.domainStats = {};
+            if (!P.domainStats[domainKey]) P.domainStats[domainKey] = { used: 0, survived: 0 };
+            P.domainStats[domainKey].used++;
             calculateStats();
             showNotification(`${SPIRIT_DOMAINS[domainKey].icon} ${SPIRIT_DOMAINS[domainKey].name}已激活：${SPIRIT_DOMAINS[domainKey].desc}`, '#b39ddb');
             return true;
         }
         // 战斗结束（撤退 / 被击败 / 通关不循环）时清空，恢复玩家属性；domainDecided 一并复位，
         // 这样下一场战斗（哪怕选择了「不用灵域」）也会重新弹一次选择框，而不是被上一场的决定卡住
-        function clearActiveDomain() {
+        // outcome：'survived'（默认，撤退/通关/渡劫成功）/ 'died'（被击败）/ 'skip'（结局不明确，比如离线期间战斗被中断，不计入统计）
+        function clearActiveDomain(outcome = 'survived') {
             gameState.player.domainDecided = false;
-            if (!gameState.player.activeDomain) return;
+            const domainKey = gameState.player.activeDomain;
+            if (!domainKey) return;
+            if (outcome !== 'skip') {
+                if (!gameState.player.domainStats) gameState.player.domainStats = {};
+                if (!gameState.player.domainStats[domainKey]) gameState.player.domainStats[domainKey] = { used: 0, survived: 0 };
+                if (outcome === 'survived') gameState.player.domainStats[domainKey].survived++;
+            }
             gameState.player.activeDomain = null;
             calculateStats();
         }
@@ -4344,9 +4382,14 @@
             const P = gameState.player;
             el.innerHTML = Object.entries(SPIRIT_DOMAINS).map(([key, d]) => {
                 const affordable = P.shenshi >= DOMAIN_SHENSHI_COST;
+                const s = getDomainStats(key);
+                const statsHtml = s.used > 0
+                    ? `<div class="domain-stats">你选过 ${s.used} 次，存活 ${Math.round(s.survived / s.used * 100)}%</div>`
+                    : `<div class="domain-stats domain-stats-new">还没选过</div>`;
                 return `<div class="domain-card${affordable ? '' : ' unaffordable'}" onclick="confirmDomainChoice('${key}')">
                     <div class="domain-icon">${d.icon}</div>
                     <div class="domain-name">${d.name}</div>
+                    ${statsHtml}
                     <div class="domain-desc">${d.desc}</div>
                 </div>`;
             }).join('');
@@ -4466,6 +4509,7 @@
                 const isMs = LAW_MILESTONE_LEVELS.includes(after);
                 const msText = isMs ? '（里程碑：' + describeEffects(def.milestones[after]).join('、') + '）' : '';
                 showNotification(`${def.icon} ${def.name} 领悟到 Lv.${after}${msText}`, '#b89a5b');
+                if (isMs) showQuickCelebration(`${def.icon} ${def.name} 里程碑 Lv.${after}`);
             }
             if (document.body.dataset.panel === 'wudao') generateLawList();
             return after >= cap;
@@ -5021,6 +5065,7 @@
                 const name = (getAction(skillName, key) || {}).name || key;
                 const milestone = MASTERY_MILESTONES.includes(after) ? '（里程碑！）' : '';
                 showNotification(`🎓 ${name} 精通 Lv.${after}${milestone}`, '#b89a5b');
+                showQuickCelebration(`🎓 ${name} 精通 Lv.${after}`);
             }
         }
 
@@ -5114,6 +5159,10 @@
             }
         }
 
+        // 本次打开游戏后每个配方完成的次数（纯前端展示用，不存档、刷新页面就清零）：
+        // 给重复点击的核心循环加一层看得见的进度感，哪怕产出数值不变也有"我已经做了这么多"的反馈（正反馈诊断 C-4）
+        const recipeSessionCounts = {};
+
         // 极速行动（如礼包饰品 ×100 速度）：连续完成时静音通知，界面每 0.4 秒刷新一次、存档每 5 秒一次
         const FAST_ACTION_SECONDS = 0.5;
         let notifyMuted = false, fastUiTs = 0, fastSaveTs = 0;
@@ -5141,7 +5190,7 @@
             const actionKey = act.action;
             const mastery = getMasteryBonus(act.skill, actionKey);
             const saveMaterials = action.requires && Math.random() < getSkillMod('save', act.skill) + mastery.save;
-            if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980');
+            if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980', 'rare');
             if (action.requires && !saveMaterials) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
                     const invIndex = gameState.player.inventory.findIndex(i => i.id === itemId);
@@ -5183,7 +5232,7 @@
             // 灵根/功法的「产出翻倍」特效
             if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', act.skill) + mastery.double + boostDouble + (bonus.double || 0)) {
                 finalOutput.items.forEach(item => { item.qty *= 2; });
-                showNotification('✨ 产出翻倍！', '#6fa980');
+                showNotification('✨ 产出翻倍！', '#6fa980', 'rare');
             }
 
             // 处理输出
@@ -5233,6 +5282,8 @@
             }
 
             trackQuest('act:' + act.skill + '.' + actionKey);
+            const __countKey = act.skill + ':' + actionKey;
+            recipeSessionCounts[__countKey] = (recipeSessionCounts[__countKey] || 0) + 1;
             if (bonus.batch) return;   // 极速行动（耗时 < 0.5 秒）：由调用方节流刷新界面 / 存档，否则每秒几十次全界面重绘会卡死页面
             updateUI();
             saveGame();
@@ -5733,9 +5784,14 @@
                 card.className = className;
             }
 
+            // 本次打开游戏后这个配方完成过几次：纯展示、不存档，给重复点击加一层看得见的进度感（正反馈诊断 C-4）
+            const sessionCount = recipeSessionCounts[skillName + ':' + recipeKey] || 0;
+            const sessionCountHtml = sessionCount > 0 ? `<div class="recipe-session-count" title="本次打开游戏后完成次数，刷新页面清零">本次×${sessionCount}</div>` : '';
+
             // 布局（自上而下）：名称 → 耗时 / 效率 → 产出大图 → 产出与消耗 → 进度条 → 精通条 → 分身按钮
             // 不再单独显示「✓ 要求」一行：未解锁时由锁定提示说明，要求全文放在卡片悬停提示里
             card.innerHTML = `
+                ${sessionCountHtml}
                 <div class="recipe-name rc-name">${recipe.name}</div>
                 <div class="recipe-time rc-meta">⏱ ${timeText}</div>
                 <div class="rc-art${unlockState.unlocked ? '' : ' locked'}">${unlockState.unlocked ? recipeArtIcon(recipe) : '🔒'}</div>
@@ -5772,7 +5828,12 @@
 
             actionList.innerHTML = '';
 
-            Object.entries(skill.recipes).forEach(([key, recipe]) => {
+            // 按解锁等级/境界从低到高排序，不再是 GAME_CONFIG 里写的原始顺序——配方是分多个版本陆续加的，
+            // 新配方大多直接追加在对象末尾，写入顺序跟需要的等级早就对不上了（用户反馈：很多配方顺序不是按等级来的）
+            const sortedEntries = Object.entries(skill.recipes).sort(([, a], [, b]) =>
+                getRecipeUnlockState(skillName, a).requiredValue - getRecipeUnlockState(skillName, b).requiredValue);
+
+            sortedEntries.forEach(([key, recipe]) => {
                 try {
                     const card = renderRecipeCard(skillName, key, recipe);
                     if (card) {
@@ -7131,6 +7192,27 @@
             });
         }
 
+        // 精通升级 / 法则里程碑这类数值跃迁太频繁，不适合用需要点确认的重弹窗（境界解锁提示那种），
+        // 但完全静默（只有一条会被刷掉的 toast）又感知不到——加一个屏幕中央短暂浮现、自动消失、不挡手的小庆祝，
+        // 复用同一个 DOM 节点：连续触发时只重置文字和计时器，不会叠好几个气泡（正反馈诊断 C-5）
+        let quickCelebrationTimer = null;
+        function showQuickCelebration(text) {
+            if (gameState.settings && gameState.settings.enableNotifications === false) return;
+            let el = document.getElementById('quickCelebration');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'quickCelebration';
+                el.className = 'quick-celebration';
+                document.body.appendChild(el);
+            }
+            el.textContent = text;
+            el.classList.remove('show');
+            void el.offsetWidth;   // 强制重排，确保连续触发时动画能重新播放一次
+            el.classList.add('show');
+            clearTimeout(quickCelebrationTimer);
+            quickCelebrationTimer = setTimeout(() => el.classList.remove('show'), 800);
+        }
+
         // 通知类型系统（P1功能）
         // 通知关闭时仍要显示的「重要提示」：类型为 error / danger / warning，或使用了警示 / 错误色的通知
         const IMPORTANT_NOTIFICATION_COLORS = ['#c4483a', '#c98a3e', '#ef4444', '#f59e0b', '#ff6b6b', '#f39c12'];
@@ -7142,7 +7224,9 @@
                 return;
             }
             const notification = document.createElement('div');
-            notification.className = 'notification';
+            // type: 'rare' 用于翻倍/节省这类概率触发的稀有事件，边框加粗+轻微脉冲发光，
+            // 跟"材料不足"这种日常提示拉开视觉层级（正反馈诊断 C-1），不影响静音/常驻等既有逻辑
+            notification.className = 'notification' + (type === 'rare' ? ' notification-rare' : '');
             notification.style.setProperty('--accent', color);   // 颜色只用作左侧色条，底色由样式统一
             notification.style.minWidth = '300px';
 
@@ -9022,12 +9106,12 @@
 
             if (savedAction && (savedAction.isBattle || savedAction.isDungeon)) {
                 if (savedAction.isDungeon) {
-                    resetBattleState('idle');
+                    resetBattleState('idle', 'skip');
                 } else {
                     gameState.battles = null;
                     gameState.currentAction = null;
                     gameState.currentActionProgress = 0;
-                    clearActiveDomain();
+                    clearActiveDomain('skip');
                     const battleContainer = document.getElementById('battleContainer');
                     if (battleContainer) battleContainer.classList.add('hidden');
                     syncBattleMode();
