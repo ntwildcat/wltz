@@ -5129,6 +5129,10 @@
             }
         }
 
+        // 本次打开游戏后每个配方完成的次数（纯前端展示用，不存档、刷新页面就清零）：
+        // 给重复点击的核心循环加一层看得见的进度感，哪怕产出数值不变也有"我已经做了这么多"的反馈（正反馈诊断 C-4）
+        const recipeSessionCounts = {};
+
         // 极速行动（如礼包饰品 ×100 速度）：连续完成时静音通知，界面每 0.4 秒刷新一次、存档每 5 秒一次
         const FAST_ACTION_SECONDS = 0.5;
         let notifyMuted = false, fastUiTs = 0, fastSaveTs = 0;
@@ -5248,6 +5252,8 @@
             }
 
             trackQuest('act:' + act.skill + '.' + actionKey);
+            const __countKey = act.skill + ':' + actionKey;
+            recipeSessionCounts[__countKey] = (recipeSessionCounts[__countKey] || 0) + 1;
             if (bonus.batch) return;   // 极速行动（耗时 < 0.5 秒）：由调用方节流刷新界面 / 存档，否则每秒几十次全界面重绘会卡死页面
             updateUI();
             saveGame();
@@ -5748,9 +5754,14 @@
                 card.className = className;
             }
 
+            // 本次打开游戏后这个配方完成过几次：纯展示、不存档，给重复点击加一层看得见的进度感（正反馈诊断 C-4）
+            const sessionCount = recipeSessionCounts[skillName + ':' + recipeKey] || 0;
+            const sessionCountHtml = sessionCount > 0 ? `<div class="recipe-session-count" title="本次打开游戏后完成次数，刷新页面清零">本次×${sessionCount}</div>` : '';
+
             // 布局（自上而下）：名称 → 耗时 / 效率 → 产出大图 → 产出与消耗 → 进度条 → 精通条 → 分身按钮
             // 不再单独显示「✓ 要求」一行：未解锁时由锁定提示说明，要求全文放在卡片悬停提示里
             card.innerHTML = `
+                ${sessionCountHtml}
                 <div class="recipe-name rc-name">${recipe.name}</div>
                 <div class="recipe-time rc-meta">⏱ ${timeText}</div>
                 <div class="rc-art${unlockState.unlocked ? '' : ' locked'}">${unlockState.unlocked ? recipeArtIcon(recipe) : '🔒'}</div>

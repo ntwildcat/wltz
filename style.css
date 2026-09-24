@@ -1257,6 +1257,27 @@ body.in-battle .battle-container {
     user-select: none;
     text-shadow: 2px 2px 4px #000;
 }
+/* 配方卡片「本次完成次数」角标：纯前端展示，每次配方完成重新渲染时播放一下弹出动画（正反馈诊断 C-4） */
+.recipe-session-count {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 0.7em;
+    font-weight: bold;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--bg-l1);
+    border: 1px solid var(--border-l3);
+    color: var(--text-l3);
+    animation: sessionCountPop 0.3s ease-out;
+    z-index: 1;
+}
+@keyframes sessionCountPop {
+    0% { transform: scale(0.6); opacity: 0.4; }
+    60% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
 .damage-float-layer {
     position: absolute;
     top: 0; left: 0;
