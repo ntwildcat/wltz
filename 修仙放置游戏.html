@@ -2220,13 +2220,13 @@
                         golden_grass: { name: '种植金灵草', desc: '消耗种子→产出灵药', duration: 180, output: { items: [{ id: 'goldengrass', qty: 1 }], skill: 'farming', exp: 100 }, requiredLevel: 30, requires: { seed_goldengrass: 1 }, unlocked: false },
                         lotus:        { name: '种植九叶莲', desc: '消耗种子→产出灵药', duration: 300, output: { items: [{ id: 'lotus',       qty: 1 }], skill: 'farming', exp: 80  }, requiredLevel: 40, requires: { seed_lotus:       1 }, unlocked: false },
 
-                        // === 分解配方：1灵药→2种子（扩充种子池） ===
-                        decompose_grass:        { name: '分解清灵草', desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_cleangrass',  qty: 2 }], skill: 'farming', exp: 5  }, requiredLevel: 2,  requires: { cleangrass:  1 }, unlocked: false },
-                        decompose_mushroom:     { name: '分解灵芝',   desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_mushroom',    qty: 2 }], skill: 'farming', exp: 8  }, requiredLevel: 10, requires: { mushroom:    1 }, unlocked: false },
-                        decompose_tea:          { name: '分解悟道茶', desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_tea',         qty: 2 }], skill: 'farming', exp: 12 }, requiredLevel: 20, requires: { tea:         1 }, unlocked: false },
-                        decompose_spirit_fruit: { name: '分解灵果',   desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_spiritfruit', qty: 2 }], skill: 'farming', exp: 10 }, requiredLevel: 15, requires: { spiritfruit: 1 }, unlocked: false },
-                        decompose_golden_grass: { name: '分解金灵草', desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_goldengrass', qty: 2 }], skill: 'farming', exp: 20 }, requiredLevel: 30, requires: { goldengrass: 1 }, unlocked: false },
-                        decompose_lotus:        { name: '分解九叶莲', desc: '1灵药→2种子', duration: 5, output: { items: [{ id: 'seed_lotus',       qty: 2 }], skill: 'farming', exp: 15 }, requiredLevel: 40, requires: { lotus:       1 }, unlocked: false }
+                        // === 分解配方：1灵药→1种子（1:1兑换，防止复利） ===
+                        decompose_grass:        { name: '分解清灵草', desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_cleangrass',  qty: 1 }], skill: 'farming', exp: 5  }, requiredLevel: 2,  requires: { cleangrass:  1 }, unlocked: false },
+                        decompose_mushroom:     { name: '分解灵芝',   desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_mushroom',    qty: 1 }], skill: 'farming', exp: 8  }, requiredLevel: 10, requires: { mushroom:    1 }, unlocked: false },
+                        decompose_tea:          { name: '分解悟道茶', desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_tea',         qty: 1 }], skill: 'farming', exp: 12 }, requiredLevel: 20, requires: { tea:         1 }, unlocked: false },
+                        decompose_spirit_fruit: { name: '分解灵果',   desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_spiritfruit', qty: 1 }], skill: 'farming', exp: 10 }, requiredLevel: 15, requires: { spiritfruit: 1 }, unlocked: false },
+                        decompose_golden_grass: { name: '分解金灵草', desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_goldengrass', qty: 1 }], skill: 'farming', exp: 20 }, requiredLevel: 30, requires: { goldengrass: 1 }, unlocked: false },
+                        decompose_lotus:        { name: '分解九叶莲', desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_lotus',       qty: 1 }], skill: 'farming', exp: 15 }, requiredLevel: 40, requires: { lotus:       1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2372,10 +2372,10 @@
                     { id: 'yuanyingsword', name: '元婴灵剑', icon: '✨', price: 10000, desc: '攻击力+80', minRealmIndex: 13 }
                 ],
                 materials: [
-                    { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5 },
-                    { id: 'crystal', name: '玄晶 ×3', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
-                    { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9 },
-                    { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13 }
+                    { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5, qty: 5 },
+                    { id: 'crystal', name: '玄晶 ×3', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8, qty: 3 },
+                    { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9, qty: 1 },
+                    { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13, qty: 1 }
                 ],
                 special: [
                     { id: 'golden_art', name: '金丹大道', icon: '📜', price: 10000, desc: '修炼速度 ×1.5', minRealmIndex: 8, type: 'art' },
@@ -2630,7 +2630,7 @@
             // 根据出身给予初始物品和功法
             if (origin === 'orphan') {
                 gameState.player.equipment.jewelry.push('jade');
-                gameState.workSpeedMultiplier = 0.95;
+                // workSpeedMultiplier由灵玉装备效果动态计算，不在此硬编码
                 gameState.player.currentArt = 'basic_art';  // 分配基础功法
             } else if (origin === 'disciple') {
                 gameState.player.equipment.weapon = 'sword';
@@ -3957,7 +3957,7 @@
                 item.onclick = () => switchPanel(skillName);
 
                 const level = skill.level || 1;
-                const maxExp = 100 * level;
+                const maxExp = 100 * Math.pow(level, 1.8);
                 const currentExp = skill.exp || 0;
                 const expPercent = Math.min((currentExp / maxExp) * 100, 100);
 
@@ -4571,10 +4571,12 @@
             // 处理装备按钮显示（P2功能：equipping/unequipping）
             const actionBtn = document.getElementById('itemActionBtn');
             if (actionBtn) {
-                if (itemConfig.type === 'weapon' || itemConfig.type === 'jewelry') {
+                if (itemConfig.type === 'weapon' || itemConfig.type === 'armor' || itemConfig.type === 'jewelry') {
                     // 检查是否已装备
                     let isEquipped = false;
                     if (itemConfig.type === 'weapon' && gameState.player.equipment.weapon === itemId) {
+                        isEquipped = true;
+                    } else if (itemConfig.type === 'armor' && gameState.player.equipment.armor === itemId) {
                         isEquipped = true;
                     } else if (itemConfig.type === 'jewelry' && gameState.player.equipment.jewelry?.includes(itemId)) {
                         isEquipped = true;
@@ -4617,6 +4619,8 @@
             let isEquipped = false;
             if (itemType === 'weapon' && gameState.player.equipment.weapon === itemId) {
                 isEquipped = true;
+            } else if (itemType === 'armor' && gameState.player.equipment.armor === itemId) {
+                isEquipped = true;
             } else if (itemType === 'jewelry' && gameState.player.equipment.jewelry?.includes(itemId)) {
                 isEquipped = true;
             }
@@ -4625,6 +4629,8 @@
                 // 卸下装备
                 if (itemType === 'weapon') {
                     gameState.player.equipment.weapon = null;
+                } else if (itemType === 'armor') {
+                    gameState.player.equipment.armor = null;
                 } else if (itemType === 'jewelry') {
                     gameState.player.equipment.jewelry = gameState.player.equipment.jewelry.filter(id => id !== itemId);
                 }
@@ -4633,6 +4639,9 @@
                 // 装备
                 if (itemType === 'weapon') {
                     gameState.player.equipment.weapon = itemId;
+                    showNotification(`已装备${itemConfig.name}`, '#16a34a');
+                } else if (itemType === 'armor') {
+                    gameState.player.equipment.armor = itemId;
                     showNotification(`已装备${itemConfig.name}`, '#16a34a');
                 } else if (itemType === 'jewelry') {
                     // 首饰可以多个装备
@@ -4682,7 +4691,7 @@
 
         // 初始化秘境
         function initializeDungeons() {
-            const dungeonList = ['mysteryTower', 'mysteriousForest', 'ancientRuin'];
+            const dungeonList = Object.keys(GAME_CONFIG.dungeons);
             const dungeonActions = {};
 
             dungeonList.forEach(dungeonId => {
@@ -4735,10 +4744,16 @@
             const container = document.getElementById('dungeonActions');
             container.innerHTML = '';
 
-            const dungeonIds = ['mysteryTower', 'mysteriousForest', 'ancientRuin'];
+            const dungeonIds = Object.keys(GAME_CONFIG.dungeons);
+
+            const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满', '金丹初期', '金丹中期', '金丹后期', '金丹圆满', '元婴初期', '元婴中期', '元婴后期', '元婴圆满'];
 
             dungeonIds.forEach(dungeonId => {
                 const dungeon = GAME_CONFIG.dungeons[dungeonId];
+                // 如果存档里没有该秘境记录（老存档），动态补全
+                if (!gameState.dungeons[dungeonId]) {
+                    gameState.dungeons[dungeonId] = { completed: false };
+                }
                 const record = gameState.dungeons[dungeonId];
 
                 // 检查是否满足境界要求（仅基于最低境界索引）
@@ -4746,7 +4761,6 @@
                 const statusColor = record.completed ? '#16a34a' : meetsRequirement ? '#fbbf24' : '#666';
                 const statusText = record.completed ? '✓ 已通关' : meetsRequirement ? '✓ 可进入' : '⛔ 境界不足';
 
-                const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满'];
                 const requiredRealmName = realmNames[dungeon.minRealmIndex] || '未知';
 
                 const actionDiv = document.createElement('div');
@@ -5172,8 +5186,9 @@
                 updateArtDisplay();
                 updateActionDisplay();
             } else {
-                // 消耗品处理
-                addToInventory(itemId, 1);
+                // 消耗品/材料处理（qty字段支持批量购买）
+                const purchaseQty = item.qty || 1;
+                addToInventory(itemId, purchaseQty);
                 showNotification(`购买成功：${item.name}`, '#16a34a');
             }
 
@@ -5443,6 +5458,17 @@
             };
 
             gameState.player.stats = totalStats;
+
+            // 根据首饰effect动态计算工作速度倍率（灵玉等装备才生效）
+            let speedMulti = 1.0;
+            jewelry.forEach(jewelryId => {
+                const jewelryItem = GAME_CONFIG.items[jewelryId];
+                if (jewelryItem?.effect?.workSpeed) {
+                    speedMulti *= jewelryItem.effect.workSpeed;
+                }
+            });
+            gameState.workSpeedMultiplier = speedMulti;
+
             updateStatsDisplay();
         }
 
@@ -6062,6 +6088,7 @@
                 const dataStr = atob(input);
                 const loaded = JSON.parse(dataStr);
                 gameState = loaded;
+                migrateGameData();
                 handleOfflineTime();
                 document.getElementById('startScreen').classList.remove('show');
                 document.getElementById('gameScreen').classList.remove('hidden');
@@ -6117,15 +6144,11 @@
                         currentMonsterHP: 0,
                         defeatCount: 0,
                         bossDefeated: false,
-                        mysteryTower: {
-                            completed: false
-                        },
-                        mysteriousForest: {
-                            completed: false
-                        },
-                        ancientRuin: {
-                            completed: false
-                        }
+                        mysteryTower: { completed: false },
+                        mysteriousForest: { completed: false },
+                        ancientRuin: { completed: false },
+                        tribulationGround: { completed: false },
+                        huashenRealm: { completed: false }
                     },
                     // P2功能：用户设置
                     settings: {
