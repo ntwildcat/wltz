@@ -5821,6 +5821,13 @@
         }
 
         function selectAction(skill, action) {
+            // 点击「当前正在做的这个配方」＝停止，不是重新开始——之前点哪个配方卡片都会先 stopAction()
+            // 再立刻开始同一个配方，等于白点；现在再点一次正在进行的配方直接停下来
+            if (gameState.currentAction && gameState.currentAction.skill === skill && gameState.currentAction.action === action) {
+                stopAction();
+                return;
+            }
+
             // 凡人无法参与战斗
             if (gameState.player.realmIndex === 0 && skill === 'battle') {
                 showNotification('凡人无法参与战斗，请先突破到练气初期', '#c98a3e', 'warning');
