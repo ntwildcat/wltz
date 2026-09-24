@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -2027,11 +2027,8 @@
                         { name: '玄机子', type: '木', hp: 100, atk: 15, spd: 40, def: 6, attackSpeed: 3.2, isBoss: true, drop: 'coins', dropQty: 100 }
                     ],
                     rewards: {
-                        fixed: [
-                            { id: 'seed_cleangrass', qty: [3, 5] }
-                        ],
+                        fixed: [],  // 种子只从战斗区域掉落
                         random: [
-                            { id: 'seed_mushroom', qty: 1, probability: 0.2 },
                             { id: 'stone', qty: [2, 4], probability: 1 }
                         ],
                         coins: [200, 500],
@@ -2041,7 +2038,7 @@
                 mysteriousForest: {
                     id: 'mysteriousForest',
                     name: '诡异森林',
-                    desc: '灵植妖物·通关掉落灵芝种子',
+                    desc: '灵植妖物·战斗掉落灵田种子',
                     icon: '🌲',
                     minRealmIndex: 4,                    // 最低需要练气巅峰（索引4）
                     baseRealmIndex: 4,                   // 秘径内怪物的基础境界（新索引）
@@ -2051,16 +2048,14 @@
                         { name: '腐沼瘴气', type: '水', hp: 135, atk: 9, spd: 55, def: 4, attackSpeed: 2.1, drop: 'coins', dropQty: 45 },
                         { name: '幻影蝶', type: '风', hp: 165, atk: 13, spd: 60, def: 3, attackSpeed: 2.0, drop: 'coins', dropQty: 50 },
                         { name: '古树守卫', type: '木', hp: 210, atk: 7, spd: 35, def: 10, attackSpeed: 2.8, drop: 'coins', dropQty: 55 },
-                        { name: '灵草魅影', type: '木', hp: 165, atk: 10, spd: 45, def: 5, attackSpeed: 2.3, drop: 'seed_cleangrass', dropQty: 1 },
+                        { name: '灵草魅影', type: '木', hp: 165, atk: 10, spd: 45, def: 5, attackSpeed: 2.3, drop: 'coins', dropQty: 30 },
                         { name: '森林之心', type: '木', hp: 300, atk: 18, spd: 42, def: 8, attackSpeed: 3.0, isBoss: true, drop: 'coins', dropQty: 200 }
                     ],
                     rewards: {
-                        fixed: [
-                            { id: 'seed_mushroom', qty: [2, 4] }
-                        ],
+                        fixed: [],
                         random: [
-                            { id: 'seed_tea', qty: 1, probability: 0.3 },
-                            { id: 'cleangrass', qty: [3, 5], probability: 1 }
+                            { id: 'cleangrass', qty: [3, 5], probability: 1 },
+                            { id: 'yaodan', qty: [1, 2], probability: 0.5 }
                         ],
                         coins: [500, 1200],
                         skillExp: 50
@@ -2069,7 +2064,7 @@
                 ancientRuin: {
                     id: 'ancientRuin',
                     name: '古老遗迹',
-                    desc: '法则残片·通关掉落九叶莲种子',
+                    desc: '法则残片·战斗掉落灵田种子',
                     icon: '⚱️',
                     minRealmIndex: 6,                    // 最低需要筑基中期（索引6）
                     baseRealmIndex: 6,                   // 秘径内怪物的基础境界（新索引）
@@ -2082,12 +2077,10 @@
                         { name: '遗迹意志', type: '无', hp: 900, atk: 20, spd: 48, def: 10, attackSpeed: 3.1, isBoss: true, drop: 'coins', dropQty: 300 }
                     ],
                     rewards: {
-                        fixed: [
-                            { id: 'seed_lotus', qty: 1 }
-                        ],
+                        fixed: [],
                         random: [
-                            { id: 'seed_tea', qty: 1, probability: 0.5 },
-                            { id: 'crystal', qty: [2, 3], probability: 1 }
+                            { id: 'crystal', qty: [2, 3], probability: 1 },
+                            { id: 'yaodan', qty: [1, 3], probability: 0.8 }
                         ],
                         coins: [1000, 2000],
                         skillExp: 80
@@ -2185,13 +2178,19 @@
                         restore: { name: '回气丹', desc: '灵米 ×2', duration: 8, output: { items: [{ id: 'restpill', qty: 1 }], skill: 'alchemy', exp: 18 }, requiredLevel: 2, requires: { millet: 2 }, unlocked: false },
                         breakthrough: { name: '筑基丹', desc: '清灵草 ×3', duration: 12, output: { items: [{ id: 'pill', qty: 1 }], skill: 'alchemy', exp: 25 }, requiredLevel: 5, requires: { cleangrass: 3 }, unlocked: false },
                         gather: { name: '聚灵丹', desc: '清灵草 ×2 + 灵米 ×1', duration: 15, output: { items: [{ id: 'gatherpill', qty: 1 }], skill: 'alchemy', exp: 30 }, requiredLevel: 8, requires: { cleangrass: 2, millet: 1 }, unlocked: false },
-                        realm: { name: '破境丹', desc: '清灵草 ×5 + 妖丹 ×1', duration: 25, output: { items: [{ id: 'realmpill', qty: 1 }], skill: 'alchemy', exp: 50 }, requiredLevel: 15, requires: { cleangrass: 5 }, unlocked: false },
-                        marrow: { name: '洗髓丹', desc: '妖丹 ×2 + 灵玉粉 ×1', duration: 30, output: { items: [{ id: 'marrpill', qty: 1 }], skill: 'alchemy', exp: 70 }, requiredLevel: 25, requires: {}, unlocked: false },
+                        realm: { name: '破境丹', desc: '清灵草 ×5 + 妖丹 ×1', duration: 25, output: { items: [{ id: 'realmpill', qty: 1 }], skill: 'alchemy', exp: 50 }, requiredLevel: 15, requires: { cleangrass: 5, yaodan: 1 }, unlocked: false },
+                        marrow: { name: '洗髓丹', desc: '妖丹 ×2 + 灵玉粉 ×1', duration: 30, output: { items: [{ id: 'marrpill', qty: 1 }], skill: 'alchemy', exp: 70 }, requiredLevel: 25, requires: { yaodan: 2, jadepowder: 1 }, unlocked: false },
                         // P6 金丹期配方
                         golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 丹火 ×2', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 120 }, requiredLevel: 30, requires: { mushroom: 3, crystal: 1, danhuo: 2 }, unlocked: false },
                         spirit_pill: { name: '聚灵丹（高级）', desc: '灵芝 ×5 + 玄晶 ×2', duration: 45, output: { items: [{ id: 'spiritpill', qty: 1 }], skill: 'alchemy', exp: 150 }, requiredLevel: 35, requires: { mushroom: 5, crystal: 2 }, unlocked: false },
                         // P7 元婴期配方
-                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 神识 ×2', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 40, requires: { lotus: 3, tea: 5, shenshi: 2 }, unlocked: false }
+                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 神识 ×2', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 40, requires: { lotus: 3, tea: 5, shenshi: 2 }, unlocked: false },
+                        // 辅材配方
+                        grind_jade: { name: '研磨灵玉', desc: '灵玉 ×1 → 灵玉粉 ×3', duration: 15, output: { items: [{ id: 'jadepowder', qty: 3 }], skill: 'alchemy', exp: 20 }, requiredLevel: 10, requires: { jade: 1 }, unlocked: false },
+                        // 食物配方
+                        cook_porridge: { name: '熬制灵米粥', desc: '灵米 ×3', duration: 10, output: { items: [{ id: 'millet_porridge', qty: 3 }], skill: 'alchemy', exp: 12 }, requiredLevel: 1, requires: { millet: 3 }, unlocked: true },
+                        cook_herb_soup: { name: '炼制灵草汤', desc: '清灵草 ×2 + 灵米 ×1', duration: 20, output: { items: [{ id: 'herb_soup', qty: 2 }], skill: 'alchemy', exp: 30 }, requiredLevel: 8, requires: { cleangrass: 2, millet: 1 }, unlocked: false },
+                        cook_immortal_peach: { name: '炼化蟠桃', desc: '九叶莲 ×2 + 灵芝 ×3', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 1 }], skill: 'alchemy', exp: 180 }, requiredLevel: 38, requires: { lotus: 2, mushroom: 3 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2218,13 +2217,24 @@
                     level: 1,
                     exp: 0,
                     recipes: {
+                        // 灵米：产出灵米，不需要种子
                         millet: { name: '种植灵米', desc: '食物', duration: 5, output: { items: [{ id: 'millet', qty: 1 }], skill: 'farming', exp: 10 }, requiredLevel: 1, unlocked: true },
-                        grass: { name: '种植清灵草', desc: '炼丹材料 需灵草种子', duration: 10, output: { items: [{ id: 'cleangrass', qty: 1 }], skill: 'farming', exp: 15 }, requiredLevel: 2, requires: { seed_cleangrass: 1 }, unlocked: false },
-                        mushroom: { name: '种植灵芝', desc: '高级材料 需灵芝种子', duration: 30, output: { items: [{ id: 'mushroom', qty: 1 }], skill: 'farming', exp: 25 }, requiredLevel: 10, requires: { seed_mushroom: 1 }, unlocked: false },
-                        tea: { name: '种植悟道茶', desc: '特殊材料 需悟道茶种子', duration: 60, output: { items: [{ id: 'tea', qty: 1 }], skill: 'farming', exp: 40 }, requiredLevel: 20, requires: { seed_tea: 1 }, unlocked: false },
-                        spirit_fruit: { name: '种植灵果', desc: '中级材料 需灵果种子', duration: 120, output: { items: [{ id: 'spiritfruit', qty: 1 }], skill: 'farming', exp: 50 }, requiredLevel: 15, requires: { seed_spiritfruit: 1 }, unlocked: false },
-                        golden_grass: { name: '种植金灵草', desc: '高级材料 需金灵草种子', duration: 180, output: { items: [{ id: 'goldengrass', qty: 1 }], skill: 'farming', exp: 100 }, requiredLevel: 30, requires: { seed_goldengrass: 1 }, unlocked: false },
-                        lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 80 }, requiredLevel: 40, requires: { seed_lotus: 1 }, unlocked: false }
+
+                        // === 种植配方：消耗1种子→产出1灵药 ===
+                        grass:        { name: '种植清灵草', desc: '消耗种子→产出灵药', duration: 10,  output: { items: [{ id: 'cleangrass',  qty: 1 }], skill: 'farming', exp: 15  }, requiredLevel: 2,  requires: { seed_cleangrass:  1 }, unlocked: false },
+                        mushroom:     { name: '种植灵芝',   desc: '消耗种子→产出灵药', duration: 30,  output: { items: [{ id: 'mushroom',    qty: 1 }], skill: 'farming', exp: 25  }, requiredLevel: 10, requires: { seed_mushroom:    1 }, unlocked: false },
+                        tea:          { name: '种植悟道茶', desc: '消耗种子→产出灵药', duration: 60,  output: { items: [{ id: 'tea',         qty: 1 }], skill: 'farming', exp: 40  }, requiredLevel: 20, requires: { seed_tea:         1 }, unlocked: false },
+                        spirit_fruit: { name: '种植灵果',   desc: '消耗种子→产出灵药', duration: 120, output: { items: [{ id: 'spiritfruit', qty: 1 }], skill: 'farming', exp: 50  }, requiredLevel: 15, requires: { seed_spiritfruit: 1 }, unlocked: false },
+                        golden_grass: { name: '种植金灵草', desc: '消耗种子→产出灵药', duration: 180, output: { items: [{ id: 'goldengrass', qty: 1 }], skill: 'farming', exp: 100 }, requiredLevel: 30, requires: { seed_goldengrass: 1 }, unlocked: false },
+                        lotus:        { name: '种植九叶莲', desc: '消耗种子→产出灵药', duration: 300, output: { items: [{ id: 'lotus',       qty: 1 }], skill: 'farming', exp: 80  }, requiredLevel: 40, requires: { seed_lotus:       1 }, unlocked: false },
+
+                        // === 分解配方：1灵药→1种子（1:1兑换，防止复利） ===
+                        decompose_grass:        { name: '分解清灵草', desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_cleangrass',  qty: 1 }], skill: 'farming', exp: 5  }, requiredLevel: 2,  requires: { cleangrass:  1 }, unlocked: false },
+                        decompose_mushroom:     { name: '分解灵芝',   desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_mushroom',    qty: 1 }], skill: 'farming', exp: 8  }, requiredLevel: 10, requires: { mushroom:    1 }, unlocked: false },
+                        decompose_tea:          { name: '分解悟道茶', desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_tea',         qty: 1 }], skill: 'farming', exp: 12 }, requiredLevel: 20, requires: { tea:         1 }, unlocked: false },
+                        decompose_spirit_fruit: { name: '分解灵果',   desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_spiritfruit', qty: 1 }], skill: 'farming', exp: 10 }, requiredLevel: 15, requires: { spiritfruit: 1 }, unlocked: false },
+                        decompose_golden_grass: { name: '分解金灵草', desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_goldengrass', qty: 1 }], skill: 'farming', exp: 20 }, requiredLevel: 30, requires: { goldengrass: 1 }, unlocked: false },
+                        decompose_lotus:        { name: '分解九叶莲', desc: '1灵药→1种子', duration: 5, output: { items: [{ id: 'seed_lotus',       qty: 1 }], skill: 'farming', exp: 15 }, requiredLevel: 40, requires: { lotus:       1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -2311,6 +2321,8 @@
                 // 特殊材料
                 spiritstone: { name: '灵石', icon: '💎', type: 'currency' },
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', effect: { workSpeed: 0.95 } },
+                yaodan: { name: '妖丹', icon: '🔴', type: 'material', desc: '妖兽核心，秘境掉落' },
+                jadepowder: { name: '灵玉粉', icon: '✨', type: 'material', desc: '灵玉研磨所得' },
 
                 // P6 丹火相关物品
                 danhuo: { name: '丹火', icon: '🔥', type: 'material' },
@@ -2341,7 +2353,12 @@
                 spiritfruit: { name: '灵果', icon: '🍎', type: 'material' },
                 goldengrass: { name: '金灵草', icon: '🌾', type: 'material' },
                 seed_spiritfruit: { name: '灵果种子', icon: '🌱', type: 'seed' },
-                seed_goldengrass: { name: '金灵草种子', icon: '🌿', type: 'seed' }
+                seed_goldengrass: { name: '金灵草种子', icon: '🌿', type: 'seed' },
+
+                // 食物（可装备为战斗食物，使用时从背包消耗）
+                millet_porridge: { name: '灵米粥', icon: '🍲', type: 'food', hpRestore: 100, cooldown: 1.0, desc: '恢复100点生命值' },
+                herb_soup: { name: '灵草汤', icon: '🍜', type: 'food', hpRestore: 250, cooldown: 2.0, desc: '恢复250点生命值' },
+                immortal_peach: { name: '蟠桃', icon: '🍑', type: 'food', hpRestore: 1000, cooldown: 5.0, desc: '完全恢复生命值' }
             },
             shop: {
                 upgrades: [
@@ -2353,14 +2370,7 @@
                     { id: 'cleangrass', name: '清灵草', icon: '🍃', price: 25, desc: '炼丹材料' },
                     { id: 'mushroom', name: '灵芝', icon: '🍄', price: 50, desc: '高级材料' }
                 ],
-                pills: [
-                    { id: 'restpill', name: '回气丹', icon: '💊', price: 30, desc: '+50灵气', minRealmIndex: 0 },
-                    { id: 'pill', name: '筑基丹', icon: '🔮', price: 60, desc: '+100灵气', minRealmIndex: 0 },
-                    { id: 'gatherpill', name: '聚灵丹', icon: '🔵', price: 100, desc: '+200灵气', minRealmIndex: 0 },
-                    { id: 'spiritpill', name: '聚灵丹（高级）', icon: '🔷', price: 500, desc: '恢复大量灵气', minRealmIndex: 10 },
-                    { id: 'goldenpill', name: '金丹秘药', icon: '🟤', price: 5000, desc: '金丹期突破必需', minRealmIndex: 9 },
-                    { id: 'yuanyingpill', name: '元婴丹', icon: '⭕', price: 20000, desc: '元婴期突破必需', minRealmIndex: 13 }
-                ],
+                pills: [],
                 equipment: [
                     { id: 'sword', name: '桃木剑', icon: '⚔️', price: 150, desc: '攻击力+15', minRealmIndex: 0 },
                     { id: 'jade', name: '灵玉', icon: '📿', price: 80, desc: '工作速度-5%', minRealmIndex: 0 },
@@ -2370,10 +2380,10 @@
                     { id: 'yuanyingsword', name: '元婴灵剑', icon: '✨', price: 10000, desc: '攻击力+80', minRealmIndex: 13 }
                 ],
                 materials: [
-                    { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5 },
-                    { id: 'crystal', name: '玄晶 ×3', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
-                    { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9 },
-                    { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13 }
+                    { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5, qty: 5 },
+                    { id: 'crystal', name: '玄晶 ×3', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8, qty: 3 },
+                    { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9, qty: 1 },
+                    { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13, qty: 1 }
                 ],
                 special: [
                     { id: 'golden_art', name: '金丹大道', icon: '📜', price: 10000, desc: '修炼速度 ×1.5', minRealmIndex: 8, type: 'art' },
@@ -2503,8 +2513,8 @@
                 name: '灵田',
                 effectPer: 1,
                 effectType: 'speed',
-                // 每级速度 -1%: 等级50时速度×0.5(快50%)
-                formula: (level) => 1 - (level - 1) * 0.01
+                // 每级速度 -1%，最低速度×0.1（即快90%），防止高等级负数
+                formula: (level) => Math.max(0.1, 1 - (level - 1) * 0.01)
             },
             mining: {
                 name: '采矿',
@@ -2628,7 +2638,7 @@
             // 根据出身给予初始物品和功法
             if (origin === 'orphan') {
                 gameState.player.equipment.jewelry.push('jade');
-                gameState.workSpeedMultiplier = 0.95;
+                // workSpeedMultiplier由灵玉装备效果动态计算，不在此硬编码
                 gameState.player.currentArt = 'basic_art';  // 分配基础功法
             } else if (origin === 'disciple') {
                 gameState.player.equipment.weapon = 'sword';
@@ -2690,13 +2700,15 @@
 
                 const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
 
-                // 检查所需物品是否充足，不足则停止action
+                // 检查所需物品是否充足，不足则停止action（灵田按槽位数检查）
                 if (action.requires) {
+                    const slots = gameState.currentAction.skill === 'farming'
+                        ? (gameState.player.farmingSlots || 1) : 1;
                     let materialShortage = false;
                     for (const [itemId, requiredQty] of Object.entries(action.requires)) {
                         const invItem = gameState.player.inventory.find(i => i.id === itemId);
                         const currentQty = invItem ? invItem.qty : 0;
-                        if (currentQty < requiredQty) {
+                        if (currentQty < requiredQty * slots) {
                             materialShortage = true;
                             break;
                         }
@@ -2941,41 +2953,49 @@
         function consumeFood() {
             // 检查是否装备了食物
             if (!gameState.player.foodSlot) {
-                return false; // 没有装备食物
-            }
-
-            // 检查食物数量是否足够（重要：必须有食物才能吃）
-            if (!gameState.player.foodCount || gameState.player.foodCount <= 0) {
-                return false; // 食物不足，无法进食
-            }
-
-            // 获取装备的食物配置
-            const foodId = gameState.player.foodSlot;
-            const foodConfig = FOOD_CONFIG.foods[foodId];
-            if (!foodConfig) {
-                console.warn(`未找到食物配置: ${foodId}`);
                 return false;
             }
 
+            const foodId = gameState.player.foodSlot;
+            // 从背包检查数量
+            const invEntry = gameState.player.inventory.find(i => i.id === foodId);
+            if (!invEntry || invEntry.qty <= 0) {
+                // 背包没有这种食物，自动切换到背包里有的食物
+                const fallback = gameState.player.inventory.find(i => GAME_CONFIG.items[i.id]?.type === 'food' && i.qty > 0);
+                if (fallback) {
+                    gameState.player.foodSlot = fallback.id;
+                } else {
+                    gameState.player.foodSlot = null;
+                }
+                return false;
+            }
+
+            // 获取食物配置（优先读GAME_CONFIG.items，回退FOOD_CONFIG）
+            const itemCfg = GAME_CONFIG.items[foodId];
+            const foodConfig = itemCfg || FOOD_CONFIG.foods[foodId];
+            if (!foodConfig) return false;
+
             // 检查冷却时间
-            if (gameState.player.foodUseTimer < foodConfig.cooldown) {
-                return false; // 仍在冷却中
+            if (gameState.player.foodUseTimer < (foodConfig.cooldown || 1.0)) {
+                return false;
             }
 
             // 计算恢复量（不超过最大HP）
             const hpBefore = gameState.player.stats.hp.current;
             const hpRestore = Math.min(foodConfig.hpRestore, gameState.player.stats.hp.max - hpBefore);
 
-            // 只有有恢复量时才能进食
             if (hpRestore <= 0) {
-                return false; // HP满了，不需要进食
+                return false;
             }
 
             gameState.player.stats.hp.current += hpRestore;
 
-            // 消耗食物（扣除数量）
-            gameState.player.foodCount--;
-            gameState.player.foodUseTimer = 0; // 重置冷却
+            // 从背包扣除1个食物
+            invEntry.qty--;
+            if (invEntry.qty <= 0) {
+                gameState.player.inventory = gameState.player.inventory.filter(i => i.id !== foodId);
+            }
+            gameState.player.foodUseTimer = 0;
 
             // 记录食物使用事件（未来可用于统计）
             console.log(`使用${foodConfig.name}，恢复HP ${hpRestore}`);
@@ -3283,16 +3303,26 @@
             // 增加战斗计时
             battle.turnCount = (battle.turnCount || 0) + timeDelta;
 
-            // 模拟战斗伤害（每2秒一个回合）
+            // 模拟战斗伤害（每2秒一个回合），使用真实属性
             if (battle.turnCount % 2 < timeDelta) {
-                const playerDmg = Math.floor(Math.random() * 10) + 5;
-                const enemyDmg = Math.floor(Math.random() * 8) + 3;
+                const stats = gameState.player.stats;
+                const enemy = battle.currentEnemy;
+                const playerAtk = stats.atk || 10;
+                const playerDef = stats.def || 0;
+                const enemyAtk = enemy.atk || 5;
+                const enemyDef = enemy.def || 0;
 
-                battle.currentEnemy.currentHP -= playerDmg;
-                battle.playerHP.current -= enemyDmg;
+                // 伤害公式与秘境一致：Math.max(1, atk - def/2) × 0.9~1.1随机浮动
+                const rawPlayerDmg = Math.max(1, playerAtk - enemyDef * 0.5);
+                const rawEnemyDmg = Math.max(1, enemyAtk - playerDef * 0.5);
+                const playerDmg = Math.floor(rawPlayerDmg * (0.9 + Math.random() * 0.2));
+                const enemyDmg = Math.floor(rawEnemyDmg * (0.9 + Math.random() * 0.2));
+
+                enemy.currentHP -= playerDmg;
+                battle.playerHP.current = Math.max(0, battle.playerHP.current - enemyDmg);
 
                 battle.log.push(`玩家造成${playerDmg}点伤害`);
-                if (enemyDmg > 0) battle.log.push(`${battle.currentEnemy.name}造成${enemyDmg}点伤害`);
+                if (enemyDmg > 0) battle.log.push(`${enemy.name}造成${enemyDmg}点伤害`);
                 if (battle.log.length > 10) battle.log.shift();
             }
 
@@ -3377,7 +3407,28 @@
                     gameState.skills.battle.level++;
                 }
 
-                showNotification(`🎉 战胜${battle.currentEnemy.name}！\n+${areaData.coins}金币 +${areaData.exp}经验`, '#6fa980');
+                // 2% 概率掉落与当前区域等级匹配的灵田种子
+                const areaSeedMap = {
+                    forest:          ['seed_cleangrass'],
+                    mountain:        ['seed_cleangrass', 'seed_mushroom'],
+                    deepMountain:    ['seed_mushroom', 'seed_tea'],
+                    swamp:           ['seed_mushroom', 'seed_tea'],
+                    abyss:           ['seed_tea', 'seed_spiritfruit'],
+                    goldenPlains:    ['seed_spiritfruit', 'seed_goldengrass'],
+                    thunderArea:     ['seed_goldengrass', 'seed_lotus'],
+                    yuanyingPlains:  ['seed_lotus', 'seed_goldengrass'],
+                    huashenRealm:    ['seed_lotus'],
+                };
+                const battleSeedPool = areaSeedMap[areaKey];
+                let seedNotice = '';
+                if (battleSeedPool && Math.random() < 0.02) {
+                    const seed = battleSeedPool[Math.floor(Math.random() * battleSeedPool.length)];
+                    addToInventory(seed, 1);
+                    const seedItem = GAME_CONFIG.items[seed];
+                    seedNotice = seedItem ? `\n+ ${seedItem.name} x1` : '';
+                }
+
+                showNotification(`🎉 战胜${battle.currentEnemy.name}！\n+${areaData.coins}金币 +${areaData.exp}经验${seedNotice}`, '#6fa980');
             } else {
                 showNotification(`⚔️ 战斗失败，逃出${areaData.name}`, '#ef4444');
             }
@@ -3433,6 +3484,22 @@
                         rewardMsg += `+ ${item.name} x${qty}\n`;
                     }
                 });
+            }
+
+            // 5% 概率掉落灵田种子（按秘境难度给对应等级种子）
+            const dungeonSeedMap = {
+                mysteryTower:      ['seed_cleangrass', 'seed_mushroom'],
+                mysteriousForest:  ['seed_mushroom', 'seed_tea', 'seed_spiritfruit'],
+                ancientRuin:       ['seed_tea', 'seed_spiritfruit', 'seed_goldengrass'],
+                tribulationGround: ['seed_goldengrass', 'seed_lotus'],
+                huashenRealm:      ['seed_lotus', 'seed_goldengrass'],
+            };
+            const seedPool = dungeonSeedMap[dungeonId] || ['seed_cleangrass', 'seed_mushroom'];
+            if (Math.random() < 0.05) {  // 5% 概率
+                const randomSeed = seedPool[Math.floor(Math.random() * seedPool.length)];
+                addToInventory(randomSeed, 1);
+                const seedItem = GAME_CONFIG.items[randomSeed];
+                rewardMsg += `+ ${seedItem.name} x1\n`;
             }
 
             // 技能经验（指数级：100 × level^1.8）
@@ -3683,16 +3750,23 @@
 
         // 计算调整后的行动持续时间
         // 修炼：仅受功法速度倍率 = duration ÷ speedMultiplier
-        // 其他技能：仅受工作速度倍率 = duration × workSpeedMultiplier
+        // 其他技能：受工作速度倍率 × 技能等级速度加成（仅speed类型技能）
         function getAdjustedDuration(skill, duration) {
             if (skill === 'cultivation') {
                 const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
                 if (currentArt) {
-                    return duration / currentArt.speedMultiplier; // 倍率越高，持续时间越短
+                    return duration / currentArt.speedMultiplier;
                 }
                 return duration;
             } else {
-                return duration * gameState.workSpeedMultiplier;
+                let d = duration * gameState.workSpeedMultiplier;
+                // 灵田等speed类技能：等级越高完成时间越短
+                const effect = SKILL_LEVEL_EFFECTS[skill];
+                const skillData = gameState.skills[skill];
+                if (effect && effect.effectType === 'speed' && skillData && skillData.level >= 2) {
+                    d = Math.max(1, d * effect.formula(skillData.level));
+                }
+                return d;
             }
         }
 
@@ -3705,12 +3779,17 @@
             const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
             if (!action.output) return;
 
-            // 消耗所需的材料（P2功能 - 材料消耗）
+            // 灵田槽位倍数（farmingSlots购买后多槽并行种植）
+            const slots = gameState.currentAction.skill === 'farming'
+                ? (gameState.player.farmingSlots || 1) : 1;
+
+            // 消耗所需的材料（灵田按槽位数倍乘）
             if (action.requires) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
+                    const totalQty = qty * slots;
                     const invIndex = gameState.player.inventory.findIndex(i => i.id === itemId);
                     if (invIndex !== -1) {
-                        gameState.player.inventory[invIndex].qty -= qty;
+                        gameState.player.inventory[invIndex].qty -= totalQty;
                         if (gameState.player.inventory[invIndex].qty <= 0) {
                             gameState.player.inventory.splice(invIndex, 1);
                         }
@@ -3719,6 +3798,11 @@
             }
 
             let finalOutput = JSON.parse(JSON.stringify(action.output));
+
+            // 灵田多槽：产出物品同比例放大
+            if (slots > 1 && finalOutput.items) {
+                finalOutput.items = finalOutput.items.map(item => ({ ...item, qty: item.qty * slots }));
+            }
 
             // 应用技能等级效果
             applySkillLevelBonus(gameState.currentAction.skill, finalOutput);
@@ -3816,8 +3900,8 @@
             return '';
         }
 
-        // 应用技能等级加成到产出
-        function applySkillLevelBonus(skillName, output) {
+        // 应用技能等级加成到产出（completionCount=1为在线单次，>1为离线批量）
+        function applySkillLevelBonus(skillName, output, completionCount = 1) {
             const skill = gameState.skills[skillName];
             const effect = SKILL_LEVEL_EFFECTS[skillName];
 
@@ -3833,8 +3917,8 @@
                 // 灵石输出加成
                 output.coins = Math.floor(output.coins * multiplier);
             } else if (effect.effectType === 'quantity' && output.items) {
-                // 产量加成：物品数量+1每5级
-                const bonusQty = Math.floor((skill.level - 1) / 5);
+                // 产量加成：物品数量+1每5级，离线需乘以完成次数
+                const bonusQty = Math.floor((skill.level - 1) / 5) * completionCount;
                 if (bonusQty > 0) {
                     output.items.forEach(item => {
                         item.qty += bonusQty;
@@ -3920,7 +4004,7 @@
                 item.onclick = () => switchPanel(skillName);
 
                 const level = skill.level || 1;
-                const maxExp = 100 * level;
+                const maxExp = 100 * Math.pow(level, 1.8);
                 const currentExp = skill.exp || 0;
                 const expPercent = Math.min((currentExp / maxExp) * 100, 100);
 
@@ -4309,14 +4393,17 @@
                 stopAction();
             }
 
-            // 检查材料（P2功能 - 材料检查）
+            // 检查材料（灵田按槽位数检查）
             if (actionObj.requires) {
+                const slots = skill === 'farming' ? (gameState.player.farmingSlots || 1) : 1;
                 for (const [itemId, requiredQty] of Object.entries(actionObj.requires)) {
                     const inventoryItem = gameState.player.inventory.find(i => i.id === itemId);
                     const actualQty = inventoryItem ? inventoryItem.qty : 0;
-                    if (actualQty < requiredQty) {
+                    const needed = requiredQty * slots;
+                    if (actualQty < needed) {
                         const itemConfig = GAME_CONFIG.items[itemId];
-                        showNotification(`${itemConfig.name}不足（需要${requiredQty}，有${actualQty}）`, '#ff6b6b', 'error');
+                        const slotNote = slots > 1 ? `（${slots}槽×${requiredQty}）` : '';
+                        showNotification(`${itemConfig.name}不足（需要${needed}${slotNote}，有${actualQty}）`, '#ff6b6b', 'error');
                         return;
                     }
                 }
@@ -4531,10 +4618,12 @@
             // 处理装备按钮显示（P2功能：equipping/unequipping）
             const actionBtn = document.getElementById('itemActionBtn');
             if (actionBtn) {
-                if (itemConfig.type === 'weapon' || itemConfig.type === 'jewelry') {
+                if (itemConfig.type === 'weapon' || itemConfig.type === 'armor' || itemConfig.type === 'jewelry') {
                     // 检查是否已装备
                     let isEquipped = false;
                     if (itemConfig.type === 'weapon' && gameState.player.equipment.weapon === itemId) {
+                        isEquipped = true;
+                    } else if (itemConfig.type === 'armor' && gameState.player.equipment.armor === itemId) {
                         isEquipped = true;
                     } else if (itemConfig.type === 'jewelry' && gameState.player.equipment.jewelry?.includes(itemId)) {
                         isEquipped = true;
@@ -4544,6 +4633,12 @@
                     actionBtn.style.display = 'block';
                     actionBtn.dataset.itemId = itemId;
                     actionBtn.dataset.itemType = itemConfig.type;
+                } else if (itemConfig.type === 'food') {
+                    const isSlotted = gameState.player.foodSlot === itemId;
+                    actionBtn.textContent = isSlotted ? '已装备食物' : '装备为战斗食物';
+                    actionBtn.style.display = 'block';
+                    actionBtn.dataset.itemId = itemId;
+                    actionBtn.dataset.itemType = 'food';
                 } else {
                     actionBtn.style.display = 'none';
                 }
@@ -4577,6 +4672,8 @@
             let isEquipped = false;
             if (itemType === 'weapon' && gameState.player.equipment.weapon === itemId) {
                 isEquipped = true;
+            } else if (itemType === 'armor' && gameState.player.equipment.armor === itemId) {
+                isEquipped = true;
             } else if (itemType === 'jewelry' && gameState.player.equipment.jewelry?.includes(itemId)) {
                 isEquipped = true;
             }
@@ -4585,6 +4682,8 @@
                 // 卸下装备
                 if (itemType === 'weapon') {
                     gameState.player.equipment.weapon = null;
+                } else if (itemType === 'armor') {
+                    gameState.player.equipment.armor = null;
                 } else if (itemType === 'jewelry') {
                     gameState.player.equipment.jewelry = gameState.player.equipment.jewelry.filter(id => id !== itemId);
                 }
@@ -4594,6 +4693,9 @@
                 if (itemType === 'weapon') {
                     gameState.player.equipment.weapon = itemId;
                     showNotification(`已装备${itemConfig.name}`, '#16a34a');
+                } else if (itemType === 'armor') {
+                    gameState.player.equipment.armor = itemId;
+                    showNotification(`已装备${itemConfig.name}`, '#16a34a');
                 } else if (itemType === 'jewelry') {
                     // 首饰可以多个装备
                     if (!gameState.player.equipment.jewelry.includes(itemId)) {
@@ -4601,6 +4703,11 @@
                     }
                     showNotification(`已装备${itemConfig.name}`, '#16a34a');
                 }
+            }
+
+            if (itemType === 'food') {
+                gameState.player.foodSlot = itemId;
+                showNotification(`已设置${itemConfig.name}为战斗食物`, '#16a34a');
             }
 
             updateUI();
@@ -4617,7 +4724,7 @@
                 abyss: { name: '魔窟深渊', desc: '极端危险', minLevel: 7, maxLevel: 8, enemies: ['demon-lord', 'abyssal'], coins: 300, exp: 150 },
                 // P6 金丹期新增
                 goldenPlains: { name: '金丹平原', desc: '金丹修士的猎场', minLevel: 9, maxLevel: 10, enemies: ['golden-beast', 'spirit-wolf'], coins: 500, exp: 200 },
-                tribulationGround: { name: '天劫之地', desc: '雷劫试炼', minLevel: 10, maxLevel: 11, enemies: ['thunder-demon', 'tribulation-spirit'], coins: 800, exp: 350 },
+                thunderArea: { name: '天劫之地', desc: '雷劫试炼', minLevel: 10, maxLevel: 11, enemies: ['thunder-demon', 'tribulation-spirit'], coins: 800, exp: 350 },
                 // P7 元婴期新增
                 voidSea: { name: '虚空之海', desc: '元婴修士的试炼场', minLevel: 13, maxLevel: 14, enemies: ['void-creature', 'soul-devourer'], coins: 1000, exp: 400 },
                 abyssRuins: { name: '深渊遗迹', desc: '极端危险的废墟', minLevel: 15, maxLevel: 16, enemies: ['abyss-lord', 'ancient-god'], coins: 2000, exp: 800 }
@@ -4642,7 +4749,7 @@
 
         // 初始化秘境
         function initializeDungeons() {
-            const dungeonList = ['mysteryTower', 'mysteriousForest', 'ancientRuin'];
+            const dungeonList = Object.keys(GAME_CONFIG.dungeons);
             const dungeonActions = {};
 
             dungeonList.forEach(dungeonId => {
@@ -4695,10 +4802,16 @@
             const container = document.getElementById('dungeonActions');
             container.innerHTML = '';
 
-            const dungeonIds = ['mysteryTower', 'mysteriousForest', 'ancientRuin'];
+            const dungeonIds = Object.keys(GAME_CONFIG.dungeons);
+
+            const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满', '金丹初期', '金丹中期', '金丹后期', '金丹圆满', '元婴初期', '元婴中期', '元婴后期', '元婴圆满'];
 
             dungeonIds.forEach(dungeonId => {
                 const dungeon = GAME_CONFIG.dungeons[dungeonId];
+                // 如果存档里没有该秘境记录（老存档），动态补全
+                if (!gameState.dungeons[dungeonId]) {
+                    gameState.dungeons[dungeonId] = { completed: false };
+                }
                 const record = gameState.dungeons[dungeonId];
 
                 // 检查是否满足境界要求（仅基于最低境界索引）
@@ -4706,7 +4819,6 @@
                 const statusColor = record.completed ? '#16a34a' : meetsRequirement ? '#fbbf24' : '#666';
                 const statusText = record.completed ? '✓ 已通关' : meetsRequirement ? '✓ 可进入' : '⛔ 境界不足';
 
-                const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满'];
                 const requiredRealmName = realmNames[dungeon.minRealmIndex] || '未知';
 
                 const actionDiv = document.createElement('div');
@@ -4856,11 +4968,16 @@
                 gameState.player.stats.hp.current = gameState.player.stats.hp.max;
             }
 
-            // P0-4 食物系统初始化
-            gameState.player.foodUseTimer = FOOD_CONFIG.autoEatConfig.cooldown; // 进食冷却完成
-            // 如果没有装备食物，装备默认食物
-            if (!gameState.player.foodSlot) {
-                gameState.player.foodSlot = FOOD_CONFIG.defaultFood;
+            // P0-4 食物系统初始化：优先保留已装备食物（如背包有），否则自动选背包里最优食物
+            gameState.player.foodUseTimer = FOOD_CONFIG.autoEatConfig.cooldown;
+            const currentFood = gameState.player.foodSlot;
+            const hasCurrentFood = currentFood && gameState.player.inventory.some(i => i.id === currentFood && i.qty > 0);
+            if (!hasCurrentFood) {
+                // 按hpRestore降序，选背包里有的最优食物
+                const foodIds = Object.keys(GAME_CONFIG.items).filter(id => GAME_CONFIG.items[id].type === 'food');
+                foodIds.sort((a, b) => (GAME_CONFIG.items[b].hpRestore || 0) - (GAME_CONFIG.items[a].hpRestore || 0));
+                const best = foodIds.find(id => gameState.player.inventory.some(i => i.id === id && i.qty > 0));
+                gameState.player.foodSlot = best || null;
             }
 
             // 初始化第一个怪物
@@ -5043,9 +5160,15 @@
                 byType[itemConfig.type].push(item);
             });
 
-            // 按类型显示
-            const typeNames = { material: '材料', ore: '矿石', consumable: '丹药', weapon: '装备', jewelry: '首饰' };
-            Object.entries(byType).forEach(([type, items]) => {
+            // 按类型显示（顺序控制展示顺序）
+            const typeOrder = ['consumable', 'food', 'weapon', 'armor', 'jewelry', 'material', 'ore', 'seed'];
+            const typeNames = { material: '材料', ore: '矿石', consumable: '丹药', weapon: '武器', armor: '防具', jewelry: '首饰', seed: '种子', food: '食物' };
+            // 按预定顺序排列类型
+            const orderedEntries = typeOrder
+                .filter(t => byType[t])
+                .map(t => [t, byType[t]])
+                .concat(Object.entries(byType).filter(([t]) => !typeOrder.includes(t)));
+            orderedEntries.forEach(([type, items]) => {
                 const typeLabel = document.createElement('div');
                 typeLabel.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #16a34a; margin-top: 10px; margin-bottom: 5px;';
                 typeLabel.textContent = typeNames[type] || type;
@@ -5132,8 +5255,9 @@
                 updateArtDisplay();
                 updateActionDisplay();
             } else {
-                // 消耗品处理
-                addToInventory(itemId, 1);
+                // 消耗品/材料处理（qty字段支持批量购买）
+                const purchaseQty = item.qty || 1;
+                addToInventory(itemId, purchaseQty);
                 showNotification(`购买成功：${item.name}`, '#16a34a');
             }
 
@@ -5403,6 +5527,17 @@
             };
 
             gameState.player.stats = totalStats;
+
+            // 根据首饰effect动态计算工作速度倍率（灵玉等装备才生效）
+            let speedMulti = 1.0;
+            jewelry.forEach(jewelryId => {
+                const jewelryItem = GAME_CONFIG.items[jewelryId];
+                if (jewelryItem?.effect?.workSpeed) {
+                    speedMulti *= jewelryItem.effect.workSpeed;
+                }
+            });
+            gameState.workSpeedMultiplier = speedMulti;
+
             updateStatsDisplay();
         }
 
@@ -5595,14 +5730,25 @@
             // 版本迁移函数：自动更新旧数据以支持新配方
             if (!gameState.version) gameState.version = 0;
 
-            const currentVersion = 1;
-            if (gameState.version < currentVersion) {
+            const currentVersion = 2;  // P4：属性系统重写 + 初始化BugFix
+
+            // 版本1→2 迁移
+            if (gameState.version < 1) {
                 // 从GAME_CONFIG更新所有技能配方
                 Object.keys(GAME_CONFIG.skills).forEach(skillName => {
                     if (gameState.skills[skillName] && GAME_CONFIG.skills[skillName].recipes) {
                         gameState.skills[skillName].recipes = JSON.parse(JSON.stringify(GAME_CONFIG.skills[skillName].recipes));
                     }
                 });
+            }
+
+            // 版本2：属性系统重新计算（使用新的境界倍数）
+            if (gameState.version < 2) {
+                calculateStats(); // 重新计算属性使用新系统
+                console.log('✅ 游戏数据已升级至v2（属性系统已更新）');
+            }
+
+            if (gameState.version < currentVersion) {
                 gameState.version = currentVersion;
             }
 
@@ -5696,7 +5842,38 @@
             const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
             // 应用工作速度和功法倍率（修炼特殊处理）
             const duration = getAdjustedDuration(gameState.currentAction.skill, action.duration);
-            const completions = Math.floor(actualOfflineSeconds / duration);
+            let completions = Math.floor(actualOfflineSeconds / duration);
+
+            // 灵田多槽倍数（离线也生效）
+            const offlineSlots = (gameState.currentAction.skill === 'farming')
+                ? (gameState.player.farmingSlots || 1) : 1;
+
+            // 限制离线完成次数：不超过材料库存能支撑的上限
+            if (action.requires && Object.keys(action.requires).length > 0) {
+                let maxByMaterials = completions;
+                for (const [matId, requiredPerCompletion] of Object.entries(action.requires)) {
+                    const inv = gameState.player.inventory.find(i => i.id === matId);
+                    const available = inv ? inv.qty : 0;
+                    const costPerCompletion = requiredPerCompletion * offlineSlots;
+                    if (costPerCompletion > 0) {
+                        maxByMaterials = Math.min(maxByMaterials, Math.floor(available / costPerCompletion));
+                    }
+                }
+                completions = Math.max(0, maxByMaterials);
+                // 扣除实际消耗的材料
+                if (completions > 0) {
+                    for (const [matId, requiredPerCompletion] of Object.entries(action.requires)) {
+                        const totalCost = requiredPerCompletion * offlineSlots * completions;
+                        const inv = gameState.player.inventory.find(i => i.id === matId);
+                        if (inv) {
+                            inv.qty -= totalCost;
+                            if (inv.qty <= 0) {
+                                gameState.player.inventory = gameState.player.inventory.filter(i => i.id !== matId);
+                            }
+                        }
+                    }
+                }
+            }
 
             let offlineRewards = {
                 coins: 0,
@@ -5710,9 +5887,16 @@
                 if (action.output.cultivation) offlineRewards.cultivation += action.output.cultivation;
                 if (action.output.items) {
                     action.output.items.forEach(item => {
-                        const existing = offlineRewards.items.find(i => i.id === item.id);
-                        if (existing) existing.qty += item.qty;
-                        else offlineRewards.items.push({ ...item });
+                        // 计算净产出：产出量 - 消耗量（防止种子等循环材料被重复计入）
+                        let netQty = item.qty * offlineSlots;
+                        if (action.requires && action.requires[item.id]) {
+                            netQty -= action.requires[item.id] * offlineSlots;
+                        }
+                        if (netQty > 0) {
+                            const existing = offlineRewards.items.find(r => r.id === item.id);
+                            if (existing) existing.qty += netQty;
+                            else offlineRewards.items.push({ id: item.id, qty: netQty });
+                        }
                     });
                 }
                 if (action.output.skill && action.output.exp) {
@@ -5720,8 +5904,8 @@
                 }
             }
 
-            // 应用技能等级效果倍率（与在线completeAction保持一致）
-            applySkillLevelBonus(gameState.currentAction.skill, offlineRewards);
+            // 应用技能等级效果倍率（传入completions，修正离线quantity类型累加Bug）
+            applySkillLevelBonus(gameState.currentAction.skill, offlineRewards, completions);
 
             // 应用离线奖励
             gameState.player.coins += offlineRewards.coins;
@@ -5763,8 +5947,15 @@
             }
 
             offlineRewards.items.forEach(item => addToInventory(item.id, item.qty));
-            Object.entries(offlineRewards.skillExp).forEach(([skill, exp]) => {
-                gameState.skills[skill].exp += exp;
+            Object.entries(offlineRewards.skillExp).forEach(([skillName, exp]) => {
+                const skill = gameState.skills[skillName];
+                if (!skill) return;
+                skill.exp += exp;
+                // 触发技能升级（与在线completeAction保持一致）
+                while (skill.exp >= 100 * Math.pow(skill.level, 1.8)) {
+                    skill.exp -= 100 * Math.pow(skill.level, 1.8);
+                    skill.level++;
+                }
             });
 
             gameState.lastActiveTime = now;
@@ -5993,6 +6184,7 @@
                 const dataStr = atob(input);
                 const loaded = JSON.parse(dataStr);
                 gameState = loaded;
+                migrateGameData();
                 handleOfflineTime();
                 document.getElementById('startScreen').classList.remove('show');
                 document.getElementById('gameScreen').classList.remove('hidden');
@@ -6010,8 +6202,9 @@
                 gameRunning = false;
                 clearInterval(tickInterval);
 
-                // 重置游戏状态
+                // 重置游戏状态（与初始gameState保持字段一致）
                 gameState = {
+                    version: '6.0',
                     player: {
                         name: '',
                         gender: '男',
@@ -6019,21 +6212,21 @@
                         spiritRoot: '',
                         realmIndex: 0,
                         cultivationXP: 0,
+                        currentArt: 'basic_art',
                         coins: 100,
                         inventory: [],
                         equipment: { weapon: null, armor: null, jewelry: [] },
                         lastBreakthroughTime: 0,
-                        // 永久升级跟踪
                         inventoryCapacity: 50,
                         farmingSlots: 1,
                         boughtUpgrades: [],
-                        // 属性系统
-                        stats: {
-                            hp: 100,
-                            atk: 10,
-                            def: 5,
-                            spd: 10
-                        }
+                        stats: { hp: 100, atk: 10, def: 5, spd: 10 },
+                        attackTimer: 0,
+                        foodSlot: null,
+                        foodCount: 0,
+                        autoEat: true,
+                        foodUseTimer: 0,
+                        lastHPRecoverTime: Date.now()
                     },
                     skills: JSON.parse(JSON.stringify(GAME_CONFIG.skills)),
                     currentAction: null,
@@ -6041,24 +6234,25 @@
                     workSpeedMultiplier: 1,
                     lastSaveTime: Date.now(),
                     lastActiveTime: Date.now(),
-                    // 秘境系统
                     dungeons: {
                         currentDungeon: null,
                         currentMonsterIndex: 0,
                         currentMonsterHP: 0,
                         defeatCount: 0,
                         bossDefeated: false,
-                        mysteryTower: {
-                            completed: false
-                        },
-                        mysteriousForest: {
-                            completed: false
-                        },
-                        ancientRuin: {
-                            completed: false
-                        }
+                        monsterAttackTimer: 0,
+                        battleState: 'idle',
+                        playerDeathCount: 0,
+                        deathHistory: [],
+                        totalDeathCount: 0,
+                        totalCultivationLost: 0,
+                        totalFoodLost: 0,
+                        mysteryTower: { completed: false },
+                        mysteriousForest: { completed: false },
+                        ancientRuin: { completed: false },
+                        tribulationGround: { completed: false },
+                        huashenRealm: { completed: false }
                     },
-                    // P2功能：用户设置
                     settings: {
                         maxOfflineHours: 24,
                         enableNotifications: true,
