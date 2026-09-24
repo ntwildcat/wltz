@@ -2694,13 +2694,15 @@
 
                 const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
 
-                // 检查所需物品是否充足，不足则停止action
+                // 检查所需物品是否充足，不足则停止action（灵田按槽位数检查）
                 if (action.requires) {
+                    const slots = gameState.currentAction.skill === 'farming'
+                        ? (gameState.player.farmingSlots || 1) : 1;
                     let materialShortage = false;
                     for (const [itemId, requiredQty] of Object.entries(action.requires)) {
                         const invItem = gameState.player.inventory.find(i => i.id === itemId);
                         const currentQty = invItem ? invItem.qty : 0;
-                        if (currentQty < requiredQty) {
+                        if (currentQty < requiredQty * slots) {
                             materialShortage = true;
                             break;
                         }
@@ -3696,16 +3698,23 @@
 
         // 计算调整后的行动持续时间
         // 修炼：仅受功法速度倍率 = duration ÷ speedMultiplier
-        // 其他技能：仅受工作速度倍率 = duration × workSpeedMultiplier
+        // 其他技能：受工作速度倍率 × 技能等级速度加成（仅speed类型技能）
         function getAdjustedDuration(skill, duration) {
             if (skill === 'cultivation') {
                 const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
                 if (currentArt) {
-                    return duration / currentArt.speedMultiplier; // 倍率越高，持续时间越短
+                    return duration / currentArt.speedMultiplier;
                 }
                 return duration;
             } else {
-                return duration * gameState.workSpeedMultiplier;
+                let d = duration * gameState.workSpeedMultiplier;
+                // 灵田等speed类技能：等级越高完成时间越短
+                const effect = SKILL_LEVEL_EFFECTS[skill];
+                const skillData = gameState.skills[skill];
+                if (effect && effect.effectType === 'speed' && skillData && skillData.level >= 2) {
+                    d = Math.max(1, d * effect.formula(skillData.level));
+                }
+                return d;
             }
         }
 
@@ -3718,12 +3727,17 @@
             const action = getAction(gameState.currentAction.skill, gameState.currentAction.action);
             if (!action.output) return;
 
-            // 消耗所需的材料（P2功能 - 材料消耗）
+            // 灵田槽位倍数（farmingSlots购买后多槽并行种植）
+            const slots = gameState.currentAction.skill === 'farming'
+                ? (gameState.player.farmingSlots || 1) : 1;
+
+            // 消耗所需的材料（灵田按槽位数倍乘）
             if (action.requires) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
+                    const totalQty = qty * slots;
                     const invIndex = gameState.player.inventory.findIndex(i => i.id === itemId);
                     if (invIndex !== -1) {
-                        gameState.player.inventory[invIndex].qty -= qty;
+                        gameState.player.inventory[invIndex].qty -= totalQty;
                         if (gameState.player.inventory[invIndex].qty <= 0) {
                             gameState.player.inventory.splice(invIndex, 1);
                         }
@@ -3732,6 +3746,11 @@
             }
 
             let finalOutput = JSON.parse(JSON.stringify(action.output));
+
+            // 灵田多槽：产出物品同比例放大
+            if (slots > 1 && finalOutput.items) {
+                finalOutput.items = finalOutput.items.map(item => ({ ...item, qty: item.qty * slots }));
+            }
 
             // 应用技能等级效果
             applySkillLevelBonus(gameState.currentAction.skill, finalOutput);
@@ -4322,14 +4341,17 @@
                 stopAction();
             }
 
-            // 检查材料（P2功能 - 材料检查）
+            // 检查材料（灵田按槽位数检查）
             if (actionObj.requires) {
+                const slots = skill === 'farming' ? (gameState.player.farmingSlots || 1) : 1;
                 for (const [itemId, requiredQty] of Object.entries(actionObj.requires)) {
                     const inventoryItem = gameState.player.inventory.find(i => i.id === itemId);
                     const actualQty = inventoryItem ? inventoryItem.qty : 0;
-                    if (actualQty < requiredQty) {
+                    const needed = requiredQty * slots;
+                    if (actualQty < needed) {
                         const itemConfig = GAME_CONFIG.items[itemId];
-                        showNotification(`${itemConfig.name}不足（需要${requiredQty}，有${actualQty}）`, '#ff6b6b', 'error');
+                        const slotNote = slots > 1 ? `（${slots}槽×${requiredQty}）` : '';
+                        showNotification(`${itemConfig.name}不足（需要${needed}${slotNote}，有${actualQty}）`, '#ff6b6b', 'error');
                         return;
                     }
                 }
@@ -5729,14 +5751,25 @@
                 skillExp: {}
             };
 
+            // 灵田多槽倍数（离线也生效）
+            const offlineSlots = (gameState.currentAction.skill === 'farming')
+                ? (gameState.player.farmingSlots || 1) : 1;
+
             for (let i = 0; i < completions; i++) {
                 if (action.output.coins) offlineRewards.coins += action.output.coins;
                 if (action.output.cultivation) offlineRewards.cultivation += action.output.cultivation;
                 if (action.output.items) {
                     action.output.items.forEach(item => {
-                        const existing = offlineRewards.items.find(i => i.id === item.id);
-                        if (existing) existing.qty += item.qty;
-                        else offlineRewards.items.push({ ...item });
+                        // 计算净产出：产出量 - 消耗量（防止种子等循环材料被重复计入）
+                        let netQty = item.qty * offlineSlots;
+                        if (action.requires && action.requires[item.id]) {
+                            netQty -= action.requires[item.id] * offlineSlots;
+                        }
+                        if (netQty > 0) {
+                            const existing = offlineRewards.items.find(r => r.id === item.id);
+                            if (existing) existing.qty += netQty;
+                            else offlineRewards.items.push({ id: item.id, qty: netQty });
+                        }
                     });
                 }
                 if (action.output.skill && action.output.exp) {
@@ -5787,8 +5820,15 @@
             }
 
             offlineRewards.items.forEach(item => addToInventory(item.id, item.qty));
-            Object.entries(offlineRewards.skillExp).forEach(([skill, exp]) => {
-                gameState.skills[skill].exp += exp;
+            Object.entries(offlineRewards.skillExp).forEach(([skillName, exp]) => {
+                const skill = gameState.skills[skillName];
+                if (!skill) return;
+                skill.exp += exp;
+                // 触发技能升级（与在线completeAction保持一致）
+                while (skill.exp >= 100 * Math.pow(skill.level, 1.8)) {
+                    skill.exp -= 100 * Math.pow(skill.level, 1.8);
+                    skill.level++;
+                }
             });
 
             gameState.lastActiveTime = now;
