@@ -1478,7 +1478,12 @@
             saveGame();
         }
 
-        // 悟道法则卡片上的「化虚」按钮组：四个品阶各一个按钮，等级或资源不够就置灰
+        // 悟道法则卡片上的「化虚」按钮组：四个品阶各一个按钮，等级或资源不够就置灰。
+        // 用户反馈两次：先是不知道化虚是什么玩法，讲清楚之后又说"化虚按钮我就没看见"——
+        // 真实原因是四个品阶大概率全部置灰（虚晶要采矿Lv50才能挖，道果攒得很慢），0.72em 的小字+0.4
+        // 透明度的按钮行，混在卡片一堆文字里非常容易被完全忽略。这次加：①固定显示的小标题，不管能不能
+        // 化虚这一整块都先露出来，不会被当成"没有这个功能"；②每个按钮的提示从"写死的完整消耗"
+        // 改成"还差什么"，缺哪样写哪样，不缺就不提，一眼看出卡在哪一步
         function daozeButtonsHtml(lawId) {
             if (!isVoidUnlocked()) return '';
             const info = getLawInfo(lawId);
@@ -1486,10 +1491,20 @@
             const voidHave = (P.inventory.find(i => i.id === 'voidcrystal') || { qty: 0 }).qty;
             const tierNames = isDachengUnlocked() ? DAOZE_TIER_NAMES : DAOZE_TIER_NAMES.slice(0, 4);   // 本源品要大乘初期才显示
             const btns = tierNames.map((name, i) => {
-                const can = info.level >= DAOZE_TIER_LEVEL_COST[i] && (P.daoguo || 0) >= DAOZE_TIER_DAOGUO_COST[i] && voidHave >= DAOZE_TIER_VOID_COST[i];
-                return `<button type="button" class="btn ${can ? 'btn-secondary' : 'btn-secondary'} law-huaxu-btn" ${can ? '' : 'disabled'} title="消耗 ${DAOZE_TIER_LEVEL_COST[i]} 级 + 道果 ${DAOZE_TIER_DAOGUO_COST[i]} + 虚晶 ${DAOZE_TIER_VOID_COST[i]}" onclick="event.stopPropagation(); huaxuLaw('${lawId}', ${i})">☯️ ${name}</button>`;
+                const lackLevel = Math.max(0, DAOZE_TIER_LEVEL_COST[i] - info.level);
+                const lackDaoguo = Math.max(0, DAOZE_TIER_DAOGUO_COST[i] - (P.daoguo || 0));
+                const lackVoid = Math.max(0, DAOZE_TIER_VOID_COST[i] - voidHave);
+                const can = !lackLevel && !lackDaoguo && !lackVoid;
+                const lacks = [];
+                if (lackLevel) lacks.push(`法则还差 ${lackLevel} 级`);
+                if (lackDaoguo) lacks.push(`道果还差 ${lackDaoguo}`);
+                if (lackVoid) lacks.push(`虚晶还差 ${lackVoid}（采矿Lv50解锁「采虚晶」）`);
+                const title = can
+                    ? `消耗 ${DAOZE_TIER_LEVEL_COST[i]} 级 + 道果 ${DAOZE_TIER_DAOGUO_COST[i]} + 虚晶 ${DAOZE_TIER_VOID_COST[i]}`
+                    : lacks.join('，');
+                return `<button type="button" class="btn btn-secondary law-huaxu-btn" ${can ? '' : 'disabled'} title="${title}" onclick="event.stopPropagation(); huaxuLaw('${lawId}', ${i})">☯️ ${name}</button>`;
             }).join('');
-            return `<div class="law-huaxu">${btns}</div>`;
+            return `<div class="law-huaxu-block"><div class="law-huaxu-title">☯️ 化虚兑道则（消耗法则等级+道果+虚晶，换实体道则去装备页镶嵌）</div><div class="law-huaxu">${btns}</div></div>`;
         }
 
         // ---- 炼虚期：天劫（v6.68） ----
