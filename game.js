@@ -3,12 +3,26 @@
             realms: [
                 // 索引0：凡人（初始境界）
                 { name: '凡人', nextReq: 50, baseStats: { hp: 50, atk: 5, def: 2, spd: 5 }, bonusPerLevel: { atk: 0.2, def: 0.05, spd: 0.05 }, isMortal: true },
-                // 指数级修为曲线: 基础值100 × (索引)^2.5
-                { name: '练气初期', nextReq: 100 },      // 100 × 1^2.5 = 100
-                { name: '练气中期', nextReq: 566 },      // 100 × 2^2.5 ≈ 566
-                { name: '练气后期', nextReq: 1559 },     // 100 × 3^2.5 ≈ 1559
-                { name: '练气巅峰', nextReq: 3200 },     // 100 × 4^2.5 ≈ 3200
-                { name: '筑基初期', nextReq: 5590 },     // 100 × 5^2.5 ≈ 5590
+                // 练气期（索引1-13，v6.89 按《凡人修仙传》原著改为13层，原«练气初期/中期/后期/巅峰»4段拆开）：
+                // 前期1-4层：感知吸收灵气建立丹田基础；中期5-9层：灵气运转熟练、体质改善；后期10-13层：为突破筑基做准备。
+                // 沿用原有 100×索引^2.5 公式往下细分，13层圆满突破筑基需筑基丹（原「练气巅峰→筑基初期」的丹药要求，
+                // 现挪到「练气十三层→筑基一层」，见 MAJOR_BREAKTHROUGH_PILLS[13]）。此前索引5起的所有境界因为这次
+                // 插入9层而整体后移9位（原索引5→14、原34→43），下方每条境界都在注释里标了原索引方便核对没漏改。
+                { name: '练气一层', nextReq: 100 },      // 100 × 1^2.5 = 100
+                { name: '练气二层', nextReq: 566 },      // 100 × 2^2.5 ≈ 566
+                { name: '练气三层', nextReq: 1559 },     // 100 × 3^2.5 ≈ 1559
+                { name: '练气四层', nextReq: 3200 },     // 100 × 4^2.5 ≈ 3200
+                { name: '练气五层', nextReq: 5590 },     // 100 × 5^2.5 ≈ 5590
+                { name: '练气六层', nextReq: 8818 },     // 100 × 6^2.5 ≈ 8818
+                { name: '练气七层', nextReq: 12964 },    // 100 × 7^2.5 ≈ 12964
+                { name: '练气八层', nextReq: 18102 },    // 100 × 8^2.5 ≈ 18102
+                { name: '练气九层', nextReq: 24300 },    // 100 × 9^2.5 ≈ 24300
+                { name: '练气十层', nextReq: 31623 },    // 100 × 10^2.5 ≈ 31623
+                { name: '练气十一层', nextReq: 40130 },  // 100 × 11^2.5 ≈ 40130
+                { name: '练气十二层', nextReq: 49890 },  // 100 × 12^2.5 ≈ 49890
+                { name: '练气十三层', nextReq: 60930 },  // 100 × 13^2.5 ≈ 60930
+                // 原索引5起整体 +9：以下每条境界名/nextReq 与迁移前完全一致，只是数组位置后移
+                { name: '筑基初期', nextReq: 5590 },     // 原索引5：100 × 5^2.5 ≈ 5590
                 { name: '筑基中期', nextReq: 8839 },     // 100 × 6^2.5 ≈ 8839
                 { name: '筑基后期', nextReq: 13077 },    // 100 × 7^2.5 ≈ 13077
                 { name: '筑基圆满', nextReq: 18379 },    // 100 × 8^2.5 ≈ 18379
@@ -60,9 +74,9 @@
                     name: '神秘之塔',
                     desc: '五行试炼·通关掉落灵草种子',
                     icon: '🔮',
-                    minRealmIndex: 2,                    // 最低需要练气中期（索引2）
-                    baseRealmIndex: 2,                   // 秘径内怪物的基础境界（新索引）
-                    recommendedLevel: '练气中期~练气后期',
+                    minRealmIndex: 5,                    // v6.89：原索引2（练气中期）→13层制下的练气五层
+                    baseRealmIndex: 5,
+                    recommendedLevel: '练气五层~练气九层',
                     monsters: [
                         { name: '塔灵傀儡', type: '金', hp: 50, atk: 8, spd: 35, def: 5, attackSpeed: 2.5, drop: 'coins', dropQty: 30 },
                         { name: '灵雾幽魂', type: '水', hp: 45, atk: 10, spd: 50, def: 3, attackSpeed: 2.2, drop: 'coins', dropQty: 35 },
@@ -87,9 +101,9 @@
                     name: '诡异森林',
                     desc: '灵植妖物·通关掉落灵芝种子',
                     icon: '🌲',
-                    minRealmIndex: 4,                    // 最低需要练气巅峰（索引4）
-                    baseRealmIndex: 4,                   // 秘径内怪物的基础境界（新索引）
-                    recommendedLevel: '练气巅峰~筑基初期',
+                    minRealmIndex: 13,                   // v6.89：原索引4（练气巅峰）→13层制下的练气十三层
+                    baseRealmIndex: 13,
+                    recommendedLevel: '练气十三层~筑基初期',
                     monsters: [
                         { name: '食人花妖', type: '木', hp: 150, atk: 11, spd: 40, def: 6, attackSpeed: 2.4, drop: 'coins', dropQty: 40 },
                         { name: '腐沼瘴气', type: '水', hp: 135, atk: 9, spd: 55, def: 4, attackSpeed: 2.1, drop: 'coins', dropQty: 45 },
@@ -115,8 +129,8 @@
                     name: '古老遗迹',
                     desc: '法则残片·通关掉落九叶莲种子',
                     icon: '⚱️',
-                    minRealmIndex: 6,                    // 最低需要筑基中期（索引6）
-                    baseRealmIndex: 6,                   // 秘径内怪物的基础境界（新索引）
+                    minRealmIndex: 15,                   // v6.89：原索引6（筑基中期）→ +9
+                    baseRealmIndex: 15,
                     recommendedLevel: '筑基中期~筑基圆满',
                     monsters: [
                         { name: '残魂守卫', type: '雷', hp: 460, atk: 14, spd: 45, def: 7, attackSpeed: 2.3, drop: 'coins', dropQty: 60 },
@@ -143,8 +157,8 @@
                     name: '天劫之地',
                     desc: '雷劫淬体·通关掉落金丹秘药材料',
                     icon: '⚡',
-                    minRealmIndex: 8,                       // 最低筑基圆满：这里掉落突破金丹所需的金丹秘药，必须在突破前就能进入
-                    baseRealmIndex: 9,                      // 怪物境界为金丹初期
+                    minRealmIndex: 17,                      // v6.89：原索引8 → +9，最低筑基圆满
+                    baseRealmIndex: 18,                     // 原索引9 → +9，怪物境界为金丹初期
                     recommendedLevel: '筑基圆满~金丹中期',
                     monsters: [
                         { name: '雷劫残魂', type: '雷', hp: 1190, atk: 35, spd: 55, def: 15, attackSpeed: 2.2, drop: 'coins', dropQty: 150 },
@@ -172,8 +186,8 @@
                     name: '元婴秘境',
                     desc: '元神试炼·通关掉落元婴丹材料',
                     icon: '🌌',
-                    minRealmIndex: 12,                      // 最低金丹圆满：这里掉落突破元婴所需的元婴丹，必须在突破前就能进入
-                    baseRealmIndex: 13,                     // 怪物境界为元婴初期
+                    minRealmIndex: 21,                      // v6.89：原索引12 → +9，最低金丹圆满
+                    baseRealmIndex: 22,                     // 原索引13 → +9，怪物境界为元婴初期
                     recommendedLevel: '金丹圆满~元婴中期',
                     monsters: [
                         { name: '元神残影', type: '无', hp: 4990, atk: 80, spd: 60, def: 30, attackSpeed: 2.1, drop: 'coins', dropQty: 400 },
@@ -202,8 +216,8 @@
                     name: '太虚幻境',
                     desc: '虚实交织的幻境·通关掉落化神丹材料',
                     icon: '🌠',
-                    minRealmIndex: 16,                      // 最低元婴圆满
-                    baseRealmIndex: 17,                     // 怪物境界为化神初期
+                    minRealmIndex: 25,                      // v6.89：原索引16 → +9，最低元婴圆满
+                    baseRealmIndex: 26,                     // 原索引17 → +9，怪物境界为化神初期
                     recommendedLevel: '元婴圆满~化神中期',
                     monsters: [
                         { name: '幻境行者', type: '风', hp: 21630, atk: 150, spd: 70, def: 50, attackSpeed: 2.0, drop: 'coins', dropQty: 800 },
@@ -232,8 +246,8 @@
                     name: '虚界',
                     desc: '虚实交界·通关掉落虚晶与道则残料',
                     icon: '🌫️',
-                    minRealmIndex: 20,                      // 最低化神圆满
-                    baseRealmIndex: 21,                     // 怪物境界为炼虚初期
+                    minRealmIndex: 29,                      // v6.89：原索引20 → +9，最低化神圆满
+                    baseRealmIndex: 30,                     // 原索引21 → +9，怪物境界为炼虚初期
                     recommendedLevel: '化神圆满~炼虚中期',
                     monsters: [
                         { name: '虚灵游魂', type: '无', hp: 36000, atk: 250, spd: 78, def: 70, attackSpeed: 2.1, drop: 'coins', dropQty: 1400 },
@@ -263,8 +277,8 @@
                     name: '天道秘境',
                     desc: '天道试炼·通关掉落天道石与道果种子',
                     icon: '🌌',
-                    minRealmIndex: 24,                      // 最低炼虚圆满
-                    baseRealmIndex: 25,                     // 怪物境界为合体初期
+                    minRealmIndex: 33,                      // v6.89：原索引24 → +9，最低炼虚圆满
+                    baseRealmIndex: 34,                     // 原索引25 → +9，怪物境界为合体初期
                     recommendedLevel: '炼虚圆满~合体后期',
                     monsters: [
                         { name: '天道残影', type: '无', hp: 58000, atk: 400, spd: 70, def: 115, attackSpeed: 2.2, drop: 'coins', dropQty: 2400 },
@@ -294,8 +308,8 @@
                     name: '太乙圣域',
                     desc: '灵界至高战力的试炼场·通关掉落太乙精华与元婴精魄',
                     icon: '🌟',
-                    minRealmIndex: 28,                      // 最低合体圆满
-                    baseRealmIndex: 29,                     // 怪物境界为大乘初期
+                    minRealmIndex: 37,                      // v6.89：原索引28 → +9，最低合体圆满
+                    baseRealmIndex: 38,                     // 原索引29 → +9，怪物境界为大乘初期
                     recommendedLevel: '合体圆满~大乘后期',
                     monsters: [
                         { name: '太乙游神', type: '无', hp: 240000, atk: 620, spd: 92, def: 190, attackSpeed: 2.2, drop: 'coins', dropQty: 6000 },
@@ -328,8 +342,8 @@
                     name: '太清仙域',
                     desc: '真仙修士的试炼场·通关掉落更多太乙精华，是打通仙窍的主要材料来源',
                     icon: '🌌',
-                    minRealmIndex: 33,                      // 最低真仙初期
-                    baseRealmIndex: 33,                     // 怪物境界为真仙初期
+                    minRealmIndex: 42,                      // v6.89：原索引33 → +9，最低真仙初期
+                    baseRealmIndex: 42,                     // 怪物境界为真仙初期
                     recommendedLevel: '真仙初期~真仙后期',
                     monsters: [
                         { name: '九霄游仙', type: '无', hp: 127000, atk: 328, spd: 100, def: 100, attackSpeed: 2.2, drop: 'coins', dropQty: 9600 },
@@ -355,27 +369,28 @@
                 },
                 // 炼虚期天劫（v6.68）：每个炼虚小境界各一场，不在秘境列表里显示，只能通过突破弹窗的「渡劫」进入；
                 // 通关后 gameState.dungeons[id].completed 标记为已渡劫，不会像普通秘境那样循环挑战（见 completeDungeon 的 isTribulation 分支）
-                tribulation21: {
-                    id: 'tribulation21', name: '初劫', desc: '融入天地元气的第一道劫——道心不稳，招来的第一场考验', icon: '⚡',
-                    isTribulation: true, tribulationRealm: 21, minRealmIndex: 21, baseRealmIndex: 21,
+                // v6.89：原索引21-24（炼虚期4个小境界）整体 +9 → 30-33，key 名跟着 tribulationIdFor() 的拼接规则改
+                tribulation30: {
+                    id: 'tribulation30', name: '初劫', desc: '融入天地元气的第一道劫——道心不稳，招来的第一场考验', icon: '⚡',
+                    isTribulation: true, tribulationRealm: 30, minRealmIndex: 30, baseRealmIndex: 30,
                     monsters: [{ name: '劫云傀儡', type: '雷', hp: 5000, atk: 575, spd: 68, def: 90, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 1800 }],
                     rewards: { coins: [4000, 6000], danhuo: [80, 140], shenshi: [70, 120], skillExp: 500 }
                 },
-                tribulation22: {
-                    id: 'tribulation22', name: '心魔劫', desc: '劫中生出心魔幻象，照见修行路上的执念', icon: '👁️',
-                    isTribulation: true, tribulationRealm: 22, minRealmIndex: 22, baseRealmIndex: 22,
+                tribulation31: {
+                    id: 'tribulation31', name: '心魔劫', desc: '劫中生出心魔幻象，照见修行路上的执念', icon: '👁️',
+                    isTribulation: true, tribulationRealm: 31, minRealmIndex: 31, baseRealmIndex: 31,
                     monsters: [{ name: '本心魔影', type: '无', hp: 5250, atk: 600, spd: 74, def: 105, attackSpeed: 2.3, isBoss: true, drop: 'coins', dropQty: 2400 }],
                     rewards: { coins: [5500, 8000], danhuo: [110, 180], shenshi: [95, 160], skillExp: 700 }
                 },
-                tribulation23: {
-                    id: 'tribulation23', name: '雷劫', desc: '九天玄雷劈落，涤荡道基中的驳杂之气', icon: '🌩️',
-                    isTribulation: true, tribulationRealm: 23, minRealmIndex: 23, baseRealmIndex: 23,
+                tribulation32: {
+                    id: 'tribulation32', name: '雷劫', desc: '九天玄雷劈落，涤荡道基中的驳杂之气', icon: '🌩️',
+                    isTribulation: true, tribulationRealm: 32, minRealmIndex: 32, baseRealmIndex: 32,
                     monsters: [{ name: '雷劫化身', type: '雷', hp: 5500, atk: 625, spd: 82, def: 120, attackSpeed: 2.1, isBoss: true, drop: 'coins', dropQty: 3200 }],
                     rewards: { coins: [7500, 11000], danhuo: [150, 240], shenshi: [130, 210], skillExp: 950 }
                 },
-                tribulation24: {
-                    id: 'tribulation24', name: '大天劫', desc: '炼虚圆满前的终极考验：身与天地相融的最后一步，威力远胜前三劫', icon: '☄️',
-                    isTribulation: true, tribulationRealm: 24, minRealmIndex: 24, baseRealmIndex: 24,
+                tribulation33: {
+                    id: 'tribulation33', name: '大天劫', desc: '炼虚圆满前的终极考验：身与天地相融的最后一步，威力远胜前三劫', icon: '☄️',
+                    isTribulation: true, tribulationRealm: 33, minRealmIndex: 33, baseRealmIndex: 33,
                     monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 4500 }],
                     rewards: { coins: [10000, 15000], danhuo: [200, 320], shenshi: [180, 280], skillExp: 1300 }
                 }
@@ -389,36 +404,36 @@
                     recipes: {
                         basic: { name: '吐纳灵气', desc: '基础修为', duration: 5, output: { cultivation: 5, skill: 'cultivation', exp: 8 }, requiredRealmIndex: 0, unlocked: true },
                         small: { name: '小周天', desc: '效率提升', duration: 8, output: { cultivation: 15, skill: 'cultivation', exp: 15 }, requiredRealmIndex: 1, unlocked: false },
-                        big: { name: '大周天', desc: '中期主力', duration: 12, output: { cultivation: 30, skill: 'cultivation', exp: 25 }, requiredRealmIndex: 3, unlocked: false },
-                        breath: { name: '龟息术', desc: '高产出', duration: 20, output: { cultivation: 100, skill: 'cultivation', exp: 40 }, requiredRealmIndex: 4, unlocked: false },
-                        epiphany: { name: '顿悟', desc: '后期爆发', duration: 60, output: { cultivation: 500, skill: 'cultivation', exp: 80 }, requiredRealmIndex: 6, unlocked: false },
-                        // P6 金丹期配方
-                        golden_temper: { name: '金丹淬炼', desc: '金丹初期主力', duration: 30, output: { cultivation: 300, skill: 'cultivation', exp: 120 }, requiredRealmIndex: 9, unlocked: false },
-                        fire_body: { name: '丹火炼体', desc: '金丹中期高产', duration: 45, output: { cultivation: 600, skill: 'cultivation', exp: 180 }, requiredRealmIndex: 10, unlocked: false },
-                        golden_perfect: { name: '金丹圆满', desc: '金丹期最终法', duration: 90, output: { cultivation: 1500, skill: 'cultivation', exp: 300 }, requiredRealmIndex: 11, unlocked: false },
-                        // P7 元婴期配方
-                        yuanying_nurture: { name: '元婴温养', desc: '元婴初期主力', duration: 45, output: { cultivation: 800, skill: 'cultivation', exp: 200 }, requiredRealmIndex: 13, unlocked: false },
-                        soul_travel: { name: '元神出窍', desc: '元婴中期高产', duration: 60, output: { cultivation: 1400, skill: 'cultivation', exp: 280 }, requiredRealmIndex: 14, unlocked: false },
-                        yuanying_dao: { name: '元婴合道', desc: '元婴期最终法', duration: 120, output: { cultivation: 3500, skill: 'cultivation', exp: 450 }, requiredRealmIndex: 15, unlocked: false },
-                        // P9 化神期配方
-                        huashen_ning: { name: '化神凝元', desc: '化神初期主力', duration: 60, output: { cultivation: 2400, skill: 'cultivation', exp: 500 }, requiredRealmIndex: 17, unlocked: false },
-                        yuanshen_huaxu: { name: '元神化虚', desc: '化神中期高产', duration: 80, output: { cultivation: 4200, skill: 'cultivation', exp: 650 }, requiredRealmIndex: 18, unlocked: false },
-                        tiandi_gongming: { name: '天地共鸣', desc: '化神期最终法', duration: 150, output: { cultivation: 9000, skill: 'cultivation', exp: 900 }, requiredRealmIndex: 19, unlocked: false },
-                        // 合体期配方（索引21–23解锁；修为 / 秒高于化神期的 60，配合合体期功法）
-                        heti_unity: { name: '合体归一', desc: '合体初期主力', duration: 220, output: { cultivation: 28000, skill: 'cultivation', exp: 2600 }, requiredRealmIndex: 25, unlocked: false },
-                        dao_body: { name: '道果炼体', desc: '合体中期高产', duration: 320, output: { cultivation: 52000, skill: 'cultivation', exp: 3200 }, requiredRealmIndex: 26, unlocked: false },
-                        dao_perfect: { name: '合道圆满', desc: '合体期最终修炼法', duration: 420, output: { cultivation: 90000, skill: 'cultivation', exp: 4000 }, requiredRealmIndex: 27, unlocked: false },
-                        // 炼虚期配方（索引21–23解锁）
-                        lianxu_main: { name: '炼虚归元', desc: '炼虚初期主力', duration: 200, output: { cultivation: 15000, skill: 'cultivation', exp: 1000 }, requiredRealmIndex: 21, unlocked: false },
-                        huaxu_unity: { name: '化虚合真', desc: '炼虚中期高产', duration: 300, output: { cultivation: 27000, skill: 'cultivation', exp: 1500 }, requiredRealmIndex: 22, unlocked: false },
-                        taixu_manifest: { name: '太虚显化', desc: '炼虚期最终修炼法', duration: 450, output: { cultivation: 50000, skill: 'cultivation', exp: 2200 }, requiredRealmIndex: 23, unlocked: false },
-                        // 大乘期配方（索引29-31解锁）
-                        dacheng_convergence: { name: '大乘归一', desc: '大乘初期主力', duration: 260, output: { cultivation: 170000, skill: 'cultivation', exp: 4800 }, requiredRealmIndex: 29, unlocked: false },
-                        yuanying_growth: { name: '元婴蜕变', desc: '大乘中期高产', duration: 380, output: { cultivation: 320000, skill: 'cultivation', exp: 6000 }, requiredRealmIndex: 30, unlocked: false },
-                        fadao_suppress: { name: '法则镇伏', desc: '大乘期最终修炼法', duration: 540, output: { cultivation: 560000, skill: 'cultivation', exp: 7500 }, requiredRealmIndex: 31, unlocked: false },
-                        // 真仙境配方（索引32起解锁）：不产出修为，直接打通一窍（xianqiao+1），
+                        big: { name: '大周天', desc: '中期主力', duration: 12, output: { cultivation: 30, skill: 'cultivation', exp: 25 }, requiredRealmIndex: 9, unlocked: false },   // 原索引3（练气后期）→13层制下等比换算为第9层
+                        breath: { name: '龟息术', desc: '高产出', duration: 20, output: { cultivation: 100, skill: 'cultivation', exp: 40 }, requiredRealmIndex: 13, unlocked: false },   // 原索引4（练气巅峰，练气期最后一段）→新第13层（练气期最后一层）
+                        epiphany: { name: '顿悟', desc: '后期爆发', duration: 60, output: { cultivation: 500, skill: 'cultivation', exp: 80 }, requiredRealmIndex: 15, unlocked: false },   // 原索引6（筑基中期）→+9
+                        // P6 金丹期配方（v6.89：原索引9/10/11 → 因练气改13层整体 +9 → 18/19/20）
+                        golden_temper: { name: '金丹淬炼', desc: '金丹初期主力', duration: 30, output: { cultivation: 300, skill: 'cultivation', exp: 120 }, requiredRealmIndex: 18, unlocked: false },
+                        fire_body: { name: '丹火炼体', desc: '金丹中期高产', duration: 45, output: { cultivation: 600, skill: 'cultivation', exp: 180 }, requiredRealmIndex: 19, unlocked: false },
+                        golden_perfect: { name: '金丹圆满', desc: '金丹期最终法', duration: 90, output: { cultivation: 1500, skill: 'cultivation', exp: 300 }, requiredRealmIndex: 20, unlocked: false },
+                        // P7 元婴期配方（原索引13/14/15 → 22/23/24）
+                        yuanying_nurture: { name: '元婴温养', desc: '元婴初期主力', duration: 45, output: { cultivation: 800, skill: 'cultivation', exp: 200 }, requiredRealmIndex: 22, unlocked: false },
+                        soul_travel: { name: '元神出窍', desc: '元婴中期高产', duration: 60, output: { cultivation: 1400, skill: 'cultivation', exp: 280 }, requiredRealmIndex: 23, unlocked: false },
+                        yuanying_dao: { name: '元婴合道', desc: '元婴期最终法', duration: 120, output: { cultivation: 3500, skill: 'cultivation', exp: 450 }, requiredRealmIndex: 24, unlocked: false },
+                        // P9 化神期配方（原索引17/18/19 → 26/27/28）
+                        huashen_ning: { name: '化神凝元', desc: '化神初期主力', duration: 60, output: { cultivation: 2400, skill: 'cultivation', exp: 500 }, requiredRealmIndex: 26, unlocked: false },
+                        yuanshen_huaxu: { name: '元神化虚', desc: '化神中期高产', duration: 80, output: { cultivation: 4200, skill: 'cultivation', exp: 650 }, requiredRealmIndex: 27, unlocked: false },
+                        tiandi_gongming: { name: '天地共鸣', desc: '化神期最终法', duration: 150, output: { cultivation: 9000, skill: 'cultivation', exp: 900 }, requiredRealmIndex: 28, unlocked: false },
+                        // 合体期配方（原索引25/26/27 → 34/35/36）
+                        heti_unity: { name: '合体归一', desc: '合体初期主力', duration: 220, output: { cultivation: 28000, skill: 'cultivation', exp: 2600 }, requiredRealmIndex: 34, unlocked: false },
+                        dao_body: { name: '道果炼体', desc: '合体中期高产', duration: 320, output: { cultivation: 52000, skill: 'cultivation', exp: 3200 }, requiredRealmIndex: 35, unlocked: false },
+                        dao_perfect: { name: '合道圆满', desc: '合体期最终修炼法', duration: 420, output: { cultivation: 90000, skill: 'cultivation', exp: 4000 }, requiredRealmIndex: 36, unlocked: false },
+                        // 炼虚期配方（原索引21/22/23 → 30/31/32）
+                        lianxu_main: { name: '炼虚归元', desc: '炼虚初期主力', duration: 200, output: { cultivation: 15000, skill: 'cultivation', exp: 1000 }, requiredRealmIndex: 30, unlocked: false },
+                        huaxu_unity: { name: '化虚合真', desc: '炼虚中期高产', duration: 300, output: { cultivation: 27000, skill: 'cultivation', exp: 1500 }, requiredRealmIndex: 31, unlocked: false },
+                        taixu_manifest: { name: '太虚显化', desc: '炼虚期最终修炼法', duration: 450, output: { cultivation: 50000, skill: 'cultivation', exp: 2200 }, requiredRealmIndex: 32, unlocked: false },
+                        // 大乘期配方（原索引29/30/31 → 38/39/40）
+                        dacheng_convergence: { name: '大乘归一', desc: '大乘初期主力', duration: 260, output: { cultivation: 170000, skill: 'cultivation', exp: 4800 }, requiredRealmIndex: 38, unlocked: false },
+                        yuanying_growth: { name: '元婴蜕变', desc: '大乘中期高产', duration: 380, output: { cultivation: 320000, skill: 'cultivation', exp: 6000 }, requiredRealmIndex: 39, unlocked: false },
+                        fadao_suppress: { name: '法则镇伏', desc: '大乘期最终修炼法', duration: 540, output: { cultivation: 560000, skill: 'cultivation', exp: 7500 }, requiredRealmIndex: 40, unlocked: false },
+                        // 真仙境配方（原索引32 → 41）：不产出修为，直接打通一窍（xianqiao+1），
                         // 是大乘圆满→真仙初期、真仙初期→真仙后期这两次突破的唯一判定依据，见 attemptBreakthrough()
-                        open_orifice: { name: '开辟仙窍', desc: '肉身化道体，以窍代修：太乙精华×5 换一窍，12窍飞升真仙初期，24窍圆满真仙后期', duration: 300, output: { xianqiao: 1, skill: 'cultivation', exp: 8000 }, requires: { taiyiessence: 5 }, requiredRealmIndex: 32, unlocked: false }
+                        open_orifice: { name: '开辟仙窍', desc: '肉身化道体，以窍代修：太乙精华×5 换一窍，12窍飞升真仙初期，24窍圆满真仙后期', duration: 300, output: { xianqiao: 1, skill: 'cultivation', exp: 8000 }, requires: { taiyiessence: 5 }, requiredRealmIndex: 41, unlocked: false }
                     },
                     actions: {}
                 },
@@ -431,7 +446,7 @@
                         study: { name: '看丹书', desc: '增加经验', duration: 10, output: { skill: 'alchemy', exp: 15 }, requiredLevel: 1, unlocked: true },
                         millet_porridge: { name: '灵米粥', desc: '灵米 ×2（战斗食物：恢复100生命）', duration: 8, output: { items: [{ id: 'millet_porridge', qty: 2 }], skill: 'alchemy', exp: 12 }, requiredLevel: 1, requires: { millet: 2 }, unlocked: false },
                         herb_soup: { name: '灵草汤', desc: '清灵草 ×2 + 灵米 ×1（战斗食物：恢复250生命）', duration: 12, output: { items: [{ id: 'herb_soup', qty: 2 }], skill: 'alchemy', exp: 30 }, requiredLevel: 8, requires: { cleangrass: 2, millet: 1 }, unlocked: false },
-                        breakthrough: { name: '筑基丹', desc: '清灵草 ×3（练气巅峰突破必需）', duration: 12, output: { items: [{ id: 'pill', qty: 1 }], skill: 'alchemy', exp: 45 }, requiredLevel: 10, requires: { cleangrass: 3 }, unlocked: false },
+                        breakthrough: { name: '筑基丹', desc: '清灵草 ×3（练气十三层突破必需）', duration: 12, output: { items: [{ id: 'pill', qty: 1 }], skill: 'alchemy', exp: 45 }, requiredLevel: 10, requires: { cleangrass: 3 }, unlocked: false },
                         golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 灵矿石 ×2（筑基圆满突破必需）', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 20, requires: { mushroom: 3, crystal: 1, spiritore: 2 }, unlocked: false },
                         mushroom_stew: { name: '灵芝羹', desc: '灵芝 ×2 + 灵米 ×2（战斗食物：恢复500生命）', duration: 30, output: { items: [{ id: 'mushroom_stew', qty: 2 }], skill: 'alchemy', exp: 240 }, requiredLevel: 22, requires: { mushroom: 2, millet: 2 }, unlocked: false },
                         yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2（金丹圆满突破必需）', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 400 }, requiredLevel: 30, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false },
@@ -698,9 +713,9 @@
                 upgrades: [
                     { id: 'inventory_slot', name: '背包扩展', icon: '📦', price: 100, desc: '+5格容量', type: 'upgrade', bought: false },
                     { id: 'farming_slot', name: '第二块灵田', icon: '🌾', price: 5000, desc: '解锁第二块灵田：可与主角同时种植灵田配方，速度相同，可种同一种作物（只能买一次）', type: 'upgrade', bought: false },
-                    { id: 'jewelry_slot2', name: '第二饰品栏位', icon: '💍', price: 8000, desc: '解锁第二个饰品栏位（可同时佩戴两件不同的饰品）', minRealmIndex: 9, type: 'upgrade', bought: false },
-                    { id: 'daoze_slot2', name: '第二道基槽位', icon: '☯️', price: 15000, desc: '解锁第二个道基槽位（可同时镶嵌两枚不同法则的道则）', minRealmIndex: 21, type: 'upgrade', bought: false },
-                    { id: 'daoze_slot3', name: '第三道基槽位', icon: '☯️', price: 35000, desc: '解锁第三个道基槽位', minRealmIndex: 23, type: 'upgrade', bought: false }
+                    { id: 'jewelry_slot2', name: '第二饰品栏位', icon: '💍', price: 8000, desc: '解锁第二个饰品栏位（可同时佩戴两件不同的饰品）', minRealmIndex: 18, type: 'upgrade', bought: false },
+                    { id: 'daoze_slot2', name: '第二道基槽位', icon: '☯️', price: 15000, desc: '解锁第二个道基槽位（可同时镶嵌两枚不同法则的道则）', minRealmIndex: 30, type: 'upgrade', bought: false },
+                    { id: 'daoze_slot3', name: '第三道基槽位', icon: '☯️', price: 35000, desc: '解锁第三个道基槽位', minRealmIndex: 32, type: 'upgrade', bought: false }
                 ],
                 food: [
                     { id: 'millet', name: '灵米', icon: '🌾', price: 10, desc: '普通食物' },
@@ -708,56 +723,56 @@
                     { id: 'mushroom', name: '灵芝', icon: '🍄', price: 50, desc: '高级材料' }
                 ],
                 materials: [
-                    { id: 'spiritore', name: '灵矿石', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 5 },
-                    { id: 'crystal', name: '玄晶', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 8 },
-                    { id: 'spiritcrystal', name: '灵晶', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 9 },
-                    { id: 'immortalore', name: '仙矿', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 13 }
+                    { id: 'spiritore', name: '灵矿石', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 14 },
+                    { id: 'crystal', name: '玄晶', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 17 },
+                    { id: 'spiritcrystal', name: '灵晶', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 18 },
+                    { id: 'immortalore', name: '仙矿', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 22 }
                 ],
                 // 丹火商城（金丹初期起）：用丹火买炼丹 / 战斗食物材料；食物是秘境的刚需
                 danhuo_shop: [
-                    { id: 'mushroom_stew', name: '灵芝羹 ×4', icon: '🥣', price: 40, currency: 'danhuo', bundle: 4, desc: '战斗食物（恢复 500 生命）', minRealmIndex: 9 },
-                    { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 25, currency: 'danhuo', bundle: 5, desc: '炼器材料', minRealmIndex: 9 },
-                    { id: 'crystal', name: '玄晶 ×1', icon: '💎', price: 30, currency: 'danhuo', bundle: 1, desc: '高级材料', minRealmIndex: 9 },
-                    { id: 'mushroom', name: '灵芝 ×5', icon: '🍄', price: 25, currency: 'danhuo', bundle: 5, desc: '炼丹材料', minRealmIndex: 9 },
-                    { id: 'tea', name: '悟道茶叶 ×3', icon: '🍵', price: 30, currency: 'danhuo', bundle: 3, desc: '炼丹材料', minRealmIndex: 9 },
-                    { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 60, currency: 'danhuo', bundle: 1, desc: '元婴级材料', minRealmIndex: 9 },
-                    { id: 'lotus', name: '九叶莲 ×1', icon: '🌸', price: 45, currency: 'danhuo', bundle: 1, desc: '炼丹材料（元婴丹、化神丹）', minRealmIndex: 9 }
+                    { id: 'mushroom_stew', name: '灵芝羹 ×4', icon: '🥣', price: 40, currency: 'danhuo', bundle: 4, desc: '战斗食物（恢复 500 生命）', minRealmIndex: 18 },
+                    { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 25, currency: 'danhuo', bundle: 5, desc: '炼器材料', minRealmIndex: 18 },
+                    { id: 'crystal', name: '玄晶 ×1', icon: '💎', price: 30, currency: 'danhuo', bundle: 1, desc: '高级材料', minRealmIndex: 18 },
+                    { id: 'mushroom', name: '灵芝 ×5', icon: '🍄', price: 25, currency: 'danhuo', bundle: 5, desc: '炼丹材料', minRealmIndex: 18 },
+                    { id: 'tea', name: '悟道茶叶 ×3', icon: '🍵', price: 30, currency: 'danhuo', bundle: 3, desc: '炼丹材料', minRealmIndex: 18 },
+                    { id: 'spiritcrystal', name: '灵晶 ×1', icon: '🔹', price: 60, currency: 'danhuo', bundle: 1, desc: '元婴级材料', minRealmIndex: 18 },
+                    { id: 'lotus', name: '九叶莲 ×1', icon: '🌸', price: 45, currency: 'danhuo', bundle: 1, desc: '炼丹材料（元婴丹、化神丹）', minRealmIndex: 18 }
                 ],
                 // 神识商城（元婴初期起）：用神识买高阶食物与稀有材料
                 shenshi_shop: [
-                    { id: 'immortal_peach', name: '蟠桃 ×3', icon: '🍑', price: 45, currency: 'shenshi', bundle: 3, desc: '战斗食物（恢复 1000 生命）', minRealmIndex: 13 },
-                    { id: 'jade_nectar', name: '琼浆玉液 ×2', icon: '🍶', price: 80, currency: 'shenshi', bundle: 2, desc: '战斗食物（化神初期起）', minRealmIndex: 17 },
-                    { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 60, currency: 'shenshi', bundle: 1, desc: '顶级材料', minRealmIndex: 13 },
-                    { id: 'chaosstone', name: '混沌石 ×1', icon: '🌑', price: 90, currency: 'shenshi', bundle: 1, desc: '化神装备材料', minRealmIndex: 17 },
-                    { id: 'daofruit', name: '悟道果 ×1', icon: '🍇', price: 50, currency: 'shenshi', bundle: 1, desc: '炼丹 / 神识入定材料', minRealmIndex: 13 },
-                    { id: 'lotus', name: '九叶莲 ×2', icon: '🌸', price: 40, currency: 'shenshi', bundle: 2, desc: '炼丹材料', minRealmIndex: 13 }
+                    { id: 'immortal_peach', name: '蟠桃 ×3', icon: '🍑', price: 45, currency: 'shenshi', bundle: 3, desc: '战斗食物（恢复 1000 生命）', minRealmIndex: 22 },
+                    { id: 'jade_nectar', name: '琼浆玉液 ×2', icon: '🍶', price: 80, currency: 'shenshi', bundle: 2, desc: '战斗食物（化神初期起）', minRealmIndex: 26 },
+                    { id: 'immortalore', name: '仙矿 ×1', icon: '✨', price: 60, currency: 'shenshi', bundle: 1, desc: '顶级材料', minRealmIndex: 22 },
+                    { id: 'chaosstone', name: '混沌石 ×1', icon: '🌑', price: 90, currency: 'shenshi', bundle: 1, desc: '化神装备材料', minRealmIndex: 26 },
+                    { id: 'daofruit', name: '悟道果 ×1', icon: '🍇', price: 50, currency: 'shenshi', bundle: 1, desc: '炼丹 / 神识入定材料', minRealmIndex: 22 },
+                    { id: 'lotus', name: '九叶莲 ×2', icon: '🌸', price: 40, currency: 'shenshi', bundle: 2, desc: '炼丹材料', minRealmIndex: 22 }
                 ],
                 daoguo_shop: [
-                    { id: 'jade_marrow', name: '玉髓琼浆 ×2', icon: '🍶', price: 30, currency: 'daoguo', bundle: 2, desc: '战斗食物（合体初期起，恢复 5000 生命）', minRealmIndex: 25 },
-                    { id: 'daostone', name: '天道石 ×2', icon: '🪨', price: 40, currency: 'daoguo', bundle: 2, desc: '合体级矿石（合体丹 / 合体装备材料）', minRealmIndex: 25 },
-                    { id: 'chaosstone', name: '混沌石 ×2', icon: '🌑', price: 30, currency: 'daoguo', bundle: 2, desc: '合体装备材料', minRealmIndex: 25 },
-                    { id: 'immortalore', name: '仙矿 ×3', icon: '✨', price: 30, currency: 'daoguo', bundle: 3, desc: '顶级材料', minRealmIndex: 25 },
-                    { id: 'daofruit', name: '悟道果 ×2', icon: '🍇', price: 35, currency: 'daoguo', bundle: 2, desc: '炼丹 / 玉髓琼浆 / 道果技能材料', minRealmIndex: 25 },
-                    { id: 'lotus', name: '九叶莲 ×3', icon: '🌸', price: 35, currency: 'daoguo', bundle: 3, desc: '炼丹材料', minRealmIndex: 25 },
-                    { id: 'voidcrystal', name: '虚晶 ×2', icon: '💠', price: 45, currency: 'daoguo', bundle: 2, desc: '炼虚级矿石（化虚 / 炼虚装备材料）', minRealmIndex: 25 }
+                    { id: 'jade_marrow', name: '玉髓琼浆 ×2', icon: '🍶', price: 30, currency: 'daoguo', bundle: 2, desc: '战斗食物（合体初期起，恢复 5000 生命）', minRealmIndex: 34 },
+                    { id: 'daostone', name: '天道石 ×2', icon: '🪨', price: 40, currency: 'daoguo', bundle: 2, desc: '合体级矿石（合体丹 / 合体装备材料）', minRealmIndex: 34 },
+                    { id: 'chaosstone', name: '混沌石 ×2', icon: '🌑', price: 30, currency: 'daoguo', bundle: 2, desc: '合体装备材料', minRealmIndex: 34 },
+                    { id: 'immortalore', name: '仙矿 ×3', icon: '✨', price: 30, currency: 'daoguo', bundle: 3, desc: '顶级材料', minRealmIndex: 34 },
+                    { id: 'daofruit', name: '悟道果 ×2', icon: '🍇', price: 35, currency: 'daoguo', bundle: 2, desc: '炼丹 / 玉髓琼浆 / 道果技能材料', minRealmIndex: 34 },
+                    { id: 'lotus', name: '九叶莲 ×3', icon: '🌸', price: 35, currency: 'daoguo', bundle: 3, desc: '炼丹材料', minRealmIndex: 34 },
+                    { id: 'voidcrystal', name: '虚晶 ×2', icon: '💠', price: 45, currency: 'daoguo', bundle: 2, desc: '炼虚级矿石（化虚 / 炼虚装备材料）', minRealmIndex: 34 }
                 ],
                 arts: [
                     { id: 'qingmu_art', name: '青木诀', icon: '🌿', price: 200, desc: '修炼速度 ×1.1', minRealmIndex: 1, type: 'art' },
-                    { id: 'liuyun_art', name: '流云诀', icon: '☁️', price: 1200, desc: '修炼速度 ×1.25', minRealmIndex: 3, type: 'art' },
-                    { id: 'xuanshui_art', name: '玄水经', icon: '💧', price: 4000, desc: '修炼速度 ×1.35', minRealmIndex: 5, type: 'art' },
-                    { id: 'lieyang_art', name: '烈阳功', icon: '☀️', price: 8000, desc: '修炼速度 ×1.45', minRealmIndex: 7, type: 'art' },
-                    { id: 'golden_art', name: '金丹大道', icon: '📜', price: 10000, desc: '修炼速度 ×1.5', minRealmIndex: 8, type: 'art' },
-                    { id: 'fire_art', name: '焚天诀', icon: '🔥', price: 20000, desc: '修炼速度 ×1.8', minRealmIndex: 9, type: 'art' },
-                    { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 30000, desc: '修炼速度 ×2.2', minRealmIndex: 11, type: 'art' },
-                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 13, type: 'art' },
-                { id: 'huashen_art', name: '化神真经', icon: '📖', price: 120000, desc: '修炼速度 ×3.4', minRealmIndex: 17, type: 'art' },
-                { id: 'primordial_art', name: '太初混元诀', icon: '☯️', price: 300000, desc: '修炼速度 ×4.2', minRealmIndex: 19, type: 'art' },
-                    { id: 'lianxu_art', name: '炼虚真经', icon: '📖', price: 800000, desc: '修炼速度 ×5', minRealmIndex: 21, type: 'art' },
-                    { id: 'taixuhuashi_art', name: '太虚化实经', icon: '🕮', price: 2000000, desc: '修炼速度 ×6.2', minRealmIndex: 23, type: 'art' },
-                    { id: 'heti_art', name: '合体真经', icon: '📖', price: 2000000, desc: '修炼速度 ×8', minRealmIndex: 25, type: 'art' },
-                    { id: 'dao_art', name: '太上合道经', icon: '🕮', price: 5000000, desc: '修炼速度 ×9.5', minRealmIndex: 27, type: 'art' },
-                    { id: 'dacheng_art', name: '大乘真经', icon: '📖', price: 12000000, desc: '修炼速度 ×12', minRealmIndex: 29, type: 'art' },
-                    { id: 'taiyi_art', name: '太乙化元经', icon: '🕮', price: 30000000, desc: '修炼速度 ×15', minRealmIndex: 31, type: 'art' }
+                    { id: 'liuyun_art', name: '流云诀', icon: '☁️', price: 1200, desc: '修炼速度 ×1.25', minRealmIndex: 9, type: 'art' },
+                    { id: 'xuanshui_art', name: '玄水经', icon: '💧', price: 4000, desc: '修炼速度 ×1.35', minRealmIndex: 14, type: 'art' },
+                    { id: 'lieyang_art', name: '烈阳功', icon: '☀️', price: 8000, desc: '修炼速度 ×1.45', minRealmIndex: 16, type: 'art' },
+                    { id: 'golden_art', name: '金丹大道', icon: '📜', price: 10000, desc: '修炼速度 ×1.5', minRealmIndex: 17, type: 'art' },
+                    { id: 'fire_art', name: '焚天诀', icon: '🔥', price: 20000, desc: '修炼速度 ×1.8', minRealmIndex: 18, type: 'art' },
+                    { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 30000, desc: '修炼速度 ×2.2', minRealmIndex: 20, type: 'art' },
+                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 22, type: 'art' },
+                { id: 'huashen_art', name: '化神真经', icon: '📖', price: 120000, desc: '修炼速度 ×3.4', minRealmIndex: 26, type: 'art' },
+                { id: 'primordial_art', name: '太初混元诀', icon: '☯️', price: 300000, desc: '修炼速度 ×4.2', minRealmIndex: 28, type: 'art' },
+                    { id: 'lianxu_art', name: '炼虚真经', icon: '📖', price: 800000, desc: '修炼速度 ×5', minRealmIndex: 30, type: 'art' },
+                    { id: 'taixuhuashi_art', name: '太虚化实经', icon: '🕮', price: 2000000, desc: '修炼速度 ×6.2', minRealmIndex: 32, type: 'art' },
+                    { id: 'heti_art', name: '合体真经', icon: '📖', price: 2000000, desc: '修炼速度 ×8', minRealmIndex: 34, type: 'art' },
+                    { id: 'dao_art', name: '太上合道经', icon: '🕮', price: 5000000, desc: '修炼速度 ×9.5', minRealmIndex: 36, type: 'art' },
+                    { id: 'dacheng_art', name: '大乘真经', icon: '📖', price: 12000000, desc: '修炼速度 ×12', minRealmIndex: 38, type: 'art' },
+                    { id: 'taiyi_art', name: '太乙化元经', icon: '🕮', price: 30000000, desc: '修炼速度 ×15', minRealmIndex: 40, type: 'art' }
                 ]
             }
         };
@@ -782,7 +797,7 @@
                     icon: '🍜',
                     hpRestore: 250,           // 恢复HP
                     cooldown: 2.0,
-                    minRealm: 4,              // 练气巅峰
+                    minRealm: 13,             // v6.89：原索引4（练气巅峰）→13层制的练气十三层
                     description: '由清灵草熬制的汤，恢复250点生命值'
                 },
                 // 高级食物
@@ -792,7 +807,7 @@
                     icon: '🥣',
                     hpRestore: 500,           // 恢复HP
                     cooldown: 3.0,
-                    minRealm: 9,              // 金丹初期
+                    minRealm: 18,             // v6.89：原索引9 → +9，金丹初期
                     description: '灵芝熬制的浓羹，恢复500点生命值'
                 },
                 // 极品食物
@@ -802,7 +817,7 @@
                     icon: '🍑',
                     hpRestore: 1000,          // 恢复HP
                     cooldown: 5.0,
-                    minRealm: 13,             // 元婴初期
+                    minRealm: 22,             // v6.89：原索引13 → +9，元婴初期
                     description: '传说中的仙果，完全恢复生命值'
                 },
                 // 化神期食物：恢复量更大、冷却更短
@@ -812,7 +827,7 @@
                     icon: '🍶',
                     hpRestore: 2000,          // 恢复HP
                     cooldown: 3.0,
-                    minRealm: 17,             // 化神初期
+                    minRealm: 26,             // v6.89：原索引17 → +9，化神初期
                     description: '化神修士的琼浆，饮下瞬间生机勃发，冷却比蟠桃更短'
                 },
                 jade_marrow: {
@@ -821,7 +836,7 @@
                     icon: '🍶',
                     hpRestore: 5000,          // 恢复HP
                     cooldown: 3.0,
-                    minRealm: 25,             // 合体初期
+                    minRealm: 34,             // v6.89：原索引25 → +9，合体初期
                     description: '合体修士的玉髓，肉身与元神共鸣，恢复量远超玉髓琼浆之前的一切战斗食物'
                 },
                 void_nectar: {
@@ -830,7 +845,7 @@
                     icon: '🍶',
                     hpRestore: 3500,          // 恢复HP
                     cooldown: 3.0,
-                    minRealm: 21,             // 炼虚初期
+                    minRealm: 30,             // v6.89：原索引21 → +9，炼虚初期
                     description: '炼虚修士以虚晶入酿，化虚为实，恢复量远超此前的战斗食物'
                 },
                 taiyi_nectar: {
@@ -839,7 +854,7 @@
                     icon: '🍶',
                     hpRestore: 6500,          // 恢复HP
                     cooldown: 3.0,
-                    minRealm: 29,             // 大乘初期
+                    minRealm: 38,             // v6.89：原索引29 → +9，大乘初期
                     description: '大乘修士以太乙精华炼制，灵界至高一脉的战斗补给，恢复量远超此前一切战斗食物'
                 }
             },
@@ -1017,8 +1032,11 @@
         function getTemper(slot) { return ((gameState.player.temper || {})[slot]) || 0; }
         function getRootLevel() { return gameState.player.rootLevel || 0; }
         function getShenLevel(kind) { return ((gameState.player.shen || {})[kind]) || 0; }
-        function isDanhuoUnlocked() { return gameState.player.realmIndex >= 9; }
-        function isShenshiUnlocked() { return gameState.player.realmIndex >= 13; }
+        function isDanhuoUnlocked() { return gameState.player.realmIndex >= 18; }   // v6.89：原索引9 → +9
+        function isShenshiUnlocked() { return gameState.player.realmIndex >= 22; }   // 原索引13 → +9
+        // v6.89：练气13层后，「大境界圆满→下一大境界初期」的突破点不再是均匀的 %4===0，
+        // 改成显式列表（原索引 4,8,12,16,20,24,28,32 → 13,17,21,25,29,33,37,41）
+        const MAJOR_BREAKTHROUGH_INDICES = new Set([13, 17, 21, 25, 29, 33, 37, 41]);
 
         // 灵根特效经强化后的实际数值（getMod 和界面都用它）
         function getRootEffectsScaled() {
@@ -1298,7 +1316,7 @@
             outShenshi: 0.5,     // 神识产出 +50%
             outDaoguo: 0.3       // 道果产出 +30%
         };
-        const FUSION_REQUIRED_REALM = 28;   // 合体圆满（现索引28）：晋升下一境界必须已合道
+        const FUSION_REQUIRED_REALM = 37;   // v6.89：原索引28 → +9，合体圆满：晋升下一境界必须已合道
         // 聚灵培元（v6.76）：灵石的软性无底洞。技能设施买完之后灵石在大乘期完全没处花，
         // 加这个无等级上限、每级涨价的永久小额加成——价格指数增长（×1.15/级），买得越多越贵，
         // 早期几万灵石就能买、后期要吞掉大量灵石，让「灵石多到花不完」始终有地方去，
@@ -1332,7 +1350,7 @@
 
         function daoBodyCost(level) { return Math.round(10 * Math.pow(level + 1, 1.5)); }
         function daoLawCost(level) { return Math.round(25 * Math.pow(level + 1, 1.5)); }
-        function isDaoguoUnlocked() { return gameState.player.realmIndex >= 25; }
+        function isDaoguoUnlocked() { return gameState.player.realmIndex >= 34; }   // v6.89：原索引25 → +9
         function isFused() { return !!(gameState.player.fusion && gameState.player.fusion.active); }
         function getDaoBody() { return gameState.player.daoBody || 0; }
         function getDaoLaw() { return gameState.player.daoLaw || 0; }
@@ -1443,7 +1461,7 @@
         // ---- 炼虚期：化虚（法则实体化）与道则（v6.66） ----
         // 炼虚初期（索引21）起解锁。核心取舍：消耗悟道法则的等级（可逆，参悟可以再练回来）+ 道果/虚晶，
         // 兑换成一枚「道则」（实体物品），镶嵌进新增的「道基」槽后提供比留着法则等级更集中的定向加成。
-        function isVoidUnlocked() { return gameState.player.realmIndex >= 21; }
+        function isVoidUnlocked() { return gameState.player.realmIndex >= 30; }   // v6.89：原索引21 → +9
 
         // 第 5 品「本源品」大乘初期（索引29）起才能化虚，需要 isDachengUnlocked()
         const DAOZE_TIER_NAMES = ['下品', '中品', '上品', '极品', '本源品'];
@@ -1494,7 +1512,7 @@
             invalidateLawTotals();
         }
 
-        function isDachengUnlocked() { return gameState.player.realmIndex >= 29; }
+        function isDachengUnlocked() { return gameState.player.realmIndex >= 38; }   // v6.89：原索引29 → +9
 
         // 化虚：把某个法则的 n 级（对应 tier 0-4，第 5 品「本源品」需大乘初期）兑成一枚道则，扣道果 + 虚晶
         function huaxuLaw(lawId, tier) {
@@ -1558,7 +1576,7 @@
         // 游戏化：炼虚 21-24 每个小境界各一场天劫（tribulation21-24，GAME_CONFIG.dungeons 里 isTribulation:true 的特殊单体 Boss 战），
         // 不在秘境列表里出现，只能从突破弹窗的「⚡ 渡劫」进入；渡过一次永久生效（不会像普通秘境那样清空重来）。
         // 失败沿用秘境战败的既有惩罚（损失 10% 修为、50% 食物、气血回到 50%），可以重新挑战，不会卡死进度。
-        const TRIBULATION_REALMS = [21, 22, 23, 24];
+        const TRIBULATION_REALMS = [30, 31, 32, 33];   // v6.89：原索引21-24 → +9
         const TRIBULATION_HP_PCT = 0.03;   // 渡劫：每渡一劫永久生命 / 防御 +3%（身与天地相融，越来越难杀；4 劫渡满 +12%）
         function tribulationIdFor(realmIndex) { return `tribulation${realmIndex}`; }
         function hasSurvivedTribulation(realmIndex) {
@@ -1683,13 +1701,13 @@
         // 12 窍触发大乘圆满→真仙初期的突破，24 窍触发真仙初期→真仙后期；两次突破都不再看 cultivationXP，
         // 见 attemptBreakthrough() 里的特判。五衰的前三衰（仙衰/窍衰/身衰）合并成一份随仙窍数递减的负加成，
         // 不拆成三个数值上分不清的小 debuff：刚飞升（真仙初期，12窍）时 hp/atk/def 各 -7.5%，24 窍打满时归零。
-        function isAscendUnlocked() { return gameState.player.realmIndex >= 32; }
+        function isAscendUnlocked() { return gameState.player.realmIndex >= 41; }   // v6.89：原索引32 → +9
         const XIAN_ORIFICE_MAX = 24;
         const XIAN_SHUAI_MAX_PENALTY = 0.15;
         function getXianqiao() { return Math.min(XIAN_ORIFICE_MAX, gameState.player.xianqiao || 0); }
         function getXianShuaiMod(key) {
             if (key !== 'hpPct' && key !== 'atkPct' && key !== 'defPct') return 0;
-            if (gameState.player.realmIndex < 33) return 0;
+            if (gameState.player.realmIndex < 42) return 0;   // v6.89：原索引33（真仙初期）→ +9
             return -XIAN_SHUAI_MAX_PENALTY * (1 - getXianqiao() / XIAN_ORIFICE_MAX);
         }
 
@@ -1998,35 +2016,36 @@
         // 也就不会弹提示。同一份数据也用在「设置 → 玩法介绍 → 境界解锁一览」里，完整列出全部境界当预告。
         // 每条尽量说清楚「是什么 / 在哪操作 / 关键机制或代价」，不只是一个名词——早期版本只写名词，
         // 玩家到了新境界经常不知道这个新东西具体怎么玩（用户反馈：到了炼虚期不知道道则怎么用）
+        // v6.89：练气改13层，key=1不变，原2/3/4按等比映射到新5/9/13，原索引5起整体+9
         const REALM_UNLOCKS = {
             1:  ['⚔️ 可以参与战斗了，战斗页「战斗区域」标签下森林开放。战斗区域是循环挑战（打完一场自动开下一场，直到点「撤退」），跟秘境「打到底」不一样；记得先在炼丹页做点战斗食物带上，生命不会自动恢复只能靠食物'],
-            2:  ['🔮 神秘之塔秘境开放（战斗页「秘境」标签）。秘境是连续几只怪一次性打到底，通关拿固定+随机奖励'],
-            3:  ['⚔️ 十万大山外围战斗区域开放'],
-            4:  ['🌲 诡异森林秘境开放', '💊 炼丹页解锁筑基丹配方（材料清灵草×3），趁早炼够——练气巅峰突破筑基必须要这个丹'],
-            5:  ['⚔️ 十万大山核心 / 妖兽沼泽战斗区域开放'],
-            6:  ['⚱️ 古老遗迹秘境开放'],
-            7:  ['⚔️ 魔窟深渊战斗区域开放'],
-            8:  ['⚡ 天劫之地秘境开放', '💊 金丹秘药配方解锁，突破筑基圆满前记得炼够'],
-            9:  ['🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 金丹平原战斗区域开放'],
-            10: ['⚔️ 天劫之地战斗区域开放'],
-            12: ['🌌 元婴秘境开放', '💊 元婴丹配方解锁，突破金丹圆满前记得炼够'],
-            13: ['👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
-            15: ['⚔️ 深渊遗迹战斗区域开放'],
-            16: ['🌠 太虚幻境秘境开放', '💊 化神丹配方解锁，突破元婴圆满前记得炼够'],
-            17: ['☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
-            19: ['⚔️ 九幽冥渊战斗区域开放'],
-            20: ['🌫️ 虚界秘境开放', '💊 化虚丹配方解锁，突破化神圆满前记得炼够'],
-            21: ['🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：从这个境界起，每次突破小境界前，突破弹窗会先要求「渡劫」——去对应的天劫秘境打赢，回来才能真正突破'],
-            23: ['⚔️ 化实之界战斗区域开放'],
-            24: ['🌌 天道秘境开放', '💊 合体丹配方解锁，突破炼虚圆满前记得炼够'],
-            25: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 道果页可以「合道」：收回全部分身（不可逆，之后不能再用分身），换所有主行动速度 +100%、生命/攻击/防御/速度 +15%、神识与道果产出提升——这个操作不急着现在做，但合体圆满突破到大乘期之前必须做', '⚔️ 道痕荒原战斗区域开放'],
-            27: ['⚔️ 合一虚境战斗区域开放'],
-            28: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁（前提是已经合道），本境界圆满后必须先合道才能突破到大乘期'],
-            29: ['👁️ 元婴蜕变解锁：道果页花道果 + 元婴精魄升级（最多10级），从婴儿形态练到青年形态，被动加攻击和暴击伤害，不用手动操作', '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
-            31: ['⚔️ 灵界绝境战斗区域开放'],
-            32: ['🌌 灵界至高战力已至，但大道并未到头——「修炼」页新增「开辟仙窍」配方：不产出修为，每次花太乙精华×5，直接打通一窍（xianqiao +1），累计 12 窍即可突破飞升为真仙初期，之前攒的修为不影响这次突破'],
-            33: ['🌟 飞升成功，正式脱离"人"的范畴，寿元与天地同寿；但要承受"五衰"的前三衰（仙衰/窍衰/身衰）——刚飞升时生命/攻击/防御各 -7.5%，「修炼」页继续做「开辟仙窍」，每多打通一窍这份衰退就减少一点，攒满 24 窍时完全消退', '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放'],
-            34: ['🏁 真仙后期，24 窍全部打通，五衰前三衰的负面完全消退——当前实现的至高战力，暂无下一境界']
+            5:  ['🔮 神秘之塔秘境开放（战斗页「秘境」标签）。秘境是连续几只怪一次性打到底，通关拿固定+随机奖励'],
+            9:  ['⚔️ 十万大山外围战斗区域开放'],
+            13: ['🌲 诡异森林秘境开放', '💊 炼丹页解锁筑基丹配方（材料清灵草×3），趁早炼够——练气十三层突破筑基必须要这个丹'],
+            14: ['⚔️ 十万大山核心 / 妖兽沼泽战斗区域开放'],
+            15: ['⚱️ 古老遗迹秘境开放'],
+            16: ['⚔️ 魔窟深渊战斗区域开放'],
+            17: ['⚡ 天劫之地秘境开放', '💊 金丹秘药配方解锁，突破筑基圆满前记得炼够'],
+            18: ['🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 金丹平原战斗区域开放'],
+            19: ['⚔️ 天劫之地战斗区域开放'],
+            21: ['🌌 元婴秘境开放', '💊 元婴丹配方解锁，突破金丹圆满前记得炼够'],
+            22: ['👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
+            24: ['⚔️ 深渊遗迹战斗区域开放'],
+            25: ['🌠 太虚幻境秘境开放', '💊 化神丹配方解锁，突破元婴圆满前记得炼够'],
+            26: ['☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
+            28: ['⚔️ 九幽冥渊战斗区域开放'],
+            29: ['🌫️ 虚界秘境开放', '💊 化虚丹配方解锁，突破化神圆满前记得炼够'],
+            30: ['🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：从这个境界起，每次突破小境界前，突破弹窗会先要求「渡劫」——去对应的天劫秘境打赢，回来才能真正突破'],
+            32: ['⚔️ 化实之界战斗区域开放'],
+            33: ['🌌 天道秘境开放', '💊 合体丹配方解锁，突破炼虚圆满前记得炼够'],
+            34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 道果页可以「合道」：收回全部分身（不可逆，之后不能再用分身），换所有主行动速度 +100%、生命/攻击/防御/速度 +15%、神识与道果产出提升——这个操作不急着现在做，但合体圆满突破到大乘期之前必须做', '⚔️ 道痕荒原战斗区域开放'],
+            36: ['⚔️ 合一虚境战斗区域开放'],
+            37: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁（前提是已经合道），本境界圆满后必须先合道才能突破到大乘期'],
+            38: ['👁️ 元婴蜕变解锁：道果页花道果 + 元婴精魄升级（最多10级），从婴儿形态练到青年形态，被动加攻击和暴击伤害，不用手动操作', '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
+            40: ['⚔️ 灵界绝境战斗区域开放'],
+            41: ['🌌 灵界至高战力已至，但大道并未到头——「修炼」页新增「开辟仙窍」配方：不产出修为，每次花太乙精华×5，直接打通一窍（xianqiao +1），累计 12 窍即可突破飞升为真仙初期，之前攒的修为不影响这次突破'],
+            42: ['🌟 飞升成功，正式脱离"人"的范畴，寿元与天地同寿；但要承受"五衰"的前三衰（仙衰/窍衰/身衰）——刚飞升时生命/攻击/防御各 -7.5%，「修炼」页继续做「开辟仙窍」，每多打通一窍这份衰退就减少一点，攒满 24 窍时完全消退', '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放'],
+            43: ['🏁 真仙后期，24 窍全部打通，五衰前三衰的负面完全消退——当前实现的至高战力，暂无下一境界']
         };
 
         function showRealmUnlockModal(realmIndex) {
@@ -2072,7 +2091,7 @@
               desc: '你现在只是个凡人。在「修炼」页点下面高亮的「吐纳灵气」开始修炼——行动会<b>自动重复</b>，不用一直点。左侧（手机在顶部）是各个技能页的入口。',
               need: { act: 'cultivation.basic', n: 1 }, reward: { coins: 20 } },
             { title: '踏入练气', panel: 'cultivation', target: ['cultivation', 'basic'],
-              desc: '继续修炼，等上方「修为进度」满了，会出现「尝试突破」按钮，点它突破到<b>练气初期</b>。突破会让属性大涨，并解锁新配方和战斗区域。',
+              desc: '继续修炼，等上方「修为进度」满了，会出现「尝试突破」按钮，点它突破到<b>练气一层</b>。突破会让属性大涨，并解锁新配方和战斗区域。',
               need: { realm: 1 }, reward: { coins: 50 } },
             { title: '种植灵米', panel: 'farming', target: ['farming', 'millet'],
               desc: '去「灵田」种植灵米 3 次。<b>生活技能</b>做得越多等级越高，解锁更多配方。同一时间只能做一件事，切换行动会打断当前的。',
@@ -2098,9 +2117,9 @@
             { title: '逛逛商城', panel: 'shop',
               desc: '去「商城」买点东西（灵米、材料，或者功法——功法会加快修炼速度）。商城里还有永久升级，比如扩充背包。',
               need: { count: 'buy', n: 1 }, reward: { coins: 40 } },
-            { title: '练气中期', panel: 'cultivation', target: ['cultivation', 'small'],
-              desc: '练气初期解锁了更快的「小周天」。用它修炼到修为满，突破到<b>练气中期</b>——这样就能进入第一个秘境了。',
-              need: { realm: 2 }, reward: { coins: 100 } },
+            { title: '练气五层', panel: 'cultivation', target: ['cultivation', 'small'],
+              desc: '练气一层解锁了更快的「小周天」。用它修炼到修为满，一层层突破到<b>练气五层</b>——这样就能进入第一个秘境了。',
+              need: { realm: 5 }, reward: { coins: 100 } },   // v6.89：原索引2 → 13层制下的练气五层
             { title: '备足食物', panel: 'alchemy', target: ['alchemy', 'millet_porridge'],
               desc: '秘境要连续打过 5 只怪，血量不会中途恢复，<b>每次通关大约要吃 10 份食物</b>（新手大概要 20 份灵米粥）。累计熬灵米粥 10 次（一次出 2 份；灵米不够就回灵田多种），备足了再去。',
               need: { act: 'alchemy.millet_porridge', n: 10 }, reward: { coins: 60 } },
@@ -2368,7 +2387,7 @@
         // 且任意两个行动（主角与各分身）不能做同一个配方。
         // 分身耗时 = 主角调整后耗时 × getCloneFactor()（基础 1.6，神识每级 -0.01，最低 1.2）；
         // 共用背包与材料，享受精通 / 特效等全部加成；离线也会结算。
-        const CLONE_UNLOCK_REALMS = [13, 17];   // 第 1、2 个分身的解锁境界：元婴初期、化神初期
+        const CLONE_UNLOCK_REALMS = [22, 26];   // v6.89：原索引13/17 → +9，第 1、2 个分身的解锁境界：元婴初期、化神初期
 
         function getCloneSlotCount() {
             if (isFused()) return 0;   // 合道后分身永久消失
@@ -4061,14 +4080,15 @@
         // 大境界突破需要的丹药配置
         // 键为当前境界索引（突破时的源境界），值为所需丹药信息
         // 新索引：凡人(0), 练气初期(1)...练气巅峰(4), 筑基初期(5)...筑基圆满(8), 金丹初期(9)...金丹圆满(12), 元婴初期(13)...元婴圆满(16)
+        // v6.89：练气改13层，原索引5起整体+9；原索引4（练气巅峰→筑基）单独映射为新索引13（练气十三层→筑基）
         const MAJOR_BREAKTHROUGH_PILLS = {
-            4: { pillId: 'pill', pillName: '筑基丹', qty: 1 },   // 练气巅峰(索引4)→筑基初期(索引5)
-            8: { pillId: 'goldenpill', pillName: '金丹秘药', qty: 1 },  // P6 筑基圆满(索引8)→金丹初期(索引9)
-            12: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 },  // P7 金丹圆满(索引12)→元婴初期(索引13)
-            16: { pillId: 'huashenpill', pillName: '化神丹', qty: 1 },   // P9 元婴圆满(索引16)→化神初期(索引17)
-            20: { pillId: 'huaxupill', pillName: '化虚丹', qty: 1 },   // 化神圆满(索引20)→炼虚初期(索引21)
-            24: { pillId: 'hetipill', pillName: '合体丹', qty: 1 },       // 炼虚圆满(索引24)→合体初期(索引25)，且必须已「合道」（见 attemptBreakthrough）
-            28: { pillId: 'dachengpill', pillName: '大乘丹', qty: 1 }    // 合体圆满(索引28)→大乘初期(索引29)
+            13: { pillId: 'pill', pillName: '筑基丹', qty: 1 },   // 练气十三层(索引13)→筑基初期(索引14)
+            17: { pillId: 'goldenpill', pillName: '金丹秘药', qty: 1 },  // 筑基圆满(索引17)→金丹初期(索引18)
+            21: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 },  // 金丹圆满(索引21)→元婴初期(索引22)
+            25: { pillId: 'huashenpill', pillName: '化神丹', qty: 1 },   // 元婴圆满(索引25)→化神初期(索引26)
+            29: { pillId: 'huaxupill', pillName: '化虚丹', qty: 1 },   // 化神圆满(索引29)→炼虚初期(索引30)
+            33: { pillId: 'hetipill', pillName: '合体丹', qty: 1 },       // 炼虚圆满(索引33)→合体初期(索引34)，且必须已「合道」（见 attemptBreakthrough）
+            37: { pillId: 'dachengpill', pillName: '大乘丹', qty: 1 }    // 合体圆满(索引37)→大乘初期(索引38)
         };
 
         // 功法系统（绑定到角色出身，影响修炼速度）
@@ -4107,7 +4127,7 @@
                 tier: 2,
                 speedMultiplier: 1.25,
                 effects: { 'time:life': -0.05, dodge: 0.03 },  // 特效
-                description: '灵气如流云般周转不息，练气后期的常见选择。',
+                description: '灵气如流云般周转不息，练气期后段的常见选择。',
                 origin: null
             },
             xuanshui_art: {
@@ -4366,7 +4386,7 @@
         const DOMAIN_SHENSHI_COST = 15;   // 每次进入战斗激活一次：化神期神识产出约 0.3/秒，15 点约合半分钟产出，有真实成本但不至于用不起
         const MIN_ATTACK_INTERVAL = 0.3;   // 攻击间隔下限，防止冰域 / 装备叠加把间隔压到 0 或负数
 
-        function isDomainUnlocked() { return gameState.player.realmIndex >= 17; }
+        function isDomainUnlocked() { return gameState.player.realmIndex >= 26; }   // v6.89：原索引17 → +9
         function getActiveDomain() { return SPIRIT_DOMAINS[gameState.player.activeDomain] || null; }
 
         // 玩家侧灵域效果：走 getMod 统一体系，calculateStats 时自动应用到 atk/def/hp/spd，
@@ -4489,7 +4509,7 @@
         // 与自身灵根同名的法则，参悟速度 +50%。
         const LAW_IDS = ['metal', 'wood', 'water', 'fire', 'earth', 'wind', 'thunder', 'ice'];
         const LAW_MAX_LEVEL = 30;
-        const LAW_UNLOCK_REALM = 17;            // 化神初期
+        const LAW_UNLOCK_REALM = 26;            // v6.89：原索引17 → +9，化神初期
         const LAW_EXP_PER_COMPLETION = 12;      // 每次参悟获得的法则经验
         const LAW_RESONANCE_BONUS = 0.5;        // 与灵根同名的法则，经验 +50%
         const LAW_MILESTONE_LEVELS = [5, 10, 15, 20, 25];
@@ -6085,7 +6105,7 @@
 
             // 凡人无法参与战斗
             if (gameState.player.realmIndex === 0 && skill === 'battle') {
-                showNotification('凡人无法参与战斗，请先突破到练气初期', '#c98a3e', 'warning');
+                showNotification('凡人无法参与战斗，请先突破到练气一层', '#c98a3e', 'warning');
                 return;
             }
 
@@ -6604,7 +6624,7 @@
             const jSlots = getJewelrySlots();
             for (let i = 0; i < jSlots; i++) slots += slotCard('jewelry', (eq.jewelry || [])[i], `📿 饰品${jSlots > 1 ? i + 1 : ''}`);
             if (jSlots < 2) {
-                const canBuy = gameState.player.realmIndex >= 9;
+                const canBuy = gameState.player.realmIndex >= 18;   // v6.89：原索引9 → +9
                 slots += `<div class="equip-slot locked"><div class="equip-slot-label">📿 饰品2</div>
                     <div class="equip-slot-empty">🔒 第二饰品栏位</div>
                     <div class="equip-slot-stats">${canBuy ? '可在商城购买（8000灵石）' : '金丹初期后可在商城购买'}</div>
@@ -6712,31 +6732,32 @@
             closeItemDetail();
         }
 
+        // v6.89：练气改13层，minLevel/maxLevel（含义其实是 realmIndex）除 forest 的 1 不变外整体按迁移表调整
         function initializeBattleActions() {
             const battleAreas = {
-                forest: { name: '森林', desc: '野兽出没', minLevel: 1, maxLevel: 2, enemies: ['wolf', 'boar'], coins: 50, exp: 20 },
-                mountain: { name: '十万大山外围', desc: '危险地带', minLevel: 3, maxLevel: 4, enemies: ['tiger', 'bear'], coins: 100, exp: 50 },
-                deepMountain: { name: '十万大山核心', desc: '极度危险', minLevel: 5, maxLevel: 6, enemies: ['demon', 'spirit'], coins: 200, exp: 100 },
-                swamp: { name: '妖兽沼泽', desc: '诡异危险', minLevel: 5, maxLevel: 6, enemies: ['poisonBeast', 'serpent'], coins: 180, exp: 90 },
-                abyss: { name: '魔窟深渊', desc: '极端危险', minLevel: 7, maxLevel: 8, enemies: ['demon-lord', 'abyssal'], coins: 300, exp: 150 },
+                forest: { name: '森林', desc: '野兽出没', minLevel: 1, maxLevel: 5, enemies: ['wolf', 'boar'], coins: 50, exp: 20 },
+                mountain: { name: '十万大山外围', desc: '危险地带', minLevel: 9, maxLevel: 13, enemies: ['tiger', 'bear'], coins: 100, exp: 50 },
+                deepMountain: { name: '十万大山核心', desc: '极度危险', minLevel: 14, maxLevel: 15, enemies: ['demon', 'spirit'], coins: 200, exp: 100 },
+                swamp: { name: '妖兽沼泽', desc: '诡异危险', minLevel: 14, maxLevel: 15, enemies: ['poisonBeast', 'serpent'], coins: 180, exp: 90 },
+                abyss: { name: '魔窟深渊', desc: '极端危险', minLevel: 16, maxLevel: 17, enemies: ['demon-lord', 'abyssal'], coins: 300, exp: 150 },
                 // P6 金丹期新增
-                goldenPlains: { name: '金丹平原', desc: '金丹修士的猎场', minLevel: 9, maxLevel: 10, enemies: ['golden-beast', 'spirit-wolf'], coins: 500, exp: 200 },
-                tribulationGround: { name: '天劫之地', desc: '雷劫试炼', minLevel: 10, maxLevel: 11, enemies: ['thunder-demon', 'tribulation-spirit'], coins: 800, exp: 350 },
+                goldenPlains: { name: '金丹平原', desc: '金丹修士的猎场', minLevel: 18, maxLevel: 19, enemies: ['golden-beast', 'spirit-wolf'], coins: 500, exp: 200 },
+                tribulationGround: { name: '天劫之地', desc: '雷劫试炼', minLevel: 19, maxLevel: 20, enemies: ['thunder-demon', 'tribulation-spirit'], coins: 800, exp: 350 },
                 // P7 元婴期新增
-                voidSea: { name: '虚空之海', desc: '元婴修士的试炼场', minLevel: 13, maxLevel: 14, enemies: ['void-creature', 'soul-devourer'], coins: 1000, exp: 400 },
-                abyssRuins: { name: '深渊遗迹', desc: '极端危险的废墟', minLevel: 15, maxLevel: 16, enemies: ['abyss-lord', 'ancient-god'], coins: 2000, exp: 800 },
+                voidSea: { name: '虚空之海', desc: '元婴修士的试炼场', minLevel: 22, maxLevel: 23, enemies: ['void-creature', 'soul-devourer'], coins: 1000, exp: 400 },
+                abyssRuins: { name: '深渊遗迹', desc: '极端危险的废墟', minLevel: 24, maxLevel: 25, enemies: ['abyss-lord', 'ancient-god'], coins: 2000, exp: 800 },
                 // P9 化神期新增
-                chaosWastes: { name: '混沌荒原', desc: '化神修士的试炼场', minLevel: 17, maxLevel: 18, enemies: ['chaos-beast', 'void-walker'], coins: 4000, exp: 1600 },
-                nineNether: { name: '九幽冥渊', desc: '幽冥深处的绝地', minLevel: 19, maxLevel: 20, enemies: ['nether-lord', 'ghost-emperor'], coins: 8000, exp: 3200 },
+                chaosWastes: { name: '混沌荒原', desc: '化神修士的试炼场', minLevel: 26, maxLevel: 27, enemies: ['chaos-beast', 'void-walker'], coins: 4000, exp: 1600 },
+                nineNether: { name: '九幽冥渊', desc: '幽冥深处的绝地', minLevel: 28, maxLevel: 29, enemies: ['nether-lord', 'ghost-emperor'], coins: 8000, exp: 3200 },
                 // P10 合体期新增
-                daoWastes: { name: '道痕荒原', desc: '大道崩落之地', minLevel: 25, maxLevel: 26, enemies: ['dao-shade', 'law-puppet'], coins: 64000, exp: 25600 },
-                fusionVoid: { name: '合一虚境', desc: '万法归一的尽头', minLevel: 27, maxLevel: 28, enemies: ['void-beast', 'fusion-lord'], coins: 128000, exp: 51200 },
-                voidAbyss: { name: '虚渊', desc: '虚实交界的深渊', minLevel: 21, maxLevel: 22, enemies: ['void-beast', 'huaxu-demon'], coins: 16000, exp: 6400 },
-                huashiRealm: { name: '化实之界', desc: '道则具现之地', minLevel: 23, maxLevel: 24, enemies: ['shidao-walker', 'taixu-lord'], coins: 32000, exp: 12800 },
-                taiyiField: { name: '太虚战场', desc: '灵界各族交锋之地', minLevel: 29, maxLevel: 30, enemies: ['taiyi-warrior', 'lingjie-guard'], coins: 260000, exp: 102400 },
-                lingjieAbyss: { name: '灵界绝境', desc: '大乘期最险恶的死地', minLevel: 31, maxLevel: 32, enemies: ['lingjie-fiend', 'daozu-shadow'], coins: 520000, exp: 204800 },
+                daoWastes: { name: '道痕荒原', desc: '大道崩落之地', minLevel: 34, maxLevel: 35, enemies: ['dao-shade', 'law-puppet'], coins: 64000, exp: 25600 },
+                fusionVoid: { name: '合一虚境', desc: '万法归一的尽头', minLevel: 36, maxLevel: 37, enemies: ['void-beast', 'fusion-lord'], coins: 128000, exp: 51200 },
+                voidAbyss: { name: '虚渊', desc: '虚实交界的深渊', minLevel: 30, maxLevel: 31, enemies: ['void-beast', 'huaxu-demon'], coins: 16000, exp: 6400 },
+                huashiRealm: { name: '化实之界', desc: '道则具现之地', minLevel: 32, maxLevel: 33, enemies: ['shidao-walker', 'taixu-lord'], coins: 32000, exp: 12800 },
+                taiyiField: { name: '太虚战场', desc: '灵界各族交锋之地', minLevel: 38, maxLevel: 39, enemies: ['taiyi-warrior', 'lingjie-guard'], coins: 260000, exp: 102400 },
+                lingjieAbyss: { name: '灵界绝境', desc: '大乘期最险恶的死地', minLevel: 40, maxLevel: 41, enemies: ['lingjie-fiend', 'daozu-shadow'], coins: 520000, exp: 204800 },
                 // 真仙境新增（v6.88）：延续大乘期每级约 2x 的奖励增速，未做真实引擎胜率标定，先按曲线外推，后续可再调
-                xianbattle: { name: '九霄战场', desc: '真仙修士交锋的九霄之上', minLevel: 33, maxLevel: 34, enemies: ['xian-beast', 'void-immortal'], coins: 1040000, exp: 409600 }
+                xianbattle: { name: '九霄战场', desc: '真仙修士交锋的九霄之上', minLevel: 42, maxLevel: 43, enemies: ['xian-beast', 'void-immortal'], coins: 1040000, exp: 409600 }
             };
 
             const actions = {};
@@ -7179,7 +7200,7 @@
 
             // 凡人无法进入秘境
             if (gameState.player.realmIndex === 0) {
-                showNotification('凡人无法进入秘径，请先突破到练气初期', '#c98a3e', 'warning');
+                showNotification('凡人无法进入秘径，请先突破到练气一层', '#c98a3e', 'warning');
                 return;
             }
 
@@ -7386,7 +7407,7 @@
             document.getElementById('progressText').textContent = Math.round(percentage) + '%';
             // 修为显示：达到上限时提示可突破；大境界缺丹药时明确写出缺什么
             const full = gameState.player.cultivationXP >= realm.nextReq;
-            const isMajor = (gameState.player.realmIndex % 4 === 0 && gameState.player.realmIndex > 0) && !!GAME_CONFIG.realms[gameState.player.realmIndex + 1];
+            const isMajor = MAJOR_BREAKTHROUGH_INDICES.has(gameState.player.realmIndex) && !!GAME_CONFIG.realms[gameState.player.realmIndex + 1];
             const req = isMajor ? MAJOR_BREAKTHROUGH_PILLS[gameState.player.realmIndex] : null;
             const pillQty = req ? ((gameState.player.inventory.find(item => item.id === req.pillId) || {}).qty || 0) : 0;
             const lackPill = full && !!req && pillQty < req.qty;
@@ -7748,9 +7769,9 @@
             if (balEl) balEl.innerHTML = `${SHOP_CURRENCIES[balKey].icon()} ${SHOP_CURRENCIES[balKey].name}: <span ${balKey === 'coins' ? 'id="shopCoin"' : ''}>${Math.floor(gameState.player[balKey] || 0)}</span>`;
             if (shopTab === 'skills') { renderSkillShop(shopContainer); return; }
 
-            const realmNames = ['凡人', '练气初期', '练气中期', '练气后期', '练气巅峰', '筑基初期', '筑基中期', '筑基后期', '筑基圆满', '金丹初期', '金丹中期', '金丹后期', '金丹圆满', '元婴初期', '元婴中期', '元婴后期', '元婴圆满'];
+            // 之前这里有一份独立写死的 realmNames 数组（只到元婴圆满就没往下写了，且没跟着 v6.89 练气拆13层更新），
+            // 算出来的 currentRealmName 在这个函数里其实没被用到——是死代码，一并清掉，都统一用 getRealmName()
             const currentRealmIdx = gameState.player.realmIndex;
-            const currentRealmName = realmNames[currentRealmIdx] || '未知';
 
             // 灵石 / 丹火 / 神识 / 道果商城顶部：该货币的全部强化（与丹火 / 神识技能页里的相同）
             if (shopTab === 'coins' || shopTab === 'danhuo' || shopTab === 'shenshi' || shopTab === 'daoguo') {
@@ -8101,8 +8122,8 @@
             const currentRealm = GAME_CONFIG.realms[realmIndex];
             const nextRealm = GAME_CONFIG.realms[realmIndex + 1];
 
-            // 判断是否为大境界突破（新索引规则：凡人后为大境界）
-            const isMajorBreakthrough = (realmIndex % 4 === 0 && realmIndex > 0);
+            // 判断是否为大境界突破：v6.89 练气改13层后不再是均匀的 %4===0，改用显式列表
+            const isMajorBreakthrough = MAJOR_BREAKTHROUGH_INDICES.has(realmIndex);
 
             document.getElementById('btCurrentRealm').textContent = currentRealm.name;
             document.getElementById('btNextRealm').textContent = nextRealm ? nextRealm.name : '大道尽头';
@@ -8213,8 +8234,8 @@
                 return;
             }
 
-            // 判断是否为大境界突破（新索引规则）
-            const isMajorBreakthrough = (realmIndex % 4 === 0 && realmIndex > 0);
+            // 判断是否为大境界突破：v6.89 练气改13层后不再是均匀的 %4===0，改用显式列表
+            const isMajorBreakthrough = MAJOR_BREAKTHROUGH_INDICES.has(realmIndex);
 
             if (isMajorBreakthrough) {
                 // 大境界突破：需要丹药
@@ -8233,16 +8254,17 @@
         //   元婴 = 元神出窍（青白色婴儿元神从丹田升起，拖出光带）
         //   化神 = 天地法则（雷霆劈落、八种法则符文环绕旋转、屏幕震动）
         // 用 canvas 绘制，不依赖外部资源；尊重「减少动态效果」；设置里可关闭。
+        // v6.89：key=1（凡人→练气一层）不变，其余原索引5/9/13/17/21/25/29/33 整体 +9 → 14/18/22/26/30/34/38/42
         const BREAKTHROUGH_FX = {
-            1:  { name: '练气', line: '引气入体，踏上仙途', kind: 'qi', dur: 3.8 },   // 凡人 → 练气初期：踏入修仙之门
-            5:  { name: '筑基', line: '根基已成，百脉皆通', kind: 'foundation', dur: 4.2 },
-            9:  { name: '金丹', line: '丹成九转，金光内蕴', kind: 'core', dur: 4.2 },
-            13: { name: '元婴', line: '元神出窍，神游太虚', kind: 'nascent', dur: 4.4 },
-            17: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 },
-            21: { name: '炼虚', line: '化虚为实，道则显形', kind: 'voidfx', dur: 5.0 },
-            25: { name: '合体', line: '天人合一，万法归宗', kind: 'unity', dur: 4.8 },
-            29: { name: '大乘', line: '元婴离体，法则随心', kind: 'dacheng', dur: 5.4 },
-            33: { name: '飞升', line: '仙窍打通，肉身化道', kind: 'dacheng', dur: 5.6 }
+            1:  { name: '练气', line: '引气入体，踏上仙途', kind: 'qi', dur: 3.8 },   // 凡人 → 练气一层：踏入修仙之门
+            14: { name: '筑基', line: '根基已成，百脉皆通', kind: 'foundation', dur: 4.2 },
+            18: { name: '金丹', line: '丹成九转，金光内蕴', kind: 'core', dur: 4.2 },
+            22: { name: '元婴', line: '元神出窍，神游太虚', kind: 'nascent', dur: 4.4 },
+            26: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 },
+            30: { name: '炼虚', line: '化虚为实，道则显形', kind: 'voidfx', dur: 5.0 },
+            34: { name: '合体', line: '天人合一，万法归宗', kind: 'unity', dur: 4.8 },
+            38: { name: '大乘', line: '元婴离体，法则随心', kind: 'dacheng', dur: 5.4 },
+            42: { name: '飞升', line: '仙窍打通，肉身化道', kind: 'dacheng', dur: 5.6 }
         };
         // 灵根对应的颜色（灵气入体特效用你自己的灵根色）
         const ROOT_FX_COLORS = { metal: '#d8c078', wood: '#7fae9a', water: '#7d9bb5', fire: '#d9614f', earth: '#b08d5a', wind: '#b7c9c2', thunder: '#b39ddb', ice: '#a8d8e8' };
@@ -8819,7 +8841,7 @@
         function performBreakthrough() {
             const nextRealmIndex = gameState.player.realmIndex + 1;
             if (!GAME_CONFIG.realms[nextRealmIndex]) return;
-            const wasMajor = gameState.player.realmIndex % 4 === 0 && gameState.player.realmIndex > 0;   // 从大境界圆满突破
+            const wasMajor = MAJOR_BREAKTHROUGH_INDICES.has(gameState.player.realmIndex);   // 从大境界圆满突破；v6.89 改显式列表
             gameState.player.realmIndex = nextRealmIndex;
             gameState.player.cultivationXP = 0;
             calculateStats();
@@ -8909,10 +8931,26 @@
             gameState.workCurve = 2;
         }
 
+        // v6.89：练气期从4段改13层，原索引5起的全部境界整体后移9位。老存档的 realmIndex 是按旧编号存的，
+        // 必须映射到新编号，不然同一个数字现在指向完全不同（更早）的境界，老玩家读档会直接"境界倒退"好几个大境界。
+        // cultivationXP 迁移后清零重新攒——旧的进度是按旧 nextReq 攒的，新境界（尤其被拆细的练气期）nextReq
+        // 完全不是一回事，硬凑一个"差不多"的百分比比直接清零更容易出边界问题（比如凑出来的值超过新 nextReq）
+        function migrateRealmLayout() {
+            if (gameState.realmLayoutVersion === 2) return;
+            const P = gameState.player;
+            if (P && typeof P.realmIndex === 'number') {
+                const oldToNew = { 0: 0, 1: 1, 2: 5, 3: 9, 4: 13 };
+                P.realmIndex = (P.realmIndex in oldToNew) ? oldToNew[P.realmIndex] : (P.realmIndex >= 5 ? P.realmIndex + 9 : P.realmIndex);
+                P.cultivationXP = 0;
+            }
+            gameState.realmLayoutVersion = 2;
+        }
+
         function migrateGameData() {
             // 版本迁移函数：自动更新旧数据以支持新配方
             if (!gameState.version) gameState.version = 0;
             invalidateLawTotals();   // 读档 / 导入后重新计算悟道法则加成
+            migrateRealmLayout();
             migrateWorkSkillCurve();
             gameState.workSpeedMultiplier = 1;   // 旧版把孤儿的 5% 存在这里且与灵玉脱钩；现在只由装备的灵玉提供（getWorkSpeedMultiplier）
             migrateEquipmentSlots();
