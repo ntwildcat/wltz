@@ -5279,6 +5279,21 @@
         // 给重复点击的核心循环加一层看得见的进度感，哪怕产出数值不变也有"我已经做了这么多"的反馈（正反馈诊断 C-4）
         const recipeSessionCounts = {};
 
+        // 修炼修为产出改区间（v6.91）：原来一次修炼固定产出一个数，改成 ±20% 的随机区间，
+        // 每次修炼实际拿到多少不再是可以精确预判的死数字。只影响「修炼」技能自己的配方（output.cultivation），
+        // 不影响战斗掉落等其它产出——那些走各自独立的随机逻辑，不复用这个区间。
+        const CULTIVATION_VARIANCE = 0.2;
+        function cultivationRange(base) {
+            if (!base) return { lo: 0, hi: 0 };
+            const lo = Math.max(1, Math.round(base * (1 - CULTIVATION_VARIANCE)));
+            const hi = Math.max(lo, Math.round(base * (1 + CULTIVATION_VARIANCE)));
+            return { lo, hi };
+        }
+        function rollCultivation(base) {
+            const { lo, hi } = cultivationRange(base);
+            return lo + Math.floor(Math.random() * (hi - lo + 1));
+        }
+
         // 极速行动（如礼包饰品 ×100 速度）：连续完成时静音通知，界面每 0.4 秒刷新一次、存档每 5 秒一次
         const FAST_ACTION_SECONDS = 0.5;
         let notifyMuted = false, fastUiTs = 0, fastSaveTs = 0;
@@ -5338,6 +5353,11 @@
 
             // 应用技能等级效果
             applySkillLevelBonus(act.skill, finalOutput);
+
+            // 修炼修为产出改区间：等级加成算完之后再在这个数上下浮动 ±20%，不影响其它技能的产出
+            if (act.skill === 'cultivation' && finalOutput.cultivation) {
+                finalOutput.cultivation = rollCultivation(finalOutput.cultivation);
+            }
 
             // 战斗特殊处理（掉落）
             if (act.skill === 'battle') {
@@ -5775,7 +5795,12 @@
             const parts = [];
 
             if (output.cultivation) {
-                parts.push(`${QI_ICON} +${output.cultivation}修为`);
+                if (skillName === 'cultivation') {
+                    const { lo, hi } = cultivationRange(output.cultivation);
+                    parts.push(lo === hi ? `${QI_ICON} +${lo}修为` : `${QI_ICON} +${lo}~${hi}修为`);
+                } else {
+                    parts.push(`${QI_ICON} +${output.cultivation}修为`);
+                }
             }
             if (output.coins) {
                 parts.push(`${COIN_ICON} +${output.coins}`);
