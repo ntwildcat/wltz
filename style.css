@@ -1709,9 +1709,12 @@ display: none !important;
 .law-effects { font-size: 0.8em; color: var(--border-l2); line-height: 1.6; min-height: 1.6em; }
 .law-next { font-size: 0.72em; color: var(--text-l4); margin-top: 4px; line-height: 1.5; }
 .law-resonant { font-size: 0.7em; color: #c084fc; margin-left: 6px; }
-.law-huaxu { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 6px; }
-.law-huaxu-btn { padding: 3px 8px; font-size: 0.72em; }
-.law-huaxu-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* 化虚兑道则：单独给个带边框的小区块，不然一排小按钮混在卡片文字里太容易被完全忽略（用户反馈"化虚按钮我就没看见"） */
+.law-huaxu-block { margin-top: 8px; padding: 6px 4px 4px; border: 1px dashed var(--border-l3); border-radius: 6px; }
+.law-huaxu-title { font-size: 0.7em; color: var(--bronze, var(--text-l3)); margin-bottom: 4px; line-height: 1.4; }
+.law-huaxu { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.law-huaxu-btn { padding: 3px 8px; font-size: 0.75em; }
+.law-huaxu-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 .law-capped { opacity: 0.85; }
 
 /* 装备界面 */
