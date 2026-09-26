@@ -44,7 +44,14 @@
                 { name: '大乘初期', nextReq: 453000 },
                 { name: '大乘中期', nextReq: 493000 },
                 { name: '大乘后期', nextReq: 535000 },
-                { name: '大乘圆满', nextReq: 579000 }
+                { name: '大乘圆满', nextReq: 579000 },
+                // 真仙境（索引33-34，v6.88）：飞升后的全新阶段，不再靠修为突破——大乘圆满起「修炼」页新增
+                // 「开辟仙窍」配方，一次打通一窍，累计 12 窍触发大乘圆满→真仙初期的突破，累计 24 窍触发
+                // 真仙初期→真仙后期；nextReq 沿用曲线只作显示参考，真正的突破判定见 attemptBreakthrough()。
+                // 肉身脱离人的范畴、以窍代修的同时也要扛「五衰」的前三衰（仙衰/窍衰/身衰）：刚飞升时
+                // hp/atk/def 有一份衰退惩罚，仙窍越打通越少，24窍打满时完全消退（getXianShuaiMod）
+                { name: '真仙初期', nextReq: 626000, xianqiaoReq: 12 },
+                { name: '真仙后期', nextReq: 674000, xianqiaoReq: 24 }
             ],
             // P2功能：秘境系统
             dungeons: {
@@ -312,6 +319,40 @@
                         skillExp: 2200
                     }
                 },
+                // 真仙境秘境（v6.88）：太乙圣域的怪物原始数值会被下面 P4_MONSTER_SCALE.taiyiRealm=0.33 折算，
+                // 实际生效血量/攻击是配置里写的数字 ×0.33（约 hp 79200~102300、atk 205~241，boss hp198000/atk290）。
+                // 这个新秘境没有配 P4_MONSTER_SCALE 项，下面直接写「已经是折算后」的最终数值（≈太乙圣域实际生效值
+                // 的 1.6 倍），不需要再乘系数；没有跑真实引擎模拟标定通关率，后续实测明显偏离再回来调
+                taiqingRealm: {
+                    id: 'taiqingRealm',
+                    name: '太清仙域',
+                    desc: '真仙修士的试炼场·通关掉落更多太乙精华，是打通仙窍的主要材料来源',
+                    icon: '🌌',
+                    minRealmIndex: 33,                      // 最低真仙初期
+                    baseRealmIndex: 33,                     // 怪物境界为真仙初期
+                    recommendedLevel: '真仙初期~真仙后期',
+                    monsters: [
+                        { name: '九霄游仙', type: '无', hp: 127000, atk: 328, spd: 100, def: 100, attackSpeed: 2.2, drop: 'coins', dropQty: 9600 },
+                        { name: '仙窍化魔', type: '无', hp: 148000, atk: 351, spd: 95, def: 110, attackSpeed: 2.3, drop: 'coins', dropQty: 10900 },
+                        { name: '道体执法', type: '雷', hp: 137000, atk: 371, spd: 108, def: 95, attackSpeed: 2.1, drop: 'coins', dropQty: 12000 },
+                        { name: '飞升残魂', type: '无', hp: 164000, atk: 386, spd: 97, def: 122, attackSpeed: 2.4, drop: 'coins', dropQty: 13100 },
+                        { name: '太清道尊', type: '无', hp: 317000, atk: 465, spd: 100, def: 138, attackSpeed: 3.4, isBoss: true, drop: 'coins', dropQty: 41600 }
+                    ],
+                    rewards: {
+                        fixed: [
+                            { id: 'nascentsoul_essence', qty: [4, 8] }
+                        ],
+                        random: [
+                            { id: 'taiyiessence', qty: [5, 9], probability: 1 },
+                            { id: 'voidcrystal', qty: [6, 11], probability: 1 }
+                        ],
+                        coins: [42000, 67000],
+                        danhuo: [880, 1520],
+                        shenshi: [770, 1310],
+                        daoguo: [130, 210],
+                        skillExp: 3500
+                    }
+                },
                 // 炼虚期天劫（v6.68）：每个炼虚小境界各一场，不在秘境列表里显示，只能通过突破弹窗的「渡劫」进入；
                 // 通关后 gameState.dungeons[id].completed 标记为已渡劫，不会像普通秘境那样循环挑战（见 completeDungeon 的 isTribulation 分支）
                 tribulation21: {
@@ -374,7 +415,10 @@
                         // 大乘期配方（索引29-31解锁）
                         dacheng_convergence: { name: '大乘归一', desc: '大乘初期主力', duration: 260, output: { cultivation: 170000, skill: 'cultivation', exp: 4800 }, requiredRealmIndex: 29, unlocked: false },
                         yuanying_growth: { name: '元婴蜕变', desc: '大乘中期高产', duration: 380, output: { cultivation: 320000, skill: 'cultivation', exp: 6000 }, requiredRealmIndex: 30, unlocked: false },
-                        fadao_suppress: { name: '法则镇伏', desc: '大乘期最终修炼法', duration: 540, output: { cultivation: 560000, skill: 'cultivation', exp: 7500 }, requiredRealmIndex: 31, unlocked: false }
+                        fadao_suppress: { name: '法则镇伏', desc: '大乘期最终修炼法', duration: 540, output: { cultivation: 560000, skill: 'cultivation', exp: 7500 }, requiredRealmIndex: 31, unlocked: false },
+                        // 真仙境配方（索引32起解锁）：不产出修为，直接打通一窍（xianqiao+1），
+                        // 是大乘圆满→真仙初期、真仙初期→真仙后期这两次突破的唯一判定依据，见 attemptBreakthrough()
+                        open_orifice: { name: '开辟仙窍', desc: '肉身化道体，以窍代修：太乙精华×5 换一窍，12窍飞升真仙初期，24窍圆满真仙后期', duration: 300, output: { xianqiao: 1, skill: 'cultivation', exp: 8000 }, requires: { taiyiessence: 5 }, requiredRealmIndex: 32, unlocked: false }
                     },
                     actions: {}
                 },
@@ -959,6 +1003,7 @@
             if (typeof P.daoLaw !== 'number') P.daoLaw = 0;
             if (typeof P.nascentSoul !== 'number') P.nascentSoul = 0;
             if (typeof P.coinRefine !== 'number') P.coinRefine = 0;
+            if (typeof P.xianqiao !== 'number') P.xianqiao = 0;
             if (P.activeDomain === undefined) P.activeDomain = null;
             if (typeof P.avatarLevel !== 'number') P.avatarLevel = 0;
             if (!P.temper) P.temper = { weapon: 0, armor: 0, jewelry: 0 };
@@ -1097,7 +1142,8 @@
             voidAbyss:         { danhuo: [6, 9], shenshi: [5, 7], daoguo: [1, 2] },
             huashiRealm:       { danhuo: [8, 12], shenshi: [6, 9], daoguo: [2, 4] },
             taiyiField:        { danhuo: [18, 26], shenshi: [15, 22], daoguo: [5, 8] },
-            lingjieAbyss:      { danhuo: [24, 34], shenshi: [20, 30], daoguo: [7, 11] }
+            lingjieAbyss:      { danhuo: [24, 34], shenshi: [20, 30], daoguo: [7, 11] },
+            xianbattle:        { danhuo: [30, 42], shenshi: [26, 38], daoguo: [10, 15] }
         };
         function rollAreaCurrency(areaKey, bonus) {
             const cfg = BATTLE_CURRENCY[areaKey] || {};
@@ -1632,6 +1678,21 @@
                 </div></div>`;
         }
 
+        // ---- 真仙境：飞升后打通仙窍（v6.88） ----
+        // 大乘圆满（32）起，「修炼」页新增「开辟仙窍」配方，一次打通一窍（不产出修为，直接给 xianqiao +1）。
+        // 12 窍触发大乘圆满→真仙初期的突破，24 窍触发真仙初期→真仙后期；两次突破都不再看 cultivationXP，
+        // 见 attemptBreakthrough() 里的特判。五衰的前三衰（仙衰/窍衰/身衰）合并成一份随仙窍数递减的负加成，
+        // 不拆成三个数值上分不清的小 debuff：刚飞升（真仙初期，12窍）时 hp/atk/def 各 -7.5%，24 窍打满时归零。
+        function isAscendUnlocked() { return gameState.player.realmIndex >= 32; }
+        const XIAN_ORIFICE_MAX = 24;
+        const XIAN_SHUAI_MAX_PENALTY = 0.15;
+        function getXianqiao() { return Math.min(XIAN_ORIFICE_MAX, gameState.player.xianqiao || 0); }
+        function getXianShuaiMod(key) {
+            if (key !== 'hpPct' && key !== 'atkPct' && key !== 'defPct') return 0;
+            if (gameState.player.realmIndex < 33) return 0;
+            return -XIAN_SHUAI_MAX_PENALTY * (1 - getXianqiao() / XIAN_ORIFICE_MAX);
+        }
+
         // 当前打开的是丹火 / 神识 / 炼丹面板时刷新对应的「用途」区
         function renderSkillUses() {
             const panel = document.body.dataset.panel;
@@ -1693,7 +1754,10 @@
             chaosWastes: { hp: 0.1718, atk: 1.337 }, nineNether: { hp: 0.0837, atk: 1.047 },
             daoWastes: { hp: 0.04, atk: 1.6 }, fusionVoid: { hp: 0.028, atk: 1.56 },
             voidAbyss: { hp: 0.0811, atk: 1.262 }, huashiRealm: { hp: 0.0639, atk: 1.145 },
-            taiyiField: { hp: 0.0425, atk: 0.4675 }, lingjieAbyss: { hp: 0.0328, atk: 0.3321 }
+            taiyiField: { hp: 0.0425, atk: 0.4675 }, lingjieAbyss: { hp: 0.0328, atk: 0.3321 },
+            // 真仙境新增（v6.88）：延续 taiyiField→lingjieAbyss 的衰减比例外推（hp×0.77、atk×0.71），
+            // 没有跑真实引擎模拟标定胜率，后续如果实测通关率明显偏离 65% 目标，回来调这两个数
+            xianbattle: { hp: 0.025, atk: 0.235 }
         };
 
         const BATTLE_FORMULAS = {
@@ -1811,6 +1875,7 @@
                 daoguo: 0,           // 道果（货币，合体起）
                 daoBody: 0,          // 道果淬体等级（0–10）
                 daoLaw: 0,           // 道果悟法等级（0–5）
+                xianqiao: 0,         // 真仙境仙窍数（0–24），大乘圆满起靠「开辟仙窍」配方打通，12窍=真仙初期，24窍=真仙后期
                 fusion: null,        // 合道状态 { active, at }（不可逆）
                 temper: { weapon: 0, armor: 0, jewelry: 0 },   // 淬炼等级（按部位，0–10）
                 rootLevel: 0,        // 灵根强化等级（0–10）
@@ -1959,7 +2024,9 @@
             28: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁（前提是已经合道），本境界圆满后必须先合道才能突破到大乘期'],
             29: ['👁️ 元婴蜕变解锁：道果页花道果 + 元婴精魄升级（最多10级），从婴儿形态练到青年形态，被动加攻击和暴击伤害，不用手动操作', '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
             31: ['⚔️ 灵界绝境战斗区域开放'],
-            32: ['🏁 大道尽头——灵界至高战力，暂无下一境界']
+            32: ['🌌 灵界至高战力已至，但大道并未到头——「修炼」页新增「开辟仙窍」配方：不产出修为，每次花太乙精华×5，直接打通一窍（xianqiao +1），累计 12 窍即可突破飞升为真仙初期，之前攒的修为不影响这次突破'],
+            33: ['🌟 飞升成功，正式脱离"人"的范畴，寿元与天地同寿；但要承受"五衰"的前三衰（仙衰/窍衰/身衰）——刚飞升时生命/攻击/防御各 -7.5%，「修炼」页继续做「开辟仙窍」，每多打通一窍这份衰退就减少一点，攒满 24 窍时完全消退', '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放'],
+            34: ['🏁 真仙后期，24 窍全部打通，五衰前三衰的负面完全消退——当前实现的至高战力，暂无下一境界']
         };
 
         function showRealmUnlockModal(realmIndex) {
@@ -3728,7 +3795,9 @@
             voidAbyss:         [{ id: 'daostone', p: 0.10, qty: 1 }, { id: 'chaosstone', p: 0.12, qty: 1 }, { id: 'daofruit', p: 0.06, qty: 1 }, { id: 'seed_daofruit', p: 0.03, qty: 1 }],
             huashiRealm:       [{ id: 'daostone', p: 0.18, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'daoguo_seed', p: 0.015, qty: 1 }],
             taiyiField:        [{ id: 'taiyiessence', p: 0.12, qty: 1 }, { id: 'chaosstone', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.02, qty: 1 }],
-            lingjieAbyss:      [{ id: 'taiyiessence', p: 0.20, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.03, qty: 1 }]
+            lingjieAbyss:      [{ id: 'taiyiessence', p: 0.20, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.03, qty: 1 }],
+            // 太乙精华概率比上一档更高：这是「开辟仙窍」的唯一材料，真仙境的战斗本身就是仙窍材料的主要来源
+            xianbattle:        [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'daofruit', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.04, qty: 1 }]
         };
 
         // 掉落数量文字（如 1–2 / 1）
@@ -4729,6 +4798,7 @@
             total += getCoinRefineMod(key);   // 聚灵培元：灵石的软性无底洞，永久小幅 +生命/攻击/防御
             total += getDomainMod(key);   // 化神期灵域：战斗中对双方同时生效的领域规则（玩家侧这一半）
             total += getAvatarMod(key);   // 化神期身外化身：永久小幅 +攻击/防御
+            total += getXianShuaiMod(key);   // 真仙境五衰（前三衰合并）：飞升代价，随仙窍数打通递减至归零
             return total;
         }
 
@@ -5191,6 +5261,14 @@
             const action = getAction(act.skill, act.action);
             if (!action.output) return;
 
+            // 仙窍已经打满（24）时「开辟仙窍」直接停止，不再消耗太乙精华——真仙后期已经是当前实现的上限
+            if (action.output.xianqiao && getXianqiao() >= XIAN_ORIFICE_MAX) {
+                showNotification('☯️ 仙窍已全部打通', '#c98a3e');
+                gameState.currentAction = null;
+                gameState.currentActionProgress = 0;
+                return;
+            }
+
             // 丹火助炼：炼丹时消耗丹火，提高翻倍产出概率（丹火不够时自动不助炼）
             let boostDouble = 0;
             if (act.skill === 'alchemy' && gameState.player.alchemyBoost) {
@@ -5260,6 +5338,11 @@
                 });
             }
             if (finalOutput.danhuo || finalOutput.shenshi || finalOutput.daoguo) addCurrency(finalOutput);
+            if (finalOutput.xianqiao) {
+                gameState.player.xianqiao = Math.min(XIAN_ORIFICE_MAX, (gameState.player.xianqiao || 0) + finalOutput.xianqiao);
+                showNotification(`☯️ 打通一窍：仙窍 ${gameState.player.xianqiao}/${XIAN_ORIFICE_MAX}`, '#b39ddb');
+                calculateStats();   // 仙窍数变了，五衰惩罚要立刻重算
+            }
 
             // 处理技能经验
             if (finalOutput.skill && finalOutput.exp) {
@@ -5663,6 +5746,9 @@
             }
             if (output.daoguo) {
                 parts.push(`${DAOGUO_ICON} +${output.daoguo}道果`);
+            }
+            if (output.xianqiao) {
+                parts.push(`☯️ +${output.xianqiao}窍（当前 ${getXianqiao()}/${XIAN_ORIFICE_MAX}）`);
             }
             if (output.exp) {
                 parts.push(`+${output.exp}exp`);
@@ -6648,7 +6734,9 @@
                 voidAbyss: { name: '虚渊', desc: '虚实交界的深渊', minLevel: 21, maxLevel: 22, enemies: ['void-beast', 'huaxu-demon'], coins: 16000, exp: 6400 },
                 huashiRealm: { name: '化实之界', desc: '道则具现之地', minLevel: 23, maxLevel: 24, enemies: ['shidao-walker', 'taixu-lord'], coins: 32000, exp: 12800 },
                 taiyiField: { name: '太虚战场', desc: '灵界各族交锋之地', minLevel: 29, maxLevel: 30, enemies: ['taiyi-warrior', 'lingjie-guard'], coins: 260000, exp: 102400 },
-                lingjieAbyss: { name: '灵界绝境', desc: '大乘期最险恶的死地', minLevel: 31, maxLevel: 32, enemies: ['lingjie-fiend', 'daozu-shadow'], coins: 520000, exp: 204800 }
+                lingjieAbyss: { name: '灵界绝境', desc: '大乘期最险恶的死地', minLevel: 31, maxLevel: 32, enemies: ['lingjie-fiend', 'daozu-shadow'], coins: 520000, exp: 204800 },
+                // 真仙境新增（v6.88）：延续大乘期每级约 2x 的奖励增速，未做真实引擎胜率标定，先按曲线外推，后续可再调
+                xianbattle: { name: '九霄战场', desc: '真仙修士交锋的九霄之上', minLevel: 33, maxLevel: 34, enemies: ['xian-beast', 'void-immortal'], coins: 1040000, exp: 409600 }
             };
 
             const actions = {};
@@ -6835,6 +6923,13 @@
                 lingjieAbyss: [
                     { name: '灵界凶兽', hp: 50000, atk: 1750, def: 540, spd: 105, icon: '🐉' },
                     { name: '道祖之影', hp: 46000, atk: 1900, def: 500, spd: 115, icon: '😈' }
+                ],
+                // 注意：普通战斗区域的原始数值会被 P4_AREA_SCALE.xianbattle（hp×0.025、atk×0.235）折算成实际生效值，
+                // 下面这两个是「折算前」的原始数值，实际生效约 hp 2450~2650、atk 940~1010（比灵界绝境的
+                // 实际生效值 hp≈1509~1640、atk≈581~631 高约 1.6 倍，延续奖励曲线的增速），没有跑模拟标定
+                xianbattle: [
+                    { name: '九霄仙兽', hp: 100000, atk: 4000, def: 620, spd: 120, icon: '🐲' },
+                    { name: '虚境仙魔', hp: 106000, atk: 4260, def: 580, spd: 130, icon: '👹' }
                 ]
             };
 
@@ -8015,7 +8110,14 @@
             // 隐藏丹药需求区域
             document.getElementById('btPillRequirement').style.display = 'none';
 
-            if (isMajorBreakthrough && nextRealm) {
+            if (nextRealm && nextRealm.xianqiaoReq) {
+                // 真仙境两次突破：不看修为/丹药，看仙窍数量（12窍飞升真仙初期，24窍圆满真仙后期）
+                document.getElementById('btModalTitle').textContent = `✨ 突破${nextRealm.name} ✨`;
+                const have = getXianqiao(), need = nextRealm.xianqiaoReq;
+                document.getElementById('btBreakthroughType').textContent = `以窍代修：仙窍 ${have}/${need}`;
+                const button = document.getElementById('btButton');
+                button.textContent = have >= need ? '🌟 飞升突破 🌟' : `仙窍不足（${have}/${need}）`;
+            } else if (isMajorBreakthrough && nextRealm) {
                 // 大境界突破
                 document.getElementById('btModalTitle').textContent = `✨ 突破${nextRealm ? nextRealm.name : '大道尽头'} ✨`;
                 document.getElementById('btBreakthroughType').textContent = '需丹药辅助';
@@ -8076,9 +8178,17 @@
         function attemptBreakthrough() {
             const realmIndex = gameState.player.realmIndex;
             const currentRealm = GAME_CONFIG.realms[realmIndex];
+            const nextRealm = GAME_CONFIG.realms[realmIndex + 1];
 
-            // 检查修为是否足够
-            if (gameState.player.cultivationXP < currentRealm.nextReq) {
+            // 真仙境两次突破（大乘圆满→真仙初期需12窍，真仙初期→真仙后期需24窍）改用仙窍数量判定，
+            // 不再看修为——nextRealm.xianqiaoReq 有值就说明这次突破走仙窍这条线
+            if (nextRealm && nextRealm.xianqiaoReq) {
+                if (getXianqiao() < nextRealm.xianqiaoReq) {
+                    showNotification(`仙窍不足：已打通 ${getXianqiao()}/${nextRealm.xianqiaoReq}，去「修炼」页做「开辟仙窍」`, '#c98a3e', 'warning');
+                    return;
+                }
+            } else if (gameState.player.cultivationXP < currentRealm.nextReq) {
+                // 检查修为是否足够
                 showNotification('修为不足，无法突破', '#c98a3e', 'warning');
                 return;
             }
@@ -8131,7 +8241,8 @@
             17: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 },
             21: { name: '炼虚', line: '化虚为实，道则显形', kind: 'voidfx', dur: 5.0 },
             25: { name: '合体', line: '天人合一，万法归宗', kind: 'unity', dur: 4.8 },
-            29: { name: '大乘', line: '元婴离体，法则随心', kind: 'dacheng', dur: 5.4 }
+            29: { name: '大乘', line: '元婴离体，法则随心', kind: 'dacheng', dur: 5.4 },
+            33: { name: '飞升', line: '仙窍打通，肉身化道', kind: 'dacheng', dur: 5.6 }
         };
         // 灵根对应的颜色（灵气入体特效用你自己的灵根色）
         const ROOT_FX_COLORS = { metal: '#d8c078', wood: '#7fae9a', water: '#7d9bb5', fire: '#d9614f', earth: '#b08d5a', wind: '#b7c9c2', thunder: '#b39ddb', ice: '#a8d8e8' };
@@ -9163,6 +9274,12 @@
             }
             let completions = Math.floor(actualOfflineSeconds / duration);
 
+            // 「开辟仙窍」离线时也要卡 24 窍上限，不然会把仙窍打过头之外，还会白白多扣不该扣的太乙精华
+            if (action.output && action.output.xianqiao) {
+                completions = Math.min(completions, XIAN_ORIFICE_MAX - getXianqiao());
+                if (completions <= 0) { gameState.currentAction = null; gameState.lastActiveTime = now; return; }
+            }
+
             // 需要材料的配方：完成次数受材料库存限制，并扣除离线消耗
             let materialsRanOut = false;
             if (action.requires) {
@@ -9199,6 +9316,7 @@
             offlineRewards.shenshi = (perAction.shenshi || 0) * completions;
             offlineRewards.daoguo = (perAction.daoguo || 0) * completions;
             offlineRewards.cultivation = (perAction.cultivation || 0) * completions;
+            offlineRewards.xianqiao = (perAction.xianqiao || 0) * completions;
             // 「产出翻倍」特效：按概率折算（期望值）；丹火助炼按能负担的次数折算
             const doubleRate = getSkillMod('double', savedAction.skill) + getMasteryBonus(savedAction.skill, savedAction.action).double + applyAlchemyBoostBatch(savedAction.skill, action, completions);
             (perAction.items || []).forEach(item => {
@@ -9212,6 +9330,9 @@
             // 应用离线奖励
             gameState.player.coins += offlineRewards.coins;
             addCurrency(offlineRewards);
+            if (offlineRewards.xianqiao) {
+                gameState.player.xianqiao = Math.min(XIAN_ORIFICE_MAX, (gameState.player.xianqiao || 0) + offlineRewards.xianqiao);
+            }
 
             // 处理修为，检查是否会超过本境界上限
             if (offlineRewards.cultivation > 0) {
@@ -9320,6 +9441,9 @@
             }
             if (rewards.daoguo > 0) {
                 content += `<div class="stat-row"><span class="stat-label">${DAOGUO_ICON} 获得道果:</span><span class="stat-value">+${rewards.daoguo}</span></div>`;
+            }
+            if (rewards.xianqiao > 0) {
+                content += `<div class="stat-row"><span class="stat-label">☯️ 打通仙窍:</span><span class="stat-value">+${rewards.xianqiao}（当前 ${getXianqiao()}/${XIAN_ORIFICE_MAX}）</span></div>`;
             }
 
             if (rewards.cultivation > 0) {
