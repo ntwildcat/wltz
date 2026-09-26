@@ -406,6 +406,9 @@
                         small: { name: '小周天', desc: '效率提升', duration: 8, output: { cultivation: 15, skill: 'cultivation', exp: 15 }, requiredRealmIndex: 1, unlocked: false },
                         big: { name: '大周天', desc: '中期主力', duration: 12, output: { cultivation: 30, skill: 'cultivation', exp: 25 }, requiredRealmIndex: 9, unlocked: false },   // 原索引3（练气后期）→13层制下等比换算为第9层
                         breath: { name: '龟息术', desc: '高产出', duration: 20, output: { cultivation: 100, skill: 'cultivation', exp: 40 }, requiredRealmIndex: 13, unlocked: false },   // 原索引4（练气巅峰，练气期最后一段）→新第13层（练气期最后一层）
+                        // 洗髓易经（v6.90）：原著设定，突破筑基除了筑基丹还要"洗髓易经改善凡人体质"——一次性操作，
+                        // 不产出修为，完成后置 marrowCleansed 标记；练气十三层→筑基初期的突破除了丹药还会检查这个标记
+                        marrow_cleansing: { name: '洗髓易经', desc: '洗涤经脉、改善凡人体质，为突破筑基做准备（一次性，清灵草×10）', duration: 200, output: { marrowCleanse: 1, skill: 'cultivation', exp: 300 }, requires: { cleangrass: 10 }, requiredRealmIndex: 13, unlocked: false },
                         epiphany: { name: '顿悟', desc: '后期爆发', duration: 60, output: { cultivation: 500, skill: 'cultivation', exp: 80 }, requiredRealmIndex: 15, unlocked: false },   // 原索引6（筑基中期）→+9
                         // P6 金丹期配方（v6.89：原索引9/10/11 → 因练气改13层整体 +9 → 18/19/20）
                         golden_temper: { name: '金丹淬炼', desc: '金丹初期主力', duration: 30, output: { cultivation: 300, skill: 'cultivation', exp: 120 }, requiredRealmIndex: 18, unlocked: false },
@@ -1019,6 +1022,7 @@
             if (typeof P.nascentSoul !== 'number') P.nascentSoul = 0;
             if (typeof P.coinRefine !== 'number') P.coinRefine = 0;
             if (typeof P.xianqiao !== 'number') P.xianqiao = 0;
+            if (typeof P.marrowCleansed !== 'boolean') P.marrowCleansed = false;
             if (P.activeDomain === undefined) P.activeDomain = null;
             if (typeof P.avatarLevel !== 'number') P.avatarLevel = 0;
             if (!P.temper) P.temper = { weapon: 0, armor: 0, jewelry: 0 };
@@ -1894,6 +1898,7 @@
                 daoBody: 0,          // 道果淬体等级（0–10）
                 daoLaw: 0,           // 道果悟法等级（0–5）
                 xianqiao: 0,         // 真仙境仙窍数（0–24），大乘圆满起靠「开辟仙窍」配方打通，12窍=真仙初期，24窍=真仙后期
+                marrowCleansed: false,   // 洗髓易经是否已完成（一次性），练气十三层→筑基初期的突破前提之一
                 fusion: null,        // 合道状态 { active, at }（不可逆）
                 temper: { weapon: 0, armor: 0, jewelry: 0 },   // 淬炼等级（按部位，0–10）
                 rootLevel: 0,        // 灵根强化等级（0–10）
@@ -2010,6 +2015,12 @@
             }
         }
 
+        // 结丹突破（筑基圆满→金丹初期）成功率（v6.90）：原著设定这次突破不是"丹药够了就成"，
+        // 韩立式的普通修士要试很多次（近50颗丹药）、天才一两次就过。只对这一次突破生效，
+        // 其它大境界突破仍然是"丹药够了必成"，避免全局引入失败机制影响其它境界的节奏。
+        // 定义放在 REALM_UNLOCKS 前面：后者是立即求值的对象字面量，要在里面引用这个常量就不能晚于这里声明
+        const JIEDAN_SUCCESS_RATE = 0.4;
+
         // ==================== 境界解锁提示（v6.79） ====================
         // 每次突破后，如果这个境界解锁了新秘境 / 战斗区域 / 系统，播放完突破特效再弹一个小提示——
         // 不是每个境界索引都有条目：中间过渡的小境界（比如练气中期→后期）如果没有新内容就不出现在这里，
@@ -2021,11 +2032,11 @@
             1:  ['⚔️ 可以参与战斗了，战斗页「战斗区域」标签下森林开放。战斗区域是循环挑战（打完一场自动开下一场，直到点「撤退」），跟秘境「打到底」不一样；记得先在炼丹页做点战斗食物带上，生命不会自动恢复只能靠食物'],
             5:  ['🔮 神秘之塔秘境开放（战斗页「秘境」标签）。秘境是连续几只怪一次性打到底，通关拿固定+随机奖励'],
             9:  ['⚔️ 十万大山外围战斗区域开放'],
-            13: ['🌲 诡异森林秘境开放', '💊 炼丹页解锁筑基丹配方（材料清灵草×3），趁早炼够——练气十三层突破筑基必须要这个丹'],
+            13: ['🌲 诡异森林秘境开放', '💊 炼丹页解锁筑基丹配方（材料清灵草×3），趁早炼够——练气十三层突破筑基必须要这个丹', '🩸 修炼页解锁「洗髓易经」：一次性操作（清灵草×10），完成后才能突破筑基，跟筑基丹是两个独立条件都要满足'],
             14: ['⚔️ 十万大山核心 / 妖兽沼泽战斗区域开放'],
             15: ['⚱️ 古老遗迹秘境开放'],
             16: ['⚔️ 魔窟深渊战斗区域开放'],
-            17: ['⚡ 天劫之地秘境开放', '💊 金丹秘药配方解锁，突破筑基圆满前记得炼够'],
+            17: ['⚡ 天劫之地秘境开放', '💊 金丹秘药配方解锁，突破筑基圆满前记得炼够', `⚡ 这次突破（结丹）不是丹药够了就必成——成功率约${Math.round(JIEDAN_SUCCESS_RATE * 100)}%，失败会损失丹药但不掉境界，可以再炼丹药重试`],
             18: ['🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 金丹平原战斗区域开放'],
             19: ['⚔️ 天劫之地战斗区域开放'],
             21: ['🌌 元婴秘境开放', '💊 元婴丹配方解锁，突破金丹圆满前记得炼够'],
@@ -5288,6 +5299,13 @@
                 gameState.currentActionProgress = 0;
                 return;
             }
+            // 洗髓易经是一次性的，已经做过就不再重复消耗清灵草
+            if (action.output.marrowCleanse && gameState.player.marrowCleansed) {
+                showNotification('🩸 已完成洗髓易经', '#c98a3e');
+                gameState.currentAction = null;
+                gameState.currentActionProgress = 0;
+                return;
+            }
 
             // 丹火助炼：炼丹时消耗丹火，提高翻倍产出概率（丹火不够时自动不助炼）
             let boostDouble = 0;
@@ -5362,6 +5380,10 @@
                 gameState.player.xianqiao = Math.min(XIAN_ORIFICE_MAX, (gameState.player.xianqiao || 0) + finalOutput.xianqiao);
                 showNotification(`☯️ 打通一窍：仙窍 ${gameState.player.xianqiao}/${XIAN_ORIFICE_MAX}`, '#b39ddb');
                 calculateStats();   // 仙窍数变了，五衰惩罚要立刻重算
+            }
+            if (finalOutput.marrowCleanse) {
+                gameState.player.marrowCleansed = true;
+                showNotification('🩸 洗髓易经完成，凡人体质脱胎换骨——突破筑基还需筑基丹', '#b39ddb');
             }
 
             // 处理技能经验
@@ -5769,6 +5791,9 @@
             }
             if (output.xianqiao) {
                 parts.push(`☯️ +${output.xianqiao}窍（当前 ${getXianqiao()}/${XIAN_ORIFICE_MAX}）`);
+            }
+            if (output.marrowCleanse) {
+                parts.push(gameState.player.marrowCleansed ? '🩸 已完成（一次性）' : '🩸 洗髓易经（一次性）');
             }
             if (output.exp) {
                 parts.push(`+${output.exp}exp`);
@@ -8141,7 +8166,17 @@
             } else if (isMajorBreakthrough && nextRealm) {
                 // 大境界突破
                 document.getElementById('btModalTitle').textContent = `✨ 突破${nextRealm ? nextRealm.name : '大道尽头'} ✨`;
-                document.getElementById('btBreakthroughType').textContent = '需丹药辅助';
+                if (realmIndex === 13) {
+                    // 练气十三层→筑基初期：丹药之外还要洗髓易经
+                    document.getElementById('btBreakthroughType').textContent = gameState.player.marrowCleansed
+                        ? '需丹药辅助（洗髓易经已完成 ✅）'
+                        : '需丹药辅助 + 先完成「洗髓易经」（修炼页，尚未完成 ❌）';
+                } else if (realmIndex === 17) {
+                    // 结丹突破：原著设定成功率较低，会失败、要重试、消耗可变数量丹药
+                    document.getElementById('btBreakthroughType').textContent = `需丹药辅助，结丹成功率 ${Math.round(JIEDAN_SUCCESS_RATE * 100)}%（失败会损失丹药，可重试）`;
+                } else {
+                    document.getElementById('btBreakthroughType').textContent = '需丹药辅助';
+                }
 
                 // 显示丹药需求
                 const pillReq = MAJOR_BREAKTHROUGH_PILLS[realmIndex];
@@ -8173,7 +8208,10 @@
 
                 // 更新按钮文本
                 const button = document.getElementById('btButton');
-                if (pillReq && (gameState.player.inventory.find(item => item.id === pillReq.pillId)?.qty || 0) >= pillReq.qty) {
+                const pillReady = pillReq && (gameState.player.inventory.find(item => item.id === pillReq.pillId)?.qty || 0) >= pillReq.qty;
+                if (realmIndex === 13 && pillReady && !gameState.player.marrowCleansed) {
+                    button.textContent = '未完成洗髓易经';
+                } else if (pillReady) {
                     button.textContent = '🌟 服丹突破 🌟';
                 } else {
                     button.textContent = '丹药不足';
@@ -8231,6 +8269,12 @@
             if (TRIBULATION_REALMS.includes(realmIndex) && !hasSurvivedTribulation(realmIndex)) {
                 showNotification('修为已满，但还未渡过本境界的天劫，请先「渡劫」', '#c98a3e', 'warning');
                 showBreakthroughModal();
+                return;
+            }
+
+            // 练气十三层→筑基初期：原著设定除了筑基丹还要「洗髓易经」改善凡人体质，两个条件都要满足
+            if (realmIndex === 13 && !gameState.player.marrowCleansed) {
+                showNotification('必须先完成「洗髓易经」才能突破筑基（去「修炼」页）', '#c98a3e', 'warning');
                 return;
             }
 
@@ -8887,6 +8931,15 @@
             if (pillInInventory.qty <= 0) {
                 const idx = gameState.player.inventory.indexOf(pillInInventory);
                 gameState.player.inventory.splice(idx, 1);
+            }
+
+            // 结丹突破（筑基圆满→金丹初期）：原著设定成功率不高，韩立式的普通修士要试很多次、天才一两次就过。
+            // 只对这一次突破生效——丹药已经扣了，失败不退境界、不退修为，只是要再炼丹药重试
+            if (realmIndex === 17 && Math.random() >= JIEDAN_SUCCESS_RATE) {
+                showNotification(`⚡ 结丹失败！${requirement.pillName} 已耗尽但未能凝丹，境界未跌，再炼丹药即可重新尝试`, '#c4483a', 'error');
+                updateUI();
+                saveGame();
+                return;
             }
 
             // 执行突破
