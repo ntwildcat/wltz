@@ -23,17 +23,17 @@
                 { name: '练气十三层', nextReq: 60930 },  // 100 × 13^2.5 ≈ 60930
                 // v6.92 境界修为重标定：功法×合道叠加后后期速度远超前期，每个大境界反而更快，与"更慢才对"完全背离。
                 // 重新以各阶段实际修炼速率（功法+功法加速+合道+修炼技能加成）反算所需修为，确保
-                // 练气(~16h) < 筑基(~21h) < 金丹(~27h) < 元婴(~33h) < 化神(~36h) < 炼虚(~46h) < 合体(~56h) < 大乘(~61h)
+                // 练气(~16h) < 筑基(~21h) < 结丹(~27h) < 元婴(~33h) < 化神(~36h) < 炼虚(~46h) < 合体(~56h) < 大乘(~61h)
                 // 原 100×n^2.5 曲线已废弃；炼虚圆满+合体圆满+大乘圆满仍需对应大境界突破丹药，不受此影响。
                 { name: '筑基初期', nextReq: 165000 },    // 龟息+玄水经1.35×技能 ≈ 8 xp/s；约5.7h
                 { name: '筑基中期', nextReq: 225000 },    // 顿悟+玄水经 ≈ 14 xp/s；约4.5h
                 { name: '筑基后期', nextReq: 290000 },    // 顿悟+烈阳功1.45× ≈ 16 xp/s；约5.1h
                 { name: '筑基圆满', nextReq: 360000 },    // 顿悟+金丹大道1.5× ≈ 17 xp/s；约5.9h  合计≈21h
-                // P6 金丹期（索引18-21）
-                { name: '金丹初期', nextReq: 800000, baseStats: { hp: 400, atk: 40, def: 20, spd: 20 }, bonusPerLevel: { atk: 2.0, def: 0.4, spd: 0.4 } },
-                { name: '金丹中期', nextReq: 960000, baseStats: { hp: 450, atk: 45, def: 22, spd: 22 }, bonusPerLevel: { atk: 2.2, def: 0.44, spd: 0.44 } },
-                { name: '金丹后期', nextReq: 1100000, baseStats: { hp: 500, atk: 50, def: 25, spd: 24 }, bonusPerLevel: { atk: 2.5, def: 0.5, spd: 0.5 } },
-                { name: '金丹圆满', nextReq: 1200000, baseStats: { hp: 560, atk: 56, def: 28, spd: 26 }, bonusPerLevel: { atk: 2.8, def: 0.56, spd: 0.56 } },
+                // P6 结丹期（索引18-21）
+                { name: '结丹初期', nextReq: 800000, baseStats: { hp: 400, atk: 40, def: 20, spd: 20 }, bonusPerLevel: { atk: 2.0, def: 0.4, spd: 0.4 } },
+                { name: '结丹中期', nextReq: 960000, baseStats: { hp: 450, atk: 45, def: 22, spd: 22 }, bonusPerLevel: { atk: 2.2, def: 0.44, spd: 0.44 } },
+                { name: '结丹后期', nextReq: 1100000, baseStats: { hp: 500, atk: 50, def: 25, spd: 24 }, bonusPerLevel: { atk: 2.5, def: 0.5, spd: 0.5 } },
+                { name: '结丹圆满', nextReq: 1200000, baseStats: { hp: 560, atk: 56, def: 28, spd: 26 }, bonusPerLevel: { atk: 2.8, def: 0.56, spd: 0.56 } },
                 // P7 元婴期（索引22-25）
                 { name: '元婴初期', nextReq: 2800000, baseStats: { hp: 800, atk: 80, def: 40, spd: 30 }, bonusPerLevel: { atk: 4.0, def: 0.8, spd: 0.6 } },
                 { name: '元婴中期', nextReq: 3200000, baseStats: { hp: 900, atk: 90, def: 45, spd: 33 }, bonusPerLevel: { atk: 4.4, def: 0.88, spd: 0.66 } },
@@ -153,15 +153,15 @@
                         skillExp: 80
                     }
                 },
-                // P6 金丹期秘境：天劫之地
+                // P6 结丹期秘境：天劫之地
                 tribulationGround: {
                     id: 'tribulationGround',
                     name: '天劫之地',
                     desc: '雷劫淬体·通关掉落金丹秘药材料',
                     icon: '⚡',
                     minRealmIndex: 17,                      // v6.89：原索引8 → +9，最低筑基圆满
-                    baseRealmIndex: 18,                     // 原索引9 → +9，怪物境界为金丹初期
-                    recommendedLevel: '筑基圆满~金丹中期',
+                    baseRealmIndex: 18,                     // 原索引9 → +9，怪物境界为结丹初期
+                    recommendedLevel: '筑基圆满~结丹中期',
                     monsters: [
                         { name: '雷劫残魂', type: '雷', hp: 1190, atk: 35, spd: 55, def: 15, attackSpeed: 2.2, drop: 'coins', dropQty: 150 },
                         { name: '天雷傀儡', type: '雷', hp: 1485, atk: 40, spd: 50, def: 18, attackSpeed: 2.3, drop: 'coins', dropQty: 180 },
@@ -188,9 +188,9 @@
                     name: '元婴秘境',
                     desc: '元神试炼·通关掉落元婴丹材料',
                     icon: '🌌',
-                    minRealmIndex: 21,                      // v6.89：原索引12 → +9，最低金丹圆满
+                    minRealmIndex: 21,                      // v6.89：原索引12 → +9，最低结丹圆满
                     baseRealmIndex: 22,                     // 原索引13 → +9，怪物境界为元婴初期
-                    recommendedLevel: '金丹圆满~元婴中期',
+                    recommendedLevel: '结丹圆满~元婴中期',
                     monsters: [
                         { name: '元神残影', type: '无', hp: 4990, atk: 80, spd: 60, def: 30, attackSpeed: 2.1, drop: 'coins', dropQty: 400 },
                         { name: '虚空吞噬者', type: '风', hp: 5990, atk: 90, spd: 70, def: 25, attackSpeed: 1.8, drop: 'coins', dropQty: 450 },
@@ -412,10 +412,10 @@
                         // 不产出修为，完成后置 marrowCleansed 标记；练气十三层→筑基初期的突破除了丹药还会检查这个标记
                         marrow_cleansing: { name: '洗髓易经', desc: '洗涤经脉、改善凡人体质，为突破筑基做准备（一次性，清灵草×10）', duration: 200, output: { marrowCleanse: 1, skill: 'cultivation', exp: 300 }, requires: { cleangrass: 10 }, requiredRealmIndex: 13, unlocked: false },
                         epiphany: { name: '顿悟', desc: '后期爆发', duration: 60, output: { cultivation: 500, skill: 'cultivation', exp: 80 }, requiredRealmIndex: 15, unlocked: false },   // 原索引6（筑基中期）→+9
-                        // P6 金丹期配方（v6.89：原索引9/10/11 → 因练气改13层整体 +9 → 18/19/20）
-                        golden_temper: { name: '金丹淬炼', desc: '金丹初期主力', duration: 30, output: { cultivation: 300, skill: 'cultivation', exp: 120 }, requiredRealmIndex: 18, unlocked: false },
-                        fire_body: { name: '丹火炼体', desc: '金丹中期高产', duration: 45, output: { cultivation: 600, skill: 'cultivation', exp: 180 }, requiredRealmIndex: 19, unlocked: false },
-                        golden_perfect: { name: '金丹圆满', desc: '金丹期最终法', duration: 90, output: { cultivation: 1500, skill: 'cultivation', exp: 300 }, requiredRealmIndex: 20, unlocked: false },
+                        // P6 结丹期配方（v6.89：原索引9/10/11 → 因练气改13层整体 +9 → 18/19/20）
+                        golden_temper: { name: '金丹淬炼', desc: '结丹初期主力', duration: 30, output: { cultivation: 300, skill: 'cultivation', exp: 120 }, requiredRealmIndex: 18, unlocked: false },
+                        fire_body: { name: '丹火炼体', desc: '结丹中期高产', duration: 45, output: { cultivation: 600, skill: 'cultivation', exp: 180 }, requiredRealmIndex: 19, unlocked: false },
+                        golden_perfect: { name: '结丹圆满', desc: '结丹期最终法', duration: 90, output: { cultivation: 1500, skill: 'cultivation', exp: 300 }, requiredRealmIndex: 20, unlocked: false },
                         // P7 元婴期配方（原索引13/14/15 → 22/23/24）
                         yuanying_nurture: { name: '元婴温养', desc: '元婴初期主力', duration: 45, output: { cultivation: 800, skill: 'cultivation', exp: 200 }, requiredRealmIndex: 22, unlocked: false },
                         soul_travel: { name: '元神出窍', desc: '元婴中期高产', duration: 60, output: { cultivation: 1400, skill: 'cultivation', exp: 280 }, requiredRealmIndex: 23, unlocked: false },
@@ -454,7 +454,7 @@
                         breakthrough: { name: '筑基丹', desc: '清灵草 ×3（练气十三层突破必需）', duration: 12, output: { items: [{ id: 'pill', qty: 1 }], skill: 'alchemy', exp: 45 }, requiredLevel: 10, requires: { cleangrass: 3 }, unlocked: false },
                         golden_pill_alchemy: { name: '金丹秘药', desc: '灵芝 ×3 + 玄晶 ×1 + 灵矿石 ×2（筑基圆满突破必需）', duration: 60, output: { items: [{ id: 'goldenpill', qty: 1 }], skill: 'alchemy', exp: 200 }, requiredLevel: 20, requires: { mushroom: 3, crystal: 1, spiritore: 2 }, unlocked: false },
                         mushroom_stew: { name: '灵芝羹', desc: '灵芝 ×2 + 灵米 ×2（战斗食物：恢复500生命）', duration: 30, output: { items: [{ id: 'mushroom_stew', qty: 2 }], skill: 'alchemy', exp: 240 }, requiredLevel: 22, requires: { mushroom: 2, millet: 2 }, unlocked: false },
-                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2（金丹圆满突破必需）', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 400 }, requiredLevel: 30, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false },
+                        yuanying_pill_alchemy: { name: '元婴丹', desc: '九叶莲 ×3 + 悟道茶 ×5 + 灵晶 ×2（结丹圆满突破必需）', duration: 90, output: { items: [{ id: 'yuanyingpill', qty: 1 }], skill: 'alchemy', exp: 400 }, requiredLevel: 30, requires: { lotus: 3, tea: 5, spiritcrystal: 2 }, unlocked: false },
                         huashen_pill_alchemy: { name: '化神丹', desc: '九叶莲 ×5 + 悟道茶 ×8 + 仙矿 ×2（元婴圆满突破必需）', duration: 120, output: { items: [{ id: 'huashenpill', qty: 1 }], skill: 'alchemy', exp: 700 }, requiredLevel: 40, requires: { lotus: 5, tea: 8, immortalore: 2 }, unlocked: false },
                         immortal_peach: { name: '蟠桃', desc: '悟道茶 ×3 + 灵芝 ×2（战斗食物：恢复1000生命）', duration: 60, output: { items: [{ id: 'immortal_peach', qty: 2 }], skill: 'alchemy', exp: 500 }, requiredLevel: 34, requires: { tea: 3, mushroom: 2 }, unlocked: false },
                         jade_nectar: { name: '琼浆玉液', desc: '悟道果 ×2 + 悟道茶 ×3（战斗食物：恢复2000生命，冷却更短）', duration: 80, output: { items: [{ id: 'jade_nectar', qty: 2 }], skill: 'alchemy', exp: 900 }, requiredLevel: 45, requires: { daofruit: 2, tea: 3 }, unlocked: false },
@@ -481,9 +481,9 @@
                         iron_blade: { name: '精铁剑', desc: '铁矿石 ×6 + 碎石 ×5', duration: 35, output: { items: [{ id: 'ironblade', qty: 1 }], skill: 'forging', exp: 90 }, requiredLevel: 13, requires: { ironore: 6, stone: 5 }, unlocked: false },
                         spirit_sword: { name: '灵剑', desc: '灵矿石 ×3 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritsword', qty: 1 }], skill: 'forging', exp: 130 }, requiredLevel: 18, requires: { spiritore: 3, crystal: 1 }, unlocked: false },
                         spirit_armor: { name: '灵甲', desc: '灵矿石 ×4 + 玄晶 ×1', duration: 45, output: { items: [{ id: 'spiritarmor', qty: 1 }], skill: 'forging', exp: 150 }, requiredLevel: 20, requires: { spiritore: 4, crystal: 1 }, unlocked: false },
-                        golden_sword: { name: '金丹剑', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldensword', qty: 1 }], skill: 'forging', exp: 220 }, requiredLevel: 25, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
-                        golden_armor: { name: '金丹法袍', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldenarmor', qty: 1 }], skill: 'forging', exp: 260 }, requiredLevel: 27, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
-                        golden_pendant: { name: '金丹佩', desc: '灵晶 ×1 + 玄晶 ×3', duration: 50, output: { items: [{ id: 'goldenpendant', qty: 1 }], skill: 'forging', exp: 300 }, requiredLevel: 30, requires: { spiritcrystal: 1, crystal: 3 }, unlocked: false },
+                        golden_sword: { name: '结丹剑', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldensword', qty: 1 }], skill: 'forging', exp: 220 }, requiredLevel: 25, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
+                        golden_armor: { name: '结丹法袍', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldenarmor', qty: 1 }], skill: 'forging', exp: 260 }, requiredLevel: 27, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
+                        golden_pendant: { name: '结丹佩', desc: '灵晶 ×1 + 玄晶 ×3', duration: 50, output: { items: [{ id: 'goldenpendant', qty: 1 }], skill: 'forging', exp: 300 }, requiredLevel: 30, requires: { spiritcrystal: 1, crystal: 3 }, unlocked: false },
                         yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 500 }, requiredLevel: 36, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
                         yuanying_armor: { name: '元婴法衣', desc: '灵晶 ×4 + 玄晶 ×4', duration: 90, output: { items: [{ id: 'yuanyingarmor', qty: 1 }], skill: 'forging', exp: 560 }, requiredLevel: 39, requires: { spiritcrystal: 4, crystal: 4 }, unlocked: false },
                         yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 40, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false },
@@ -550,7 +550,7 @@
                     exp: 0,
                     actions: {}
                 },
-                // P6 丹火技能（金丹期新技能）
+                // P6 丹火技能（结丹期新技能）
                 danhuo: {
                     name: '丹火',
                     icon: '🔥',
@@ -660,7 +660,7 @@
                 ironblade: { name: '精铁剑', icon: '🗡️', type: 'weapon', sellPrice: 200, stats: { atk: 26 } },
                 ironarmor: { name: '铁甲', icon: '🛡️', type: 'armor', sellPrice: 120, stats: { def: 10 } },
                 spiritsword: { name: '灵剑', icon: '⚡', type: 'weapon', sellPrice: 400, stats: { atk: 40 } },
-                goldenarmor: { name: '金丹法袍', icon: '👔', type: 'armor', sellPrice: 1200, stats: { def: 25, hp: 50 } },
+                goldenarmor: { name: '结丹法袍', icon: '👔', type: 'armor', sellPrice: 1200, stats: { def: 25, hp: 50 } },
                 yuanyingsword: { name: '元婴灵剑', icon: '✨', type: 'weapon', sellPrice: 4000, stats: { atk: 80 } },
 
                 // P6/P7 新丹药
@@ -706,8 +706,8 @@
                 jade_nectar: { name: '琼浆玉液', icon: '🍶', type: 'food', sellPrice: 1200 },
                 // 炼器新增装备
                 spiritarmor: { name: '灵甲', icon: '🛡️', type: 'armor', sellPrice: 160, stats: { def: 16, hp: 30 } },
-                goldensword: { name: '金丹剑', icon: '🗡️', type: 'weapon', sellPrice: 260, stats: { atk: 62 } },
-                goldenpendant: { name: '金丹佩', icon: '📿', type: 'jewelry', sellPrice: 300, stats: { spd: 6, hp: 40 } },
+                goldensword: { name: '结丹剑', icon: '🗡️', type: 'weapon', sellPrice: 260, stats: { atk: 62 } },
+                goldenpendant: { name: '结丹佩', icon: '📿', type: 'jewelry', sellPrice: 300, stats: { spd: 6, hp: 40 } },
                 yuanyingarmor: { name: '元婴法衣', icon: '🥋', type: 'armor', sellPrice: 1100, stats: { def: 45, hp: 120 } },
                 yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', sellPrice: 700, stats: { spd: 10, hp: 80 } },
                 huashensword: { name: '化神剑', icon: '🗡️', type: 'weapon', sellPrice: 3500, stats: { atk: 110 } },
@@ -733,7 +733,7 @@
                     { id: 'spiritcrystal', name: '灵晶', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 18 },
                     { id: 'immortalore', name: '仙矿', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 22 }
                 ],
-                // 丹火商城（金丹初期起）：用丹火买炼丹 / 战斗食物材料；食物是秘境的刚需
+                // 丹火商城（结丹初期起）：用丹火买炼丹 / 战斗食物材料；食物是秘境的刚需
                 danhuo_shop: [
                     { id: 'mushroom_stew', name: '灵芝羹 ×4', icon: '🥣', price: 40, currency: 'danhuo', bundle: 4, desc: '战斗食物（恢复 500 生命）', minRealmIndex: 18 },
                     { id: 'spiritore', name: '灵矿石 ×5', icon: '✨', price: 25, currency: 'danhuo', bundle: 5, desc: '炼器材料', minRealmIndex: 18 },
@@ -812,7 +812,7 @@
                     icon: '🥣',
                     hpRestore: 500,           // 恢复HP
                     cooldown: 3.0,
-                    minRealm: 18,             // v6.89：原索引9 → +9，金丹初期
+                    minRealm: 18,             // v6.89：原索引9 → +9，结丹初期
                     description: '灵芝熬制的浓羹，恢复500点生命值'
                 },
                 // 极品食物
@@ -989,7 +989,7 @@
         const COIN_ICON = ITEM_ICONS.spiritstone;
 
         // ==================== 丹火 / 神识：独立货币与用途（v6.51 重构） ====================
-        // 丹火（金丹起）与神识（元婴起）不再是背包物品，而是像灵石一样的数值（player.danhuo / player.shenshi），不能出售。
+        // 丹火（结丹起）与神识（元婴起）不再是背包物品，而是像灵石一样的数值（player.danhuo / player.shenshi），不能出售。
         // 产出：各自技能的配方、战斗区域胜利、秘境通关；消耗：
         //   丹火 —— 淬炼装备（武器 / 护甲 / 饰品各自 0–10 级，每级 +4% 该部位属性）、强化灵根（0–10 级，灵根特效 ×(1+5%×级)）、炼丹助炼（提高翻倍产出概率）
         //   神识 —— 分身强化（更快、更容易翻倍）、专注（生活技能耗时 -1.5%/级）、神识感应（暴击 / 闪避 +1%/级）、神识探查（下次秘境掉落 ×1.5）
@@ -1153,7 +1153,7 @@
 
         const CURRENCY_NAMES = { danhuo: '丹火', shenshi: '神识', daoguo: '道果' };
         const CURRENCY_ICONS = { coins: () => COIN_ICON, danhuo: () => DANHUO_ICON, shenshi: () => SHENSHI_ICON, daoguo: () => DAOGUO_ICON };
-        // 战斗区域胜利掉落的丹火 / 神识（金丹级战斗区域起掉丹火，元婴级起掉神识；乘该区域精通的奖励加成）
+        // 战斗区域胜利掉落的丹火 / 神识（结丹级战斗区域起掉丹火，元婴级起掉神识；乘该区域精通的奖励加成）
         const BATTLE_CURRENCY = {
             goldenPlains:      { danhuo: [1, 2] },
             tribulationGround: { danhuo: [2, 3] },
@@ -1189,7 +1189,7 @@
 
 
         // ---- 丹火 / 神识：界面 ----
-        // 顶部货币条：丹火（金丹起）、神识（元婴起）；桌面在侧栏灵石下面，手机在头部灵石条旁
+        // 顶部货币条：丹火（结丹起）、神识（元婴起）；桌面在侧栏灵石下面，手机在头部灵石条旁
         function updateCurrencyChips() {
             const P = gameState.player;
             const show = { danhuo: isDanhuoUnlocked(), shenshi: isShenshiUnlocked(), daoguo: isDaoguoUnlocked() };
@@ -1245,7 +1245,7 @@
             const rootEff = describeEffects(getRootEffectsScaled()).join(' · ');
             const rootRow = root ? useRow(`${ROOT_ICONS[P.spiritRoot]} ${root.name}`, `强化 Lv.${rlv}/${ROOT_MAX}`, `灵根特效整体 +${Math.round(rlv * ROOT_PER_LEVEL * 100)}%${rlv >= ROOT_MAX ? '' : ` → +${Math.round((rlv + 1) * ROOT_PER_LEVEL * 100)}%`}<br/>${rootEff}`, rootCost(rlv), 'danhuo', 'upgradeRoot()', rlv >= ROOT_MAX) : '';
             return `
-                <div class="use-balance">${DANHUO_ICON} 丹火 <b>${Math.floor(P.danhuo)}</b><small>产出：丹火技能的配方（凝聚 / 培育 / 提炼 / 凝练）· 金丹级战斗区域胜利 · 秘境通关。丹火不能出售，只用来变强和购买商品。</small></div>
+                <div class="use-balance">${DANHUO_ICON} 丹火 <b>${Math.floor(P.danhuo)}</b><small>产出：丹火技能的配方（凝聚 / 培育 / 提炼 / 凝练）· 结丹级战斗区域胜利 · 秘境通关。丹火不能出售，只用来变强和购买商品。</small></div>
                 <div class="use-card"><div class="use-title">🔨 淬炼台 <small>联动炼器：武器 / 护甲 / 饰品各自淬炼，每级 +${Math.round(TEMPER_PER_LEVEL * 100)}% 该部位装备属性；换装备后等级保留，与炼器等级加成（当前 Lv.${forgeLv}）相乘</small></div>${temperRows}</div>
                 <div class="use-card"><div class="use-title">🌱 强化灵根 <small>联动战斗：灵根自带的全部特效（攻击、暴击、耗时、翻倍……）整体放大，每级 +${Math.round(ROOT_PER_LEVEL * 100)}%</small></div>${rootRow}</div>
                 <div class="use-card"><div class="use-title">⚗️ 炼丹助炼 <small>联动炼丹：在炼丹页开启，每次炼丹消耗丹火，产出翻倍概率 +25%（当前${P.alchemyBoost ? '已开启' : '未开启'}）</small></div>
@@ -1894,7 +1894,7 @@
                 farmingSlots: 1,
                 boughtUpgrades: [],  // 已购买的永久升级ID列表
                 temperLevel: 0,      // （旧）全局淬炼次数，v6.51 起改为 temper（按部位），读档时迁移
-                danhuo: 0,           // 丹火（货币，金丹起）
+                danhuo: 0,           // 丹火（货币，结丹起）
                 shenshi: 0,          // 神识（货币，元婴起）
                 daoguo: 0,           // 道果（货币，合体起）
                 daoBody: 0,          // 道果淬体等级（0–10）
@@ -2017,7 +2017,7 @@
             }
         }
 
-        // 结丹突破（筑基圆满→金丹初期）成功率（v6.90）：原著设定这次突破不是"丹药够了就成"，
+        // 结丹突破（筑基圆满→结丹初期）成功率（v6.90）：原著设定这次突破不是"丹药够了就成"，
         // 韩立式的普通修士要试很多次（近50颗丹药）、天才一两次就过。只对这一次突破生效，
         // 其它大境界突破仍然是"丹药够了必成"，避免全局引入失败机制影响其它境界的节奏。
         // 定义放在 REALM_UNLOCKS 前面：后者是立即求值的对象字面量，要在里面引用这个常量就不能晚于这里声明
@@ -2039,9 +2039,9 @@
             15: ['⚱️ 古老遗迹秘境开放'],
             16: ['⚔️ 魔窟深渊战斗区域开放'],
             17: ['⚡ 天劫之地秘境开放', '💊 金丹秘药配方解锁，突破筑基圆满前记得炼够', `⚡ 这次突破（结丹）不是丹药够了就必成——成功率约${Math.round(JIEDAN_SUCCESS_RATE * 100)}%，失败会损失丹药但不掉境界，可以再炼丹药重试`],
-            18: ['🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 金丹平原战斗区域开放'],
+            18: ['🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
             19: ['⚔️ 天劫之地战斗区域开放'],
-            21: ['🌌 元婴秘境开放', '💊 元婴丹配方解锁，突破金丹圆满前记得炼够'],
+            21: ['🌌 元婴秘境开放', '💊 元婴丹配方解锁，突破结丹圆满前记得炼够'],
             22: ['👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
             24: ['⚔️ 深渊遗迹战斗区域开放'],
             25: ['🌠 太虚幻境秘境开放', '💊 化神丹配方解锁，突破元婴圆满前记得炼够'],
@@ -2304,9 +2304,9 @@
                     你已经把基础玩法都试过一遍了。接下来，这个游戏的目标是——<br/>
                     <b>🎯 一步步修炼、突破，走到当前的最高境界「${maxName}」，成为一方大能。</b><br/><br/>
                     路上你会：<br/>
-                    ・每个大境界（练气→筑基→金丹→元婴→化神）的突破需要<b>突破丹药</b>，只能靠炼丹制作<br/>
+                    ・每个大境界（练气→筑基→结丹→元婴→化神）的突破需要<b>突破丹药</b>，只能靠炼丹制作<br/>
                     ・用<b>炼器</b>打造更好的装备，带足<b>食物</b>挑战更深的秘境，拿材料和种子<br/>
-                    ・金丹后解锁<b>丹火</b>（货币：淬炼装备、强化灵根、助炼丹药），元婴后解锁<b>神识</b>（货币：强化分身、加快生活技能、增强战斗感知）和<b>分身</b>，化神后解锁<b>悟道</b><br/>
+                    ・结丹后解锁<b>丹火</b>（货币：淬炼装备、强化灵根、助炼丹药），元婴后解锁<b>神识</b>（货币：强化分身、加快生活技能、增强战斗感知）和<b>分身</b>，化神后解锁<b>悟道</b><br/>
                     ・学更强的功法、提高精通，让一切越来越快——离线也在成长<br/><br/>
                     不用着急，放置游戏，慢慢来。这份任务和玩法介绍都可以在<b>设置</b>里重新查看。
                 </div>
@@ -4005,7 +4005,7 @@
                 rewardMsg += `+ ${coins} 灵石\n`;
             }
 
-            // 通关丹火 / 神识（金丹级以上秘境）
+            // 通关丹火 / 神识（结丹级以上秘境）
             [['danhuo', '丹火'], ['shenshi', '神识'], ['daoguo', '道果']].forEach(([kind, label]) => {
                 const range = rewards[kind];
                 if (!range) return;
@@ -4032,7 +4032,7 @@
         // 境界压制系统（纵向位阶感）
         const REALM_SUPPRESSION = {
             // 大阶段划分：每4个境界为一个大阶段（凡人单独为0）
-            REALMS_PER_TIER: 4,  // 凡人(0), 练气(1-4), 筑基(5-8), 金丹(9-12)...
+            REALMS_PER_TIER: 4,  // 凡人(0), 练气(1-4), 筑基(5-8), 结丹(9-12)...
 
             // 压制系数（相对值）
             MAJOR_TIER_HIT_PENALTY: 0.15,      // 大境界差每级命中 -15%
@@ -4092,12 +4092,12 @@
 
         // 大境界突破需要的丹药配置
         // 键为当前境界索引（突破时的源境界），值为所需丹药信息
-        // 新索引：凡人(0), 练气初期(1)...练气巅峰(4), 筑基初期(5)...筑基圆满(8), 金丹初期(9)...金丹圆满(12), 元婴初期(13)...元婴圆满(16)
+        // 新索引：凡人(0), 练气初期(1)...练气巅峰(4), 筑基初期(5)...筑基圆满(8), 结丹初期(9)...结丹圆满(12), 元婴初期(13)...元婴圆满(16)
         // v6.89：练气改13层，原索引5起整体+9；原索引4（练气巅峰→筑基）单独映射为新索引13（练气十三层→筑基）
         const MAJOR_BREAKTHROUGH_PILLS = {
             13: { pillId: 'pill', pillName: '筑基丹', qty: 1 },   // 练气十三层(索引13)→筑基初期(索引14)
-            17: { pillId: 'goldenpill', pillName: '金丹秘药', qty: 1 },  // 筑基圆满(索引17)→金丹初期(索引18)
-            21: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 },  // 金丹圆满(索引21)→元婴初期(索引22)
+            17: { pillId: 'goldenpill', pillName: '金丹秘药', qty: 1 },  // 筑基圆满(索引17)→结丹初期(索引18)
+            21: { pillId: 'yuanyingpill', pillName: '元婴丹', qty: 1 },  // 结丹圆满(索引21)→元婴初期(索引22)
             25: { pillId: 'huashenpill', pillName: '化神丹', qty: 1 },   // 元婴圆满(索引25)→化神初期(索引26)
             29: { pillId: 'huaxupill', pillName: '化虚丹', qty: 1 },   // 化神圆满(索引29)→炼虚初期(索引30)
             33: { pillId: 'hetipill', pillName: '合体丹', qty: 1 },       // 炼虚圆满(索引33)→合体初期(索引34)，且必须已「合道」（见 attemptBreakthrough）
@@ -4161,17 +4161,17 @@
                 description: '至阳至刚的筑基功法，修炼极快但对经脉要求很高。',
                 origin: null
             },
-            // P6 金丹期功法（可获取，非出身绑定）
+            // P6 结丹期功法（可获取，非出身绑定）
             golden_art: {
                 id: 'golden_art',
                 name: '金丹大道',
                 tier: 3,
                 speedMultiplier: 1.5,               // 修炼速度快50%
                 effects: { hpPct: 0.10, 'exp:alchemy': 0.15, 'exp:danhuo': 0.15 },  // 特效
-                description: '金丹修士的标配功法，以丹火淬炼经脉，修炼效率远超筑基功法。',
+                description: '结丹修士的标配功法，以丹火淬炼经脉，修炼效率远超筑基功法。',
                 origin: null                        // 非出身绑定
             },
-            // 金丹期高阶功法（稀有）
+            // 结丹期高阶功法（稀有）
             fire_art: {
                 id: 'fire_art',
                 name: '焚天诀',
@@ -4188,7 +4188,7 @@
                 tier: 5,
                 speedMultiplier: 2.2,               // 修炼速度快120%
                 effects: { 'exp:life': 0.10, hpPct: 0.10 },  // 特效
-                description: '元婴修士的标配功法，元神与肉身双修，修炼效率是金丹功法的数倍。',
+                description: '元婴修士的标配功法，元神与肉身双修，修炼效率是结丹功法的数倍。',
                 origin: null
             },
             // 元婴期高阶功法（稀有）
@@ -6557,7 +6557,7 @@
 
         // ==================== 装备系统 ====================
         // 装备栏与背包分开：装备 = 把物品从背包挪到装备栏，卸下 = 放回背包，换装备时旧的自动回背包。
-        // 武器、护甲各 1 件；饰品初始 1 个栏位，商城购买「第二饰品栏位」（金丹初期起）后有 2 个，同名饰品不能重复佩戴。
+        // 武器、护甲各 1 件；饰品初始 1 个栏位，商城购买「第二饰品栏位」（结丹初期起）后有 2 个，同名饰品不能重复佩戴。
         const STAT_LABELS = { hp: '生命', atk: '攻击', def: '防御', spd: '速度' };
         const EQUIP_TYPES = ['weapon', 'armor', 'jewelry', 'daoze'];
         const EQUIP_TYPE_NAMES = { weapon: '武器', armor: '护甲', jewelry: '饰品', daoze: '道则' };
@@ -6685,7 +6685,7 @@
                 const canBuy = gameState.player.realmIndex >= 18;   // v6.89：原索引9 → +9
                 slots += `<div class="equip-slot locked"><div class="equip-slot-label">📿 饰品2</div>
                     <div class="equip-slot-empty">🔒 第二饰品栏位</div>
-                    <div class="equip-slot-stats">${canBuy ? '可在商城购买（8000灵石）' : '金丹初期后可在商城购买'}</div>
+                    <div class="equip-slot-stats">${canBuy ? '可在商城购买（8000灵石）' : '结丹初期后可在商城购买'}</div>
                     ${canBuy ? `<button class="btn btn-secondary equip-btn" onclick="switchPanel('shop')">去商城</button>` : ''}</div>`;
             }
             // 道基槽（炼虚初期起）：只能镶嵌道则，同一法则的道则不能重复镶嵌
@@ -6704,7 +6704,7 @@
             const forgeBonus = parseFloat(((SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1) - 1) * 100).toFixed(1));
             const summary = `<div class="equip-summary">
                 <span>❤️ 生命 ${stats.hp.max}</span><span>⚔️ 攻击 ${stats.atk}</span><span>🛡️ 防御 ${stats.def}</span><span>💨 速度 ${stats.spd}</span>
-                <div class="equip-summary-sub">装备加成：淬炼 ${temperText}${isDanhuoUnlocked() ? '（在丹火页淬炼台升级）' : '（金丹后解锁丹火淬炼）'}${forgeBonus > 0 ? ` · 炼器等级（装备属性 +${forgeBonus}%）` : ''}</div></div>`;
+                <div class="equip-summary-sub">装备加成：淬炼 ${temperText}${isDanhuoUnlocked() ? '（在丹火页淬炼台升级）' : '（结丹后解锁丹火淬炼）'}${forgeBonus > 0 ? ` · 炼器等级（装备属性 +${forgeBonus}%）` : ''}</div></div>`;
             // 背包里的装备
             const bagItems = gameState.player.inventory.filter(i => isEquipmentItem(i.id));
             let bag = '';
@@ -6798,8 +6798,8 @@
                 deepMountain: { name: '十万大山核心', desc: '极度危险', minLevel: 14, maxLevel: 15, enemies: ['demon', 'spirit'], coins: 200, exp: 100 },
                 swamp: { name: '妖兽沼泽', desc: '诡异危险', minLevel: 14, maxLevel: 15, enemies: ['poisonBeast', 'serpent'], coins: 180, exp: 90 },
                 abyss: { name: '魔窟深渊', desc: '极端危险', minLevel: 16, maxLevel: 17, enemies: ['demon-lord', 'abyssal'], coins: 300, exp: 150 },
-                // P6 金丹期新增
-                goldenPlains: { name: '金丹平原', desc: '金丹修士的猎场', minLevel: 18, maxLevel: 19, enemies: ['golden-beast', 'spirit-wolf'], coins: 500, exp: 200 },
+                // P6 结丹期新增
+                goldenPlains: { name: '结丹平原', desc: '结丹修士的猎场', minLevel: 18, maxLevel: 19, enemies: ['golden-beast', 'spirit-wolf'], coins: 500, exp: 200 },
                 tribulationGround: { name: '天劫之地', desc: '雷劫试炼', minLevel: 19, maxLevel: 20, enemies: ['thunder-demon', 'tribulation-spirit'], coins: 800, exp: 350 },
                 // P7 元婴期新增
                 voidSea: { name: '虚空之海', desc: '元婴修士的试炼场', minLevel: 22, maxLevel: 23, enemies: ['void-creature', 'soul-devourer'], coins: 1000, exp: 400 },
@@ -6952,7 +6952,7 @@
                     { name: '魔王', hp: 120, atk: 25, def: 12, spd: 40, icon: '👿' },
                     { name: '深渊生物', hp: 110, atk: 22, def: 10, spd: 35, icon: '🌀' }
                 ],
-                // P6 金丹期敌人
+                // P6 结丹期敌人
                 goldenPlains: [
                     { name: '金甲兽', hp: 200, atk: 40, def: 15, spd: 30, icon: '🦁' },
                     { name: '灵狼', hp: 150, atk: 45, def: 10, spd: 50, icon: '🐺' }
@@ -7814,7 +7814,7 @@
                 daoguo_shop: '🍎 道果商品'
             };
 
-            // 商城标签：灵石商城 / 丹火商城（金丹起）/ 神识商城（元婴起）
+            // 商城标签：灵石商城 / 丹火商城（结丹起）/ 神识商城（元婴起）
             if ((shopTab === 'danhuo' && !isDanhuoUnlocked()) || (shopTab === 'shenshi' && !isShenshiUnlocked()) || (shopTab === 'daoguo' && !isDaoguoUnlocked())) shopTab = 'coins';
             const tabsEl = document.getElementById('shopTabs');
             if (tabsEl) {
@@ -8327,7 +8327,7 @@
         // 小境界：一圈铜色涟漪加火花 + 朱印「破」，约 1.6 秒，不挡操作。
         // 大境界：每个境界有自己的特效（约 4 秒，点击可跳过）：
         //   筑基 = 筑基台（地上画出八卦阵纹，三层圆台依次升起，一道金光贯天而起）
-        //   金丹 = 金丹凝结（金色光点旋转汇聚成丹，光环扩散）
+        //   结丹 = 金丹凝结（金色光点旋转汇聚成丹，光环扩散）
         //   元婴 = 元神出窍（青白色婴儿元神从丹田升起，拖出光带）
         //   化神 = 天地法则（雷霆劈落、八种法则符文环绕旋转、屏幕震动）
         // 用 canvas 绘制，不依赖外部资源；尊重「减少动态效果」；设置里可关闭。
@@ -8335,7 +8335,7 @@
         const BREAKTHROUGH_FX = {
             1:  { name: '练气', line: '引气入体，踏上仙途', kind: 'qi', dur: 3.8 },   // 凡人 → 练气一层：踏入修仙之门
             14: { name: '筑基', line: '根基已成，百脉皆通', kind: 'foundation', dur: 4.2 },
-            18: { name: '金丹', line: '丹成九转，金光内蕴', kind: 'core', dur: 4.2 },
+            18: { name: '结丹', line: '丹成九转，金光内蕴', kind: 'core', dur: 4.2 },
             22: { name: '元婴', line: '元神出窍，神游太虚', kind: 'nascent', dur: 4.4 },
             26: { name: '化神', line: '天地法则，尽在掌中', kind: 'law', dur: 4.6 },
             30: { name: '炼虚', line: '化虚为实，道则显形', kind: 'voidfx', dur: 5.0 },
@@ -8966,7 +8966,7 @@
                 gameState.player.inventory.splice(idx, 1);
             }
 
-            // 结丹突破（筑基圆满→金丹初期）：原著设定成功率不高，韩立式的普通修士要试很多次、天才一两次就过。
+            // 结丹突破（筑基圆满→结丹初期）：原著设定成功率不高，韩立式的普通修士要试很多次、天才一两次就过。
             // 只对这一次突破生效——丹药已经扣了，失败不退境界、不退修为，只是要再炼丹药重试
             if (realmIndex === 17 && Math.random() >= JIEDAN_SUCCESS_RATE) {
                 showNotification(`⚡ 结丹失败！${requirement.pillName} 已耗尽但未能凝丹，境界未跌，再炼丹药即可重新尝试`, '#c4483a', 'error');
