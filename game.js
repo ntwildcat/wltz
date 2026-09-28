@@ -413,9 +413,9 @@
                         marrow_cleansing: { name: '洗髓易经', desc: '洗涤经脉、改善凡人体质，为突破筑基做准备（一次性，清灵草×10）', duration: 200, output: { marrowCleanse: 1, skill: 'cultivation', exp: 300 }, requires: { cleangrass: 10 }, requiredRealmIndex: 13, unlocked: false },
                         epiphany: { name: '顿悟', desc: '后期爆发', duration: 60, output: { cultivation: 500, skill: 'cultivation', exp: 80 }, requiredRealmIndex: 15, unlocked: false },   // 原索引6（筑基中期）→+9
                         // P6 结丹期配方（v6.89：原索引9/10/11 → 因练气改13层整体 +9 → 18/19/20）
-                        golden_temper: { name: '金丹淬炼', desc: '结丹初期主力', duration: 30, output: { cultivation: 300, skill: 'cultivation', exp: 120 }, requiredRealmIndex: 18, unlocked: false },
-                        fire_body: { name: '丹火炼体', desc: '结丹中期高产', duration: 45, output: { cultivation: 600, skill: 'cultivation', exp: 180 }, requiredRealmIndex: 19, unlocked: false },
-                        golden_perfect: { name: '结丹圆满', desc: '结丹期最终法', duration: 90, output: { cultivation: 1500, skill: 'cultivation', exp: 300 }, requiredRealmIndex: 20, unlocked: false },
+                        golden_temper: { name: '金丹淬炼', desc: '以丹火温养金丹，磨砺品质（品质越高，日后突破元婴的成功率越大）', duration: 30, output: { cultivation: 300, skill: 'cultivation', exp: 120 }, requiredRealmIndex: 18, unlocked: false },
+                        fire_body: { name: '丹火炼体', desc: '以丹火淬炼经脉与本命法宝，器、人同修', duration: 45, output: { cultivation: 600, skill: 'cultivation', exp: 180 }, requiredRealmIndex: 19, unlocked: false },
+                        golden_perfect: { name: '结丹圆满', desc: '金丹圆满如月，蓄势冲击元婴，此乃假婴境界', duration: 90, output: { cultivation: 1500, skill: 'cultivation', exp: 300 }, requiredRealmIndex: 20, unlocked: false },
                         // P7 元婴期配方（原索引13/14/15 → 22/23/24）
                         yuanying_nurture: { name: '元婴温养', desc: '元婴初期主力', duration: 45, output: { cultivation: 800, skill: 'cultivation', exp: 200 }, requiredRealmIndex: 22, unlocked: false },
                         soul_travel: { name: '元神出窍', desc: '元婴中期高产', duration: 60, output: { cultivation: 1400, skill: 'cultivation', exp: 280 }, requiredRealmIndex: 23, unlocked: false },
@@ -484,6 +484,7 @@
                         golden_sword: { name: '结丹剑', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldensword', qty: 1 }], skill: 'forging', exp: 220 }, requiredLevel: 25, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
                         golden_armor: { name: '结丹法袍', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldenarmor', qty: 1 }], skill: 'forging', exp: 260 }, requiredLevel: 27, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
                         golden_pendant: { name: '结丹佩', desc: '灵晶 ×1 + 玄晶 ×3', duration: 50, output: { items: [{ id: 'goldenpendant', qty: 1 }], skill: 'forging', exp: 300 }, requiredLevel: 30, requires: { spiritcrystal: 1, crystal: 3 }, unlocked: false },
+                        life_sword: { name: '本命飞剑', desc: '灵晶 ×3 + 玄晶 ×5（本命法宝：与心神相连、威力远超同阶法器；持有时元婴突破成功率 +15%）', duration: 120, output: { items: [{ id: 'lifesword', qty: 1 }], skill: 'forging', exp: 450 }, requiredLevel: 32, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
                         yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 500 }, requiredLevel: 36, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
                         yuanying_armor: { name: '元婴法衣', desc: '灵晶 ×4 + 玄晶 ×4', duration: 90, output: { items: [{ id: 'yuanyingarmor', qty: 1 }], skill: 'forging', exp: 560 }, requiredLevel: 39, requires: { spiritcrystal: 4, crystal: 4 }, unlocked: false },
                         yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 40, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false },
@@ -708,6 +709,7 @@
                 spiritarmor: { name: '灵甲', icon: '🛡️', type: 'armor', sellPrice: 160, stats: { def: 16, hp: 30 } },
                 goldensword: { name: '结丹剑', icon: '🗡️', type: 'weapon', sellPrice: 260, stats: { atk: 62 } },
                 goldenpendant: { name: '结丹佩', icon: '📿', type: 'jewelry', sellPrice: 300, stats: { spd: 6, hp: 40 } },
+                lifesword: { name: '本命飞剑', icon: '🌿', type: 'weapon', sellPrice: 0, stats: { atk: 95, hp: 60 } },  // 本命法宝：不可出售，品质影响元婴突破成功率
                 yuanyingarmor: { name: '元婴法衣', icon: '🥋', type: 'armor', sellPrice: 1100, stats: { def: 45, hp: 120 } },
                 yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', sellPrice: 700, stats: { spd: 10, hp: 80 } },
                 huashensword: { name: '化神剑', icon: '🗡️', type: 'weapon', sellPrice: 3500, stats: { atk: 110 } },
@@ -2022,6 +2024,7 @@
         // 其它大境界突破仍然是"丹药够了必成"，避免全局引入失败机制影响其它境界的节奏。
         // 定义放在 REALM_UNLOCKS 前面：后者是立即求值的对象字面量，要在里面引用这个常量就不能晚于这里声明
         const JIEDAN_SUCCESS_RATE = 0.4;
+        const YUANYING_BASE_SUCCESS_RATE = 0.65;  // 元婴突破基础成功率；持有本命飞剑+0.15
 
         // ==================== 境界解锁提示（v6.79） ====================
         // 每次突破后，如果这个境界解锁了新秘境 / 战斗区域 / 系统，播放完突破特效再弹一个小提示——
@@ -2039,9 +2042,9 @@
             15: ['⚱️ 古老遗迹秘境开放'],
             16: ['⚔️ 魔窟深渊战斗区域开放'],
             17: ['⚡ 天劫之地秘境开放', '💊 金丹秘药配方解锁，突破筑基圆满前记得炼够', `⚡ 这次突破（结丹）不是丹药够了就必成——成功率约${Math.round(JIEDAN_SUCCESS_RATE * 100)}%，失败会损失丹药但不掉境界，可以再炼丹药重试`],
-            18: ['🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
+            18: ['🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放', '✈️ 御空飞行：结丹修士不借法器即可御空，寿命延至 500 年，是修仙界的中坚力量', '⚔️ 本命法宝：炼器页解锁「本命飞剑」配方——本命法宝与心神相连，威力远超同阶法器，持有时元婴突破成功率 +15%'],
             19: ['⚔️ 天劫之地战斗区域开放'],
-            21: ['🌌 元婴秘境开放', '💊 元婴丹配方解锁，突破结丹圆满前记得炼够'],
+            21: ['🌌 元婴秘境开放', '💊 元婴丹配方解锁，突破结丹圆满前记得炼够', '⚡ 元婴突破有成功率（基础 65%）——持有本命飞剑（本命法宝）可提升至 80%；失败消耗丹药但不跌境界'],
             22: ['👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
             24: ['⚔️ 深渊遗迹战斗区域开放'],
             25: ['🌠 太虚幻境秘境开放', '💊 化神丹配方解锁，突破元婴圆满前记得炼够'],
@@ -8207,6 +8210,11 @@
                 } else if (realmIndex === 17) {
                     // 结丹突破：原著设定成功率较低，会失败、要重试、消耗可变数量丹药
                     document.getElementById('btBreakthroughType').textContent = `需丹药辅助，结丹成功率 ${Math.round(JIEDAN_SUCCESS_RATE * 100)}%（失败会损失丹药，可重试）`;
+                } else if (realmIndex === 21) {
+                    // 元婴突破：金丹品质（本命法宝）影响成功率
+                    const hasLifeSword = gameState.player.inventory.some(i => i.id === 'lifesword');
+                    const rate = hasLifeSword ? YUANYING_BASE_SUCCESS_RATE + 0.15 : YUANYING_BASE_SUCCESS_RATE;
+                    document.getElementById('btBreakthroughType').textContent = `需丹药辅助，元婴突破成功率 ${Math.round(rate * 100)}%${hasLifeSword ? '（持有本命飞剑 +15% ✅）' : '（炼制本命飞剑可 +15%）'}（失败会损失丹药，可重试）`;
                 } else {
                     document.getElementById('btBreakthroughType').textContent = '需丹药辅助';
                 }
@@ -8973,6 +8981,18 @@
                 updateUI();
                 saveGame();
                 return;
+            }
+
+            // 元婴突破（结丹圆满→元婴初期）：金丹品质（本命法宝）影响成功率
+            if (realmIndex === 21) {
+                const hasLifeSword = gameState.player.inventory.some(i => i.id === 'lifesword');
+                const rate = hasLifeSword ? YUANYING_BASE_SUCCESS_RATE + 0.15 : YUANYING_BASE_SUCCESS_RATE;
+                if (Math.random() >= rate) {
+                    showNotification(`⚡ 元婴突破失败！金丹未能温养出元婴，${requirement.pillName} 已耗尽，境界未跌，再炼丹药重试${hasLifeSword ? '' : '（炼制本命飞剑可提升成功率）'}`, '#c4483a', 'error');
+                    updateUI();
+                    saveGame();
+                    return;
+                }
             }
 
             // 执行突破
