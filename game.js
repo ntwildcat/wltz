@@ -412,6 +412,7 @@
                         // 洗髓易经（v6.90）：原著设定，突破筑基除了筑基丹还要"洗髓易经改善凡人体质"——一次性操作，
                         // 不产出修为，完成后置 marrowCleansed 标记；练气十三层→筑基初期的突破除了丹药还会检查这个标记
                         marrow_cleansing: { name: '洗髓易经', desc: '洗涤经脉、改善凡人体质，为突破筑基做准备（一次性，清灵草×10）', duration: 200, output: { marrowCleanse: 1, skill: 'cultivation', exp: 300 }, requires: { cleangrass: 10 }, requiredRealmIndex: 13, unlocked: false },
+                        danding: { name: '凝立丹鼎', desc: '强化根基、为结丹做准备（一次性，灵矿石×8 + 玄晶×2）：结丹成功率 +10%', duration: 240, output: { danDing: 1, skill: 'cultivation', exp: 400 }, requires: { spiritore: 8, crystal: 2 }, requiredRealmIndex: 16, unlocked: false },
                         epiphany: { name: '顿悟', desc: '后期爆发', duration: 60, output: { cultivation: 500, skill: 'cultivation', exp: 80 }, requiredRealmIndex: 15, unlocked: false },   // 原索引6（筑基中期）→+9
                         // P6 结丹期配方（v6.89：原索引9/10/11 → 因练气改13层整体 +9 → 18/19/20）
                         // 金丹淬炼带 coreTemper：每次完成提高金丹品质；修为满了也不停（结丹圆满时可以一直打磨品质再冲元婴）
@@ -834,7 +835,7 @@
                     hpRestore: 1000,          // 恢复HP
                     cooldown: 5.0,
                     minRealm: 22,             // v6.89：原索引13 → +9，元婴初期
-                    description: '传说中的仙果，完全恢复生命值'
+                    description: '传说中的仙果，恢复1000点生命值'
                 },
                 // 化神期食物：恢复量更大、冷却更短
                 jade_nectar: {
@@ -1038,6 +1039,7 @@
             if (typeof P.marrowCleansed !== 'boolean') P.marrowCleansed = false;
             if (!ROOT_GRADES[P.rootGrade]) P.rootGrade = DEFAULT_ROOT_GRADE;
             if (typeof P.coreQuality !== 'number') P.coreQuality = P.realmIndex >= 18 ? 35 : 0;   // 已结丹的老存档按中品下限补一颗金丹
+            if (typeof P.danDing !== 'boolean') P.danDing = false;
             if (!P.btFails) P.btFails = {};
             if (typeof P.lifeTreasureTier !== 'number') P.lifeTreasureTier = 0;
             if (P.activeDomain === undefined) P.activeDomain = null;
@@ -2055,10 +2057,30 @@
             P.coreQuality = 100 - (100 - (P.coreQuality || 0)) * Math.pow(CORE_TEMPER_KEEP, times);
         }
 
+        // 凝立丹鼎（筑基后期的一次性修炼，原著"凝立丹鼎，为结丹期做准备，强化根基"）：结丹成功率加算
+        const DANDING_BONUS = 0.1;
+        // 境界未稳（原著"结丹初期：刚凝结金丹，境界未稳，功力运用未纯熟"）：结丹初期修为未到 30% 时攻防打折
+        const UNSTABLE_REALM = 18, UNSTABLE_UNTIL = 0.3, UNSTABLE_PENALTY = 0.1;
+        // 元婴不灭（原著"元婴不灭可夺舍重生"）：元婴期起秘境战败不掉修为
+        const NASCENT_SAFE_REALM = 22;
+        function isRealmUnstable() {
+            const P = gameState.player;
+            return P.realmIndex === UNSTABLE_REALM && P.cultivationXP < GAME_CONFIG.realms[UNSTABLE_REALM].nextReq * UNSTABLE_UNTIL;
+        }
+        let statsRealmUnstable = false;   // calculateStats() 计算属性时是否处于境界未稳
+        // 修为变化后调用：跨过 30% 门槛（或战败掉回门槛下）时重算属性
+        function checkRealmStability() {
+            const unstable = isRealmUnstable();
+            if (unstable === statsRealmUnstable) return;
+            const wasUnstable = statsRealmUnstable;
+            calculateStats();
+            if (wasUnstable && !unstable) showNotification('🟡 境界稳固：金丹法力运用自如，攻击/防御恢复正常', '#c2a25f');
+        }
+
         // 大境界突破成功率：null 表示丹药够了必成。筑基/结丹看灵根资质（结丹比筑基更难），元婴看金丹品质
         function getMajorBreakthroughRate(realmIndex) {
             if (realmIndex === 13) return getRootGrade().zhuji;
-            if (realmIndex === 17) return getRootGrade().jiedan;
+            if (realmIndex === 17) return getRootGrade().jiedan + (gameState.player.danDing ? DANDING_BONUS : 0);
             if (realmIndex === 21) return Math.min(0.95, 0.35 + 0.6 * getCoreQuality() / 100);
             return null;
         }
@@ -2101,21 +2123,19 @@
             return null;
         }
 
-        // 境界感悟：侧栏显示当前境界的原著描述、寿元、神通
+        // 境界感悟：侧栏显示当前所处的原著阶段，以及这个阶段在游戏里实际要做 / 实际生效的事（只写有机制对应的内容）
         const REALM_LORE = [
-            { from: 0, to: 0, title: '凡人', desc: '肉体凡胎，尚未引气入体。', life: '约 70 年', ability: '无' },
-            { from: 1, to: 4, title: '练气前期', desc: '学会感知和吸收天地灵气，引气入体，建立丹田基础。', life: '与凡人相仿，最多约 180 年', ability: '基础术法、简单法器；仍需依靠灵根吸纳灵气' },
-            { from: 5, to: 9, title: '练气中期', desc: '灵气运转更加熟练，温养经脉四肢，体质明显改善。', life: '与凡人相仿，最多约 180 年', ability: '基础术法、简单法器；仍需依靠灵根吸纳灵气' },
-            { from: 10, to: 13, title: '练气后期', desc: '为突破筑基做准备，每层难度递增。十三层圆满后方可冲击筑基——大多数散修终其一生止步于此。', life: '与凡人相仿，最多约 180 年', ability: '基础术法、简单法器；仍需依靠灵根吸纳灵气' },
-            { from: 14, to: 14, title: '筑基初期', desc: '开辟气海：丹田灵气压缩成液态真气，由灵气修炼转为真气修炼，建立储存根基。', life: '200～250 年', ability: '御剑飞行、辟谷、神识大增，以法器为主的战斗' },
-            { from: 15, to: 15, title: '筑基中期', desc: '筑立灵台：精神层面塑造，真气收放自如。', life: '200～250 年', ability: '御剑飞行、辟谷、神识大增，以法器为主的战斗' },
-            { from: 16, to: 16, title: '筑基后期', desc: '凝立丹鼎：强化根基，为结丹做准备。', life: '200～250 年', ability: '御剑飞行、辟谷、神识大增，以法器为主的战斗' },
-            { from: 17, to: 17, title: '筑基大圆满', desc: '筑基期顶峰，具备冲击结丹的条件。结丹要把液态真气凝成固体金丹，比筑基更难，成功率较低。', life: '200～250 年', ability: '御剑飞行、辟谷、神识大增，以法器为主的战斗' },
-            { from: 18, to: 18, title: '结丹初期', desc: '液态真气压缩固化，凝成金丹，与性命相连。刚结金丹，境界未稳，功力运用未纯熟。', life: '500～600 年', ability: '不借法器御空飞行，炼制并操控本命法宝；修仙界中坚，炼气弟子见之称"师祖"，十个筑基后期方能抗衡一个结丹初期' },
-            { from: 19, to: 19, title: '结丹中期', desc: '境界稳固，能熟练运用金丹期法力。', life: '500～600 年', ability: '不借法器御空飞行，炼制并操控本命法宝' },
-            { from: 20, to: 20, title: '结丹后期', desc: '功力达到境界上限，可冲击下一阶段。', life: '500～600 年', ability: '不借法器御空飞行，炼制并操控本命法宝' },
-            { from: 21, to: 21, title: '结丹大圆满（假婴）', desc: '结丹期顶峰，又称假婴境，准备以金丹温养出元婴。金丹品质越高，突破元婴越有把握。', life: '500～600 年', ability: '不借法器御空飞行，炼制并操控本命法宝' },
-            { from: 22, to: 25, title: '元婴期', desc: '金丹温养出元婴，实现质的飞跃；元婴不灭，肉身被毁亦可夺舍重生。', life: '约 1000 年', ability: '元婴出窍、夺舍重生' }
+            { from: 0, to: 0, title: '凡人', tip: '吐纳灵气攒满修为即可引气入体' },
+            { from: 1, to: 4, title: '练气前期·引气入体', tip: '修炼速度取决于灵根资质；练气五层开放神秘之塔秘境' },
+            { from: 5, to: 9, title: '练气中期·灵气运转', tip: '练气九层解锁「大周天」和十万大山外围' },
+            { from: 10, to: 13, title: '练气后期·冲击筑基', tip: '十三层须完成「洗髓易经」并备好筑基丹，筑基会失败' },
+            { from: 14, to: 14, title: '筑基初期·开辟气海', tip: '筑基后期可做「凝立丹鼎」，提高结丹成功率' },
+            { from: 15, to: 15, title: '筑基中期·筑立灵台', tip: '筑基后期可做「凝立丹鼎」，提高结丹成功率' },
+            { from: 16, to: 17, title: '筑基后期·凝立丹鼎', tip: '修炼页「凝立丹鼎」（一次性）：结丹成功率 +10%' },
+            { from: 18, to: 18, title: '结丹初期·境界未稳', tip: '修为达到本境界 30% 前攻击 / 防御 −10%；「金丹淬炼」可提高金丹品质' },
+            { from: 19, to: 20, title: '结丹期·境界稳固', tip: '「金丹淬炼」提高金丹品质；凑齐万年金雷竹可炼本命法宝' },
+            { from: 21, to: 21, title: '结丹大圆满·假婴', tip: '金丹品质决定元婴成功率，突破元婴后品质定型' },
+            { from: 22, to: 25, title: '元婴期·元婴不灭', tip: '秘境战败不再损失修为；元婴出窍可驱使分身' }
         ];
         function getRealmLore(idx) { return REALM_LORE.find(l => idx >= l.from && idx <= l.to) || null; }
 
@@ -2127,18 +2147,18 @@
         // 玩家到了新境界经常不知道这个新东西具体怎么玩（用户反馈：到了炼虚期不知道道则怎么用）
         // v6.89：练气改13层，key=1不变，原2/3/4按等比映射到新5/9/13，原索引5起整体+9
         const REALM_UNLOCKS = {
-            1:  ['🌬️ 引气入体，踏入练气期（共十三层）：寿元仍与凡人相仿（最多约 180 年），可使用基础术法和简单法器。修炼速度取决于你的灵根资质，侧栏「境界感悟」可随时查看当前境界', '⚔️ 可以参与战斗了，战斗页「战斗区域」标签下森林开放。战斗区域是循环挑战（打完一场自动开下一场，直到点「撤退」），跟秘境「打到底」不一样；记得先在炼丹页做点战斗食物带上，生命不会自动恢复只能靠食物'],
+            1:  ['🌬️ 踏入练气期（共十三层）：修炼速度取决于你的灵根资质；侧栏「境界感悟」随时显示当前阶段要点、突破成功率等','⚔️ 可以参与战斗了，战斗页「战斗区域」标签下森林开放。战斗区域是循环挑战（打完一场自动开下一场，直到点「撤退」），跟秘境「打到底」不一样；记得先在炼丹页做点战斗食物带上，生命不会自动恢复只能靠食物'],
             5:  ['🔮 神秘之塔秘境开放（战斗页「秘境」标签）。秘境是连续几只怪一次性打到底，通关拿固定+随机奖励'],
             9:  ['⚔️ 十万大山外围战斗区域开放'],
-            13: ['🌲 诡异森林秘境开放', '💊 炼丹页解锁筑基丹配方（材料清灵草×3），趁早多炼——每次冲击筑基服一颗', `⚡ 筑基并非必成：成功率看灵根资质（天灵根 ${ROOT_GRADES.tian.zhuji * 100}% / 真灵根 ${ROOT_GRADES.zhen.zhuji * 100}% / 伪灵根 ${ROOT_GRADES.wei.zhuji * 100}%），失败耗掉一颗筑基丹但不掉境界。韩立用了近五十颗筑基丹才筑基，天才一两颗即成——大多数修士终生卡在练气`, '🩸 修炼页解锁「洗髓易经」：一次性操作（清灵草×10），改善凡人体质，完成后才能冲击筑基，跟筑基丹是两个独立条件都要满足'],
-            14: ['🗡️ 筑基成功，从此是真正的修仙者：丹田灵气化为液态真气，寿元增至 200～250 年，可御剑飞行、辟谷，神识大增——这也是各宗门长老收徒的门槛', '⚔️ 十万大山核心 / 妖兽沼泽战斗区域开放'],
+            13: ['🌲 诡异森林秘境开放', '💊 炼丹页解锁筑基丹配方（材料清灵草×3），趁早多炼——每次冲击筑基服一颗', `⚡ 筑基并非必成：成功率看灵根资质（天灵根 ${ROOT_GRADES.tian.zhuji * 100}% / 真灵根 ${ROOT_GRADES.zhen.zhuji * 100}% / 伪灵根 ${ROOT_GRADES.wei.zhuji * 100}%），失败耗掉一颗筑基丹但不掉境界，可以一直重试`, '🩸 修炼页解锁「洗髓易经」：一次性操作（清灵草×10），改善凡人体质，完成后才能冲击筑基，跟筑基丹是两个独立条件都要满足'],
+            14: ['⚔️ 十万大山核心 / 妖兽沼泽战斗区域开放', '⚔️ 跨入新的大境界：对练气期的敌人有大境界压制（命中、伤害更高）；反过来越级挑战更高大境界的敌人会被压制'],
             15: ['⚱️ 古老遗迹秘境开放'],
-            16: ['⚔️ 魔窟深渊战斗区域开放'],
+            16: ['⚔️ 魔窟深渊战斗区域开放', `⚱️ 修炼页解锁「凝立丹鼎」：一次性操作（灵矿石×8 + 玄晶×2），为结丹强化根基，结丹成功率 +${DANDING_BONUS * 100}%`],
             17: ['⚡ 天劫之地秘境开放（有几率掉落「万年金雷竹」，结丹后炼本命法宝要用，可以先攒着）', '💊 金丹秘药配方解锁，每次冲击结丹服一颗，多备几颗', `⚡ 结丹比筑基更难：成功率看灵根资质（天灵根 ${ROOT_GRADES.tian.jiedan * 100}% / 真灵根 ${ROOT_GRADES.zhen.jiedan * 100}% / 伪灵根 ${ROOT_GRADES.wei.jiedan * 100}%），失败耗掉丹药但不掉境界，可以重试`],
-            18: ['✈️ 结丹成功：液态真气凝成固体金丹，寿元增至 500～600 年，不借法器即可御空飞行。结丹修士是修仙界的中坚，炼气弟子见了要称"师祖"，十个筑基后期才能抗衡一个结丹初期', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🎋 本命法宝：凑齐「万年金雷竹」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青竹蜂云剑」。一生只能炼一把、不可出售；之后每个大境界都能在炼器页「祭炼」一重（同境界武器的材料 + 1 根金雷竹），威力超过同阶普通法器。金丹品质决定威力倍数和最多能祭炼几重（下品三重、中品四重、上品以上五重），祭炼到顶后再改用普通炼器武器', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
+            18: [`⚠ 境界未稳：刚结金丹，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%，之后境界稳固恢复正常`, '⚔️ 结丹对筑基期敌人有大境界压制（命中、伤害更高）', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🎋 本命法宝：凑齐「万年金雷竹」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青竹蜂云剑」。一生只能炼一把、不可出售；之后每个大境界都能在炼器页「祭炼」一重（同境界武器的材料 + 1 根金雷竹），威力超过同阶普通法器。金丹品质决定威力倍数和最多能祭炼几重（下品三重、中品四重、上品以上五重），祭炼到顶后再改用普通炼器武器', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
             19: ['⚔️ 天劫之地战斗区域开放'],
-            21: ['🌕 结丹大圆满，又称假婴境：接下来要以金丹温养出元婴', '🌌 元婴秘境开放', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🔒 突破元婴后金丹化为元婴，金丹品质就此定型，「金丹淬炼」不再提升品质——它同时决定本命法宝能祭炼到第几重，想走得远就在结丹期打磨好'],
-            22: ['👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
+            21: ['🌌 元婴秘境开放', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🔒 突破元婴后金丹化为元婴，金丹品质就此定型，「金丹淬炼」不再提升品质——它同时决定本命法宝能祭炼到第几重，想走得远就在结丹期打磨好'],
+            22: ['🛡️ 元婴不灭：从此在秘境战败不再损失修为（食物照常损失一半）', '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
             24: ['⚔️ 深渊遗迹战斗区域开放'],
             25: ['🌠 太虚幻境秘境开放', '💊 化神丹配方解锁，突破元婴圆满前记得炼够'],
             26: ['☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
@@ -3058,10 +3078,12 @@
             };
 
             // === 计算损失 ===
-            // 1. 损失修为（10%）
-            const lostCultivation = Math.floor(gameState.player.cultivationXP * 0.1);
+            // 1. 损失修为（10%）；元婴期起「元婴不灭」——肉身战败元婴无损，不掉修为
+            const nascentSafe = gameState.player.realmIndex >= NASCENT_SAFE_REALM;
+            const lostCultivation = nascentSafe ? 0 : Math.floor(gameState.player.cultivationXP * 0.1);
             gameState.player.cultivationXP = Math.max(0, gameState.player.cultivationXP - lostCultivation);
             deathRecord.cultivationLost = lostCultivation;
+            checkRealmStability();
 
             // 2. 损失食物（50%）
             let foodLost = 0;
@@ -3092,7 +3114,7 @@
             // === P2修复：生成更详细的死亡通知 ===
             const damagePercent = ((hpBefore - gameState.player.stats.hp.current) / gameState.player.stats.hp.max * 100).toFixed(0);
             const notificationText = `✗ 被${monster.name}击败！\n\n` +
-                                    `丢失修为: ${lostCultivation} (10%)\n` +
+                                    (nascentSafe ? `元婴不灭：修为无损\n` : `丢失修为: ${lostCultivation} (10%)\n`) +
                                     `丢失食物: ${foodLost}份 (50%)\n` +
                                     `血量: ${gameState.player.stats.hp.current}/${gameState.player.stats.hp.max} (+50%)`;
             showNotification(notificationText, '#c4483a', 'danger');
@@ -4134,8 +4156,10 @@
 
         // 境界压制系统（纵向位阶感）
         const REALM_SUPPRESSION = {
-            // 大阶段划分：每4个境界为一个大阶段（凡人单独为0）
-            REALMS_PER_TIER: 4,  // 凡人(0), 练气(1-4), 筑基(5-8), 结丹(9-12)...
+            // 大境界按真实划分（v6.97 修正：原来按"每 4 个索引一组"算，练气改 13 层后筑基圆满与结丹初期被算成同一大境界）：
+            // 凡人 0 / 练气 1-13 / 筑基 14-17 / 结丹 18-21 / 元婴 22-25 …；阶段内位置 0~3，练气 13 层按比例折成 0~3
+            tierOf(idx) { return idx <= 0 ? 0 : idx <= 13 ? 1 : 2 + Math.floor((idx - 14) / 4); },
+            posOf(idx) { return idx <= 0 ? 0 : idx <= 13 ? (idx - 1) / 4 : (idx - 14) % 4; },
 
             // 压制系数（相对值）
             MAJOR_TIER_HIT_PENALTY: 0.15,      // 大境界差每级命中 -15%
@@ -4149,22 +4173,8 @@
 
             // 计算境界压制系数
             calculate: function(playerRealmIndex, monsterRealmIndex) {
-                // 计算大阶段
-                const playerTier = Math.floor(playerRealmIndex / this.REALMS_PER_TIER);
-                const monsterTier = Math.floor(monsterRealmIndex / this.REALMS_PER_TIER);
-                const tierDiff = playerTier - monsterTier;
-
-                // 计算小境界差
-                let minorDiff = 0;
-                if (tierDiff === 0) {
-                    // 同大阶段：直接比较索引
-                    minorDiff = playerRealmIndex - monsterRealmIndex;
-                } else {
-                    // 跨大阶段：计算同阶内位置的差
-                    const playerMinor = playerRealmIndex % this.REALMS_PER_TIER;
-                    const monsterMinor = monsterRealmIndex % this.REALMS_PER_TIER;
-                    minorDiff = playerMinor - monsterMinor;
-                }
+                const tierDiff = this.tierOf(playerRealmIndex) - this.tierOf(monsterRealmIndex);
+                const minorDiff = this.posOf(playerRealmIndex) - this.posOf(monsterRealmIndex);
 
                 // 计算修正系数
                 let hitMod = 1 + tierDiff * this.MAJOR_TIER_HIT_PENALTY + minorDiff * this.MINOR_TIER_HIT_PENALTY;
@@ -4261,7 +4271,7 @@
                 tier: 3,
                 speedMultiplier: 1.45,
                 effects: { atkPct: 0.08, 'time:forging': -0.10 },  // 特效
-                description: '至阳至刚的筑基功法，修炼极快但对经脉要求很高。',
+                description: '至阳至刚的筑基功法，出手更狠，阳火亦利于炼器。',
                 origin: null
             },
             // P6 结丹期功法（可获取，非出身绑定）
@@ -4291,7 +4301,7 @@
                 tier: 5,
                 speedMultiplier: 2.2,               // 修炼速度快120%
                 effects: { 'exp:life': 0.10, hpPct: 0.10 },  // 特效
-                description: '元婴修士的标配功法，元神与肉身双修，修炼效率是结丹功法的数倍。',
+                description: '元婴修士的标配功法，元神与肉身双修，气血更足，生活技能也更有长进。',
                 origin: null
             },
             // 元婴期高阶功法（稀有）
@@ -4926,6 +4936,7 @@
             const artEffects = CULTIVATION_ARTS[player.currentArt]?.effects;
             if (artEffects && artEffects[key]) total += artEffects[key];
             total += getRootGrade().effects[key] || 0;   // 灵根资质（天灵根修炼更快；伪灵根修炼慢，但掌天瓶让灵田又快又多）
+            if ((key === 'atkPct' || key === 'defPct') && isRealmUnstable()) total -= UNSTABLE_PENALTY;
             total += getLawTotals()[key] || 0;
             total += getSkillUpgradeTotals()[key] || 0;   // 技能商店里已购置的设施
             total += getEquippedEffectSum(key);   // 装备物品自带的特效（含武器/护甲的修炼速度、道基镶嵌的道则）
@@ -5434,8 +5445,8 @@
                 return;
             }
             // 洗髓易经是一次性的，已经做过就不再重复消耗清灵草
-            if (action.output.marrowCleanse && gameState.player.marrowCleansed) {
-                showNotification('🩸 已完成洗髓易经', '#c98a3e');
+            if ((action.output.marrowCleanse && gameState.player.marrowCleansed) || (action.output.danDing && gameState.player.danDing)) {
+                showNotification(`已完成${action.name}（一次性）`, '#c98a3e');
                 gameState.currentAction = null;
                 gameState.currentActionProgress = 0;
                 return;
@@ -5529,6 +5540,12 @@
                 gameState.player.marrowCleansed = true;
                 showNotification('🩸 洗髓易经完成，凡人体质脱胎换骨——突破筑基还需筑基丹', '#b39ddb');
             }
+            if (finalOutput.danDing) {
+                gameState.player.danDing = true;
+                gameState.currentAction = null;
+                gameState.currentActionProgress = 0;
+                showNotification(`⚱️ 丹鼎已立，根基稳固——结丹成功率 +${DANDING_BONUS * 100}%`, '#b39ddb');
+            }
             if (finalOutput.lifeRefine) {
                 gameState.player.lifeTreasureTier = finalOutput.lifeRefine;
                 gameState.currentAction = null;
@@ -5587,6 +5604,7 @@
                     // 正常增加修为
                     gameState.player.cultivationXP += finalOutput.cultivation;
                 }
+                checkRealmStability();
             }
 
             trackQuest('act:' + act.skill + '.' + actionKey);
@@ -5970,6 +5988,9 @@
             }
             if (output.marrowCleanse) {
                 parts.push(gameState.player.marrowCleansed ? '🩸 已完成（一次性）' : '🩸 洗髓易经（一次性）');
+            }
+            if (output.danDing) {
+                parts.push(gameState.player.danDing ? '⚱️ 已完成（一次性）' : `⚱️ 结丹成功率 +${DANDING_BONUS * 100}%（一次性）`);
             }
             if (output.lifeRefine) {
                 const t = output.lifeRefine, cur = getLifeRefineTier();
@@ -6366,6 +6387,10 @@
                 showNotification('本命法宝与性命相连，一生只能炼制一件——你已经拥有青竹蜂云剑', '#c98a3e', 'normal');
                 return;
             }
+            if (actionObj.output && ((actionObj.output.marrowCleanse && gameState.player.marrowCleansed) || (actionObj.output.danDing && gameState.player.danDing))) {
+                showNotification(`${actionObj.name}已经完成（一次性）`, '#c98a3e', 'normal');
+                return;
+            }
             const refineBlock = actionObj.output && actionObj.output.lifeRefine && lifeRefineBlock(actionObj.output.lifeRefine);
             if (refineBlock) {
                 showNotification(refineBlock, '#c98a3e', 'normal');
@@ -6540,28 +6565,22 @@
                 }
             });
 
-            // P3优化：扩展的物品用途说明
+            // 用作哪些配方的材料：直接从配方表生成，避免手写说明和实际配方对不上
+            const consumers = [];
+            Object.values(gameState.skills).forEach(skill => {
+                Object.values(skill.recipes || {}).forEach(recipe => {
+                    if (recipe.requires && recipe.requires[itemId]) consumers.push(`${skill.name}【${recipe.name}】×${recipe.requires[itemId]}`);
+                });
+            });
+            if (consumers.length) usages.push(`用于：${consumers.slice(0, 6).join('、')}${consumers.length > 6 ? ` 等 ${consumers.length} 个配方` : ''}`);
+
+            // 配方表里看不出来的用途（突破丹药、种子、特殊物品）
             const specialUsages = {
-                // 丹药
-                pill: '突破修为必备丹药，用于大境界突破',
-                xujidan: '虚极丹：增强突破成功率，大阶段突破必需',
-                yingyangdan: '阴阳丹：平衡属性，提升修炼效率',
-                shenqidan: '神器丹：提升灵根资质，增加所有属性',
-
-                // 灵田产出
-                millet: '灵米：灵田产出，炼丹的重要材料',
-                cleangrass: '清灵草：灵田主要产出，炼丹必需材料',
-                peach_branch: '桃木枝：灵田稀有产出，炼器高级材料',
-
-                // 采矿产出
-                stone: '灵石碎片：采矿基础产出，炼器基础材料',
-                ironore: '灵铁矿：采矿中级产出，炼器中级材料',
-                spiritore: '灵精矿：采矿高级产出，炼器高级材料',
-                crystal: '灵晶：采矿顶级产出，炼器最高级材料',
-
-                // 其他物品
+                pill: '练气十三层冲击筑基时服用，每次冲击耗一颗（成功率看灵根资质）',
+                goldenpill: '筑基圆满冲击结丹时服用，每次冲击耗一颗（成功率看灵根资质与凝立丹鼎）',
+                yuanyingpill: '结丹圆满冲击元婴时服用，每次冲击耗一颗（成功率看金丹品质）',
                 danhuo_seed: '丹火种子：在丹火技能「培育丹火」里使用，一次得到 25 丹火',
-                jinleizhu: '万年金雷竹：生于雷劫之地的奇竹，天劫之地秘境通关有几率获得；炼制本命法宝「青竹蜂云剑」的主材（需 2 根）',
+                jinleizhu: '天劫之地秘境通关有几率获得；炼制本命法宝「青竹蜂云剑」和每一重祭炼都要用',
                 lifesword: '本命法宝：与心神相连，一生仅此一把、不可出售。每个大境界可在炼器页祭炼一重，攻击升到该境界武器之上并按金丹品质放大；金丹品质决定最多能祭炼几重',
                 shenshi_seed: '神识种子：在神识技能「培育神识」里使用，一次得到 20 神识'
             };
@@ -6596,13 +6615,15 @@
 
             // P3优化：添加物品类别说明
             const categoryExplanations = {
-                consumable: '💊 消耗品：一次性使用，在特定情况下消耗（如丹药用于突破）',
+                consumable: '💊 消耗品：一次性使用',
+                breakthrough_material: '💊 突破丹药：大境界突破时服用，每次冲击消耗一颗',
+                seed: '🌱 种子：灵田种植用；丹火、神识种子在对应技能页使用',
                 material: '🧪 材料：用于制作、合成或升级其他物品的基础材料',
                 ore: '⛏️ 矿物：采矿得到的矿物，用于炼器合成',
                 food: '🍲 战斗食物：设为战斗食物后，战斗中生命低于50%时自动食用恢复生命（死亡会损失一半食物）',
                 armor: '🛡️ 护甲：穿戴后提升防御和生命，只能同时穿戴一件',
                 weapon: '⚔️ 武器装备：穿戴后提升攻击力和其他属性',
-                jewelry: '✨ 首饰：穿戴后提升防御、血量等防御属性',
+                jewelry: '✨ 饰品：提升速度、生命或带特殊效果；初始 1 个栏位，商城可买第二栏位，同名饰品不能重复佩戴',
                 upgrade: '🔧 永久升级：一次性升级，永久提升游戏能力（无法重复购买）'
             };
 
@@ -7006,6 +7027,7 @@
 
             dungeonList.forEach(dungeonId => {
                 const dungeon = GAME_CONFIG.dungeons[dungeonId];
+                if (!gameState.dungeons[dungeonId]) gameState.dungeons[dungeonId] = { completed: false };   // 新角色的默认存档只带最早几个秘境的记录
                 dungeonActions[dungeonId] = {
                     name: dungeon.name,
                     desc: dungeon.desc,
@@ -7628,18 +7650,17 @@
             if (!box) return;
             const P = gameState.player;
             const idx = P.realmIndex;
-            const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, getLifeRefineTier(), ownsLifeTreasure()].join('|');
+            const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, P.danDing, isRealmUnstable(), getLifeRefineTier(), ownsLifeTreasure()].join('|');
             if (key === realmLoreKey) return;   // 每个 tick 都会调用，内容没变就不重写 DOM
             realmLoreKey = key;
             const lore = getRealmLore(idx);
             const grade = getRootGrade();
             const rows = [];
             if (lore) {
-                rows.push(`<div><b style="color:#c2a25f">${lore.title}</b>${lore.title !== GAME_CONFIG.realms[idx].name ? `（${GAME_CONFIG.realms[idx].name}）` : ''}</div>`);
-                rows.push(`<div>${lore.desc}</div>`);
-                rows.push(`<div>⏳ 寿元：${lore.life}</div>`);
-                rows.push(`<div>✨ 神通：${lore.ability}</div>`);
+                rows.push(`<div><b style="color:#c2a25f">${lore.title}</b>（${GAME_CONFIG.realms[idx].name}）</div>`);
+                rows.push(`<div>📌 ${lore.tip}</div>`);
             }
+            if (isRealmUnstable()) rows.push(`<div style="color:#c98a3e">⚠ 境界未稳：攻击 / 防御 −${UNSTABLE_PENALTY * 100}%（修为达 ${UNSTABLE_UNTIL * 100}% 后稳固）</div>`);
             const gradeEff = describeEffects(grade.effects);
             rows.push(`<div>🌱 灵根资质：<b>${grade.name}</b>${gradeEff.length ? '（' + gradeEff.join('、') + '）' : ''}${grade.treasure ? ` · 身怀${grade.treasure}` : ''}</div>`);
             if (idx >= 18) {
@@ -7648,7 +7669,9 @@
             }
             const next = [13, 17, 21].find(i => i >= idx);
             if (next !== undefined && idx >= next - 4) {
-                rows.push(`<div>⚡ ${BREAKTHROUGH_RATE_NAMES[next]}成功率：${Math.round(getMajorBreakthroughRate(next) * 100)}%${next === 13 ? (P.marrowCleansed ? ' · 洗髓易经 ✅' : ' · 洗髓易经未完成') : ''}</div>`);
+                const prep = next === 13 ? (P.marrowCleansed ? ' · 洗髓易经 ✅' : ' · 洗髓易经未完成')
+                    : next === 17 ? (P.danDing ? ' · 丹鼎已立 ✅' : ' · 未凝立丹鼎') : '';
+                rows.push(`<div>⚡ ${BREAKTHROUGH_RATE_NAMES[next]}成功率：${Math.round(getMajorBreakthroughRate(next) * 100)}%${prep}</div>`);
             }
             box.innerHTML = rows.join('');
         }
@@ -8210,6 +8233,7 @@
             // P4重写：境界驱动的属性系统（替代技能等级驱动）
             const realmIndex = gameState.player.realmIndex;
             refreshLifeTreasure();   // 本命法宝的属性/名字随祭炼重数与金丹品质变化，所有显示处都读这份配置
+            statsRealmUnstable = isRealmUnstable();
 
             // === 第一步：从凡人境界基础属性开始 ===
             // 使用凡人阶段作为基准，避免各境界baseStats不一致
@@ -9194,9 +9218,9 @@
 
             const pillWord = `第 ${tries} 颗${requirement.pillName}`;
             const successText = {
-                13: `服下${pillWord}，筑基成功！寿元增至 200～250 年`,
-                17: `服下${pillWord}，凝成${getCoreGradeName()}（品质 ${getCoreQuality().toFixed(1)}）！寿元增至 500～600 年`,
-                21: `服下${pillWord}，金丹化婴，元婴已成！寿元增至约 1000 年`
+                13: `服下${pillWord}，筑基成功！`,
+                17: `服下${pillWord}，凝成${getCoreGradeName()}（品质 ${getCoreQuality().toFixed(1)}）！境界未稳，修为达 ${UNSTABLE_UNTIL * 100}% 前攻防 −${UNSTABLE_PENALTY * 100}%`,
+                21: `服下${pillWord}，金丹化婴，元婴已成！从此秘境战败不再损失修为`
             }[realmIndex];
             showNotification(successText || `消耗了 ${requirement.pillName} ×${requirement.qty}`, successText ? '#c2a25f' : '#7d9bb5', successText ? 'rare' : 'info');
         }
@@ -9623,9 +9647,9 @@
                 if (completions <= 0) { gameState.currentAction = null; gameState.lastActiveTime = now; return; }
             }
             // 一次性的配方（洗髓易经 / 本命法宝）离线最多完成一次，完成后停下
-            const oneShotDone = (action.output.marrowCleanse && gameState.player.marrowCleansed) || (action.unique && ownsLifeTreasure())
-                || (action.output.lifeRefine && !!lifeRefineBlock(action.output.lifeRefine));
-            if (action.output.marrowCleanse || action.unique || action.output.lifeRefine) {
+            const oneShotDone = (action.output.marrowCleanse && gameState.player.marrowCleansed) || (action.output.danDing && gameState.player.danDing)
+                || (action.unique && ownsLifeTreasure()) || (action.output.lifeRefine && !!lifeRefineBlock(action.output.lifeRefine));
+            if (action.output.marrowCleanse || action.output.danDing || action.unique || action.output.lifeRefine) {
                 completions = oneShotDone ? 0 : Math.min(completions, 1);
                 if (completions <= 0) { gameState.currentAction = null; gameState.lastActiveTime = now; return; }
                 gameState.currentAction = null;
@@ -9730,6 +9754,8 @@
                 gameState.player.marrowCleansed = true;
                 gameState.currentAction = null;
             }
+            if (perAction.danDing && completions > 0) gameState.player.danDing = true;
+            checkRealmStability();
             if (perAction.lifeRefine && completions > 0) {
                 gameState.player.lifeTreasureTier = perAction.lifeRefine;
                 calculateStats();
