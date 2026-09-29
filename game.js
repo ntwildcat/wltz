@@ -415,7 +415,7 @@
                         epiphany: { name: '顿悟', desc: '后期爆发', duration: 60, output: { cultivation: 500, skill: 'cultivation', exp: 80 }, requiredRealmIndex: 15, unlocked: false },   // 原索引6（筑基中期）→+9
                         // P6 结丹期配方（v6.89：原索引9/10/11 → 因练气改13层整体 +9 → 18/19/20）
                         // 金丹淬炼带 coreTemper：每次完成提高金丹品质；修为满了也不停（结丹圆满时可以一直打磨品质再冲元婴）
-                        golden_temper: { name: '金丹淬炼', desc: '以丹火温养金丹、打磨品质（修为满了也会继续；品质决定元婴成功率与本命法宝威力）', duration: 30, output: { cultivation: 300, coreTemper: 1, skill: 'cultivation', exp: 120 }, requiredRealmIndex: 18, unlocked: false },
+                        golden_temper: { name: '金丹淬炼', desc: '以丹火温养金丹、打磨品质（仅结丹期有效，修为满了也会继续；品质决定元婴成功率、本命法宝威力与可祭炼重数）', duration: 30, output: { cultivation: 300, coreTemper: 1, skill: 'cultivation', exp: 120 }, requiredRealmIndex: 18, unlocked: false },
                         fire_body: { name: '丹火炼体', desc: '引丹火淬炼肉身经脉，法力大进', duration: 45, output: { cultivation: 600, skill: 'cultivation', exp: 180 }, requiredRealmIndex: 19, unlocked: false },
                         golden_perfect: { name: '结丹圆满', desc: '金丹圆满如月，蓄势假婴，只待温养出元婴', duration: 90, output: { cultivation: 1500, skill: 'cultivation', exp: 300 }, requiredRealmIndex: 20, unlocked: false },
                         // P7 元婴期配方（原索引13/14/15 → 22/23/24）
@@ -486,22 +486,28 @@
                         golden_sword: { name: '结丹剑', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldensword', qty: 1 }], skill: 'forging', exp: 220 }, requiredLevel: 25, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
                         golden_armor: { name: '结丹法袍', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldenarmor', qty: 1 }], skill: 'forging', exp: 260 }, requiredLevel: 27, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
                         golden_pendant: { name: '结丹佩', desc: '灵晶 ×1 + 玄晶 ×3', duration: 50, output: { items: [{ id: 'goldenpendant', qty: 1 }], skill: 'forging', exp: 300 }, requiredLevel: 30, requires: { spiritcrystal: 1, crystal: 3 }, unlocked: false },
-                        life_sword: { name: '青竹蜂云剑（本命法宝）', desc: '万年金雷竹 ×2 + 灵晶 ×2 + 玄晶 ×3｜结丹后可炼，一生仅此一把、不可出售；随境界一同成长，金丹品质越高威力越大', duration: 120, output: { items: [{ id: 'lifesword', qty: 1 }], skill: 'forging', exp: 450 }, requiredLevel: 28, requiredRealmIndex: 18, unique: true, requires: { jinleizhu: 2, spiritcrystal: 2, crystal: 3 }, unlocked: false },
+                        life_sword: { name: '青竹蜂云剑（本命法宝）', desc: '万年金雷竹 ×2 + 灵晶 ×2 + 玄晶 ×3｜结丹后可炼，一生仅此一把、不可出售；之后每个大境界可在这里祭炼一重，金丹品质越高威力越大、能祭炼的重数越多', duration: 120, output: { items: [{ id: 'lifesword', qty: 1 }], skill: 'forging', exp: 450 }, requiredLevel: 28, requiredRealmIndex: 18, unique: true, requires: { jinleizhu: 2, spiritcrystal: 2, crystal: 3 }, unlocked: false },
                         yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 500 }, requiredLevel: 36, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
+                        // 祭炼本命法宝（lifeRefine = 祭炼到第几重）：材料与同境界武器相同再加一根金雷竹，每重只做一次
+                        life_refine_1: { name: '祭炼青竹蜂云剑·一重', desc: '万年金雷竹 ×1 + 灵晶 ×3 + 玄晶 ×5｜本命法宝攻击升至元婴级（任何品质的金丹都能炼）', duration: 90, output: { lifeRefine: 1, skill: 'forging', exp: 500 }, requiredLevel: 36, requiredRealmIndex: 22, requires: { jinleizhu: 1, spiritcrystal: 3, crystal: 5 }, unlocked: false },
                         yuanying_armor: { name: '元婴法衣', desc: '灵晶 ×4 + 玄晶 ×4', duration: 90, output: { items: [{ id: 'yuanyingarmor', qty: 1 }], skill: 'forging', exp: 560 }, requiredLevel: 39, requires: { spiritcrystal: 4, crystal: 4 }, unlocked: false },
                         yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 40, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false },
                         huashen_sword: { name: '化神剑', desc: '混沌石 ×3 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashensword', qty: 1 }], skill: 'forging', exp: 800 }, requiredLevel: 45, requires: { chaosstone: 3, immortalore: 2 }, unlocked: false },
+                        life_refine_2: { name: '祭炼青竹蜂云剑·二重', desc: '万年金雷竹 ×1 + 混沌石 ×3 + 仙矿 ×2｜本命法宝攻击升至化神级', duration: 110, output: { lifeRefine: 2, skill: 'forging', exp: 800 }, requiredLevel: 45, requiredRealmIndex: 26, requires: { jinleizhu: 1, chaosstone: 3, immortalore: 2 }, unlocked: false },
                         huashen_armor: { name: '化神法衣', desc: '混沌石 ×4 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashenarmor', qty: 1 }], skill: 'forging', exp: 880 }, requiredLevel: 48, requires: { chaosstone: 4, immortalore: 2 }, unlocked: false },
                         huashen_pendant: { name: '化神佩', desc: '混沌石 ×2 + 灵晶 ×3', duration: 100, output: { items: [{ id: 'huashenpendant', qty: 1 }], skill: 'forging', exp: 950 }, requiredLevel: 50, requires: { chaosstone: 2, spiritcrystal: 3 }, unlocked: false },
                         heti_sword: { name: '合体剑', desc: '天道石 ×3 + 混沌石 ×2', duration: 150, output: { items: [{ id: 'hetisword', qty: 1 }], skill: 'forging', exp: 2400 }, requiredLevel: 64, requires: { daostone: 3, chaosstone: 2 }, unlocked: false },
+                        life_refine_4: { name: '祭炼青竹蜂云剑·四重', desc: '万年金雷竹 ×1 + 天道石 ×3 + 混沌石 ×2｜本命法宝攻击升至合体级（须中品以上金丹）', duration: 150, output: { lifeRefine: 4, skill: 'forging', exp: 2400 }, requiredLevel: 64, requiredRealmIndex: 34, requires: { jinleizhu: 1, daostone: 3, chaosstone: 2 }, unlocked: false },
                         heti_armor: { name: '合体法衣', desc: '天道石 ×4 + 混沌石 ×2', duration: 150, output: { items: [{ id: 'hetiarmor', qty: 1 }], skill: 'forging', exp: 2600 }, requiredLevel: 65, requires: { daostone: 4, chaosstone: 2 }, unlocked: false },
                         heti_pendant: { name: '合体佩', desc: '天道石 ×2 + 灵晶 ×3', duration: 140, output: { items: [{ id: 'hetipendant', qty: 1 }], skill: 'forging', exp: 2800 }, requiredLevel: 66, requires: { daostone: 2, spiritcrystal: 3 }, unlocked: false },
                         // 炼虚期炼器（索引64-66解锁）
                         lianxu_sword: { name: '炼虚剑', desc: '虚晶 ×3 + 混沌石 ×3', duration: 130, output: { items: [{ id: 'lianxusword', qty: 1 }], skill: 'forging', exp: 1100 }, requiredLevel: 56, requires: { voidcrystal: 3, chaosstone: 3 }, unlocked: false },
+                        life_refine_3: { name: '祭炼青竹蜂云剑·三重', desc: '万年金雷竹 ×1 + 虚晶 ×3 + 混沌石 ×3｜本命法宝攻击升至炼虚级（下品金丹的上限）', duration: 130, output: { lifeRefine: 3, skill: 'forging', exp: 1100 }, requiredLevel: 56, requiredRealmIndex: 30, requires: { jinleizhu: 1, voidcrystal: 3, chaosstone: 3 }, unlocked: false },
                         lianxu_armor: { name: '炼虚法衣', desc: '虚晶 ×4 + 混沌石 ×3', duration: 130, output: { items: [{ id: 'lianxuarmor', qty: 1 }], skill: 'forging', exp: 1200 }, requiredLevel: 59, requires: { voidcrystal: 4, chaosstone: 3 }, unlocked: false },
                         lianxu_pendant: { name: '炼虚佩', desc: '虚晶 ×2 + 灵晶 ×4', duration: 120, output: { items: [{ id: 'lianxupendant', qty: 1 }], skill: 'forging', exp: 1300 }, requiredLevel: 60, requires: { voidcrystal: 2, spiritcrystal: 4 }, unlocked: false },
                         // 大乘期炼器（索引76-80解锁）
                         dacheng_sword: { name: '大乘剑', desc: '太乙精华 ×4 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengsword', qty: 1 }], skill: 'forging', exp: 3400 }, requiredLevel: 76, requires: { taiyiessence: 4, chaosstone: 4 }, unlocked: false },
+                        life_refine_5: { name: '祭炼青竹蜂云剑·五重', desc: '万年金雷竹 ×1 + 太乙精华 ×4 + 混沌石 ×4｜本命法宝攻击升至大乘级（须上品以上金丹）', duration: 180, output: { lifeRefine: 5, skill: 'forging', exp: 3400 }, requiredLevel: 76, requiredRealmIndex: 38, requires: { jinleizhu: 1, taiyiessence: 4, chaosstone: 4 }, unlocked: false },
                         dacheng_armor: { name: '大乘法衣', desc: '太乙精华 ×5 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengarmor', qty: 1 }], skill: 'forging', exp: 3600 }, requiredLevel: 78, requires: { taiyiessence: 5, chaosstone: 4 }, unlocked: false },
                         dacheng_pendant: { name: '大乘佩', desc: '太乙精华 ×3 + 灵晶 ×5', duration: 170, output: { items: [{ id: 'dachengpendant', qty: 1 }], skill: 'forging', exp: 3800 }, requiredLevel: 80, requires: { taiyiessence: 3, spiritcrystal: 5 }, unlocked: false }
                     },
@@ -1033,6 +1039,7 @@
             if (!ROOT_GRADES[P.rootGrade]) P.rootGrade = DEFAULT_ROOT_GRADE;
             if (typeof P.coreQuality !== 'number') P.coreQuality = P.realmIndex >= 18 ? 35 : 0;   // 已结丹的老存档按中品下限补一颗金丹
             if (!P.btFails) P.btFails = {};
+            if (typeof P.lifeTreasureTier !== 'number') P.lifeTreasureTier = 0;
             if (P.activeDomain === undefined) P.activeDomain = null;
             if (typeof P.avatarLevel !== 'number') P.avatarLevel = 0;
             if (!P.temper) P.temper = { weapon: 0, armor: 0, jewelry: 0 };
@@ -2057,23 +2064,41 @@
         }
         const BREAKTHROUGH_RATE_NAMES = { 13: '筑基', 17: '结丹', 21: '元婴' };
 
-        // 本命法宝「青竹蜂云剑」：唯一、不可出售，随境界一同成长（按各境界炼器武器的攻击插值），
-        // 威力乘数由金丹品质决定——原著"本命法宝品质决定战力上限"
+        // 本命法宝「青竹蜂云剑」：唯一、不可出售。不会自己变强——原著韩立是不断用金雷竹祭炼、一把把加上去的：
+        // 结丹期炼成（初成），之后每个大境界在炼器页「祭炼」一重，攻击升到该境界炼器武器的水平再乘金丹品质倍数。
+        // 金丹品质决定最多能祭炼几重（原著"本命法宝品质决定战力上限"）；祭炼到顶后，更高境界改用普通炼器武器。
         const LIFE_TREASURE_ID = 'lifesword';
-        const LIFE_TREASURE_CURVE = [[18, 62], [22, 80], [26, 110], [30, 150], [34, 220], [38, 320], [43, 420]];
-        function getLifeTreasureStats() {
-            const r = Math.max(18, gameState.player.realmIndex || 0);
-            const c = LIFE_TREASURE_CURVE;
-            let atk = c[c.length - 1][1];
-            for (let i = 0; i < c.length - 1; i++) {
-                if (r <= c[i + 1][0]) { atk = c[i][1] + (c[i + 1][1] - c[i][1]) * (r - c[i][0]) / (c[i + 1][0] - c[i][0]); break; }
-            }
-            const mult = 1.1 + 0.4 * getCoreQuality() / 100;
-            return { atk: Math.round(atk * mult), spd: Math.round(atk * mult / 20) };
+        const LIFE_REFINE_TIERS = [
+            { name: '初成', atk: 62, realm: 18 },
+            { name: '一重', atk: 80, realm: 22 },
+            { name: '二重', atk: 110, realm: 26 },
+            { name: '三重', atk: 150, realm: 30 },
+            { name: '四重', atk: 220, realm: 34 },
+            { name: '五重', atk: 320, realm: 38 }
+        ];
+        function getLifeRefineTier() { return gameState.player.lifeTreasureTier || 0; }
+        function getLifeRefineCap(q = getCoreQuality()) { return q >= 65 ? 5 : q >= 35 ? 4 : 3; }   // 下品三重 / 中品四重 / 上品、极品五重
+        function getLifeTreasureMult() { return 1.1 + 0.4 * getCoreQuality() / 100; }
+        function getLifeTreasureStats(tier = getLifeRefineTier()) {
+            const atk = LIFE_REFINE_TIERS[tier].atk * getLifeTreasureMult();
+            return { atk: Math.round(atk), spd: Math.round(atk / 20) };
+        }
+        function refreshLifeTreasure() {
+            const item = GAME_CONFIG.items[LIFE_TREASURE_ID];
+            item.stats = getLifeTreasureStats();
+            item.name = `青竹蜂云剑·${LIFE_REFINE_TIERS[getLifeRefineTier()].name}`;
         }
         function ownsLifeTreasure() {
             const P = gameState.player;
             return P.equipment.weapon === LIFE_TREASURE_ID || P.inventory.some(i => i.id === LIFE_TREASURE_ID);
+        }
+        // 祭炼配方能不能做：返回拦截原因，null 表示可以
+        function lifeRefineBlock(tier) {
+            if (!ownsLifeTreasure()) return '还没有本命法宝——先炼制「青竹蜂云剑」';
+            if (getLifeRefineTier() >= tier) return `青竹蜂云剑已祭炼到${LIFE_REFINE_TIERS[getLifeRefineTier()].name}`;
+            if (getLifeRefineTier() < tier - 1) return `须先祭炼${LIFE_REFINE_TIERS[tier - 1].name}`;
+            if (tier > getLifeRefineCap()) return `${getCoreGradeName()}只能承载到${LIFE_REFINE_TIERS[getLifeRefineCap()].name}，这一重祭炼不上去——改用普通炼器武器`;
+            return null;
         }
 
         // 境界感悟：侧栏显示当前境界的原著描述、寿元、神通
@@ -2110,9 +2135,9 @@
             15: ['⚱️ 古老遗迹秘境开放'],
             16: ['⚔️ 魔窟深渊战斗区域开放'],
             17: ['⚡ 天劫之地秘境开放（有几率掉落「万年金雷竹」，结丹后炼本命法宝要用，可以先攒着）', '💊 金丹秘药配方解锁，每次冲击结丹服一颗，多备几颗', `⚡ 结丹比筑基更难：成功率看灵根资质（天灵根 ${ROOT_GRADES.tian.jiedan * 100}% / 真灵根 ${ROOT_GRADES.zhen.jiedan * 100}% / 伪灵根 ${ROOT_GRADES.wei.jiedan * 100}%），失败耗掉丹药但不掉境界，可以重试`],
-            18: ['✈️ 结丹成功：液态真气凝成固体金丹，寿元增至 500～600 年，不借法器即可御空飞行。结丹修士是修仙界的中坚，炼气弟子见了要称"师祖"，十个筑基后期才能抗衡一个结丹初期', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🎋 本命法宝：凑齐「万年金雷竹」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青竹蜂云剑」。一生只能炼一把、不可出售；它与心神相连，会随你的境界一同成长，不必像普通法器那样每个境界换新，金丹品质越高威力越大', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
+            18: ['✈️ 结丹成功：液态真气凝成固体金丹，寿元增至 500～600 年，不借法器即可御空飞行。结丹修士是修仙界的中坚，炼气弟子见了要称"师祖"，十个筑基后期才能抗衡一个结丹初期', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🎋 本命法宝：凑齐「万年金雷竹」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青竹蜂云剑」。一生只能炼一把、不可出售；之后每个大境界都能在炼器页「祭炼」一重（同境界武器的材料 + 1 根金雷竹），威力超过同阶普通法器。金丹品质决定威力倍数和最多能祭炼几重（下品三重、中品四重、上品以上五重），祭炼到顶后再改用普通炼器武器', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
             19: ['⚔️ 天劫之地战斗区域开放'],
-            21: ['🌕 结丹大圆满，又称假婴境：接下来要以金丹温养出元婴', '🌌 元婴秘境开放', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界'],
+            21: ['🌕 结丹大圆满，又称假婴境：接下来要以金丹温养出元婴', '🌌 元婴秘境开放', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🔒 突破元婴后金丹化为元婴，金丹品质就此定型，「金丹淬炼」不再提升品质——它同时决定本命法宝能祭炼到第几重，想走得远就在结丹期打磨好'],
             22: ['👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
             24: ['⚔️ 深渊遗迹战斗区域开放'],
             25: ['🌠 太虚幻境秘境开放', '💊 化神丹配方解锁，突破元婴圆满前记得炼够'],
@@ -2131,6 +2156,10 @@
             42: ['🌟 飞升成功，正式脱离"人"的范畴，寿元与天地同寿；但要承受"五衰"的前三衰（仙衰/窍衰/身衰）——刚飞升时生命/攻击/防御各 -7.5%，「修炼」页继续做「开辟仙窍」，每多打通一窍这份衰退就减少一点，攒满 24 窍时完全消退', '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放'],
             43: ['🏁 真仙后期，24 窍全部打通，五衰前三衰的负面完全消退——当前实现的至高战力，暂无下一境界']
         };
+        LIFE_REFINE_TIERS.slice(1).forEach((t, i) => {
+            const limit = [null, null, null, '下品金丹的上限', '须中品以上金丹', '须上品以上金丹'][i + 1];
+            (REALM_UNLOCKS[t.realm] = REALM_UNLOCKS[t.realm] || []).push(`🎍 炼器页可「祭炼青竹蜂云剑·${t.name}」（需先拥有本命法宝并祭炼到上一重）${limit ? '，' + limit : ''}`);
+        });
 
         function showRealmUnlockModal(realmIndex) {
             const unlocks = REALM_UNLOCKS[realmIndex];
@@ -2526,7 +2555,7 @@
             if (!LIFE_SKILLS.includes(skill)) { showNotification('分身只能做生活技能的配方', '#c98a3e'); return; }
             const recipe = getAction(skill, key);
             if (!recipe || !getRecipeUnlockState(skill, recipe).unlocked) { showNotification('🔒 这个配方还没解锁', '#c98a3e'); return; }
-            if (recipe.unique) { showNotification('本命法宝须亲手炼制，不能交给分身', '#c98a3e'); return; }
+            if (recipe.unique || (recipe.output && recipe.output.lifeRefine)) { showNotification('本命法宝须亲手炼制、祭炼，不能交给分身', '#c98a3e'); return; }
             const main = gameState.currentAction;
             if (main && main.skill === skill && main.action === key) {
                 showNotification('主角正在做这个配方，分身不能重复（请让分身做别的）', '#c98a3e');
@@ -5411,7 +5440,7 @@
                 gameState.currentActionProgress = 0;
                 return;
             }
-            if (action.unique && ownsLifeTreasure()) {
+            if ((action.unique && ownsLifeTreasure()) || (action.output.lifeRefine && lifeRefineBlock(action.output.lifeRefine))) {
                 gameState.currentAction = null;
                 gameState.currentActionProgress = 0;
                 return;
@@ -5500,7 +5529,15 @@
                 gameState.player.marrowCleansed = true;
                 showNotification('🩸 洗髓易经完成，凡人体质脱胎换骨——突破筑基还需筑基丹', '#b39ddb');
             }
-            if (finalOutput.coreTemper) {
+            if (finalOutput.lifeRefine) {
+                gameState.player.lifeTreasureTier = finalOutput.lifeRefine;
+                gameState.currentAction = null;
+                gameState.currentActionProgress = 0;
+                calculateStats();
+                showNotification(`🎍 青竹蜂云剑祭炼成功：${LIFE_REFINE_TIERS[finalOutput.lifeRefine].name}（攻击 ${getLifeTreasureStats().atk}）`, '#c2a25f', 'rare');
+            }
+            // 金丹淬炼只在结丹期有效：突破元婴后金丹化为元婴，品质就此定型
+            if (finalOutput.coreTemper && gameState.player.realmIndex <= 21) {
                 const before = getCoreGradeName();
                 applyCoreTemper(finalOutput.coreTemper);
                 if (getCoreGradeName() !== before) showNotification(`🟡 金丹品质提升：${getCoreGradeName()}（${getCoreQuality().toFixed(1)}）`, '#c2a25f', 'rare');
@@ -5538,7 +5575,7 @@
                 if (gameState.player.cultivationXP + finalOutput.cultivation >= realmCapacity) {
                     const wasFull = gameState.player.cultivationXP >= realmCapacity;
                     gameState.player.cultivationXP = realmCapacity;
-                    if (finalOutput.coreTemper) {
+                    if (finalOutput.coreTemper && gameState.player.realmIndex <= 21) {
                         // 金丹淬炼：修为满了也继续打磨金丹品质，只在刚满的那一次提示
                         if (!wasFull) showNotification(`修为已达 ${currentRealm.name} 上限，可以突破；金丹淬炼仍会继续打磨金丹品质`, '#c2a25f');
                     } else {
@@ -5934,6 +5971,12 @@
             if (output.marrowCleanse) {
                 parts.push(gameState.player.marrowCleansed ? '🩸 已完成（一次性）' : '🩸 洗髓易经（一次性）');
             }
+            if (output.lifeRefine) {
+                const t = output.lifeRefine, cur = getLifeRefineTier();
+                parts.push(ownsLifeTreasure() && cur >= t
+                    ? `🎍 已祭炼至${LIFE_REFINE_TIERS[cur].name}`
+                    : `🎍 本命法宝攻击 → ${getLifeTreasureStats(t).atk}（当前${ownsLifeTreasure() ? LIFE_REFINE_TIERS[cur].name : '未炼成'} · 可祭炼到${LIFE_REFINE_TIERS[getLifeRefineCap()].name}）`);
+            }
             if (output.exp) {
                 parts.push(`+${output.exp}exp`);
             }
@@ -6048,7 +6091,7 @@
 
             // 分身（元婴初期起）：把这个配方交给分身做
             let cloneHtml = '';
-            if (LIFE_SKILLS.includes(skillName) && unlockState.unlocked && isCloneUnlocked()) {
+            if (LIFE_SKILLS.includes(skillName) && unlockState.unlocked && isCloneUnlocked() && !recipe.unique && !(recipe.output && recipe.output.lifeRefine)) {
                 const cloneSlot = findCloneFor(skillName, recipeKey);
                 const cloneHere = cloneSlot >= 0;
                 if (cloneHere) className += ' clone-active';
@@ -6323,6 +6366,11 @@
                 showNotification('本命法宝与性命相连，一生只能炼制一件——你已经拥有青竹蜂云剑', '#c98a3e', 'normal');
                 return;
             }
+            const refineBlock = actionObj.output && actionObj.output.lifeRefine && lifeRefineBlock(actionObj.output.lifeRefine);
+            if (refineBlock) {
+                showNotification(refineBlock, '#c98a3e', 'normal');
+                return;
+            }
 
             // 分身正在做的配方，主角不能重复做
             if (isCloneUnlocked() && findCloneFor(skill, action) >= 0) {
@@ -6514,7 +6562,7 @@
                 // 其他物品
                 danhuo_seed: '丹火种子：在丹火技能「培育丹火」里使用，一次得到 25 丹火',
                 jinleizhu: '万年金雷竹：生于雷劫之地的奇竹，天劫之地秘境通关有几率获得；炼制本命法宝「青竹蜂云剑」的主材（需 2 根）',
-                lifesword: '本命法宝：与心神相连，一生仅此一把、不可出售。威力随你的境界一同成长，并按金丹品质放大——不必像普通法器那样每个境界换新',
+                lifesword: '本命法宝：与心神相连，一生仅此一把、不可出售。每个大境界可在炼器页祭炼一重，攻击升到该境界武器之上并按金丹品质放大；金丹品质决定最多能祭炼几重',
                 shenshi_seed: '神识种子：在神识技能「培育神识」里使用，一次得到 20 神识'
             };
 
@@ -7580,7 +7628,7 @@
             if (!box) return;
             const P = gameState.player;
             const idx = P.realmIndex;
-            const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed].join('|');
+            const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, getLifeRefineTier(), ownsLifeTreasure()].join('|');
             if (key === realmLoreKey) return;   // 每个 tick 都会调用，内容没变就不重写 DOM
             realmLoreKey = key;
             const lore = getRealmLore(idx);
@@ -7595,7 +7643,8 @@
             const gradeEff = describeEffects(grade.effects);
             rows.push(`<div>🌱 灵根资质：<b>${grade.name}</b>${gradeEff.length ? '（' + gradeEff.join('、') + '）' : ''}${grade.treasure ? ` · 身怀${grade.treasure}` : ''}</div>`);
             if (idx >= 18) {
-                rows.push(`<div>🟡 ${idx >= 22 ? '结丹根基' : '金丹'}：<b>${getCoreGradeName()}</b>（品质 ${getCoreQuality().toFixed(1)}）· 本命法宝威力 ×${(1.1 + 0.4 * getCoreQuality() / 100).toFixed(2)}</div>`);
+                rows.push(`<div>🟡 ${idx >= 22 ? '结丹根基' : '金丹'}：<b>${getCoreGradeName()}</b>（品质 ${getCoreQuality().toFixed(1)}${idx >= 22 ? '，已定型' : ''}）· 本命法宝威力 ×${getLifeTreasureMult().toFixed(2)}，最多祭炼到${LIFE_REFINE_TIERS[getLifeRefineCap()].name}</div>`);
+                rows.push(`<div>🎍 本命法宝：${ownsLifeTreasure() ? `${GAME_CONFIG.items[LIFE_TREASURE_ID].name}（攻击 ${getLifeTreasureStats().atk}）` : '尚未炼成'}</div>`);
             }
             const next = [13, 17, 21].find(i => i >= idx);
             if (next !== undefined && idx >= next - 4) {
@@ -8160,7 +8209,7 @@
         function calculateStats() {
             // P4重写：境界驱动的属性系统（替代技能等级驱动）
             const realmIndex = gameState.player.realmIndex;
-            GAME_CONFIG.items[LIFE_TREASURE_ID].stats = getLifeTreasureStats();   // 本命法宝随境界与金丹品质成长，所有显示处都读这份配置
+            refreshLifeTreasure();   // 本命法宝的属性/名字随祭炼重数与金丹品质变化，所有显示处都读这份配置
 
             // === 第一步：从凡人境界基础属性开始 ===
             // 使用凡人阶段作为基准，避免各境界baseStats不一致
@@ -9574,8 +9623,9 @@
                 if (completions <= 0) { gameState.currentAction = null; gameState.lastActiveTime = now; return; }
             }
             // 一次性的配方（洗髓易经 / 本命法宝）离线最多完成一次，完成后停下
-            const oneShotDone = (action.output.marrowCleanse && gameState.player.marrowCleansed) || (action.unique && ownsLifeTreasure());
-            if (action.output.marrowCleanse || action.unique) {
+            const oneShotDone = (action.output.marrowCleanse && gameState.player.marrowCleansed) || (action.unique && ownsLifeTreasure())
+                || (action.output.lifeRefine && !!lifeRefineBlock(action.output.lifeRefine));
+            if (action.output.marrowCleanse || action.unique || action.output.lifeRefine) {
                 completions = oneShotDone ? 0 : Math.min(completions, 1);
                 if (completions <= 0) { gameState.currentAction = null; gameState.lastActiveTime = now; return; }
                 gameState.currentAction = null;
@@ -9666,11 +9716,11 @@
                 offlineRewards.cultivation = actualCultivation;
 
                 // 如果修为已满，停止行动（金丹淬炼除外：满了也继续打磨金丹品质）
-                if (gameState.player.cultivationXP >= realmCapacity && !perAction.coreTemper) {
+                if (gameState.player.cultivationXP >= realmCapacity && !(perAction.coreTemper && gameState.player.realmIndex <= 21)) {
                     gameState.currentAction = null;
                 }
             }
-            if (perAction.coreTemper && completions > 0) {
+            if (perAction.coreTemper && completions > 0 && gameState.player.realmIndex <= 21) {
                 offlineRewards.coreBefore = getCoreQuality();
                 applyCoreTemper(perAction.coreTemper * completions);
                 calculateStats();
@@ -9679,6 +9729,11 @@
             if (perAction.marrowCleanse && completions > 0) {
                 gameState.player.marrowCleansed = true;
                 gameState.currentAction = null;
+            }
+            if (perAction.lifeRefine && completions > 0) {
+                gameState.player.lifeTreasureTier = perAction.lifeRefine;
+                calculateStats();
+                showNotification(`🎍 离线期间青竹蜂云剑祭炼成功：${LIFE_REFINE_TIERS[perAction.lifeRefine].name}`, '#c2a25f');
             }
 
             // 背包放不下的物品单独记录并在结算窗里提示，不再静默丢失
