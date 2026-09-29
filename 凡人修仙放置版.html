@@ -79,6 +79,16 @@
                             </select>
                         </div>
 
+                        <div class="form-group">
+                            <label for="playerRootGrade">灵根资质 *</label>
+                            <select id="playerRootGrade" name="playerRootGrade" autocomplete="off">
+                                <option value="">选择资质</option>
+                                <option value="tian">天灵根</option>
+                                <option value="zhen">真灵根</option>
+                                <option value="wei">伪灵根</option>
+                            </select>
+                        </div>
+
                         <button class="btn" onclick="startGame()" style="width: 100%; margin-top: 20px;">
                             🌟 开始修行 🌟
                         </button>
@@ -539,6 +549,12 @@
                             </div>
                         </div>
 
+                        <!-- 境界感悟：原著境界描述、寿元、神通、资质与金丹品质 -->
+                        <div class="stat-panel">
+                            <div class="stat-title">📜 境界感悟</div>
+                            <div id="realmLoreBox" style="font-size: 0.85em; line-height: 1.7; color: #9ca69f;"></div>
+                        </div>
+
                         <!-- 技能经验 -->
                         <div class="stat-panel">
                             <div class="stat-title">📊 技能经验</div>
@@ -798,7 +814,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.55"></script>
+    <script src="game.js?v=13.57"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
