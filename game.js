@@ -2,65 +2,64 @@
         const GAME_CONFIG = {
             realms: [
                 // 索引0：凡人（初始境界）
-                { name: '凡人', nextReq: 50, baseStats: { hp: 50, atk: 5, def: 2, spd: 5 }, bonusPerLevel: { atk: 0.2, def: 0.05, spd: 0.05 }, isMortal: true },
-                // 练气期（索引1-13，v6.89 按《凡人修仙传》原著改为13层，原«练气初期/中期/后期/巅峰»4段拆开）：
-                // 前期1-4层：感知吸收灵气建立丹田基础；中期5-9层：灵气运转熟练、体质改善；后期10-13层：为突破筑基做准备。
-                // v6.91 早期节奏调整：原 100×n^2.5 公式是为旧4段式练气设计，扩为13层后2→3层出现5.66倍陡跳，
-                // 早期体验极差。将练气二到八层的 nextReq 重新标定（约为原值的 45-50%），使小周天阶段坡度平滑；
-                // 练气九层起（大周天解锁）不变。此前索引5起的境界因插入9层而整体后移9位，见下方注释。
-                { name: '练气一层', nextReq: 100 },      // 不变：解锁小周天
-                { name: '练气二层', nextReq: 280 },      // 原 566，约 -51%
-                { name: '练气三层', nextReq: 650 },      // 原 1559，约 -58%
-                { name: '练气四层', nextReq: 1400 },     // 原 3200，约 -56%
-                { name: '练气五层', nextReq: 2600 },     // 原 5590，约 -53%；解锁神秘之塔秘境
-                { name: '练气六层', nextReq: 4000 },     // 原 8818，约 -55%
-                { name: '练气七层', nextReq: 6000 },     // 原 12964，约 -54%
-                { name: '练气八层', nextReq: 8500 },     // 原 18102，约 -53%
-                { name: '练气九层', nextReq: 24300 },    // 不变：解锁大周天 + 流云诀 + 十万大山
-                { name: '练气十层', nextReq: 31623 },    // 100 × 10^2.5 ≈ 31623
-                { name: '练气十一层', nextReq: 40130 },  // 100 × 11^2.5 ≈ 40130
-                { name: '练气十二层', nextReq: 49890 },  // 100 × 12^2.5 ≈ 49890
-                { name: '练气十三层', nextReq: 60930 },  // 100 × 13^2.5 ≈ 60930
-                // v6.92 境界修为重标定：功法×合道叠加后后期速度远超前期，每个大境界反而更快，与"更慢才对"完全背离。
-                // 重新以各阶段实际修炼速率（功法+功法加速+合道+修炼技能加成）反算所需修为，确保
-                // 练气(~16h) < 筑基(~21h) < 结丹(~27h) < 元婴(~33h) < 化神(~36h) < 炼虚(~46h) < 合体(~56h) < 大乘(~61h)
-                // 原 100×n^2.5 曲线已废弃；炼虚圆满+合体圆满+大乘圆满仍需对应大境界突破丹药，不受此影响。
-                { name: '筑基初期', nextReq: 165000 },    // 龟息+玄水经1.35×技能 ≈ 8 xp/s；约5.7h
-                { name: '筑基中期', nextReq: 225000 },    // 顿悟+玄水经 ≈ 14 xp/s；约4.5h
-                { name: '筑基后期', nextReq: 290000 },    // 顿悟+烈阳功1.45× ≈ 16 xp/s；约5.1h
-                { name: '筑基圆满', nextReq: 360000 },    // 顿悟+金丹大道1.5× ≈ 17 xp/s；约5.9h  合计≈21h
-                // P6 结丹期（索引18-21）
-                { name: '结丹初期', nextReq: 800000, baseStats: { hp: 400, atk: 40, def: 20, spd: 20 }, bonusPerLevel: { atk: 2.0, def: 0.4, spd: 0.4 } },
-                { name: '结丹中期', nextReq: 960000, baseStats: { hp: 450, atk: 45, def: 22, spd: 22 }, bonusPerLevel: { atk: 2.2, def: 0.44, spd: 0.44 } },
-                { name: '结丹后期', nextReq: 1100000, baseStats: { hp: 500, atk: 50, def: 25, spd: 24 }, bonusPerLevel: { atk: 2.5, def: 0.5, spd: 0.5 } },
-                { name: '结丹圆满', nextReq: 1200000, baseStats: { hp: 560, atk: 56, def: 28, spd: 26 }, bonusPerLevel: { atk: 2.8, def: 0.56, spd: 0.56 } },
-                // P7 元婴期（索引22-25）
-                { name: '元婴初期', nextReq: 2800000, baseStats: { hp: 800, atk: 80, def: 40, spd: 30 }, bonusPerLevel: { atk: 4.0, def: 0.8, spd: 0.6 } },
-                { name: '元婴中期', nextReq: 3200000, baseStats: { hp: 900, atk: 90, def: 45, spd: 33 }, bonusPerLevel: { atk: 4.4, def: 0.88, spd: 0.66 } },
-                { name: '元婴后期', nextReq: 3600000, baseStats: { hp: 1000, atk: 100, def: 50, spd: 36 }, bonusPerLevel: { atk: 5.0, def: 1.0, spd: 0.72 } },
-                { name: '元婴圆满', nextReq: 4000000, baseStats: { hp: 1150, atk: 115, def: 58, spd: 40 }, bonusPerLevel: { atk: 5.6, def: 1.12, spd: 0.8 } },
-                // P9 化神期（索引26-29；属性由 P4 公式按境界索引自动延伸）
-                { name: '化神初期', nextReq: 10000000 },   // 化神凝元+化神真经3.4× ≈ 236 xp/s；约11.8h
-                { name: '化神中期', nextReq: 11500000 },   // 元神化虚+化神真经3.4× ≈ 318 xp/s；约10.1h
-                { name: '化神后期', nextReq: 13000000 },   // 天地共鸣+太初混元4.2× ≈ 459 xp/s；约7.9h
-                { name: '化神圆满', nextReq: 15000000 },   // 同上 ≈ 469 xp/s；约8.9h  合计≈38h
-                // 炼虚期（索引30-33）：核心是「化虚」——悟道法则的等级可以兑成实体「道则」镶嵌进道基槽
-                { name: '炼虚初期', nextReq: 35000000 },   // 炼虚归元+炼虚真经5× ≈ 713 xp/s；约13.6h
-                { name: '炼虚中期', nextReq: 40000000 },   // 化虚合真+炼虚真经5× ≈ 873 xp/s；约12.7h
-                { name: '炼虚后期', nextReq: 48000000 },   // 太虚显化+太虚化实经6.2× ≈ 1364 xp/s；约9.8h
-                { name: '炼虚圆满', nextReq: 56000000 },   // 同上 ≈ 1391 xp/s；约11.2h  合计≈47h
+                // v6.98 境界修为按原著年数比例重标定：各大境界耗时 = 练气耗时 × (原著年数中位数 / 40)，
+                // 练气 40 : 筑基 100 : 结丹 215 : 元婴 500 : 化神 650 : 炼虚 1000 : 合体 2500 : 大乘 6500（越往上瓶颈越久）。
+                // 练气定为纯修炼 30 分钟，由此：筑基 1.25h / 结丹 2.7h / 元婴 6.3h / 化神 8.1h / 炼虚 12.5h / 合体 31h / 大乘 81h，合计约 144h。
+                // 每个 nextReq 由逐境界模拟反推：真灵根、当时可买的最好功法、最优修炼配方、修炼等级随经验成长、合体起已合道，
+                // 在该境界的目标时长内能攒到的修为。练气十三层每层时长递增 ×1.28；大境界内四个小境界按 20%/23%/26%/31% 分配（越后越慢）。
+                // 注释里的时间是纯修炼时长；实际还要花时间炼丹备药、打秘境，天灵根 ×0.8、伪灵根 ×1.25。
+                { name: '凡人', nextReq: 30, baseStats: { hp: 50, atk: 5, def: 2, spd: 5 }, bonusPerLevel: { atk: 0.2, def: 0.05, spd: 0.05 }, isMortal: true },   // 约 30 秒
+                // 练气期（索引1-13，v6.89 按原著改为13层）：前期1-4层 / 中期5-9层 / 后期10-13层；合计约 30 分钟
+                { name: '练气一层', nextReq: 45 },       // 约 25 秒
+                { name: '练气二层', nextReq: 61 },
+                { name: '练气三层', nextReq: 77 },
+                { name: '练气四层', nextReq: 107 },
+                { name: '练气五层', nextReq: 122 },      // 解锁神秘之塔秘境
+                { name: '练气六层', nextReq: 156 },
+                { name: '练气七层', nextReq: 203 },
+                { name: '练气八层', nextReq: 265 },      // 约 2 分钟
+                { name: '练气九层', nextReq: 506 },      // 解锁大周天 + 流云诀 + 十万大山
+                { name: '练气十层', nextReq: 668 },
+                { name: '练气十一层', nextReq: 832 },
+                { name: '练气十二层', nextReq: 1070 },
+                { name: '练气十三层', nextReq: 2820 },   // 约 7 分钟
+                // 筑基期（索引14-17）：合计约 76 分钟
+                { name: '筑基初期', nextReq: 6720 },
+                { name: '筑基中期', nextReq: 13400 },
+                { name: '筑基后期', nextReq: 16400 },
+                { name: '筑基圆满', nextReq: 20000 },
+                // P6 结丹期（索引18-21）：合计约 2.7h
+                { name: '结丹初期', nextReq: 41200, baseStats: { hp: 400, atk: 40, def: 20, spd: 20 }, bonusPerLevel: { atk: 2.0, def: 0.4, spd: 0.4 } },
+                { name: '结丹中期', nextReq: 65700, baseStats: { hp: 450, atk: 45, def: 22, spd: 22 }, bonusPerLevel: { atk: 2.2, def: 0.44, spd: 0.44 } },
+                { name: '结丹后期', nextReq: 116000, baseStats: { hp: 500, atk: 50, def: 25, spd: 24 }, bonusPerLevel: { atk: 2.5, def: 0.5, spd: 0.5 } },
+                { name: '结丹圆满', nextReq: 143000, baseStats: { hp: 560, atk: 56, def: 28, spd: 26 }, bonusPerLevel: { atk: 2.8, def: 0.56, spd: 0.56 } },
+                // P7 元婴期（索引22-25）：合计约 6.3h
+                { name: '元婴初期', nextReq: 300000, baseStats: { hp: 800, atk: 80, def: 40, spd: 30 }, bonusPerLevel: { atk: 4.0, def: 0.8, spd: 0.6 } },
+                { name: '元婴中期', nextReq: 473000, baseStats: { hp: 900, atk: 90, def: 45, spd: 33 }, bonusPerLevel: { atk: 4.4, def: 0.88, spd: 0.66 } },
+                { name: '元婴后期', nextReq: 693000, baseStats: { hp: 1000, atk: 100, def: 50, spd: 36 }, bonusPerLevel: { atk: 5.0, def: 1.0, spd: 0.72 } },
+                { name: '元婴圆满', nextReq: 849000, baseStats: { hp: 1150, atk: 115, def: 58, spd: 40 }, bonusPerLevel: { atk: 5.6, def: 1.12, spd: 0.8 } },
+                // P9 化神期（索引26-29；属性由 P4 公式按境界索引自动延伸）：合计约 8.1h
+                { name: '化神初期', nextReq: 1240000 },
+                { name: '化神中期', nextReq: 1950000 },
+                { name: '化神后期', nextReq: 3240000 },
+                { name: '化神圆满', nextReq: 4010000 },
+                // 炼虚期（索引30-33）：核心是「化虚」——悟道法则的等级可以兑成实体「道则」镶嵌进道基槽；合计约 12.5h
+                { name: '炼虚初期', nextReq: 6120000 },
+                { name: '炼虚中期', nextReq: 8730000 },
+                { name: '炼虚后期', nextReq: 15600000 },
+                { name: '炼虚圆满', nextReq: 19300000 },
                 // 合体期（索引34-37）：合体初期起可「合道」（收回分身，换取主行动×2加速）；
-                // 合体圆满（37）预留大乘期入口，必须已合道（FUSION_REQUIRED_REALM=37）
-                { name: '合体初期', nextReq: 260000000 },  // 合体归一+合体真经8×+合道2× ≈ 4195 xp/s；约17.2h
-                { name: '合体中期', nextReq: 300000000 },  // 道果炼体+合体真经8×+合道2× ≈ 5460 xp/s；约15.3h
-                { name: '合体后期', nextReq: 340000000 },  // 合道圆满+太上合道经9.5×+合道2× ≈ 8719 xp/s；约10.8h
-                { name: '合体圆满', nextReq: 400000000 },  // 同上 ≈ 8881 xp/s；约12.5h  合计≈56h
-                // 大乘期（索引38-41）：灵界至高战力。核心是「元婴蜕变」和道则「本源品」；
+                // 合体圆满（37）预留大乘期入口，必须已合道（FUSION_REQUIRED_REALM=37）；合计约 31h
+                { name: '合体初期', nextReq: 105000000 },
+                { name: '合体中期', nextReq: 179000000 },
+                { name: '合体后期', nextReq: 350000000 },
+                { name: '合体圆满', nextReq: 455000000 },
+                // 大乘期（索引38-41）：灵界至高战力。核心是「元婴蜕变」和道则「本源品」；初/中/后期合计约 81h。
                 // 大乘圆满→真仙初期的突破不看修为，看仙窍数量（12窍），nextReq仅作进度条显示参考
-                { name: '大乘初期', nextReq: 2500000000 }, // 大乘归一+大乘真经12×+合道2× ≈ 34826 xp/s；约19.9h
-                { name: '大乘中期', nextReq: 3500000000 }, // 元婴蜕变+大乘真经12×+合道2× ≈ 45714 xp/s；约21.3h
-                { name: '大乘后期', nextReq: 5000000000 }, // 法则镇伏+太乙化元经15×+合道2× ≈ 71553 xp/s；约19.4h
-                { name: '大乘圆满', nextReq: 5500000000 }, // 同上；仅显示参考，实际飞升靠12仙窍  合计≈61h
+                { name: '大乘初期', nextReq: 5360000000 },
+                { name: '大乘中期', nextReq: 9110000000 },
+                { name: '大乘后期', nextReq: 17700000000 },
+                { name: '大乘圆满', nextReq: 19500000000 },
                 // 真仙境（索引33-34，v6.88）：飞升后的全新阶段，不再靠修为突破——大乘圆满起「修炼」页新增
                 // 「开辟仙窍」配方，一次打通一窍，累计 12 窍触发大乘圆满→真仙初期的突破，累计 24 窍触发
                 // 真仙初期→真仙后期；nextReq 沿用曲线只作显示参考，真正的突破判定见 attemptBreakthrough()。
@@ -1894,6 +1893,7 @@
         let gameState = {
             version: 1,  // 游戏数据版本，用于自动迁移
             workCurve: 2,  // 工作技能经验曲线版本（v6.63）；旧存档没有此字段，读档时按累计经验折算
+            realmLayoutVersion: 2,   // 练气 13 层的境界布局（v6.89）；新角色本来就是新布局，读档时不能再迁移
             player: {
                 name: '',
                 gender: '男',
@@ -9267,7 +9267,9 @@
         function migrateRealmLayout() {
             if (gameState.realmLayoutVersion === 2) return;
             const P = gameState.player;
-            if (P && typeof P.realmIndex === 'number') {
+            // v6.97 前新建的角色没带这个标记，但它们本来就是 13 层布局，不能再迁移（否则练气五层会被挪到筑基初期、修为清零）。
+            // 区分办法：v6.90 起写出的存档都带 marrowCleansed 字段（默认对象或读档补全），真正的旧布局存档没有
+            if (P && typeof P.realmIndex === 'number' && !('marrowCleansed' in P)) {
                 const oldToNew = { 0: 0, 1: 1, 2: 5, 3: 9, 4: 13 };
                 P.realmIndex = (P.realmIndex in oldToNew) ? oldToNew[P.realmIndex] : (P.realmIndex >= 5 ? P.realmIndex + 9 : P.realmIndex);
                 P.cultivationXP = 0;
@@ -9333,6 +9335,8 @@
                 gameState.player.realmIndex = maxRealmIndex;
                 gameState.player.cultivationXP = Math.min(gameState.player.cultivationXP || 0, GAME_CONFIG.realms[maxRealmIndex].nextReq);
             }
+            // 修为需求调低后（v6.98），老存档当前修为可能超过新的上限：截到上限，直接可以突破
+            gameState.player.cultivationXP = Math.min(gameState.player.cultivationXP || 0, GAME_CONFIG.realms[gameState.player.realmIndex].nextReq);
 
             // 功法：修正曾经写错的商城功法id，并补全「已拥有功法」记录
             if (gameState.player.currentArt === 'void_art') gameState.player.currentArt = 'soul_art';
