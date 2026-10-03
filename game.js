@@ -372,35 +372,42 @@
                 // 炼虚期天劫（v6.68）：每个炼虚小境界各一场，不在秘境列表里显示，只能通过突破弹窗的「渡劫」进入；
                 // 通关后 gameState.dungeons[id].completed 标记为已渡劫，不会像普通秘境那样循环挑战（见 completeDungeon 的 isTribulation 分支）
                 // v6.89：原索引21-24（炼虚期4个小境界）整体 +9 → 30-33，key 名跟着 tribulationIdFor() 的拼接规则改
-                // 结婴心魔（v6.99）：结丹圆满冲击元婴前的必经一战，同样只从突破弹窗进入。isHeartDemon 表示镜像战——
-                // 这里的数值只是占位，enterDungeon() 进入时按玩家当前属性改写（生命/防御/速度相同，攻击高两成）
+                // 结婴心魔（v6.99）：结丹圆满冲击元婴前的必经一战，同样只从突破弹窗进入。
+                // 心魔与四场天劫都是镜像 Boss（mirror，见 buildMirrorBoss）：怪物表里的 hp/atk/def/spd 只是占位，进入时按玩家实际输出生成。
+                // hpMult = 生命是玩家的几倍；dmgRatio = 它每次出手的期望伤害是玩家的几倍。类型一律「无」，不吃灵根克制。
+                // 数值由模拟标定（v7.02，标准玩家=当前境界炼器三件套、战斗等级=境界数）：满血带当前最好的食物能过，不带食物过不了，越往后越凶。
                 tribulation21: {
-                    id: 'tribulation21', name: '结婴心魔', desc: '金丹化婴之际心魔丛生：它是你的镜像，生命、防御、速度与你相同，攻击比你高两成——满血、带足战斗食物再来', icon: '👹',
+                    id: 'tribulation21', name: '结婴心魔', desc: '金丹化婴之际心魔丛生：它是照着你此刻的实力生出来的，出手比你更重——满血、带足战斗食物再来', icon: '👹',
                     isTribulation: true, isHeartDemon: true, tribulationRealm: 21, minRealmIndex: 21, baseRealmIndex: 21,
+                    mirror: { hpMult: 1, dmgRatio: 1.2 },      // 不带食物 10%～30% 过（裸装到满淬炼都在这个范围），带食物必过
                     monsters: [{ name: '心魔', type: '无', hp: 1000, atk: 100, spd: 50, def: 30, attackSpeed: 2.5, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { skillExp: 300 }
                 },
                 tribulation30: {
-                    id: 'tribulation30', name: '初劫', desc: '融入天地元气的第一道劫——道心不稳，招来的第一场考验', icon: '⚡',
+                    id: 'tribulation30', name: '初劫', desc: '融入天地元气的第一道劫——照着你此刻的实力降下，备足食物再渡', icon: '⚡',
                     isTribulation: true, tribulationRealm: 30, minRealmIndex: 30, baseRealmIndex: 30,
-                    monsters: [{ name: '劫云傀儡', type: '雷', hp: 5000, atk: 575, spd: 68, def: 90, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 1800 }],
+                    mirror: { hpMult: 2, dmgRatio: 1.3 },      // 标准玩家带食物约 90% 过
+                    monsters: [{ name: '劫云傀儡', type: '无', hp: 5000, atk: 575, spd: 68, def: 90, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 1800 }],
                     rewards: { coins: [4000, 6000], danhuo: [80, 140], shenshi: [70, 120], skillExp: 500 }
                 },
                 tribulation31: {
-                    id: 'tribulation31', name: '心魔劫', desc: '劫中生出心魔幻象，照见修行路上的执念', icon: '👁️',
+                    id: 'tribulation31', name: '心魔劫', desc: '劫中生出心魔幻象，照见修行路上的执念；比初劫更重', icon: '👁️',
                     isTribulation: true, tribulationRealm: 31, minRealmIndex: 31, baseRealmIndex: 31,
+                    mirror: { hpMult: 2.25, dmgRatio: 1.35 },  // 约 70%
                     monsters: [{ name: '本心魔影', type: '无', hp: 5250, atk: 600, spd: 74, def: 105, attackSpeed: 2.3, isBoss: true, drop: 'coins', dropQty: 2400 }],
                     rewards: { coins: [5500, 8000], danhuo: [110, 180], shenshi: [95, 160], skillExp: 700 }
                 },
                 tribulation32: {
-                    id: 'tribulation32', name: '雷劫', desc: '九天玄雷劈落，涤荡道基中的驳杂之气', icon: '🌩️',
+                    id: 'tribulation32', name: '雷劫', desc: '九天玄雷劈落，涤荡道基中的驳杂之气；一劫重过一劫', icon: '🌩️',
                     isTribulation: true, tribulationRealm: 32, minRealmIndex: 32, baseRealmIndex: 32,
-                    monsters: [{ name: '雷劫化身', type: '雷', hp: 5500, atk: 625, spd: 82, def: 120, attackSpeed: 2.1, isBoss: true, drop: 'coins', dropQty: 3200 }],
+                    mirror: { hpMult: 2.5, dmgRatio: 1.35 },   // 约 70%
+                    monsters: [{ name: '雷劫化身', type: '无', hp: 5500, atk: 625, spd: 82, def: 120, attackSpeed: 2.1, isBoss: true, drop: 'coins', dropQty: 3200 }],
                     rewards: { coins: [7500, 11000], danhuo: [150, 240], shenshi: [130, 210], skillExp: 950 }
                 },
                 tribulation33: {
                     id: 'tribulation33', name: '大天劫', desc: '炼虚圆满前的终极考验：身与天地相融的最后一步，威力远胜前三劫', icon: '☄️',
                     isTribulation: true, tribulationRealm: 33, minRealmIndex: 33, baseRealmIndex: 33,
+                    mirror: { hpMult: 2.5, dmgRatio: 1.4 },    // 约 40%；四劫不带食物都是 0%
                     monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 4500 }],
                     rewards: { coins: [10000, 15000], danhuo: [200, 320], shenshi: [180, 280], skillExp: 1300 }
                 }
@@ -840,7 +847,7 @@
                     name: '蟠桃',
                     icon: '🍑',
                     hpRestore: 1000,          // 恢复HP
-                    cooldown: 5.0,
+                    cooldown: 3.0,            // 原 5 秒，是所有食物里唯一更长的，元婴期因此格外容易暴毙
                     minRealm: 22,             // v6.89：原索引13 → +9，元婴初期
                     description: '传说中的仙果，恢复1000点生命值'
                 },
@@ -1620,6 +1627,38 @@
             if (r >= FUSION_REQUIRED_REALM && !isFused()) return false;
             return true;
         }
+        // 镜像 Boss（结婴心魔、炼虚四劫，v7.02）：配置里带 mirror: { hpMult, dmgRatio } 的关卡，Boss 不用写死的数值，
+        // 而是按玩家当下的实际输出生成——生命 = 玩家生命上限 × hpMult，防御 / 速度 / 出手间隔与玩家相同，
+        // 攻击反解出来，使它每次出手的期望伤害 = 玩家每次出手的期望伤害 × dmgRatio（把命中、暴击、战斗等级、天地灵气都算进去）。
+        // 这样装备和战斗等级再高也不会让关卡失效；战斗中途换装备（属性签名变了）会重新生成，堵住"卸装进场再穿上"。
+        function mirrorSignature() {
+            const s = gameState.player.stats;
+            return [s.hp.max, s.atk, s.def, s.spd, gameState.skills.battle.level].join('|');
+        }
+        function buildMirrorBoss(dungeon) {
+            const s = gameState.player.stats, boss = dungeon.monsters[0], cfg = dungeon.mirror;
+            const oldMax = boss.hp;
+            boss.hp = Math.round(s.hp.max * cfg.hpMult);
+            boss.def = s.def;
+            boss.spd = s.spd;
+            boss.attackSpeed = getPlayerAttackInterval();
+            const hitBonus = getMod('hit');
+            const pHit = Math.max(0.05, Math.min(Math.min(0.99, 0.95 + hitBonus), BATTLE_FORMULAS.calculateHitChance(s.spd, boss.spd) + hitBonus));
+            const critRate = Math.min(1, BASE_CRIT.rate + getMod('crit'));
+            const qi = usesJingyuan() && getJingyuan() < JINGYUAN.perAttack ? 0 : getHeavenQiBonus();
+            const playerPerAttack = pHit * s.atk * (1 - 0.75 * boss.def / (s.atk + boss.def)) * getBattleSkillDmgMult() * (1 + qi)
+                * (1 + critRate * (BASE_CRIT.dmg + getMod('critDmg') - 1));
+            const mHit = Math.max(0.05, Math.min(0.95, BATTLE_FORMULAS.calculateHitChance(boss.spd, s.spd) * (1 - Math.min(0.6, getMod('dodge')))));
+            const target = cfg.dmgRatio * playerPerAttack / mHit;
+            let lo = 1, hi = Math.max(10, target * 5);
+            for (let i = 0; i < 50; i++) {
+                const mid = (lo + hi) / 2;
+                if (mid * (1 - 0.75 * s.def / (mid + s.def + 1)) < target) lo = mid; else hi = mid;
+            }
+            boss.atk = Math.max(1, Math.round(hi));
+            dungeon._mirrorSig = mirrorSignature();
+            return oldMax;
+        }
         function tribulationIdFor(realmIndex) { return `tribulation${realmIndex}`; }
         function hasSurvivedTribulation(realmIndex) {
             const rec = gameState.dungeons && gameState.dungeons[tribulationIdFor(realmIndex)];
@@ -1812,14 +1851,16 @@
         const P4_AREA_SCALE = {
             forest: { hp: 1.12, atk: 1.12 }, mountain: { hp: 1.1, atk: 1.17 }, deepMountain: { hp: 1.218, atk: 1.844 },
             swamp: { hp: 1.393, atk: 2.115 }, abyss: { hp: 1.087, atk: 1.782 }, goldenPlains: { hp: 1.357, atk: 2.602 },
-            tribulationGround: { hp: 0.96, atk: 2.067 }, voidSea: { hp: 0.482, atk: 2.405 }, abyssRuins: { hp: 0.1558, atk: 1.756 },
-            chaosWastes: { hp: 0.1718, atk: 1.337 }, nineNether: { hp: 0.0837, atk: 1.047 },
-            daoWastes: { hp: 0.04, atk: 1.6 }, fusionVoid: { hp: 0.028, atk: 1.56 },
-            voidAbyss: { hp: 0.0811, atk: 1.262 }, huashiRealm: { hp: 0.0639, atk: 1.145 },
-            taiyiField: { hp: 0.0425, atk: 0.4675 }, lingjieAbyss: { hp: 0.0328, atk: 0.3321 },
-            // 真仙境新增（v6.88）：延续 taiyiField→lingjieAbyss 的衰减比例外推（hp×0.77、atk×0.71），
-            // 没有跑真实引擎模拟标定胜率，后续如果实测通关率明显偏离 65% 目标，回来调这两个数
-            xianbattle: { hp: 0.025, atk: 0.235 }
+            tribulationGround: { hp: 0.96, atk: 2.067 },
+            // v7.02 元婴以后的区域按统一口径重标攻击系数：标准玩家 = 刚到该区域的入口境界、穿当前境界炼器三件套（无淬炼）、真灵根，
+            // 目标是敌人平均「几击打死玩家」沿 元婴 8 → 化神 7.5 → 炼虚 7 → 合体 6.5 → 大乘/真仙 6 平滑收紧。
+            // 原来是 元婴 6.9/6.6、化神 7.0/6.2、炼虚 4.5/4.4、合体 3.1/2.7（三击秒人）、大乘 7.5/9.1（反而更松）、真仙 5.1。
+            voidSea: { hp: 0.482, atk: 2.122 }, abyssRuins: { hp: 0.1558, atk: 1.501 },
+            chaosWastes: { hp: 0.1718, atk: 1.268 }, nineNether: { hp: 0.0837, atk: 0.893 },
+            daoWastes: { hp: 0.04, atk: 0.837 }, fusionVoid: { hp: 0.028, atk: 0.701 },
+            voidAbyss: { hp: 0.0811, atk: 0.858 }, huashiRealm: { hp: 0.0639, atk: 0.756 },
+            taiyiField: { hp: 0.0425, atk: 0.567 }, lingjieAbyss: { hp: 0.0328, atk: 0.471 },
+            xianbattle: { hp: 0.025, atk: 0.204 }
         };
 
         const BATTLE_FORMULAS = {
@@ -2091,10 +2132,9 @@
         // 元婴不灭（原著"元婴不灭，肉身被毁后可夺舍重生"）：元婴期起秘境战败不掉修为；
         // 且每次进入秘境第一次被击败时夺舍重生，以 NASCENT_REVIVE_HP 的生命继续战斗
         const NASCENT_SAFE_REALM = 22, NASCENT_REVIVE_HP = 0.4;
-        // 结婴心魔（原著"需要充分准备应对结婴心魔"）：结丹圆满冲击元婴前必须先斩心魔——一场镜像战（tribulation21），
-        // 心魔的生命/防御/速度/出手间隔与玩家相同，攻击为玩家的 HEART_DEMON_ATK 倍；复用天劫的「突破前必须通关」机制。
-        // 1.2 倍是实测定的：满血不带食物约三成胜率，带了战斗食物基本必胜——"充分准备"就是备好食物、满血再进
-        const HEART_DEMON_REALM = 21, HEART_DEMON_ATK = 1.2;
+        // 结婴心魔（原著"需要充分准备应对结婴心魔"）：结丹圆满冲击元婴前必须先斩心魔——一场镜像战（tribulation21，见 buildMirrorBoss），
+        // 复用天劫的「突破前必须通关」机制。"充分准备"就是备好食物、满血再进
+        const HEART_DEMON_REALM = 21;
         // 婴火（原著"拥有婴火，炼丹炼器效果远超普通火焰"）：元婴期起炼丹/炼器耗时减少、炼丹翻倍与炼器省料概率提高，
         // 强度随元婴品质（= 结丹时定型的金丹品质，原著"金丹品质决定元婴质量"）在两端之间线性变化
         const YINGHUO_TIME = [0.10, 0.20], YINGHUO_BONUS = [0.05, 0.15];
@@ -2254,7 +2294,7 @@
             17: ['⚡ 天劫之地秘境开放（有几率掉落「万年金雷竹」，结丹后炼本命法宝要用，可以先攒着）', '💊 金丹秘药配方解锁，每次冲击结丹服一颗，多备几颗', `⚡ 结丹比筑基更难：成功率看灵根资质（天灵根 ${ROOT_GRADES.tian.jiedan * 100}% / 真灵根 ${ROOT_GRADES.zhen.jiedan * 100}% / 伪灵根 ${ROOT_GRADES.wei.jiedan * 100}%），失败耗掉丹药但不掉境界，可以重试`],
             18: [`⚠ 境界未稳：刚结金丹，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%，之后境界稳固恢复正常`, '⚔️ 结丹对筑基期敌人有大境界压制（命中、伤害更高）', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🎋 本命法宝：凑齐「万年金雷竹」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青竹蜂云剑」。一生只能炼一把、不可出售；之后每个大境界都能在炼器页「祭炼」一重（同境界武器的材料 + 1 根金雷竹），威力超过同阶普通法器。金丹品质决定威力倍数和最多能祭炼几重（下品三重、中品四重、上品以上五重），祭炼到顶后再改用普通炼器武器', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
             19: ['⚔️ 天劫之地战斗区域开放'],
-            21: ['🌌 元婴秘境开放', '👹 结婴心魔：修为满后，突破弹窗里要先「斩心魔」才能冲击元婴。心魔是你自己的镜像——生命、防御、速度与你相同，攻击比你高两成；满血、装备好战斗食物再打基本能赢，空手去多半会输。战败照常损失修为和食物，可以重来，打赢一次即可', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🔒 突破元婴后金丹化为元婴，金丹品质就此定型成元婴品质，「金丹淬炼」不再提升——它决定婴火强度、化神成功率和本命法宝能祭炼到第几重，想走得远就在结丹期打磨好'],
+            21: ['🌌 元婴秘境开放', '👹 结婴心魔：修为满后，突破弹窗里要先「斩心魔」才能冲击元婴。心魔是照着你此刻的实力生出来的——生命、防御、速度与你相同，每次出手比你重两成，换装备它也跟着变；满血、装备好战斗食物再打基本能赢，空手去多半会输。战败损失一半食物，可以重来，打赢一次即可', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🔒 突破元婴后金丹化为元婴，金丹品质就此定型成元婴品质，「金丹淬炼」不再提升——它决定婴火强度、化神成功率和本命法宝能祭炼到第几重，想走得远就在结丹期打磨好'],
             22: [`🛡️ 元婴不灭：秘境战败不再损失修为（食物照常损失一半）；每次进入秘境，第一次被击败时元婴夺舍重生，以 ${NASCENT_REVIVE_HP * 100}% 生命继续战斗`, `🔥 婴火：炼丹、炼器耗时 −${YINGHUO_TIME[0] * 100}%～−${YINGHUO_TIME[1] * 100}%，炼丹翻倍、炼器省料概率 +${YINGHUO_BONUS[0] * 100}%～+${YINGHUO_BONUS[1] * 100}%，元婴品质越高越强（侧栏「境界感悟」显示你的实际数值）`, `⚠ 境界未稳：刚结元婴，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%`, '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
             23: [`💨 瞬移神通：元婴稳固，闪避 +${TELEPORT_DODGE * 100}%`],
             24: ['⚔️ 深渊遗迹战斗区域开放', `📜 化神需要特殊功法：拥有「太虚元神诀」（商城）可让化神成功率 +${HUASHEN_RATE.art * 100}%，可以先攒灵石`],
@@ -2263,7 +2303,7 @@
             27: [`🌊 天地灵气运用纯熟：出手伤害加成 +${JINGYUAN.dmg[0] * 100}% → +${JINGYUAN.dmg[1] * 100}%`],
             28: ['⚔️ 九幽冥渊战斗区域开放'],
             29: ['🌫️ 虚界秘境开放：通关一次即找到通往灵界的空间节点——这是飞升灵界（突破炼虚）的前提', '💊 化虚丹配方解锁，飞升时服一颗'],
-            30: [`🌌 飞升灵界：这里灵气充沛，出手不再损耗精元，天地灵气的伤害加成（+${JINGYUAN.dmg[1] * 100}%）从此常驻，修炼也不再受精元拖累`, '🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：从这个境界起，每次突破小境界前，突破弹窗会先要求「渡劫」——去对应的天劫秘境打赢，回来才能真正突破'],
+            30: [`🌌 飞升灵界：这里灵气充沛，出手不再损耗精元，天地灵气的伤害加成（+${JINGYUAN.dmg[1] * 100}%）从此常驻，修炼也不再受精元拖累`, '🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：从这个境界起，每次突破小境界前，突破弹窗会先要求「渡劫」，打赢才能突破。天劫是照着你此刻的实力降下的，生命是你的两倍以上、出手比你重三到四成，一劫重过一劫：不带食物过不了，带足食物、满血再渡；初劫大多能过，大天劫往往要试几次。战败只损失食物，夺舍重生在这里能救你一次'],
             32: ['⚔️ 化实之界战斗区域开放'],
             33: ['🌌 天道秘境开放', '💊 合体丹配方解锁，突破炼虚圆满前记得炼够'],
             34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 道果页可以「合道」：收回全部分身（不可逆，之后不能再用分身），换所有主行动速度 +100%、生命/攻击/防御/速度 +15%、神识与道果产出提升——这个操作不急着现在做，但合体圆满突破到大乘期之前必须做', '⚔️ 道痕荒原战斗区域开放'],
@@ -3179,7 +3219,8 @@
 
             // === 计算损失 ===
             // 1. 损失修为（10%）；元婴期起「元婴不灭」——肉身战败元婴无损，不掉修为
-            const nascentSafe = gameState.player.realmIndex >= NASCENT_SAFE_REALM;
+            // 心魔战败也不掉修为：否则修为不满进不了突破弹窗，要先补修为才能重试
+            const nascentSafe = gameState.player.realmIndex >= NASCENT_SAFE_REALM || !!dungeon.isHeartDemon;
             const lostCultivation = nascentSafe ? 0 : Math.floor(gameState.player.cultivationXP * 0.1);
             gameState.player.cultivationXP = Math.max(0, gameState.player.cultivationXP - lostCultivation);
             deathRecord.cultivationLost = lostCultivation;
@@ -3214,7 +3255,7 @@
             // === P2修复：生成更详细的死亡通知 ===
             const damagePercent = ((hpBefore - gameState.player.stats.hp.current) / gameState.player.stats.hp.max * 100).toFixed(0);
             const notificationText = `✗ 被${monster.name}击败！\n\n` +
-                                    (nascentSafe ? `元婴不灭：修为无损\n` : `丢失修为: ${lostCultivation} (10%)\n`) +
+                                    (nascentSafe ? `${dungeon.isHeartDemon ? '心魔未除' : '元婴不灭'}：修为无损\n` : `丢失修为: ${lostCultivation} (10%)\n`) +
                                     `丢失食物: ${foodLost}份 (50%)\n` +
                                     `血量: ${gameState.player.stats.hp.current}/${gameState.player.stats.hp.max} (+50%)`;
             showNotification(notificationText, '#c4483a', 'danger');
@@ -3724,6 +3765,12 @@
             const dungeonId = gameState.dungeons.currentDungeon;
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
             const monster = dungeon.monsters[gameState.dungeons.currentMonsterIndex];
+
+            // 镜像 Boss：玩家属性中途变了（换装备、切功法）就重新生成，已损失的血量按比例保留
+            if (dungeon.mirror && dungeon._mirrorSig !== mirrorSignature()) {
+                const oldMax = buildMirrorBoss(dungeon);
+                gameState.dungeons.currentMonsterHP = Math.round(gameState.dungeons.currentMonsterHP * monster.hp / oldMax);
+            }
 
             // P1-1 应用战斗速度倍率
             const speedMultiplier = gameState.battleSpeed || 1;
@@ -7320,9 +7367,7 @@
                     { name: '灵界凶兽', hp: 50000, atk: 1750, def: 540, spd: 105, icon: '🐉' },
                     { name: '道祖之影', hp: 46000, atk: 1900, def: 500, spd: 115, icon: '😈' }
                 ],
-                // 注意：普通战斗区域的原始数值会被 P4_AREA_SCALE.xianbattle（hp×0.025、atk×0.235）折算成实际生效值，
-                // 下面这两个是「折算前」的原始数值，实际生效约 hp 2450~2650、atk 940~1010（比灵界绝境的
-                // 实际生效值 hp≈1509~1640、atk≈581~631 高约 1.6 倍，延续奖励曲线的增速），没有跑模拟标定
+                // 注意：下面是「折算前」的原始数值，实际生效值要乘 P4_AREA_SCALE.xianbattle（攻击系数 v7.02 已按统一口径重标）
                 xianbattle: [
                     { name: '九霄仙兽', hp: 100000, atk: 4000, def: 620, spd: 120, icon: '🐲' },
                     { name: '虚境仙魔', hp: 106000, atk: 4260, def: 580, spd: 130, icon: '👹' }
@@ -7587,15 +7632,10 @@
                 return;
             }
 
-            // 心魔是镜像战：进入时按玩家当前属性改写它的数值
-            if (dungeon.isHeartDemon) {
+            // 镜像 Boss（心魔 / 天劫）：进入时按玩家当前的实际输出生成
+            if (dungeon.mirror) {
                 calculateStats();
-                const s = gameState.player.stats, demon = dungeon.monsters[0];
-                demon.hp = s.hp.max;
-                demon.atk = Math.max(1, Math.round(s.atk * HEART_DEMON_ATK));
-                demon.def = s.def;
-                demon.spd = s.spd;
-                demon.attackSpeed = getPlayerAttackInterval();
+                buildMirrorBoss(dungeon);
             }
 
             // 初始化秘境战斗状态
