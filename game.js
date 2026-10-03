@@ -1609,6 +1609,17 @@
         const TRIBULATION_REALMS = [30, 31, 32, 33];   // v6.89：原索引21-24 → +9
         const BREAKTHROUGH_GATE_REALMS = [21, ...TRIBULATION_REALMS];   // 突破前必须先打赢一场的境界：结丹圆满的结婴心魔 + 炼虚四劫（永久加成只算后者）
         const TRIBULATION_HP_PCT = 0.03;   // 渡劫：每渡一劫永久生命 / 防御 +3%（身与天地相融，越来越难杀；4 劫渡满 +12%）
+        // 小境界自动突破（v7.01）：修为满了、且这次突破不需要丹药 / 心魔 / 天劫 / 仙窍时直接突破，行动不中断，离线结算也连续突破。
+        // 凡人→练气一层保留手动（新手任务在教「尝试突破」按钮）。设置里可关。
+        function canAutoBreakthrough() {
+            const r = gameState.player.realmIndex, next = GAME_CONFIG.realms[r + 1];
+            if ((gameState.settings || {}).autoBreakthrough === false) return false;
+            if (r === 0 || !next || next.xianqiaoReq) return false;
+            if (MAJOR_BREAKTHROUGH_INDICES.has(r)) return false;
+            if (BREAKTHROUGH_GATE_REALMS.includes(r) && !hasSurvivedTribulation(r)) return false;
+            if (r >= FUSION_REQUIRED_REALM && !isFused()) return false;
+            return true;
+        }
         function tribulationIdFor(realmIndex) { return `tribulation${realmIndex}`; }
         function hasSurvivedTribulation(realmIndex) {
             const rec = gameState.dungeons && gameState.dungeons[tribulationIdFor(realmIndex)];
@@ -1996,6 +2007,7 @@
                 enableNotifications: true,      // 启用通知（关闭后只显示失败 / 警告等重要提示）
                 fontScale: 100,                 // 字体大小（百分比：90 小 / 100 中 / 115 大 / 130 特大）
                 breakthroughFx: true,           // 突破特效
+                autoBreakthrough: true,         // 小境界修为满了自动突破
                 notificationSeconds: 2,         // 通知停留时间（秒）
                 theme: 'dark'                   // 主题（dark/light）
             }
@@ -5691,7 +5703,12 @@
                 const realmCapacity = currentRealm.nextReq;
 
                 // 检查修为是否会超过本境界上限
-                if (gameState.player.cultivationXP + finalOutput.cultivation >= realmCapacity) {
+                if (gameState.player.cultivationXP + finalOutput.cultivation >= realmCapacity && canAutoBreakthrough()) {
+                    // 小境界：自动突破，溢出的修为带进下一个境界，行动继续
+                    const overflow = gameState.player.cultivationXP + finalOutput.cultivation - realmCapacity;
+                    performBreakthrough();
+                    gameState.player.cultivationXP = Math.min(overflow, GAME_CONFIG.realms[gameState.player.realmIndex].nextReq);
+                } else if (gameState.player.cultivationXP + finalOutput.cultivation >= realmCapacity) {
                     const wasFull = gameState.player.cultivationXP >= realmCapacity;
                     gameState.player.cultivationXP = realmCapacity;
                     if (finalOutput.coreTemper && gameState.player.realmIndex <= 21) {
@@ -5872,6 +5889,7 @@
             document.getElementById('enableNotifications').checked = settings.enableNotifications;
             document.getElementById('fontScale').value = String(settings.fontScale || 100);
             document.getElementById('breakthroughFx').checked = settings.breakthroughFx !== false;
+            document.getElementById('autoBreakthrough').checked = settings.autoBreakthrough !== false;
             renderFxReplay();
             document.getElementById('notificationSeconds').value = String(settings.notificationSeconds || 2);
             updateSettingDisplay('enableNotifications');
@@ -9557,6 +9575,7 @@
                 enableNotifications: true,
                 fontScale: 100,
                 breakthroughFx: true,
+                autoBreakthrough: true,
                 notificationSeconds: 2,
                 theme: 'dark'
             }, gameState.settings || {});
@@ -9883,15 +9902,32 @@
                 // 计算本应获得的修为
                 const baseCultivation = offlineRewards.cultivation;
 
+                // 小境界自动突破：攒满就突破，剩下的修为接着灌进下一个境界，直到遇到需要手动的大境界 / 天劫
+                let budget = baseCultivation;
+                const passedRealms = [];
+                while (budget >= GAME_CONFIG.realms[gameState.player.realmIndex].nextReq - gameState.player.cultivationXP && canAutoBreakthrough()) {
+                    budget -= GAME_CONFIG.realms[gameState.player.realmIndex].nextReq - gameState.player.cultivationXP;
+                    gameState.player.realmIndex++;
+                    gameState.player.cultivationXP = 0;
+                    passedRealms.push(gameState.player.realmIndex);
+                }
+                if (passedRealms.length) {
+                    calculateStats();
+                    if (gameState.player.stats.hp && gameState.player.stats.hp.max) gameState.player.stats.hp.current = gameState.player.stats.hp.max;
+                    offlineRewards.passedRealms = passedRealms;
+                }
+                const finalCapacity = GAME_CONFIG.realms[gameState.player.realmIndex].nextReq;
+
                 // 计算实际能增加的修为（不超过上限）
-                const remainingCapacity = realmCapacity - gameState.player.cultivationXP;
-                const actualCultivation = Math.min(baseCultivation, remainingCapacity);
+                const remainingCapacity = finalCapacity - gameState.player.cultivationXP;
+                const lastStep = Math.min(budget, remainingCapacity);
+                const actualCultivation = baseCultivation - (budget - lastStep);
 
                 // 计算溢出部分
-                const overflowCultivation = Math.max(0, baseCultivation - actualCultivation);
+                const overflowCultivation = Math.max(0, budget - lastStep);
 
                 // 应用修为
-                gameState.player.cultivationXP += actualCultivation;
+                gameState.player.cultivationXP += lastStep;
 
                 // 溢出转灵石 (比例 100:1)
                 const overflowCoins = Math.floor(overflowCultivation / 100);
@@ -9906,7 +9942,7 @@
                 offlineRewards.cultivation = actualCultivation;
 
                 // 如果修为已满，停止行动（金丹淬炼除外：满了也继续打磨金丹品质）
-                if (gameState.player.cultivationXP >= realmCapacity && !(perAction.coreTemper && gameState.player.realmIndex <= 21)) {
+                if (gameState.player.cultivationXP >= finalCapacity && !(perAction.coreTemper && gameState.player.realmIndex <= 21)) {
                     gameState.currentAction = null;
                 }
             }
@@ -9981,6 +10017,14 @@
                 </div>
                 <div class="stat-row" style="background: rgba(196,72,58,0.1); border: 1px solid #c4483a; padding: 8px; margin: 5px 0;">
                     <span class="stat-label" style="color: #999;">✗ 超时${wastedHours}小时，奖励已达上限</span>
+                </div>`;
+            }
+
+            if (rewards.passedRealms && rewards.passedRealms.length) {
+                const unlocks = rewards.passedRealms.filter(i => REALM_UNLOCKS[i]).map(i => `<div style="margin-top:6px;"><b>${getRealmName(i)}</b><br/>${REALM_UNLOCKS[i].map(u => '• ' + u).join('<br/>')}</div>`).join('');
+                content += `<div class="stat-row" style="flex-direction: column; align-items: flex-start; background: rgba(111,156,138,0.1); border: 1px solid #6f9c8a; padding: 8px; margin: 5px 0;">
+                    <span class="stat-label" style="color: #6f9c8a;">🌟 自动突破 ${rewards.passedRealms.length} 个小境界，现在是${getRealmName(rewards.passedRealms[rewards.passedRealms.length - 1])}</span>
+                    ${unlocks ? `<div style="font-size: 0.85em; color: #9ca69f; line-height: 1.6;">期间解锁：${unlocks}</div>` : ''}
                 </div>`;
             }
 

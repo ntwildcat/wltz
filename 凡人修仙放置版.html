@@ -495,6 +495,13 @@
                                     </select>
                                 </div>
                                 <div class="stat-row">
+                                    <span class="stat-label">自动突破:</span>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" id="autoBreakthrough" checked onchange="updateSetting('autoBreakthrough', this.checked)" style="width: 20px; height: 20px; cursor: pointer;">
+                                        <span>修为满了自动突破小境界（离线也生效；大境界仍需手动）</span>
+                                    </label>
+                                </div>
+                                <div class="stat-row">
                                     <span class="stat-label">突破特效:</span>
                                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                         <input type="checkbox" id="breakthroughFx" checked onchange="updateSetting('breakthroughFx', this.checked)" style="width: 20px; height: 20px; cursor: pointer;">
@@ -814,7 +821,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.69"></script>
+    <script src="game.js?v=13.70"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
