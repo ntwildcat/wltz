@@ -372,6 +372,14 @@
                 // 炼虚期天劫（v6.68）：每个炼虚小境界各一场，不在秘境列表里显示，只能通过突破弹窗的「渡劫」进入；
                 // 通关后 gameState.dungeons[id].completed 标记为已渡劫，不会像普通秘境那样循环挑战（见 completeDungeon 的 isTribulation 分支）
                 // v6.89：原索引21-24（炼虚期4个小境界）整体 +9 → 30-33，key 名跟着 tribulationIdFor() 的拼接规则改
+                // 结婴心魔（v6.99）：结丹圆满冲击元婴前的必经一战，同样只从突破弹窗进入。isHeartDemon 表示镜像战——
+                // 这里的数值只是占位，enterDungeon() 进入时按玩家当前属性改写（生命/防御/速度相同，攻击高两成）
+                tribulation21: {
+                    id: 'tribulation21', name: '结婴心魔', desc: '金丹化婴之际心魔丛生：它是你的镜像，生命、防御、速度与你相同，攻击比你高两成——满血、带足战斗食物再来', icon: '👹',
+                    isTribulation: true, isHeartDemon: true, tribulationRealm: 21, minRealmIndex: 21, baseRealmIndex: 21,
+                    monsters: [{ name: '心魔', type: '无', hp: 1000, atk: 100, spd: 50, def: 30, attackSpeed: 2.5, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { skillExp: 300 }
+                },
                 tribulation30: {
                     id: 'tribulation30', name: '初劫', desc: '融入天地元气的第一道劫——道心不稳，招来的第一场考验', icon: '⚡',
                     isTribulation: true, tribulationRealm: 30, minRealmIndex: 30, baseRealmIndex: 30,
@@ -1599,6 +1607,7 @@
         // 不在秘境列表里出现，只能从突破弹窗的「⚡ 渡劫」进入；渡过一次永久生效（不会像普通秘境那样清空重来）。
         // 失败沿用秘境战败的既有惩罚（损失 10% 修为、50% 食物、气血回到 50%），可以重新挑战，不会卡死进度。
         const TRIBULATION_REALMS = [30, 31, 32, 33];   // v6.89：原索引21-24 → +9
+        const BREAKTHROUGH_GATE_REALMS = [21, ...TRIBULATION_REALMS];   // 突破前必须先打赢一场的境界：结丹圆满的结婴心魔 + 炼虚四劫（永久加成只算后者）
         const TRIBULATION_HP_PCT = 0.03;   // 渡劫：每渡一劫永久生命 / 防御 +3%（身与天地相融，越来越难杀；4 劫渡满 +12%）
         function tribulationIdFor(realmIndex) { return `tribulation${realmIndex}`; }
         function hasSurvivedTribulation(realmIndex) {
@@ -1618,12 +1627,12 @@
             const box = document.getElementById('btTribulation');
             if (!box) return;
             const realmIndex = gameState.player.realmIndex;
-            if (!TRIBULATION_REALMS.includes(realmIndex) || hasSurvivedTribulation(realmIndex)) { box.style.display = 'none'; return; }
+            if (!BREAKTHROUGH_GATE_REALMS.includes(realmIndex) || hasSurvivedTribulation(realmIndex)) { box.style.display = 'none'; return; }
             const dungeon = GAME_CONFIG.dungeons[tribulationIdFor(realmIndex)];
             box.style.display = 'block';
-            box.innerHTML = `<div class="bt-guide-title">⚡ 需先渡过本境界的天劫</div>
+            box.innerHTML = `<div class="bt-guide-title">${dungeon.isHeartDemon ? '👹 冲击元婴前须先斩灭心魔' : '⚡ 需先渡过本境界的天劫'}</div>
                 <div class="bt-guide-line">${dungeon.icon} ${dungeon.name}：${dungeon.desc}</div>
-                <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); maybeSelectDomainThenEnter(() => enterDungeon('${tribulationIdFor(realmIndex)}'));">⚡ 渡劫</button>`;
+                <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); maybeSelectDomainThenEnter(() => enterDungeon('${tribulationIdFor(realmIndex)}'));">${dungeon.isHeartDemon ? '👹 斩心魔' : '⚡ 渡劫'}</button>`;
         }
 
         // 天劫通关：不像普通秘境那样循环挑战，标记渡过即可，额外弹一条永久加成提示
@@ -1639,7 +1648,9 @@
             gameState.currentActionProgress = 0;
 
             const rewards = dungeon.rewards;
-            let rewardMsg = `⚡ 渡过${dungeon.name}！身与天地相融更进一步（生命 / 防御 永久 +${Math.round(TRIBULATION_HP_PCT * 100)}%）\n`;
+            let rewardMsg = dungeon.isHeartDemon
+                ? `👹 心魔已灭，道心通明——可以冲击元婴了\n`
+                : `⚡ 渡过${dungeon.name}！身与天地相融更进一步（生命 / 防御 永久 +${Math.round(TRIBULATION_HP_PCT * 100)}%）\n`;
             if (rewards.coins) {
                 const coins = rewards.coins[0] + Math.floor(Math.random() * (rewards.coins[1] - rewards.coins[0] + 1));
                 gameState.player.coins += coins;
@@ -2051,7 +2062,10 @@
         const CORE_TEMPER_KEEP = 0.999;
         const CORE_GRADE_STEPS = [[90, '极品'], [65, '上品'], [35, '中品'], [0, '下品']];
         function getCoreQuality() { return gameState.player.coreQuality || 0; }
-        function getCoreGradeName(q = getCoreQuality()) { return CORE_GRADE_STEPS.find(([min]) => q >= min)[1] + '金丹'; }
+        // 突破元婴后金丹化婴，同一个品质数值改称元婴品质
+        function getCoreGradeName(q = getCoreQuality()) {
+            return CORE_GRADE_STEPS.find(([min]) => q >= min)[1] + (gameState.player.realmIndex >= NASCENT_SAFE_REALM ? '元婴' : '金丹');
+        }
         function applyCoreTemper(times) {
             const P = gameState.player;
             P.coreQuality = 100 - (100 - (P.coreQuality || 0)) * Math.pow(CORE_TEMPER_KEEP, times);
@@ -2060,12 +2074,38 @@
         // 凝立丹鼎（筑基后期的一次性修炼，原著"凝立丹鼎，为结丹期做准备，强化根基"）：结丹成功率加算
         const DANDING_BONUS = 0.1;
         // 境界未稳（原著"结丹初期：刚凝结金丹，境界未稳，功力运用未纯熟"）：结丹初期修为未到 30% 时攻防打折
-        const UNSTABLE_REALM = 18, UNSTABLE_UNTIL = 0.3, UNSTABLE_PENALTY = 0.1;
-        // 元婴不灭（原著"元婴不灭可夺舍重生"）：元婴期起秘境战败不掉修为
-        const NASCENT_SAFE_REALM = 22;
+        // 元婴初期同理（原著"刚诞生元婴，境界未稳"）
+        const UNSTABLE_REALMS = [18, 22], UNSTABLE_UNTIL = 0.3, UNSTABLE_PENALTY = 0.1;
+        // 元婴不灭（原著"元婴不灭，肉身被毁后可夺舍重生"）：元婴期起秘境战败不掉修为；
+        // 且每次进入秘境第一次被击败时夺舍重生，以 NASCENT_REVIVE_HP 的生命继续战斗
+        const NASCENT_SAFE_REALM = 22, NASCENT_REVIVE_HP = 0.4;
+        // 结婴心魔（原著"需要充分准备应对结婴心魔"）：结丹圆满冲击元婴前必须先斩心魔——一场镜像战（tribulation21），
+        // 心魔的生命/防御/速度/出手间隔与玩家相同，攻击为玩家的 HEART_DEMON_ATK 倍；复用天劫的「突破前必须通关」机制。
+        // 1.2 倍是实测定的：满血不带食物约三成胜率，带了战斗食物基本必胜——"充分准备"就是备好食物、满血再进
+        const HEART_DEMON_REALM = 21, HEART_DEMON_ATK = 1.2;
+        // 婴火（原著"拥有婴火，炼丹炼器效果远超普通火焰"）：元婴期起炼丹/炼器耗时减少、炼丹翻倍与炼器省料概率提高，
+        // 强度随元婴品质（= 结丹时定型的金丹品质，原著"金丹品质决定元婴质量"）在两端之间线性变化
+        const YINGHUO_TIME = [0.10, 0.20], YINGHUO_BONUS = [0.05, 0.15];
+        // 瞬移神通（原著"中期：能熟练运用各种元婴神通"）：元婴中期起闪避加成
+        const TELEPORT_REALM = 23, TELEPORT_DODGE = 0.05;
+        // 化神突破（原著"需要特殊功法和机缘，成功率极低"）：基础 + 元婴品质 + 拥有太虚元神诀 + 通关太虚幻境
+        const HUASHEN_RATE = { base: 0.15, quality: 0.25, art: 0.2, artId: 'soul_art', chance: 0.15, chanceDungeon: 'taixuDream' };
         function isRealmUnstable() {
             const P = gameState.player;
-            return P.realmIndex === UNSTABLE_REALM && P.cultivationXP < GAME_CONFIG.realms[UNSTABLE_REALM].nextReq * UNSTABLE_UNTIL;
+            return UNSTABLE_REALMS.includes(P.realmIndex) && P.cultivationXP < GAME_CONFIG.realms[P.realmIndex].nextReq * UNSTABLE_UNTIL;
+        }
+        function getYinghuoMod(key) {
+            if (gameState.player.realmIndex < NASCENT_SAFE_REALM) return 0;
+            const q = getCoreQuality() / 100;
+            if (key === 'time:alchemy' || key === 'time:forging') return -(YINGHUO_TIME[0] + (YINGHUO_TIME[1] - YINGHUO_TIME[0]) * q);
+            if (key === 'double:alchemy' || key === 'save:forging') return YINGHUO_BONUS[0] + (YINGHUO_BONUS[1] - YINGHUO_BONUS[0]) * q;
+            return 0;
+        }
+        function hasHuashenArt() { return (gameState.player.ownedArts || []).includes(HUASHEN_RATE.artId); }
+        function hasHuashenChance() { return !!(gameState.dungeons[HUASHEN_RATE.chanceDungeon] || {}).completed; }
+        function getHuashenRate() {
+            return HUASHEN_RATE.base + HUASHEN_RATE.quality * getCoreQuality() / 100
+                + (hasHuashenArt() ? HUASHEN_RATE.art : 0) + (hasHuashenChance() ? HUASHEN_RATE.chance : 0);
         }
         let statsRealmUnstable = false;   // calculateStats() 计算属性时是否处于境界未稳
         // 修为变化后调用：跨过 30% 门槛（或战败掉回门槛下）时重算属性
@@ -2074,7 +2114,7 @@
             if (unstable === statsRealmUnstable) return;
             const wasUnstable = statsRealmUnstable;
             calculateStats();
-            if (wasUnstable && !unstable) showNotification('🟡 境界稳固：金丹法力运用自如，攻击/防御恢复正常', '#c2a25f');
+            if (wasUnstable && !unstable) showNotification('🟡 境界稳固：攻击/防御恢复正常', '#c2a25f');
         }
 
         // 大境界突破成功率：null 表示丹药够了必成。筑基/结丹看灵根资质（结丹比筑基更难），元婴看金丹品质
@@ -2082,9 +2122,10 @@
             if (realmIndex === 13) return getRootGrade().zhuji;
             if (realmIndex === 17) return getRootGrade().jiedan + (gameState.player.danDing ? DANDING_BONUS : 0);
             if (realmIndex === 21) return Math.min(0.95, 0.35 + 0.6 * getCoreQuality() / 100);
+            if (realmIndex === 25) return getHuashenRate();
             return null;
         }
-        const BREAKTHROUGH_RATE_NAMES = { 13: '筑基', 17: '结丹', 21: '元婴' };
+        const BREAKTHROUGH_RATE_NAMES = { 13: '筑基', 17: '结丹', 21: '元婴', 25: '化神' };
 
         // 本命法宝「青竹蜂云剑」：唯一、不可出售。不会自己变强——原著韩立是不断用金雷竹祭炼、一把把加上去的：
         // 结丹期炼成（初成），之后每个大境界在炼器页「祭炼」一重，攻击升到该境界炼器武器的水平再乘金丹品质倍数。
@@ -2134,8 +2175,11 @@
             { from: 16, to: 17, title: '筑基后期·凝立丹鼎', tip: '修炼页「凝立丹鼎」（一次性）：结丹成功率 +10%' },
             { from: 18, to: 18, title: '结丹初期·境界未稳', tip: '修为达到本境界 30% 前攻击 / 防御 −10%；「金丹淬炼」可提高金丹品质' },
             { from: 19, to: 20, title: '结丹期·境界稳固', tip: '「金丹淬炼」提高金丹品质；凑齐万年金雷竹可炼本命法宝' },
-            { from: 21, to: 21, title: '结丹大圆满·假婴', tip: '金丹品质决定元婴成功率，突破元婴后品质定型' },
-            { from: 22, to: 25, title: '元婴期·元婴不灭', tip: '秘境战败不再损失修为；元婴出窍可驱使分身' }
+            { from: 21, to: 21, title: '结丹大圆满·假婴', tip: '冲击元婴前须先斩灭心魔（镜像战，满血带足食物）；金丹品质决定元婴成功率，也决定结成的元婴品质' },
+            { from: 22, to: 22, title: '元婴初期·境界未稳', tip: '修为达到本境界 30% 前攻击 / 防御 −10%；元婴出窍可驱使分身，神识技能开放' },
+            { from: 23, to: 23, title: '元婴中期·元婴稳固', tip: `瞬移神通已熟练：闪避 +${TELEPORT_DODGE * 100}%` },
+            { from: 24, to: 24, title: '元婴后期·元婴巅峰', tip: `为化神做准备：商城购得「太虚元神诀」可让化神成功率 +${HUASHEN_RATE.art * 100}%` },
+            { from: 25, to: 25, title: '元婴大圆满', tip: `太虚幻境开放，通关一次即得化神机缘（成功率 +${HUASHEN_RATE.chance * 100}%）；炼好化神丹再冲击化神` }
         ];
         function getRealmLore(idx) { return REALM_LORE.find(l => idx >= l.from && idx <= l.to) || null; }
 
@@ -2157,10 +2201,11 @@
             17: ['⚡ 天劫之地秘境开放（有几率掉落「万年金雷竹」，结丹后炼本命法宝要用，可以先攒着）', '💊 金丹秘药配方解锁，每次冲击结丹服一颗，多备几颗', `⚡ 结丹比筑基更难：成功率看灵根资质（天灵根 ${ROOT_GRADES.tian.jiedan * 100}% / 真灵根 ${ROOT_GRADES.zhen.jiedan * 100}% / 伪灵根 ${ROOT_GRADES.wei.jiedan * 100}%），失败耗掉丹药但不掉境界，可以重试`],
             18: [`⚠ 境界未稳：刚结金丹，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%，之后境界稳固恢复正常`, '⚔️ 结丹对筑基期敌人有大境界压制（命中、伤害更高）', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🎋 本命法宝：凑齐「万年金雷竹」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青竹蜂云剑」。一生只能炼一把、不可出售；之后每个大境界都能在炼器页「祭炼」一重（同境界武器的材料 + 1 根金雷竹），威力超过同阶普通法器。金丹品质决定威力倍数和最多能祭炼几重（下品三重、中品四重、上品以上五重），祭炼到顶后再改用普通炼器武器', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
             19: ['⚔️ 天劫之地战斗区域开放'],
-            21: ['🌌 元婴秘境开放', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🔒 突破元婴后金丹化为元婴，金丹品质就此定型，「金丹淬炼」不再提升品质——它同时决定本命法宝能祭炼到第几重，想走得远就在结丹期打磨好'],
-            22: ['🛡️ 元婴不灭：从此在秘境战败不再损失修为（食物照常损失一半）', '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
-            24: ['⚔️ 深渊遗迹战斗区域开放'],
-            25: ['🌠 太虚幻境秘境开放', '💊 化神丹配方解锁，突破元婴圆满前记得炼够'],
+            21: ['🌌 元婴秘境开放', '👹 结婴心魔：修为满后，突破弹窗里要先「斩心魔」才能冲击元婴。心魔是你自己的镜像——生命、防御、速度与你相同，攻击比你高两成；满血、装备好战斗食物再打基本能赢，空手去多半会输。战败照常损失修为和食物，可以重来，打赢一次即可', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🔒 突破元婴后金丹化为元婴，金丹品质就此定型成元婴品质，「金丹淬炼」不再提升——它决定婴火强度、化神成功率和本命法宝能祭炼到第几重，想走得远就在结丹期打磨好'],
+            22: [`🛡️ 元婴不灭：秘境战败不再损失修为（食物照常损失一半）；每次进入秘境，第一次被击败时元婴夺舍重生，以 ${NASCENT_REVIVE_HP * 100}% 生命继续战斗`, `🔥 婴火：炼丹、炼器耗时 −${YINGHUO_TIME[0] * 100}%～−${YINGHUO_TIME[1] * 100}%，炼丹翻倍、炼器省料概率 +${YINGHUO_BONUS[0] * 100}%～+${YINGHUO_BONUS[1] * 100}%，元婴品质越高越强（侧栏「境界感悟」显示你的实际数值）`, `⚠ 境界未稳：刚结元婴，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%`, '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
+            23: [`💨 瞬移神通：元婴稳固，闪避 +${TELEPORT_DODGE * 100}%`],
+            24: ['⚔️ 深渊遗迹战斗区域开放', `📜 化神需要特殊功法：拥有「太虚元神诀」（商城）可让化神成功率 +${HUASHEN_RATE.art * 100}%，可以先攒灵石`],
+            25: ['🌠 太虚幻境秘境开放：通关一次即得化神机缘', '💊 化神丹配方解锁，每次冲击化神服一颗', `⚡ 化神成功率极低：基础 ${HUASHEN_RATE.base * 100}% + 元婴品质最多 +${HUASHEN_RATE.quality * 100}% + 拥有「太虚元神诀」+${HUASHEN_RATE.art * 100}% + 通关太虚幻境（机缘）+${HUASHEN_RATE.chance * 100}%；失败耗掉丹药但不掉境界`],
             26: ['☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
             28: ['⚔️ 九幽冥渊战斗区域开放'],
             29: ['🌫️ 虚界秘境开放', '💊 化虚丹配方解锁，突破化神圆满前记得炼够'],
@@ -3666,11 +3711,18 @@
             // 4. P0-4 自动进食逻辑（在死亡检查前）
             checkAndAutoEat();
 
-            // 5. 检查玩家状态
+            // 5. 检查玩家状态：元婴期起每次秘境第一次被击败时夺舍重生，继续战斗
             if (gameState.player.stats.hp.current <= 0) {
-                handlePlayerDeath();
-                updateProgressBars();
-                return;
+                if (gameState.player.realmIndex >= NASCENT_SAFE_REALM && !gameState.dungeons.nascentRevived) {
+                    gameState.dungeons.nascentRevived = true;
+                    gameState.player.stats.hp.current = Math.floor(gameState.player.stats.hp.max * NASCENT_REVIVE_HP);
+                    addBattleLog(`🛡️ 肉身被毁，元婴夺舍重生！生命恢复到 ${Math.round(NASCENT_REVIVE_HP * 100)}%`, 'victory');
+                    showNotification(`🛡️ 元婴不灭：夺舍重生，以 ${Math.round(NASCENT_REVIVE_HP * 100)}% 生命继续战斗（本次秘境仅此一次）`, '#b39ddb');
+                } else {
+                    handlePlayerDeath();
+                    updateProgressBars();
+                    return;
+                }
             }
 
             // 累积进度
@@ -4936,6 +4988,8 @@
             const artEffects = CULTIVATION_ARTS[player.currentArt]?.effects;
             if (artEffects && artEffects[key]) total += artEffects[key];
             total += getRootGrade().effects[key] || 0;   // 灵根资质（天灵根修炼更快；伪灵根修炼慢，但掌天瓶让灵田又快又多）
+            total += getYinghuoMod(key);   // 元婴期婴火：炼丹 / 炼器更快、更容易翻倍或省料
+            if (key === 'dodge' && player.realmIndex >= TELEPORT_REALM) total += TELEPORT_DODGE;   // 元婴中期起的瞬移神通
             if ((key === 'atkPct' || key === 'defPct') && isRealmUnstable()) total -= UNSTABLE_PENALTY;
             total += getLawTotals()[key] || 0;
             total += getSkillUpgradeTotals()[key] || 0;   // 技能商店里已购置的设施
@@ -6578,7 +6632,8 @@
             const specialUsages = {
                 pill: '练气十三层冲击筑基时服用，每次冲击耗一颗（成功率看灵根资质）',
                 goldenpill: '筑基圆满冲击结丹时服用，每次冲击耗一颗（成功率看灵根资质与凝立丹鼎）',
-                yuanyingpill: '结丹圆满冲击元婴时服用，每次冲击耗一颗（成功率看金丹品质）',
+                yuanyingpill: '结丹圆满冲击元婴时服用，每次冲击耗一颗（成功率看金丹品质；须先斩灭心魔）',
+                huashenpill: '元婴圆满冲击化神时服用，每次冲击耗一颗（成功率看元婴品质、太虚元神诀、太虚幻境机缘）',
                 danhuo_seed: '丹火种子：在丹火技能「培育丹火」里使用，一次得到 25 丹火',
                 jinleizhu: '天劫之地秘境通关有几率获得；炼制本命法宝「青竹蜂云剑」和每一重祭炼都要用',
                 lifesword: '本命法宝：与心神相连，一生仅此一把、不可出售。每个大境界可在炼器页祭炼一重，攻击升到该境界武器之上并按金丹品质放大；金丹品质决定最多能祭炼几重',
@@ -7456,8 +7511,20 @@
                 return;
             }
 
+            // 心魔是镜像战：进入时按玩家当前属性改写它的数值
+            if (dungeon.isHeartDemon) {
+                calculateStats();
+                const s = gameState.player.stats, demon = dungeon.monsters[0];
+                demon.hp = s.hp.max;
+                demon.atk = Math.max(1, Math.round(s.atk * HEART_DEMON_ATK));
+                demon.def = s.def;
+                demon.spd = s.spd;
+                demon.attackSpeed = getPlayerAttackInterval();
+            }
+
             // 初始化秘境战斗状态
             gameState.dungeons.currentDungeon = dungeonId;
+            gameState.dungeons.nascentRevived = false;   // 元婴夺舍重生：每次进入秘境一次
             gameState.dungeons.currentMonsterIndex = 0;
             gameState.dungeons.defeatCount = 0;
             gameState.dungeons.bossDefeated = false;
@@ -7490,7 +7557,7 @@
             };
             gameState.currentActionProgress = 0;
 
-            if (!auto) showNotification(`进入 ${dungeon.name}！循环挑战，点「撤退」或被击败才会退出`, '#c2a25f');
+            if (!auto) showNotification(dungeon.isTribulation ? `${dungeon.name}开始！打赢一次即可，战败会损失修为和食物` : `进入 ${dungeon.name}！循环挑战，点「撤退」或被击败才会退出`, '#c2a25f');
             updateActionDisplay();
             updateUI();
 
@@ -7650,7 +7717,8 @@
             if (!box) return;
             const P = gameState.player;
             const idx = P.realmIndex;
-            const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, P.danDing, isRealmUnstable(), getLifeRefineTier(), ownsLifeTreasure()].join('|');
+            const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, P.danDing, isRealmUnstable(), getLifeRefineTier(), ownsLifeTreasure(),
+                hasSurvivedTribulation(HEART_DEMON_REALM), hasHuashenArt(), hasHuashenChance()].join('|');
             if (key === realmLoreKey) return;   // 每个 tick 都会调用，内容没变就不重写 DOM
             realmLoreKey = key;
             const lore = getRealmLore(idx);
@@ -7664,13 +7732,20 @@
             const gradeEff = describeEffects(grade.effects);
             rows.push(`<div>🌱 灵根资质：<b>${grade.name}</b>${gradeEff.length ? '（' + gradeEff.join('、') + '）' : ''}${grade.treasure ? ` · 身怀${grade.treasure}` : ''}</div>`);
             if (idx >= 18) {
-                rows.push(`<div>🟡 ${idx >= 22 ? '结丹根基' : '金丹'}：<b>${getCoreGradeName()}</b>（品质 ${getCoreQuality().toFixed(1)}${idx >= 22 ? '，已定型' : ''}）· 本命法宝威力 ×${getLifeTreasureMult().toFixed(2)}，最多祭炼到${LIFE_REFINE_TIERS[getLifeRefineCap()].name}</div>`);
+                rows.push(`<div>🟡 ${idx >= 22 ? '元婴' : '金丹'}：<b>${getCoreGradeName()}</b>（品质 ${getCoreQuality().toFixed(1)}${idx >= 22 ? '，由金丹品质定型' : ''}）· 本命法宝威力 ×${getLifeTreasureMult().toFixed(2)}，最多祭炼到${LIFE_REFINE_TIERS[getLifeRefineCap()].name}</div>`);
                 rows.push(`<div>🎍 本命法宝：${ownsLifeTreasure() ? `${GAME_CONFIG.items[LIFE_TREASURE_ID].name}（攻击 ${getLifeTreasureStats().atk}）` : '尚未炼成'}</div>`);
             }
-            const next = [13, 17, 21].find(i => i >= idx);
+            if (idx >= NASCENT_SAFE_REALM) {
+                const pct = v => Math.round(Math.abs(v) * 100);
+                rows.push(`<div>🔥 婴火：炼丹 / 炼器耗时 −${pct(getYinghuoMod('time:alchemy'))}%，炼丹翻倍、炼器省料 +${pct(getYinghuoMod('double:alchemy'))}%</div>`);
+                rows.push(`<div>🛡️ 元婴不灭：秘境战败不掉修为，每次秘境可夺舍重生一次（${NASCENT_REVIVE_HP * 100}% 生命）${idx >= TELEPORT_REALM ? `；瞬移神通：闪避 +${TELEPORT_DODGE * 100}%` : ''}</div>`);
+            }
+            const next = [13, 17, 21, 25].find(i => i >= idx);
             if (next !== undefined && idx >= next - 4) {
                 const prep = next === 13 ? (P.marrowCleansed ? ' · 洗髓易经 ✅' : ' · 洗髓易经未完成')
-                    : next === 17 ? (P.danDing ? ' · 丹鼎已立 ✅' : ' · 未凝立丹鼎') : '';
+                    : next === 17 ? (P.danDing ? ' · 丹鼎已立 ✅' : ' · 未凝立丹鼎')
+                    : next === 21 ? (hasSurvivedTribulation(HEART_DEMON_REALM) ? ' · 心魔已灭 ✅' : ' · 须先斩心魔')
+                    : ` · 太虚元神诀${hasHuashenArt() ? ' ✅' : ' ❌'} · 太虚幻境机缘${hasHuashenChance() ? ' ✅' : ' ❌'}`;
                 rows.push(`<div>⚡ ${BREAKTHROUGH_RATE_NAMES[next]}成功率：${Math.round(getMajorBreakthroughRate(next) * 100)}%${prep}</div>`);
             }
             box.innerHTML = rows.join('');
@@ -8424,7 +8499,9 @@
                 const fails = (gameState.player.btFails || {})[realmIndex] || 0;
                 let typeText = '需丹药辅助';
                 if (rate !== null) {
-                    const basis = realmIndex === 21 ? `${getCoreGradeName()} ${getCoreQuality().toFixed(1)}` : getRootGrade().name;
+                    const basis = realmIndex === 21 ? `${getCoreGradeName()} ${getCoreQuality().toFixed(1)}`
+                        : realmIndex === 25 ? `基础 ${HUASHEN_RATE.base * 100}% + ${getCoreGradeName()} +${Math.round(HUASHEN_RATE.quality * getCoreQuality())}% + 太虚元神诀${hasHuashenArt() ? ` +${HUASHEN_RATE.art * 100}% ✅` : ' ❌'} + 太虚幻境机缘${hasHuashenChance() ? ` +${HUASHEN_RATE.chance * 100}% ✅` : ' ❌'}`
+                        : getRootGrade().name;
                     typeText = `每次冲击服一颗丹药，${BREAKTHROUGH_RATE_NAMES[realmIndex]}成功率 ${Math.round(rate * 100)}%（${basis}）；失败耗丹不掉境界${fails ? `，已失败 ${fails} 次` : ''}`;
                 }
                 if (realmIndex === 13) {
@@ -8521,8 +8598,8 @@
             }
 
             // 炼虚 21-24：每个小境界先渡过对应的天劫才能突破（见「渡劫」入口）
-            if (TRIBULATION_REALMS.includes(realmIndex) && !hasSurvivedTribulation(realmIndex)) {
-                showNotification('修为已满，但还未渡过本境界的天劫，请先「渡劫」', '#c98a3e', 'warning');
+            if (BREAKTHROUGH_GATE_REALMS.includes(realmIndex) && !hasSurvivedTribulation(realmIndex)) {
+                showNotification(realmIndex === HEART_DEMON_REALM ? '修为已满，但心魔未除，请先「斩心魔」' : '修为已满，但还未渡过本境界的天劫，请先「渡劫」', '#c98a3e', 'warning');
                 showBreakthroughModal();
                 return;
             }
@@ -9199,9 +9276,11 @@
                 const failText = {
                     13: '丹田灵气未能化液，筑基失败',
                     17: '液态真气未能凝固成丹，结丹失败',
-                    21: '金丹未能温养出元婴，突破失败'
+                    21: '金丹未能温养出元婴，突破失败',
+                    25: '元婴未能向元神蜕变，化神失败'
                 }[realmIndex];
-                const hint = realmIndex === 21 ? '（多做「金丹淬炼」提高金丹品质可提升成功率）' : '';
+                const hint = realmIndex === 21 ? '（多做「金丹淬炼」提高金丹品质可提升成功率）'
+                    : realmIndex === 25 && !(hasHuashenArt() && hasHuashenChance()) ? '（购得「太虚元神诀」、通关太虚幻境可提升成功率）' : '';
                 showNotification(`⚡ ${failText}！耗去一颗${requirement.pillName}，境界未跌（已失败 ${tries} 次），再服丹重试${hint}`, '#c4483a', 'error');
                 updateUI();
                 saveGame();
@@ -9220,7 +9299,8 @@
             const successText = {
                 13: `服下${pillWord}，筑基成功！`,
                 17: `服下${pillWord}，凝成${getCoreGradeName()}（品质 ${getCoreQuality().toFixed(1)}）！境界未稳，修为达 ${UNSTABLE_UNTIL * 100}% 前攻防 −${UNSTABLE_PENALTY * 100}%`,
-                21: `服下${pillWord}，金丹化婴，元婴已成！从此秘境战败不再损失修为`
+                21: `服下${pillWord}，金丹化婴，结成${getCoreGradeName()}！境界未稳，修为达 ${UNSTABLE_UNTIL * 100}% 前攻防 −${UNSTABLE_PENALTY * 100}%`,
+                25: `服下${pillWord}，元婴化神，化神已成！`
             }[realmIndex];
             showNotification(successText || `消耗了 ${requirement.pillName} ×${requirement.qty}`, successText ? '#c2a25f' : '#7d9bb5', successText ? 'rare' : 'info');
         }
