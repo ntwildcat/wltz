@@ -751,8 +751,9 @@
                 ],
                 food: [
                     { id: 'millet', name: '灵米', icon: '🌾', price: 10, desc: '普通食物' },
-                    { id: 'cleangrass', name: '清灵草', icon: '🍃', price: 25, desc: '炼丹材料' },
-                    { id: 'mushroom', name: '灵芝', icon: '🍄', price: 50, desc: '高级材料' }
+                    // v7.04：原价 25 / 50 等于出售价，自己种毫无意义；提价后灵田（尤其伪灵根的掌天瓶）才有用
+                    { id: 'cleangrass', name: '清灵草', icon: '🍃', price: 60, desc: '炼丹材料（自己种更划算）' },
+                    { id: 'mushroom', name: '灵芝', icon: '🍄', price: 150, desc: '高级材料（自己种更划算）' }
                 ],
                 materials: [
                     { id: 'spiritore', name: '灵矿石', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 14 },
@@ -789,22 +790,25 @@
                     { id: 'voidcrystal', name: '虚晶 ×2', icon: '💠', price: 45, currency: 'daoguo', bundle: 2, desc: '炼虚级矿石（化虚 / 炼虚装备材料）', minRealmIndex: 34 }
                 ],
                 arts: [
-                    { id: 'qingmu_art', name: '青木诀', icon: '🌿', price: 200, desc: '修炼速度 ×1.1', minRealmIndex: 1, type: 'art' },
-                    { id: 'liuyun_art', name: '流云诀', icon: '☁️', price: 1200, desc: '修炼速度 ×1.25', minRealmIndex: 9, type: 'art' },
-                    { id: 'xuanshui_art', name: '玄水经', icon: '💧', price: 4000, desc: '修炼速度 ×1.35', minRealmIndex: 14, type: 'art' },
-                    { id: 'lieyang_art', name: '烈阳功', icon: '☀️', price: 8000, desc: '修炼速度 ×1.45', minRealmIndex: 16, type: 'art' },
-                    { id: 'golden_art', name: '金丹大道', icon: '📜', price: 10000, desc: '修炼速度 ×1.5', minRealmIndex: 17, type: 'art' },
-                    { id: 'fire_art', name: '焚天诀', icon: '🔥', price: 20000, desc: '修炼速度 ×1.8', minRealmIndex: 18, type: 'art' },
-                    { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 30000, desc: '修炼速度 ×2.2', minRealmIndex: 20, type: 'art' },
-                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 50000, desc: '修炼速度 ×2.8', minRealmIndex: 22, type: 'art' },
-                { id: 'huashen_art', name: '化神真经', icon: '📖', price: 120000, desc: '修炼速度 ×3.4', minRealmIndex: 26, type: 'art' },
-                { id: 'primordial_art', name: '太初混元诀', icon: '☯️', price: 300000, desc: '修炼速度 ×4.2', minRealmIndex: 28, type: 'art' },
-                    { id: 'lianxu_art', name: '炼虚真经', icon: '📖', price: 800000, desc: '修炼速度 ×5', minRealmIndex: 30, type: 'art' },
-                    { id: 'taixuhuashi_art', name: '太虚化实经', icon: '🕮', price: 2000000, desc: '修炼速度 ×6.2', minRealmIndex: 32, type: 'art' },
-                    { id: 'heti_art', name: '合体真经', icon: '📖', price: 2000000, desc: '修炼速度 ×8', minRealmIndex: 34, type: 'art' },
-                    { id: 'dao_art', name: '太上合道经', icon: '🕮', price: 5000000, desc: '修炼速度 ×9.5', minRealmIndex: 36, type: 'art' },
-                    { id: 'dacheng_art', name: '大乘真经', icon: '📖', price: 12000000, desc: '修炼速度 ×12', minRealmIndex: 38, type: 'art' },
-                    { id: 'taiyi_art', name: '太乙化元经', icon: '🕮', price: 30000000, desc: '修炼速度 ×15', minRealmIndex: 40, type: 'art' }
+                    // v7.04 功法重新定价：原价只相当于同期一两分钟的打怪收入，买不买不构成选择。
+                    // 现在按「功法解锁时最好的战斗区域每分钟灵石收入 × 若干分钟」定：练气 / 筑基约 4～6 分钟（境界本身就短），
+                    // 结丹 12～15 分钟，元婴～炼虚 20～25 分钟，合体 / 大乘 25～45 分钟。括号里是定价时的每分钟收入。
+                    { id: 'qingmu_art', name: '青木诀', icon: '🌿', price: 200, desc: '修炼速度 ×1.1', minRealmIndex: 1, type: 'art' },                    // 新手任务奖励就够
+                    { id: 'liuyun_art', name: '流云诀', icon: '☁️', price: 5000, desc: '修炼速度 ×1.25', minRealmIndex: 9, type: 'art' },                  // 1300/分
+                    { id: 'xuanshui_art', name: '玄水经', icon: '💧', price: 10000, desc: '修炼速度 ×1.35', minRealmIndex: 14, type: 'art' },              // 2700/分
+                    { id: 'lieyang_art', name: '烈阳功', icon: '☀️', price: 15000, desc: '修炼速度 ×1.45', minRealmIndex: 16, type: 'art' },               // 3900/分
+                    { id: 'golden_art', name: '金丹大道', icon: '📜', price: 25000, desc: '修炼速度 ×1.5', minRealmIndex: 17, type: 'art' },               // 3900/分
+                    { id: 'fire_art', name: '焚天诀', icon: '🔥', price: 80000, desc: '修炼速度 ×1.8', minRealmIndex: 18, type: 'art' },                   // 6600/分
+                    { id: 'yuanying_art', name: '元婴真解', icon: '👁️', price: 160000, desc: '修炼速度 ×2.2', minRealmIndex: 20, type: 'art' },           // 1.1万/分
+                    { id: 'soul_art', name: '太虚元神诀', icon: '🌌', price: 300000, desc: '修炼速度 ×2.8', minRealmIndex: 22, type: 'art' },              // 1.2万/分；还决定化神成功率 +20%
+                { id: 'huashen_art', name: '化神真经', icon: '📖', price: 1000000, desc: '修炼速度 ×3.4', minRealmIndex: 26, type: 'art' },                // 5万/分
+                { id: 'primordial_art', name: '太初混元诀', icon: '☯️', price: 2500000, desc: '修炼速度 ×4.2', minRealmIndex: 28, type: 'art' },           // 12万/分
+                    { id: 'lianxu_art', name: '炼虚真经', icon: '📖', price: 7000000, desc: '修炼速度 ×5', minRealmIndex: 30, type: 'art' },               // 29万/分
+                    { id: 'taixuhuashi_art', name: '太虚化实经', icon: '🕮', price: 15000000, desc: '修炼速度 ×6.2', minRealmIndex: 32, type: 'art' },     // 59万/分
+                    { id: 'heti_art', name: '合体真经', icon: '📖', price: 45000000, desc: '修炼速度 ×8', minRealmIndex: 34, type: 'art' },                // 180万/分
+                    { id: 'dao_art', name: '太上合道经', icon: '🕮', price: 110000000, desc: '修炼速度 ×9.5', minRealmIndex: 36, type: 'art' },            // 380万/分
+                    { id: 'dacheng_art', name: '大乘真经', icon: '📖', price: 220000000, desc: '修炼速度 ×12', minRealmIndex: 38, type: 'art' },           // 560万/分
+                    { id: 'taiyi_art', name: '太乙化元经', icon: '🕮', price: 520000000, desc: '修炼速度 ×15', minRealmIndex: 40, type: 'art' }            // 1170万/分
                 ]
             }
         };
@@ -8323,11 +8327,11 @@
                     const priceDisplay = isBought ? '✓ 已拥有'
                         : isOwnedArt ? (gameState.player.currentArt === item.id ? '✓ 当前功法' : '已拥有 · 点击装备')
                         : isLocked ? `🔒 需要${getRealmName(item.minRealmIndex)}`
-                        : `${SHOP_CURRENCIES[item.currency || 'coins'].icon()} ${item.price} ${SHOP_CURRENCIES[item.currency || 'coins'].name}`;
+                        : `${SHOP_CURRENCIES[item.currency || 'coins'].icon()} ${fmtXP(item.price)} ${SHOP_CURRENCIES[item.currency || 'coins'].name}`;
                     const priceColor = isBought ? '#6f9c8a' : isLocked ? '#c98a3e' : '#c2a25f';
                     // 未拥有的功法同时显示价格与境界要求，方便对比规划
                     const artExtra = item.type === 'art' && !isOwnedArt
-                        ? `<div style="font-size: 0.75em; color: #888; margin-top: 4px;">${isLocked ? item.price + ' 灵石' : '需要' + getRealmName(item.minRealmIndex) + '（已达成）'}</div>`
+                        ? `<div style="font-size: 0.75em; color: #888; margin-top: 4px;">${isLocked ? fmtXP(item.price) + ' 灵石' : '需要' + getRealmName(item.minRealmIndex) + '（已达成）'}</div>`
                         : '';
 
                     card.innerHTML = `
