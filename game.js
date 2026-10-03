@@ -6159,7 +6159,16 @@
             // 卡片显示实际耗时（含装备、功法、精通等加成）；与基础耗时不同时附上基础值
             const adjDur = getAdjustedDuration(skillName, recipe.duration, recipeKey);
             const fmt = v => parseFloat(v.toFixed(v < 10 ? 2 : 1));
-            const timeText = Math.abs(adjDur - recipe.duration) > 0.005 ? `${fmt(adjDur)}s <small style="color:#888">基础 ${recipe.duration}s</small>` : `${recipe.duration}s`;
+            // 修炼比基础还慢时写明是什么在拖慢（伪灵根、化神期精元亏损），否则玩家只看到"变慢了"不知道为什么
+            const slowReasons = [];
+            if (skillName === 'cultivation' && adjDur > recipe.duration + 0.005) {
+                const gradeSlow = getRootGrade().effects.cultSpeed || 0;
+                if (gradeSlow < 0) slowReasons.push(`${getRootGrade().name} ${Math.round(gradeSlow * 100)}%`);
+                const jingyuanSlow = Math.round(getJingyuanCultMod() * 100);
+                if (jingyuanSlow < 0) slowReasons.push(`精元亏损 ${jingyuanSlow}%`);
+            }
+            const slowText = slowReasons.length ? ` · <span style="color:#c98a3e">${slowReasons.join('、')}</span>` : '';
+            const timeText = Math.abs(adjDur - recipe.duration) > 0.005 ? `${fmt(adjDur)}s <small style="color:#888">基础 ${recipe.duration}s${slowText}</small>` : `${recipe.duration}s`;
 
             // 3. 检查材料充足度
             const materials = checkMaterialAvailability(recipe);
