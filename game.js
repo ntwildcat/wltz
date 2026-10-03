@@ -2107,6 +2107,43 @@
             return HUASHEN_RATE.base + HUASHEN_RATE.quality * getCoreQuality() / 100
                 + (hasHuashenArt() ? HUASHEN_RATE.art : 0) + (hasHuashenChance() ? HUASHEN_RATE.chance : 0);
         }
+        // ---- 化神期（v7.00） ----
+        // 天地灵气与精元（原著"能够调动天地灵气斗法……因人界灵气稀薄，妄动法力会加速精元流失、消耗寿命"）：
+        // 化神初期起每次出手调动天地灵气，伤害 +dmg[0]，中期起 +dmg[1]（原著"中期：能够熟练调动天地灵气"）。
+        // 人界的化神期（索引 from~to）每次出手耗 perAttack 精元，精元不够就没有加成；精元越低修炼越慢（最多 −cultPenalty），
+        // 按真实时间每分钟恢复 regenPerMin（用时间戳惰性结算，离线也算）。飞升灵界（炼虚起）后灵气充沛：不再耗精元，加成常驻。
+        const JINGYUAN = { max: 100, perAttack: 0.25, regenPerMin: 3, dmg: [0.2, 0.3], skilledRealm: 27, cultPenalty: 0.25, from: 26, to: 29 };
+        // 肉身极限（原著"肉身力量突破人界极限"）与神识质变（原著"神识范围和强度远超元婴期"）：化神初期起常驻
+        const HUASHEN_BODY_HP = 0.1, HUASHEN_SHENSHI_OUT = 0.3;
+        // 飞升灵界（原著"化神大圆满后需要飞升到灵界"）：化神圆满→炼虚初期除化虚丹外，须先通关这个秘境找到空间节点
+        const ASCEND_REALM = 29, ASCEND_DUNGEON = 'voidRealm';
+        function hasAscendNode() { return !!(gameState.dungeons[ASCEND_DUNGEON] || {}).completed; }
+        function usesJingyuan() { const r = gameState.player.realmIndex; return r >= JINGYUAN.from && r <= JINGYUAN.to; }
+        function getJingyuan() {
+            const P = gameState.player;
+            if (typeof P.jingyuan !== 'number') { P.jingyuan = JINGYUAN.max; P.jingyuanAt = Date.now(); }
+            return Math.min(JINGYUAN.max, P.jingyuan + Math.max(0, Date.now() - P.jingyuanAt) / 60000 * JINGYUAN.regenPerMin);
+        }
+        function getHeavenQiBonus() {
+            const r = gameState.player.realmIndex;
+            return r < JINGYUAN.from ? 0 : JINGYUAN.dmg[r >= JINGYUAN.skilledRealm ? 1 : 0];
+        }
+        let heavenQiWasActive = true;
+        // 玩家每次出手时调用：返回这一击的伤害倍率，并在人界化神期扣精元
+        function drawHeavenQi() {
+            const bonus = getHeavenQiBonus();
+            if (!bonus) return 1;
+            if (!usesJingyuan()) return 1 + bonus;
+            const P = gameState.player, left = getJingyuan();
+            const active = left >= JINGYUAN.perAttack;
+            if (active) { P.jingyuan = left - JINGYUAN.perAttack; P.jingyuanAt = Date.now(); }
+            else if (heavenQiWasActive) showNotification('💧 精元耗尽：调动不了天地灵气，伤害加成消失；停手休养会慢慢恢复', '#c98a3e');
+            heavenQiWasActive = active;
+            return active ? 1 + bonus : 1;
+        }
+        function getJingyuanCultMod() {
+            return usesJingyuan() ? -JINGYUAN.cultPenalty * (1 - getJingyuan() / JINGYUAN.max) : 0;
+        }
         let statsRealmUnstable = false;   // calculateStats() 计算属性时是否处于境界未稳
         // 修为变化后调用：跨过 30% 门槛（或战败掉回门槛下）时重算属性
         function checkRealmStability() {
@@ -2179,7 +2216,11 @@
             { from: 22, to: 22, title: '元婴初期·境界未稳', tip: '修为达到本境界 30% 前攻击 / 防御 −10%；元婴出窍可驱使分身，神识技能开放' },
             { from: 23, to: 23, title: '元婴中期·元婴稳固', tip: `瞬移神通已熟练：闪避 +${TELEPORT_DODGE * 100}%` },
             { from: 24, to: 24, title: '元婴后期·元婴巅峰', tip: `为化神做准备：商城购得「太虚元神诀」可让化神成功率 +${HUASHEN_RATE.art * 100}%` },
-            { from: 25, to: 25, title: '元婴大圆满', tip: `太虚幻境开放，通关一次即得化神机缘（成功率 +${HUASHEN_RATE.chance * 100}%）；炼好化神丹再冲击化神` }
+            { from: 25, to: 25, title: '元婴大圆满', tip: `太虚幻境开放，通关一次即得化神机缘（成功率 +${HUASHEN_RATE.chance * 100}%）；炼好化神丹再冲击化神` },
+            { from: 26, to: 26, title: '化神初期·沟通天地', tip: `出手调动天地灵气，伤害 +${JINGYUAN.dmg[0] * 100}%；人界灵气稀薄，每次出手耗精元，精元亏损会拖慢修炼。第二个分身、悟道、灵域开放` },
+            { from: 27, to: 27, title: '化神中期·元神转化', tip: `天地灵气运用纯熟：伤害加成升到 +${JINGYUAN.dmg[1] * 100}%` },
+            { from: 28, to: 28, title: '化神后期·将近飞升', tip: '化神圆满后要找到通往灵界的空间节点才能飞升，可以先备化虚丹' },
+            { from: 29, to: 29, title: '化神大圆满·飞升在即', tip: '通关一次虚界秘境找到空间节点，再服化虚丹即可飞升灵界（炼虚期）；飞升后不再损耗精元' }
         ];
         function getRealmLore(idx) { return REALM_LORE.find(l => idx >= l.from && idx <= l.to) || null; }
 
@@ -2206,10 +2247,11 @@
             23: [`💨 瞬移神通：元婴稳固，闪避 +${TELEPORT_DODGE * 100}%`],
             24: ['⚔️ 深渊遗迹战斗区域开放', `📜 化神需要特殊功法：拥有「太虚元神诀」（商城）可让化神成功率 +${HUASHEN_RATE.art * 100}%，可以先攒灵石`],
             25: ['🌠 太虚幻境秘境开放：通关一次即得化神机缘', '💊 化神丹配方解锁，每次冲击化神服一颗', `⚡ 化神成功率极低：基础 ${HUASHEN_RATE.base * 100}% + 元婴品质最多 +${HUASHEN_RATE.quality * 100}% + 拥有「太虚元神诀」+${HUASHEN_RATE.art * 100}% + 通关太虚幻境（机缘）+${HUASHEN_RATE.chance * 100}%；失败耗掉丹药但不掉境界`],
-            26: ['☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
+            26: [`🌊 调动天地灵气：从此每次出手伤害 +${JINGYUAN.dmg[0] * 100}%（化神中期起 +${JINGYUAN.dmg[1] * 100}%）。但人界灵气稀薄，每次出手耗 ${JINGYUAN.perAttack} 点精元（上限 ${JINGYUAN.max}，每分钟自然恢复 ${JINGYUAN.regenPerMin}）：精元耗尽就没有这份加成，而且精元越低修炼越慢（最多 −${JINGYUAN.cultPenalty * 100}%）——想专心修炼就少出手。侧栏「境界感悟」随时显示精元`, `💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%`, '☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
+            27: [`🌊 天地灵气运用纯熟：出手伤害加成 +${JINGYUAN.dmg[0] * 100}% → +${JINGYUAN.dmg[1] * 100}%`],
             28: ['⚔️ 九幽冥渊战斗区域开放'],
-            29: ['🌫️ 虚界秘境开放', '💊 化虚丹配方解锁，突破化神圆满前记得炼够'],
-            30: ['🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：从这个境界起，每次突破小境界前，突破弹窗会先要求「渡劫」——去对应的天劫秘境打赢，回来才能真正突破'],
+            29: ['🌫️ 虚界秘境开放：通关一次即找到通往灵界的空间节点——这是飞升灵界（突破炼虚）的前提', '💊 化虚丹配方解锁，飞升时服一颗'],
+            30: [`🌌 飞升灵界：这里灵气充沛，出手不再损耗精元，天地灵气的伤害加成（+${JINGYUAN.dmg[1] * 100}%）从此常驻，修炼也不再受精元拖累`, '🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：从这个境界起，每次突破小境界前，突破弹窗会先要求「渡劫」——去对应的天劫秘境打赢，回来才能真正突破'],
             32: ['⚔️ 化实之界战斗区域开放'],
             33: ['🌌 天道秘境开放', '💊 合体丹配方解锁，突破炼虚圆满前记得炼够'],
             34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 道果页可以「合道」：收回全部分身（不可逆，之后不能再用分身），换所有主行动速度 +100%、生命/攻击/防御/速度 +15%、神识与道果产出提升——这个操作不急着现在做，但合体圆满突破到大乘期之前必须做', '⚔️ 道痕荒原战斗区域开放'],
@@ -2973,11 +3015,12 @@
         function performPlayerAttack(monster) {
             const { hitChance, realmSuppression, counterModifier } = getDungeonPlayerHit(monster);
             const eff = getMonsterEffectiveStats(monster);
+            const heavenQi = drawHeavenQi();   // 化神起：出手调动天地灵气（人界每次出手耗精元）
 
             if (Math.random() < hitChance) {
                 const baseDmg = gameState.player.stats.atk || 20;
                 let playerDmg = BATTLE_FORMULAS.calculateDamage({ atk: baseDmg }, { def: eff.def || 0 });
-                playerDmg = Math.floor(playerDmg * realmSuppression.dmgMod);
+                playerDmg = Math.floor(playerDmg * realmSuppression.dmgMod * heavenQi);
                 playerDmg = Math.floor(playerDmg * counterModifier.damage);
                 playerDmg = Math.floor(playerDmg * getBattleSkillDmgMult());   // 战斗技能等级加成
                 // 暴击（基础5%、×1.5，灵根/功法/灵域可提高）
@@ -3772,7 +3815,7 @@
                 battle.playerAttackTimer -= playerInterval;
                 const toEnemy = rollNormalAttack(playerStats, { ...enemy, def: enemyEff.def, spd: enemyEff.spd }, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm),
                     { hit: getMod('hit'), crit: BASE_CRIT.rate + getMod('crit'), critMult: BASE_CRIT.dmg + getMod('critDmg'),
-                      dmgMult: (1 + getMasteryBonus('battle', battle.currentArea).dmg) * getBattleSkillDmgMult(),
+                      dmgMult: (1 + getMasteryBonus('battle', battle.currentArea).dmg) * getBattleSkillDmgMult() * drawHeavenQi(),
                       dodge: isDomainDodgeVoid() ? 0 : getDomainMod('dodge') });   // 水域：敌方也获得闪避
                 if (toEnemy.hit) {
                     enemy.currentHP -= toEnemy.dmg;
@@ -4990,6 +5033,11 @@
             total += getRootGrade().effects[key] || 0;   // 灵根资质（天灵根修炼更快；伪灵根修炼慢，但掌天瓶让灵田又快又多）
             total += getYinghuoMod(key);   // 元婴期婴火：炼丹 / 炼器更快、更容易翻倍或省料
             if (key === 'dodge' && player.realmIndex >= TELEPORT_REALM) total += TELEPORT_DODGE;   // 元婴中期起的瞬移神通
+            if (player.realmIndex >= JINGYUAN.from) {
+                if (key === 'hpPct') total += HUASHEN_BODY_HP;   // 化神：肉身极限
+                else if (key === 'out:shenshi') total += HUASHEN_SHENSHI_OUT;   // 化神：神识质变
+                else if (key === 'cultSpeed') total += getJingyuanCultMod();   // 人界化神期：精元亏损拖慢修炼
+            }
             if ((key === 'atkPct' || key === 'defPct') && isRealmUnstable()) total -= UNSTABLE_PENALTY;
             total += getLawTotals()[key] || 0;
             total += getSkillUpgradeTotals()[key] || 0;   // 技能商店里已购置的设施
@@ -6634,6 +6682,7 @@
                 goldenpill: '筑基圆满冲击结丹时服用，每次冲击耗一颗（成功率看灵根资质与凝立丹鼎）',
                 yuanyingpill: '结丹圆满冲击元婴时服用，每次冲击耗一颗（成功率看金丹品质；须先斩灭心魔）',
                 huashenpill: '元婴圆满冲击化神时服用，每次冲击耗一颗（成功率看元婴品质、太虚元神诀、太虚幻境机缘）',
+                huaxupill: '化神圆满飞升灵界（突破炼虚）时服用；还须先通关一次虚界秘境找到空间节点',
                 danhuo_seed: '丹火种子：在丹火技能「培育丹火」里使用，一次得到 25 丹火',
                 jinleizhu: '天劫之地秘境通关有几率获得；炼制本命法宝「青竹蜂云剑」和每一重祭炼都要用',
                 lifesword: '本命法宝：与心神相连，一生仅此一把、不可出售。每个大境界可在炼器页祭炼一重，攻击升到该境界武器之上并按金丹品质放大；金丹品质决定最多能祭炼几重',
@@ -7718,7 +7767,8 @@
             const P = gameState.player;
             const idx = P.realmIndex;
             const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, P.danDing, isRealmUnstable(), getLifeRefineTier(), ownsLifeTreasure(),
-                hasSurvivedTribulation(HEART_DEMON_REALM), hasHuashenArt(), hasHuashenChance()].join('|');
+                hasSurvivedTribulation(HEART_DEMON_REALM), hasHuashenArt(), hasHuashenChance(),
+                usesJingyuan() ? Math.floor(getJingyuan()) : '', hasAscendNode()].join('|');
             if (key === realmLoreKey) return;   // 每个 tick 都会调用，内容没变就不重写 DOM
             realmLoreKey = key;
             const lore = getRealmLore(idx);
@@ -7739,6 +7789,17 @@
                 const pct = v => Math.round(Math.abs(v) * 100);
                 rows.push(`<div>🔥 婴火：炼丹 / 炼器耗时 −${pct(getYinghuoMod('time:alchemy'))}%，炼丹翻倍、炼器省料 +${pct(getYinghuoMod('double:alchemy'))}%</div>`);
                 rows.push(`<div>🛡️ 元婴不灭：秘境战败不掉修为，每次秘境可夺舍重生一次（${NASCENT_REVIVE_HP * 100}% 生命）${idx >= TELEPORT_REALM ? `；瞬移神通：闪避 +${TELEPORT_DODGE * 100}%` : ''}</div>`);
+            }
+            if (idx >= JINGYUAN.from) {
+                const bonus = Math.round(getHeavenQiBonus() * 100);
+                if (usesJingyuan()) {
+                    const j = getJingyuan();
+                    rows.push(`<div${j < JINGYUAN.perAttack ? ' style="color:#c98a3e"' : ''}>💧 精元 ${Math.floor(j)}/${JINGYUAN.max}：出手调动天地灵气伤害 +${bonus}%，每次出手耗 ${JINGYUAN.perAttack}；修炼速度${Math.round(getJingyuanCultMod() * 100) ? ' −' + Math.round(-getJingyuanCultMod() * 100) + '%' : '正常'}（精元越低越慢，最多 −${JINGYUAN.cultPenalty * 100}%），每分钟恢复 ${JINGYUAN.regenPerMin}</div>`);
+                    if (idx === ASCEND_REALM) rows.push(`<div>🌀 空间节点：${hasAscendNode() ? '已找到 ✅' : '未找到（通关一次虚界秘境）'}</div>`);
+                } else {
+                    rows.push(`<div>🌊 天地灵气：出手伤害 +${bonus}%（灵界灵气充沛，不耗精元）</div>`);
+                }
+                rows.push(`<div>💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%</div>`);
             }
             const next = [13, 17, 21, 25].find(i => i >= idx);
             if (next !== undefined && idx >= next - 4) {
@@ -8494,7 +8555,7 @@
                 button.textContent = have >= need ? '🌟 飞升突破 🌟' : `仙窍不足（${have}/${need}）`;
             } else if (isMajorBreakthrough && nextRealm) {
                 // 大境界突破
-                document.getElementById('btModalTitle').textContent = `✨ 突破${nextRealm ? nextRealm.name : '大道尽头'} ✨`;
+                document.getElementById('btModalTitle').textContent = realmIndex === ASCEND_REALM ? `✨ 飞升灵界（${nextRealm.name}）✨` : `✨ 突破${nextRealm ? nextRealm.name : '大道尽头'} ✨`;
                 const rate = getMajorBreakthroughRate(realmIndex);
                 const fails = (gameState.player.btFails || {})[realmIndex] || 0;
                 let typeText = '需丹药辅助';
@@ -8507,6 +8568,10 @@
                 if (realmIndex === 13) {
                     // 练气十三层→筑基初期：丹药之外还要洗髓易经
                     typeText += gameState.player.marrowCleansed ? '｜洗髓易经已完成 ✅' : '｜须先完成「洗髓易经」（修炼页，尚未完成 ❌）';
+                }
+                if (realmIndex === ASCEND_REALM) {
+                    const dn = GAME_CONFIG.dungeons[ASCEND_DUNGEON].name;
+                    typeText += hasAscendNode() ? '｜已找到通往灵界的空间节点 ✅' : `｜须先找到通往灵界的空间节点：通关一次「${dn}」秘境（尚未完成 ❌）`;
                 }
                 document.getElementById('btBreakthroughType').textContent = typeText;
 
@@ -8543,8 +8608,10 @@
                 const pillReady = pillReq && (gameState.player.inventory.find(item => item.id === pillReq.pillId)?.qty || 0) >= pillReq.qty;
                 if (realmIndex === 13 && pillReady && !gameState.player.marrowCleansed) {
                     button.textContent = '未完成洗髓易经';
+                } else if (realmIndex === ASCEND_REALM && pillReady && !hasAscendNode()) {
+                    button.textContent = '尚未找到空间节点';
                 } else if (pillReady) {
-                    button.textContent = '🌟 服丹突破 🌟';
+                    button.textContent = realmIndex === ASCEND_REALM ? '🌟 服丹飞升 🌟' : '🌟 服丹突破 🌟';
                 } else {
                     button.textContent = '丹药不足';
                 }
@@ -8607,6 +8674,11 @@
             // 练气十三层→筑基初期：原著设定除了筑基丹还要「洗髓易经」改善凡人体质，两个条件都要满足
             if (realmIndex === 13 && !gameState.player.marrowCleansed) {
                 showNotification('必须先完成「洗髓易经」才能突破筑基（去「修炼」页）', '#c98a3e', 'warning');
+                return;
+            }
+            // 化神圆满→炼虚初期是飞升灵界：先要找到通往灵界的空间节点
+            if (realmIndex === ASCEND_REALM && !hasAscendNode()) {
+                showNotification(`尚未找到通往灵界的空间节点——先通关一次「${GAME_CONFIG.dungeons[ASCEND_DUNGEON].name}」秘境`, '#c98a3e', 'warning');
                 return;
             }
 
@@ -9300,7 +9372,8 @@
                 13: `服下${pillWord}，筑基成功！`,
                 17: `服下${pillWord}，凝成${getCoreGradeName()}（品质 ${getCoreQuality().toFixed(1)}）！境界未稳，修为达 ${UNSTABLE_UNTIL * 100}% 前攻防 −${UNSTABLE_PENALTY * 100}%`,
                 21: `服下${pillWord}，金丹化婴，结成${getCoreGradeName()}！境界未稳，修为达 ${UNSTABLE_UNTIL * 100}% 前攻防 −${UNSTABLE_PENALTY * 100}%`,
-                25: `服下${pillWord}，元婴化神，化神已成！`
+                25: `服下${pillWord}，元婴化神，化神已成！出手可调动天地灵气（伤害 +${JINGYUAN.dmg[0] * 100}%），但每次出手都耗精元`,
+                29: `服下${requirement.pillName}，穿过空间节点飞升灵界！灵气充沛，出手不再损耗精元`
             }[realmIndex];
             showNotification(successText || `消耗了 ${requirement.pillName} ×${requirement.qty}`, successText ? '#c2a25f' : '#7d9bb5', successText ? 'rare' : 'info');
         }
