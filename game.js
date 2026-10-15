@@ -49,7 +49,7 @@
                 { name: '炼虚后期', nextReq: 15600000 },
                 { name: '炼虚圆满', nextReq: 19300000 },
                 // 合体期（索引34-37）：合体初期起可「合道」（收回分身，换取主行动×2加速）；
-                // 合体圆满（37）预留大乘期入口，必须已合道（FUSION_REQUIRED_REALM=37）；合计约 31h
+                // 合体初期起突破必须已合道（FUSION_REQUIRED_REALM=34，v7.07）；合计约 31h
                 { name: '合体初期', nextReq: 105000000 },
                 { name: '合体中期', nextReq: 179000000 },
                 { name: '合体后期', nextReq: 350000000 },
@@ -385,8 +385,9 @@
                 // 小天劫落在 元婴后期 / 化神初期 / 化神后期；大天劫每个大境界的瓶颈处一次——炼虚圆满、合体圆满、大乘中期、大乘圆满（飞升天劫）。
                 // kind 决定渡过后的永久加成（小天劫生命/防御 +2%，大天劫 +3%）。
                 // 天劫不是镜像：hitFrac = 每一击（命中后）打掉玩家生命上限的比例，interval = 固定出手间隔，hpMult = 血量是玩家的几倍。
-                // 标定（标准玩家带食物 / 满淬炼战斗 Lv80 带食物）：小天劫三次 100%/100%、100%/100%、100%/100%；
-                // 大天劫 约 90%/100%、72%/100%、54%/93%、38%/78%；不带食物全部 0%——练得越强越稳，天劫越往后越凶。
+                // 标定（标准玩家带食物）：小天劫三次都约 100%，第一次大天劫约 90%，不带食物全部 0%。
+                // v7.07 合体起斗法核心是法则（法则之力 + 元气化形），合体后的三次大天劫按八法则平均等级标定：
+                // 平均 0 级 约 33% / 30% / 13%，10 级 约 88% / 73% / 60%，20 级 约 98% / 95% / 97%——悟道投入越深渡劫越稳。
                 tribulation21: {
                     id: 'tribulation21', name: '结婴心魔', desc: '金丹化婴之际心魔丛生：它是照着你此刻的实力生出来的，出手比你更重——满血、带足战斗食物再来', icon: '👹',
                     isTribulation: true, isHeartDemon: true, tribulationRealm: 21, minRealmIndex: 21, baseRealmIndex: 21,
@@ -425,21 +426,21 @@
                 tribulation37: {
                     id: 'tribulation37', name: '第二次大天劫', desc: '三千年又至，劫数更凶', icon: '☄️',
                     isTribulation: true, kind: 'big', tribulationRealm: 37, minRealmIndex: 37, baseRealmIndex: 37,
-                    mirror: { hpMult: 2.25, hitFrac: 0.22, interval: 1.0 },
+                    mirror: { hpMult: 2.25, hitFrac: 0.25, interval: 1.0 },
                     monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [4000000, 6000000], daoguo: [150, 250], skillExp: 2000 }
                 },
                 tribulation39: {
                     id: 'tribulation39', name: '第三次大天劫', desc: '大乘修士也躲不过的三千年之劫', icon: '☄️',
                     isTribulation: true, kind: 'big', tribulationRealm: 39, minRealmIndex: 39, baseRealmIndex: 39,
-                    mirror: { hpMult: 2.5, hitFrac: 0.25, interval: 1.0 },
+                    mirror: { hpMult: 2.5, hitFrac: 0.29, interval: 1.0 },
                     monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [15000000, 22000000], daoguo: [250, 400], skillExp: 3000 }
                 },
                 tribulation41: {
                     id: 'tribulation41', name: '飞升天劫', desc: '飞升真仙前的最后一劫，九死一生——大乘修士多在此反复打磨、迟迟不敢渡', icon: '🌌',
                     isTribulation: true, kind: 'big', tribulationRealm: 41, minRealmIndex: 41, baseRealmIndex: 41,
-                    mirror: { hpMult: 2.5, hitFrac: 0.26, interval: 1.0 },
+                    mirror: { hpMult: 2.5, hitFrac: 0.32, interval: 1.0 },
                     monsters: [{ name: '飞升劫雷', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [40000000, 60000000], daoguo: [400, 600], skillExp: 5000 }
                 }
@@ -1353,7 +1354,9 @@
         function getAvatarMod(key) {
             if (key !== 'atkPct' && key !== 'defPct') return 0;
             const lv = getAvatarLevel();
-            return key === 'atkPct' ? lv * AVATAR_ATK_PER_LEVEL : lv * AVATAR_DEF_PER_LEVEL;
+            // 合道后化身与本体融合（原著"合体期修士可将自身与元婴、化身融合"），化身加成翻倍
+            const fused = isFused() ? 2 : 1;
+            return (key === 'atkPct' ? lv * AVATAR_ATK_PER_LEVEL : lv * AVATAR_DEF_PER_LEVEL) * fused;
         }
         function upgradeAvatar() {
             const P = ensureCurrencyState();
@@ -1394,7 +1397,9 @@
 
         // ---- 道果（合体期货币）、道果强化与合道（v6.60） ----
         // 合体初期（索引 21）起解锁道果技能与货币。道果不能出售，用于：道果淬体（基础属性）、道果悟法（法则效果）、道果商城；
-        // 并可用丹火 + 神识融合凝练。合道：收回分身（不可逆），换取主行动大幅加速与属性 / 产出加成；晋升炼虚期必须已合道。
+        // 并可用丹火 + 神识融合凝练。合道：元婴分身与身外化身归于本体（不可逆），换取主行动大幅加速与属性 / 产出加成。
+        // v7.07：原著"合体期修士可将自身与元婴、化身融合……法力成倍增长"——合体期本身就是融合后的状态，
+        // 所以合道从「合体圆满前必须做」提前到「合体初期突破中期前必须做」（修炼时长标定本来就按合体初期即合道算）。
         const DAOGUO_ICON = ITEM_ICONS.daoguo;
         const DAO_BODY_MAX = 10, DAO_BODY_PER_LEVEL = 0.03;      // 道果淬体：生命 / 攻击 / 防御 +3%/级
         const DAO_LAW_MAX = 5, DAO_LAW_PER_LEVEL = 0.10;         // 道果悟法：全部法则效果 +10%/级
@@ -1406,7 +1411,7 @@
             outShenshi: 0.5,     // 神识产出 +50%
             outDaoguo: 0.3       // 道果产出 +30%
         };
-        const FUSION_REQUIRED_REALM = 37;   // v6.89：原索引28 → +9，合体圆满：晋升下一境界必须已合道
+        const FUSION_REQUIRED_REALM = 34;   // 合体初期起：晋升下一境界必须已合道（v7.07 由合体圆满 37 提前）
         // 聚灵培元（v6.76）：灵石的软性无底洞。技能设施买完之后灵石在大乘期完全没处花，
         // 加这个无等级上限、每级涨价的永久小额加成——价格指数增长（×1.15/级），买得越多越贵，
         // 早期几万灵石就能买、后期要吞掉大量灵石，让「灵石多到花不完」始终有地方去，
@@ -1488,7 +1493,7 @@
             const P = ensureCurrencyState();
             if (!isDaoguoUnlocked()) { showNotification('合体初期才能合道', '#c98a3e'); return; }
             if (isFused()) { showNotification('你已经合道了', '#c98a3e'); return; }
-            const ok = confirm('确定要合道吗？\n\n合道后你的分身将永久消失，且不可逆（无法解除、无法再召回分身，神识里的「分身强化」也会失效）。\n\n换来的是：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・神识产出 +50%、道果产出 +30%\n\n注意：晋升大乘期必须已合道。');
+            const ok = confirm('确定要合道吗？\n\n合道后元婴分身与身外化身都归于本体：分身永久消失，且不可逆（无法再召回分身，神识里的「分身强化」也会失效）。\n\n换来的是（法力成倍增长）：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・身外化身的攻击 / 防御加成翻倍\n・神识产出 +50%、道果产出 +30%\n\n注意：合体初期突破中期之前必须合道。');
             if (!ok) return;
             P.fusion = { active: true, at: Date.now() };
             getClones().forEach(c => { c.action = null; c.progress = 0; });
@@ -1504,8 +1509,8 @@
             const P = ensureCurrencyState();
             const bl = getDaoBody(), ll = getDaoLaw();
             const fusedCard = isFused()
-                ? `<div class="use-row"><div class="use-main"><b>🌟 已合道</b><div class="use-effect">所有主行动速度 +100% · 生命 / 攻击 / 防御 / 速度 +15% · 神识产出 +50% · 道果产出 +30%<br/>分身已收回体内，不可逆。</div></div><span class="use-max">已合道</span></div>`
-                : `<div class="use-row"><div class="use-main"><b>🌟 合道（不可逆）</b><div class="use-effect">收回你的分身：所有主行动速度 +100%、生命 / 攻击 / 防御 / 速度 +15%、神识产出 +50%、道果产出 +30%。<br/>代价：分身永久消失，无法解除。<b>晋升大乘期必须先合道。</b></div></div><button type="button" class="btn use-btn" onclick="startFusion()">合道</button></div>`;
+                ? `<div class="use-row"><div class="use-main"><b>🌟 已合道</b><div class="use-effect">所有主行动速度 +100% · 生命 / 攻击 / 防御 / 速度 +15% · 身外化身加成翻倍 · 神识产出 +50% · 道果产出 +30%<br/>分身与化身已归于本体，不可逆。</div></div><span class="use-max">已合道</span></div>`
+                : `<div class="use-row"><div class="use-main"><b>🌟 合道（不可逆）</b><div class="use-effect">元婴分身与身外化身归于本体：所有主行动速度 +100%、生命 / 攻击 / 防御 / 速度 +15%、身外化身加成翻倍、神识产出 +50%、道果产出 +30%。<br/>代价：分身永久消失，无法解除。<b>合体初期突破中期之前必须合道。</b></div></div><button type="button" class="btn use-btn" onclick="startFusion()">合道</button></div>`;
             const maxTimes = Math.floor(Math.min(P.danhuo / FUSE_COST.danhuo, P.shenshi / FUSE_COST.shenshi));
             return `
                 <div class="use-balance">${DAOGUO_ICON} 道果 <b>${Math.floor(P.daoguo)}</b><small>产出：道果技能的配方（凝练 / 培育 / 提炼 / 归元）· 合体级战斗区域胜利 · 天道秘境通关 · 丹火与神识融合。道果不能出售，只用来变强和购买商品。</small></div>
@@ -2288,6 +2293,29 @@
         function getJingyuanCultMod() {
             return usesJingyuan() ? -JINGYUAN.cultPenalty * (1 - getJingyuan() / JINGYUAN.max) : 0;
         }
+        // ---- 合体期（v7.07） ----
+        // 原著"此境界斗法的核心不再是法力多寡，而是天地之力的运用……可随意驱使元气化形攻击，甚至初步借用法则之力"。
+        // 游戏化的整条线：化神参悟法则（悟道）→ 炼虚化虚为实（道则）→ 合体借用法则之力（法则的战斗效果翻倍）+ 元气化形（法则越深、化形越强）。
+        // 法则之力：合体起悟道法则里与斗法相关的效果 ×LAW_POWER_MULT（修炼速度、生活技能等不翻倍，不打乱时长标定）
+        const LAW_POWER_REALM = 34, LAW_POWER_MULT = 2;
+        const LAW_COMBAT_KEYS = new Set(['atkPct', 'hpPct', 'defPct', 'spdPct', 'crit', 'critDmg', 'dodge', 'hit', 'regen', 'foodPct']);
+        // 元气化形：合体起战斗中每 interval 秒额外一击，无视防御，伤害 = 攻击 × (base + perAvgLevel × 八法则平均等级) × 战斗等级加成
+        const QI_FORM = { realm: 34, interval: 3, base: 0.1, perAvgLevel: 0.025 };   // 法则平均 0 / 10 / 20 / 30 级：攻击 ×0.10 / 0.35 / 0.60 / 0.85
+        function getLawAvgLevel() { return LAW_IDS.reduce((sum, id) => sum + getLawInfo(id).level, 0) / LAW_IDS.length; }
+        function getQiFormMult() {
+            return gameState.player.realmIndex < QI_FORM.realm ? 0 : QI_FORM.base + QI_FORM.perAvgLevel * getLawAvgLevel();
+        }
+        const areaQiFormClock = { qiFormTimer: 0 };   // 普通战斗区域的化形计时（跨场累积）
+        // 战斗里按时间累积，到点打出一击，返回伤害（0 = 这一步没出手）
+        function tickQiForm(holder, timeDelta) {
+            const mult = getQiFormMult();
+            if (!mult) return 0;
+            holder.qiFormTimer = (holder.qiFormTimer || 0) + timeDelta;
+            if (holder.qiFormTimer < QI_FORM.interval) return 0;
+            holder.qiFormTimer -= QI_FORM.interval;
+            return Math.max(1, Math.floor(gameState.player.stats.atk * mult * getBattleSkillDmgMult()));
+        }
+
         // ---- 修为里程碑（v7.05） ----
         // 元婴以后每个小境界动辄几小时到二十几小时，中间只有一根进度条。修为每到 25% / 50% / 75% 给一份「感悟」奖励：
         // 灵石 = 当前境界最好战斗区域 coinWins 场的收入（约十分钟的打怪收益），外加一份神识（元婴～炼虚）或道果（合体、大乘）。
@@ -2399,7 +2427,10 @@
             { from: 29, to: 29, title: '化神大圆满·飞升在即', tip: '通关虚界秘境找到空间节点、用五行之精补全五行灵根，再服化虚丹即可飞升灵界（炼虚期）' },
             { from: 30, to: 30, title: '炼虚初期·身融天地', tip: `与天地元气相融：战斗区域被击败不再退出，秘境可夺舍重生 ${VOID_DUNGEON_REVIVES} 次（天劫除外）；化虚 / 道则开放` },
             { from: 31, to: 32, title: '炼虚期·化虚为实', tip: '悟道页「化虚」把法则等级兑成道则，镶嵌进装备页的道基槽' },
-            { from: 33, to: 33, title: '炼虚圆满·大天劫', tip: '炼虚以上每三千年一次大天劫：突破合体前须先渡过第一次大天劫，威能远胜小天劫' }
+            { from: 33, to: 33, title: '炼虚圆满·大天劫', tip: '炼虚以上每三千年一次大天劫：突破合体前须先渡过第一次大天劫，威能远胜小天劫' },
+            { from: 34, to: 34, title: '合体初期·融合化力', tip: '道果页「合道」：元婴分身、身外化身归于本体，法力成倍增长；突破中期前必须合道' },
+            { from: 35, to: 36, title: '合体期·天地之力', tip: `斗法靠的是法则：悟道法则的战斗效果 ×${LAW_POWER_MULT}，元气化形随法则平均等级变强——多去悟道页参悟` },
+            { from: 37, to: 37, title: '合体圆满·第二次大天劫', tip: '突破大乘前须渡第二次大天劫；法则越深、化形越强，渡劫越稳' }
         ];
         function getRealmLore(idx) { return REALM_LORE.find(l => idx >= l.from && idx <= l.to) || null; }
 
@@ -2426,16 +2457,16 @@
             23: [`💨 瞬移神通：元婴稳固，闪避 +${TELEPORT_DODGE * 100}%`],
             24: ['⚔️ 深渊遗迹战斗区域开放', `📜 化神需要特殊功法：拥有「太虚元神诀」（商城）可让化神成功率 +${HUASHEN_RATE.art * 100}%，可以先攒灵石`],
             25: ['🌠 太虚幻境秘境开放：通关一次即得化神机缘', '💊 化神丹配方解锁，每次冲击化神服一颗', `⚡ 化神成功率极低：基础 ${HUASHEN_RATE.base * 100}% + 元婴品质最多 +${HUASHEN_RATE.quality * 100}% + 拥有「太虚元神诀」+${HUASHEN_RATE.art * 100}% + 通关太虚幻境（机缘）+${HUASHEN_RATE.chance * 100}%；失败耗掉丹药但不掉境界`],
-            26: [`🌊 调动天地灵气：从此每次出手伤害 +${JINGYUAN.dmg[0] * 100}%（化神中期起 +${JINGYUAN.dmg[1] * 100}%）。但人界灵气稀薄，每次出手耗 ${JINGYUAN.perAttack} 点精元（上限 ${JINGYUAN.max}，每分钟自然恢复 ${JINGYUAN.regenPerMin}）：精元耗尽就没有这份加成，而且精元越低修炼越慢（最多 −${JINGYUAN.cultPenalty * 100}%）——想专心修炼就少出手。侧栏「境界感悟」随时显示精元`, `💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%`, '☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
+            26: [`🌊 调动天地灵气：从此每次出手伤害 +${JINGYUAN.dmg[0] * 100}%（化神中期起 +${JINGYUAN.dmg[1] * 100}%）。但人界灵气稀薄，每次出手耗 ${JINGYUAN.perAttack} 点精元（上限 ${JINGYUAN.max}，每分钟自然恢复 ${JINGYUAN.regenPerMin}）：精元耗尽就没有这份加成，而且精元越低修炼越慢（最多 −${JINGYUAN.cultPenalty * 100}%）——想专心修炼就少出手。侧栏「境界感悟」随时显示精元`, `💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%`, '☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）。到了合体期，法则就是斗法的核心：战斗效果翻倍，还决定元气化形的威力和之后几次大天劫的难度，可以早点开始参悟', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
             27: [`🌊 天地灵气运用纯熟：出手伤害加成 +${JINGYUAN.dmg[0] * 100}% → +${JINGYUAN.dmg[1] * 100}%`],
             28: ['⚔️ 九幽冥渊战斗区域开放'],
             29: ['🌫️ 虚界秘境开放：通关一次即找到通往灵界的空间节点——这是飞升灵界（突破炼虚）的前提', '🌈 补灵根：突破炼虚须身具金木水火土五行灵根。虚界秘境会掉落五行之精，每缺一行要 2 个（你本身就是的那一行不用；雷 / 冰 / 风异灵根五行都要补），凑齐后在修炼页「补全五行灵根」', '💊 化虚丹配方解锁，飞升时服一颗'],
             30: [`🌌 飞升灵界：这里灵气充沛，出手不再损耗精元，天地灵气的伤害加成（+${JINGYUAN.dmg[1] * 100}%）从此常驻，修炼也不再受精元拖累`, '🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', `🌌 身融天地，不死不灭：战斗区域被击败不再退出循环（元气重凝，生命回到一半继续打，连败 3 场才停），秘境里可夺舍重生 ${VOID_DUNGEON_REVIVES} 次——但天劫例外，纵有无限寿元，亦可能陨落于劫数之下`, '☄️ 大天劫：炼虚以上每三千年一次，比小天劫凶得多——炼虚圆满、合体圆满、大乘中期、大乘圆满（飞升天劫）各一次，一劫重过一劫，后两次往往要试几次。渡过一次生命 / 防御永久 +3%'],
             32: ['⚔️ 化实之界战斗区域开放'],
             33: ['🌌 天道秘境开放', '💊 合体丹配方解锁，突破炼虚圆满前记得炼够'],
-            34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 道果页可以「合道」：收回全部分身（不可逆，之后不能再用分身），换所有主行动速度 +100%、生命/攻击/防御/速度 +15%、神识与道果产出提升——这个操作不急着现在做，但合体圆满突破到大乘期之前必须做', '⚔️ 道痕荒原战斗区域开放'],
+            34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 合体期以融合为本：道果页「合道」——元婴分身与身外化身归于本体（不可逆，之后不能再用分身），法力成倍增长：所有主行动速度 +100%、生命/攻击/防御/速度 +15%、身外化身加成翻倍、神识与道果产出提升。合体初期突破中期之前必须合道', `☯️ 借用法则之力：从此斗法的核心不再是法力多寡，而是天地之力——悟道法则里与战斗有关的效果（攻击、生命、防御、速度、暴击、闪避、命中、回复、食物）全部 ×${LAW_POWER_MULT}`, `🌀 元气化形：战斗中每 ${QI_FORM.interval} 秒额外打出一击，无视防御，伤害 = 攻击 × (${QI_FORM.base * 100}% + 八种法则平均等级 × ${QI_FORM.perAvgLevel * 100}%)——法则悟得越深，化形越强`, '⚔️ 道痕荒原战斗区域开放'],
             36: ['⚔️ 合一虚境战斗区域开放'],
-            37: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁（前提是已经合道），本境界圆满后必须先合道才能突破到大乘期'],
+            37: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁，突破大乘时服一颗'],
             38: ['👁️ 元婴蜕变解锁：道果页花道果 + 元婴精魄升级（最多10级），从婴儿形态练到青年形态，被动加攻击和暴击伤害，不用手动操作', '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
             40: ['⚔️ 灵界绝境战斗区域开放'],
             41: ['🌌 灵界至高战力已至，但大道并未到头——「修炼」页新增「开辟仙窍」配方：不产出修为，每次花太乙精华×5，直接打通一窍（xianqiao +1），累计 12 窍即可突破飞升为真仙初期，之前攒的修为不影响这次突破'],
@@ -3926,6 +3957,13 @@
                 performPlayerAttack(monster);
                 gameState.player.attackTimer = 0;
             }
+            // 合体起：元气化形，定时额外一击（无视防御）
+            const qiForm = tickQiForm(gameState.dungeons, timeDelta);
+            if (qiForm) {
+                gameState.dungeons.currentMonsterHP -= qiForm;
+                showDamageFloat(-qiForm, false, false);
+                addBattleLog(`🌀 元气化形：造成${qiForm}点伤害（无视防御）`, 'player-hit');
+            }
 
             // 2. 怪物攻击计时
             gameState.dungeons.monsterAttackTimer += timeDelta;
@@ -4020,6 +4058,13 @@
                 } else {
                     battle.log.push('玩家攻击落空');
                 }
+                trimBattleLog(battle.log);
+            }
+            // 合体起：元气化形，定时额外一击（无视防御）。普通战斗一场只有两三秒，计时跨场累积，不随每场重置
+            const qiForm = enemy.currentHP > 0 ? tickQiForm(areaQiFormClock, timeDelta) : 0;
+            if (qiForm) {
+                enemy.currentHP -= qiForm;
+                battle.log.push(`🌀 元气化形造成${qiForm}点伤害（无视防御）`);
                 trimBattleLog(battle.log);
             }
 
@@ -5239,7 +5284,7 @@
                 else if (key === 'cultSpeed') total += getJingyuanCultMod();   // 人界化神期：精元亏损拖慢修炼
             }
             if ((key === 'atkPct' || key === 'defPct') && isRealmUnstable()) total -= UNSTABLE_PENALTY;
-            total += getLawTotals()[key] || 0;
+            total += (getLawTotals()[key] || 0) * (player.realmIndex >= LAW_POWER_REALM && LAW_COMBAT_KEYS.has(key) ? LAW_POWER_MULT : 1);   // 合体起借用法则之力
             total += getSkillUpgradeTotals()[key] || 0;   // 技能商店里已购置的设施
             total += getEquippedEffectSum(key);   // 装备物品自带的特效（含武器/护甲的修炼速度、道基镶嵌的道则）
             total += getDaoMod(key);   // 道果淬体 / 合道
@@ -7796,6 +7841,7 @@
             gameState.dungeons.currentDungeon = dungeonId;
             gameState.dungeons.nascentRevived = false;   // 元婴夺舍重生：每次进入秘境重新计数
             gameState.dungeons.nascentRevives = 0;
+            gameState.dungeons.qiFormTimer = 0;
             gameState.dungeons.currentMonsterIndex = 0;
             gameState.dungeons.defeatCount = 0;
             gameState.dungeons.bossDefeated = false;
@@ -7992,7 +8038,7 @@
             const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, P.danDing, isRealmUnstable(), getLifeRefineTier(), ownsLifeTreasure(),
                 hasSurvivedTribulation(HEART_DEMON_REALM), hasHuashenArt(), hasHuashenChance(),
                 usesJingyuan() ? Math.floor(getJingyuan()) : '', hasAscendNode(), isHeavenQiOff(), JSON.stringify(P.btFails || {}), getXianqiao(),
-                hasSurvivedTribulation(idx), hasFiveRoots()].join('|');
+                hasSurvivedTribulation(idx), hasFiveRoots(), isFused(), idx >= LAW_POWER_REALM ? getLawAvgLevel().toFixed(1) : ''].join('|');
             if (key === realmLoreKey) return;   // 每个 tick 都会调用，内容没变就不重写 DOM
             realmLoreKey = key;
             const lore = getRealmLore(idx);
@@ -8031,6 +8077,10 @@
                     more.push(`<div>🌊 天地灵气：出手伤害 +${bonus}%（灵界灵气充沛，不耗精元）</div>`);
                 }
                 more.push(`<div>💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%</div>`);
+            }
+            if (idx >= FUSION_REQUIRED_REALM && !isFused()) now.push('<div style="color:#c98a3e">🌟 尚未合道：突破前必须先在道果页「合道」</div>');
+            if (idx >= LAW_POWER_REALM) {
+                now.push(`<div>☯️ 天地之力：法则平均 ${getLawAvgLevel().toFixed(1)} 级 · 法则战斗效果 ×${LAW_POWER_MULT} · 元气化形每 ${QI_FORM.interval} 秒一击（攻击 ×${getQiFormMult().toFixed(2)}，无视防御）</div>`);
             }
             if (idx >= VOID_UNDYING_REALM) more.push(`<div>🌌 身融天地：战斗区域被击败不退出，秘境可夺舍重生 ${VOID_DUNGEON_REVIVES} 次（${NASCENT_REVIVE_HP * 100}% 生命；天劫仍只有一次）</div>`);
             const tribBonus = getTribulationMod('hpPct');
@@ -8910,9 +8960,9 @@
                 return;
             }
 
-            // 合体圆满（FUSION_REQUIRED_REALM）起必须已合道才能晋升下一境界（大乘期，预留）
+            // 合体初期（FUSION_REQUIRED_REALM）起必须已合道才能晋升下一境界
             if (realmIndex >= FUSION_REQUIRED_REALM && !isFused()) {
-                showNotification('晋升下一境界必须先合道（在「道果」页面选择合道，不可逆）', '#c98a3e', 'warning');
+                showNotification('合体期以融合为本：突破前必须先合道（在「道果」页面选择合道，不可逆）', '#c98a3e', 'warning');
                 return;
             }
 
