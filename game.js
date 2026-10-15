@@ -1739,7 +1739,8 @@
             const mHit = Math.max(0.05, Math.min(0.95, BATTLE_FORMULAS.calculateHitChance(boss.spd, s.spd) * (1 - Math.min(0.6, getMod('dodge')))));
             // 天劫用 hitFrac：每一击（命中后）打掉玩家生命上限的固定比例。食物一口能回满血，生死只看"几击之内会不会被打穿"，
             // 若按玩家攻击力反推，攻击越高天劫越狠，等于惩罚练攻击；心魔是镜像，仍按 dmgRatio 跟玩家输出走
-            const target = cfg.hitFrac ? cfg.hitFrac * s.hp.max : cfg.dmgRatio * playerPerAttack / mHit;
+            // 失败保底：每失败一次劫力减弱 8%（天劫按每击占生命比例减，心魔按镜像伤害倍率减）
+            const target = (cfg.hitFrac ? cfg.hitFrac * s.hp.max : cfg.dmgRatio * playerPerAttack / mHit) * getTribPityMult(dungeon.id);
             let lo = 1, hi = Math.max(10, target * 5);
             for (let i = 0; i < 50; i++) {
                 const mid = (lo + hi) / 2;
@@ -1750,6 +1751,24 @@
             return oldMax;
         }
         function tribulationIdFor(realmIndex) { return `tribulation${realmIndex}`; }
+        // 天劫 / 心魔 / 三衰的失败保底（v7.16）：大境界突破失败有保底，渡劫却没有，法则没练够的玩家在大乘两劫只有一两成通过率，
+        // 每次失败还丢一半食物、越输越弱。现在每失败一次劫力减弱 8%（最多 5 次、共 40%），失败只丢 20% 食物。
+        // 按比例减而不是减固定百分点：天劫强弱取决于"几击打穿你"（取整），飞升天劫 32% 减 5 个点到 27% 仍是 4 击打穿，等于没减；
+        // 减 40% 到约 19% 才变成 6 击。
+        const TRIB_PITY = { maxFails: 5, per: 0.08 };
+        function getTribFails(dungeonId) { return Math.min(TRIB_PITY.maxFails, ((gameState.dungeons && gameState.dungeons[dungeonId]) || {}).fails || 0); }
+        function getTribPityMult(dungeonId) { return 1 - TRIB_PITY.per * getTribFails(dungeonId); }
+        function getEffectiveHitFrac(dungeon) { return dungeon.mirror.hitFrac * getTribPityMult(dungeon.id); }
+        // 入口处的说明：每击打掉多少生命（含保底）+ 大乘前后对法则的建议
+        function tribulationHint(dungeon) {
+            const fails = getTribFails(dungeon.id);
+            const parts = [];
+            if (dungeon.mirror && dungeon.mirror.hitFrac) parts.push(`每击约打掉你 ${Math.round(getEffectiveHitFrac(dungeon) * 100)}% 生命`);
+            if (fails) parts.push(`已失败 ${fails} 次，劫力已减弱 ${Math.round((1 - getTribPityMult(dungeon.id)) * 100)}%${fails >= TRIB_PITY.maxFails ? '（已到最低）' : ''}`);
+            const r = dungeon.tribulationRealm;
+            if (r >= 37) parts.push(`法则平均 ${getLawAvgLevel().toFixed(0)} 级（建议 ${r >= 41 ? 20 : 10} 级以上，法则越深越稳）`);
+            return parts.join(' · ');
+        }
         function hasSurvivedTribulation(realmIndex) {
             const rec = gameState.dungeons && gameState.dungeons[tribulationIdFor(realmIndex)];
             return !!(rec && rec.completed);
@@ -1773,6 +1792,7 @@
                 box.style.display = 'block';
                 box.innerHTML = `<div class="bt-guide-title">${d.icon} ${d.name}已降临（${shuai.effect}）</div>
                     <div class="bt-guide-line">${d.desc}。渡过即消；三衰都渡过才能突破真仙后期</div>
+                    <div class="bt-guide-line" style="color:var(--text-l4)">${tribulationHint(d)}</div>
                     <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); maybeSelectDomainThenEnter(() => enterDungeon('${shuai.id}'));">${d.icon} 渡${d.name}</button>`;
                 return;
             }
@@ -1781,6 +1801,7 @@
             box.style.display = 'block';
             box.innerHTML = `<div class="bt-guide-title">${dungeon.isHeartDemon ? '👹 冲击元婴前须先斩灭心魔' : '⚡ 需先渡过本境界的天劫'}</div>
                 <div class="bt-guide-line">${dungeon.icon} ${dungeon.name}：${dungeon.desc}</div>
+                ${tribulationHint(dungeon) ? `<div class="bt-guide-line" style="color:var(--text-l4)">${tribulationHint(dungeon)}</div>` : ''}
                 <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); maybeSelectDomainThenEnter(() => enterDungeon('${tribulationIdFor(realmIndex)}'));">${dungeon.isHeartDemon ? '👹 斩心魔' : '⚡ 渡劫'}</button>`;
         }
 
@@ -3524,11 +3545,16 @@
             deathRecord.cultivationLost = lostCultivation;
             checkRealmStability();
 
-            // 2. 损失食物（50%）
+            // 2. 损失食物（50%；天劫 / 心魔 / 三衰只丢 20%，并记一次失败给下次减弱劫力）
+            const foodLossRate = dungeon.isTribulation ? 0.2 : 0.5;
+            if (dungeon.isTribulation) {
+                const rec = gameState.dungeons[dungeonId] || (gameState.dungeons[dungeonId] = { completed: false });
+                rec.fails = (rec.fails || 0) + 1;
+            }
             let foodLost = 0;
             gameState.player.inventory.forEach(item => {
                 if (GAME_CONFIG.items[item.id] && GAME_CONFIG.items[item.id].type === 'food') {
-                    const lose = Math.ceil(item.qty * 0.5);
+                    const lose = Math.ceil(item.qty * foodLossRate);
                     item.qty -= lose;
                     foodLost += lose;
                 }
@@ -3554,7 +3580,8 @@
             const damagePercent = ((hpBefore - gameState.player.stats.hp.current) / gameState.player.stats.hp.max * 100).toFixed(0);
             const notificationText = `✗ 被${monster.name}击败！\n\n` +
                                     (nascentSafe ? `${dungeon.isHeartDemon ? '心魔未除' : '元婴不灭'}：修为无损\n` : `丢失修为: ${lostCultivation} (10%)\n`) +
-                                    `丢失食物: ${foodLost}份 (50%)\n` +
+                                    `丢失食物: ${foodLost}份 (${Math.round(foodLossRate * 100)}%)\n` +
+                                    (dungeon.isTribulation ? `下次再渡：劫力减弱至 ${Math.round(getTribPityMult(dungeonId) * 100)}%（失败 ${getTribFails(dungeonId)}/${TRIB_PITY.maxFails} 次封顶）\n` : '') +
                                     `血量: ${gameState.player.stats.hp.current}/${gameState.player.stats.hp.max} (+50%)`;
             showNotification(notificationText, '#c4483a', 'danger');
 
@@ -6175,7 +6202,8 @@
                     } else {
                         gameState.currentAction = null;
                         gameState.currentActionProgress = 0;
-                        showNotification(`修为已达 ${currentRealm.name} 上限，请进行突破`, '#c2a25f');
+                        const orificeRealm = (GAME_CONFIG.realms[gameState.player.realmIndex + 1] || {}).xianqiaoReq;
+                        showNotification(orificeRealm ? `${currentRealm.name}以窍代修：修为再多也不能突破，请做修炼页「开辟仙窍」` : `修为已达 ${currentRealm.name} 上限，请进行突破`, '#c2a25f');
                     }
                 } else {
                     // 正常增加修为
@@ -6345,10 +6373,17 @@
             }
         }
 
+        const OFFLINE_HOURS_MAX = 24;
+        function clampOfflineHours(v) { v = parseInt(v); return Number.isFinite(v) ? Math.min(OFFLINE_HOURS_MAX, Math.max(1, v)) : OFFLINE_HOURS_MAX; }
         function updateSetting(settingName, value) {
             // 转换值类型
             if (settingName === 'maxOfflineHours' || settingName === 'fontScale' || settingName === 'notificationSeconds') {
                 value = parseInt(value);
+            }
+            if (settingName === 'maxOfflineHours') {
+                value = clampOfflineHours(value);
+                const input = document.getElementById('maxOfflineHours');
+                if (input) input.value = value;   // 输入了超出范围的数，把输入框也改回实际生效的值
             }
             gameState.settings[settingName] = value;
             updateSettingDisplay(settingName);
@@ -6854,7 +6889,9 @@
             // 修炼：普通修炼配方只留最好的 3 个在外面，其余收进「更早的配方」；有特殊作用的配方（淬炼、洗髓、注灵、仙窍…）用得上就一直留在外面
             if (skillName === 'cultivation') {
                 const plain = entries.filter(e => e.unlocked && isPlainCultivationRecipe(e.recipe));
-                plain.slice(0, Math.max(0, plain.length - 3)).forEach(e => { e.obsolete = true; });
+                // 大乘圆满起突破只看仙窍，普通修炼配方全部收起（修为在这两个境界已经不推动突破，挂着等于白挂）
+                const keep = gameState.player.realmIndex >= 41 ? 0 : 3;
+                plain.slice(0, Math.max(0, plain.length - keep)).forEach(e => { e.obsolete = true; });
                 entries.filter(e => e.unlocked && !isPlainCultivationRecipe(e.recipe) && isSpentCultivationRecipe(e.recipe)).forEach(e => { e.obsolete = true; });
             }
             foldActionList(actionList, entries, '配方');
@@ -8340,7 +8377,8 @@
                 hasSurvivedTribulation(HEART_DEMON_REALM), hasHuashenArt(), hasHuashenChance(),
                 usesJingyuan() ? Math.floor(getJingyuan()) : '', hasAscendNode(), isHeavenQiOff(), JSON.stringify(P.btFails || {}), getXianqiao(),
                 hasSurvivedTribulation(idx), hasFiveRoots(), isFused(), idx >= LAW_POWER_REALM ? getLawAvgLevel().toFixed(1) : '',
-                getNascentSoul(), Math.floor(P.nascentInfuse || 0), XIAN_SHUAI.map(isShuaiDone).join()].join('|');
+                getNascentSoul(), Math.floor(P.nascentInfuse || 0), XIAN_SHUAI.map(isShuaiDone).join(), P.cultivationXP >= GAME_CONFIG.realms[idx].nextReq,
+                TRIBULATION_REALMS.includes(idx) ? getTribFails(tribulationIdFor(idx)) : '', XIAN_SHUAI.map(sh => getTribFails(sh.id)).join()].join('|');
             if (key === realmLoreKey) return;   // 每个 tick 都会调用，内容没变就不重写 DOM
             realmLoreKey = key;
             const lore = getRealmLore(idx);
@@ -8395,7 +8433,11 @@
             if (tribBonus > 0) more.push(`<div>⚡ 已渡天劫 ${TRIBULATION_REALMS.filter(r => hasSurvivedTribulation(r)).length} 次：生命 / 防御 +${Math.round(tribBonus * 100)}%</div>`);
             if (TRIBULATION_REALMS.includes(idx)) {
                 const d = GAME_CONFIG.dungeons[tribulationIdFor(idx)];
-                now.push(`<div>${d.icon} ${d.name}：${hasSurvivedTribulation(idx) ? '已渡过 ✅' : idx === 41 ? `须先渡劫，灵气才能化为仙灵力（满血、带足食物）<button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${tribulationIdFor(41)}'))">⚡ 渡劫</button>` : '修为满后须先渡劫才能突破（满血、带足食物）'}</div>`);
+                // 渡劫按钮：大乘圆满一进来就能渡（渡完才能化仙灵力）；其他境界修为满了才出现。带 lore-todo 的按钮才算「待办」
+                const tribBtn = `<button type="button" class="btn btn-secondary lore-todo" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${tribulationIdFor(idx)}'))">⚡ 渡劫</button>`;
+                const xpFull = P.cultivationXP >= GAME_CONFIG.realms[idx].nextReq;
+                const hint = hasSurvivedTribulation(idx) ? '' : tribulationHint(d);
+                now.push(`<div>${d.icon} ${d.name}：${hasSurvivedTribulation(idx) ? '已渡过 ✅' : idx === 41 ? `须先渡劫，灵气才能化为仙灵力（满血、带足食物）${tribBtn}` : xpFull ? `修为已满，渡过才能突破（满血、带足食物）${tribBtn}` : '修为满后须先渡劫才能突破（满血、带足食物）'}${hint ? `<br><small style="color:var(--text-l4)">${hint}</small>` : ''}</div>`);
             }
             const nextRealm = GAME_CONFIG.realms[idx + 1];
             if (nextRealm && nextRealm.xianqiaoReq) {
@@ -8413,7 +8455,7 @@
                     if (isShuaiDone(sh)) { more.push(`<div>${d.icon} ${d.name}：已渡过 ✅</div>`); return; }
                     if (getXianqiao() < sh.at) { now.push(`<div style="color:#888">${d.icon} ${d.name}：仙窍 ${sh.at} 窍时降临（${sh.effect}）</div>`); return; }
                     now.push(`<div style="color:#c4483a">${d.icon} ${d.name}生效中：${sh.effect}
-                        <button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${sh.id}'))">渡${d.name}</button></div>`);
+                        <button type="button" class="btn btn-secondary lore-todo" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${sh.id}'))">渡${d.name}</button><br><small style="color:var(--text-l4)">${tribulationHint(d)}</small></div>`);
                 });
             }
             const next = [13, 17, 21, 25].find(i => i >= idx);
@@ -8432,7 +8474,7 @@
             if (mBox && mSum) {
                 const body = now.slice(lore ? 1 : 0).join('');
                 mBox.innerHTML = body;
-                const todo = (body.match(/<button/g) || []).length;
+                const todo = (body.match(/lore-todo/g) || []).length;
                 mSum.innerHTML = `📜 ${lore ? lore.title : '境界感悟'}${todo ? ` <span class="rl-badge">${todo} 项待办</span>` : ''}`;
             }
         }
@@ -10300,6 +10342,7 @@
                 theme: 'dark'
             }, gameState.settings || {});
             delete gameState.settings.enableSoundEffects;
+            gameState.settings.maxOfflineHours = clampOfflineHours(gameState.settings.maxOfflineHours);
         }
 
         // ---- 多存档（最多 3 个槽位）----
