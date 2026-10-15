@@ -2295,3 +2295,56 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 /* 设置页：标签不折行，右侧说明文字自己换行；「查看」类按钮是次要操作 */
 #panel-settings .stat-row > .stat-label { flex: none; white-space: nowrap; margin-right: 10px; }
 #panel-settings .stat-row > label:not(.stat-label) { flex: 1; min-width: 0; }
+
+/* ===== v7.13 视觉统一：其余页面 ===== */
+/* 选中态一律古铜（商城分类标签原来是朱砂框） */
+.shop-tab.active { border-color: var(--bronze); box-shadow: inset 0 -2px 0 var(--bronze); }
+
+/* 生活技能卡：材料不足不再整圈描橙边（缺的材料本身已标红），只稍微压暗 */
+.action-item.recipe-materials-lack, .action-item.recipe-materials-lack:hover { border-color: var(--border-l3); opacity: 0.85; box-shadow: none; }
+/* 「交给分身」是次要操作：缩成靠右的小按钮 */
+.action-item .clone-btn { align-self: flex-end; justify-self: end; width: auto; margin: 6px 0 0; padding: 2px 10px; border-color: var(--border-l4); color: var(--text-l3); font-size: 0.78em; }
+.action-item .clone-btn.on { border-color: var(--jade); color: var(--jade); background: transparent; }
+
+/* 战斗区域卡：统一左对齐；已满足的境界要求不再单列一行 */
+#battleActions .action-item { text-align: left; align-items: stretch; }
+#battleActions .action-name { font-family: var(--font-title); color: var(--text-l1); font-size: 1.05em; letter-spacing: 0.05em; }
+#battleActions .action-desc { color: var(--text-l4); font-size: 0.85em; margin-bottom: 4px; }
+#battleActions .recipe-req.met { display: none; }
+#battleActions .recipe-mastery { text-align: left; }
+#battleActions .recipe-mastery .mastery-track { margin-left: 0; max-width: none; }
+
+/* 克制关系、生命条：去框，只留底色 */
+#battleCounterPreview { background: var(--bg-l2) !important; border: none !important; border-left: 3px solid var(--jade-dim) !important; border-radius: 0 !important; }
+.hp-restore-bar { border: none; background: var(--bg-l2); }
+
+/* 悟道法则卡：名称与等级同一行，效果文字左对齐 */
+.law-card { display: grid; grid-template-columns: 1fr auto; column-gap: 10px; text-align: left; align-items: baseline; }
+.law-card > * { grid-column: 1 / -1; }
+.law-card > .recipe-header { grid-column: 1; grid-row: 1; justify-content: flex-start; margin: 0; }
+.law-card > .law-level { grid-column: 2; grid-row: 1; margin: 0; font-size: 1em; font-family: var(--font-title); }
+.law-card .mastery-track { margin: 6px 0 0; max-width: none; }
+.law-card .law-effects { color: var(--text-l3); }
+
+@media (max-width: 768px) {
+    /* 右侧栏里和别处重复的四块（修为、境界感悟、技能经验、装备）手机上不再显示；属性、灵根与功法特效、离线收益保留 */
+    .side-panel > .stat-panel:has(#cultivationXP),
+    .side-panel > .stat-panel:has(#realmLoreBox),
+    .side-panel > .stat-panel:has(#skillExperienceList),
+    .side-panel > .stat-panel:has(#weaponDisplay) { display: none; }
+
+    /* 商城：手机上一件一行（左图标，中间名称和说明，右边价格），不再三列窄卡把价格折成两行 */
+    #panel-shop .inventory-grid { grid-template-columns: 1fr; }
+    #panel-shop .shop-item { display: grid !important; grid-template-columns: 34px 1fr auto; column-gap: 12px; align-items: center; text-align: left !important; padding: 10px 12px !important; }
+    #panel-shop .shop-item > div { margin: 0 !important; }
+    #panel-shop .shop-item > div:nth-child(1) { grid-column: 1; grid-row: 1 / span 2; font-size: 26px !important; text-align: center; }
+    #panel-shop .shop-item > div:nth-child(2) { grid-column: 2; grid-row: 1; }
+    #panel-shop .shop-item > div:nth-child(3) { grid-column: 2; grid-row: 2; }
+    #panel-shop .shop-item > div:nth-child(n+4) { grid-column: 3; grid-row: 1 / span 2; text-align: right; white-space: nowrap; font-size: 0.9em; }
+    #panel-shop .shop-item > div:nth-child(5) { grid-row: 2; align-self: end; font-size: 0.75em; }
+}
+/* 商城卡片名称原来是玉青色（行内样式），玉青只用于进度和正向数值，名称改回正文色 */
+#panel-shop .shop-item > div:nth-child(2) { color: var(--text-l1) !important; font-family: var(--font-title); letter-spacing: 0.04em; }
+#panel-shop .shop-item > div:nth-child(3) { color: var(--text-l4) !important; }
+#panel-shop .shop-item { background: var(--bg-l2) !important; border-color: var(--border-l3) !important; border-radius: 2px !important; }
+#panel-shop .shop-item:hover { border-color: var(--bronze) !important; }
