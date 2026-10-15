@@ -49,7 +49,7 @@
                 { name: '炼虚后期', nextReq: 15600000 },
                 { name: '炼虚圆满', nextReq: 19300000 },
                 // 合体期（索引34-37）：合体初期起可「合道」（收回分身，换取主行动×2加速）；
-                // 合体圆满（37）预留大乘期入口，必须已合道（FUSION_REQUIRED_REALM=37）；合计约 31h
+                // 合体初期起突破必须已合道（FUSION_REQUIRED_REALM=34，v7.07）；合计约 31h
                 { name: '合体初期', nextReq: 105000000 },
                 { name: '合体中期', nextReq: 179000000 },
                 { name: '合体后期', nextReq: 350000000 },
@@ -247,7 +247,7 @@
                 voidRealm: {
                     id: 'voidRealm',
                     name: '虚界',
-                    desc: '虚实交界·通关掉落虚晶与道则残料',
+                    desc: '虚实交界·通关掉落虚晶、道则残料与补灵根用的五行之精',
                     icon: '🌫️',
                     minRealmIndex: 29,                      // v6.89：原索引20 → +9，最低化神圆满
                     baseRealmIndex: 30,                     // 原索引21 → +9，怪物境界为炼虚初期
@@ -265,7 +265,13 @@
                         ],
                         random: [
                             { id: 'voidcrystal', qty: [2, 4], probability: 1 },
-                            { id: 'daostone', qty: [3, 5], probability: 1 }
+                            { id: 'daostone', qty: [3, 5], probability: 1 },
+                            // 补灵根（v7.06）：飞升灵界前要补全五行灵根，每种各要 2 个（自己本身就是的那一行不用）
+                            { id: 'jin_essence', qty: 1, probability: 0.35 },
+                            { id: 'mu_essence', qty: 1, probability: 0.35 },
+                            { id: 'shui_essence', qty: 1, probability: 0.35 },
+                            { id: 'huo_essence', qty: 1, probability: 0.35 },
+                            { id: 'tu_essence', qty: 1, probability: 0.35 }
                         ],
                         coins: [6000, 11000],
                         danhuo: [150, 300],
@@ -370,13 +376,18 @@
                         skillExp: 3500
                     }
                 },
-                // 炼虚期天劫（v6.68）：每个炼虚小境界各一场，不在秘境列表里显示，只能通过突破弹窗的「渡劫」进入；
-                // 通关后 gameState.dungeons[id].completed 标记为已渡劫，不会像普通秘境那样循环挑战（见 completeDungeon 的 isTribulation 分支）
-                // v6.89：原索引21-24（炼虚期4个小境界）整体 +9 → 30-33，key 名跟着 tribulationIdFor() 的拼接规则改
-                // 结婴心魔（v6.99）：结丹圆满冲击元婴前的必经一战，同样只从突破弹窗进入。
-                // 心魔与四场天劫都是镜像 Boss（mirror，见 buildMirrorBoss）：怪物表里的 hp/atk/def/spd 只是占位，进入时按玩家实际输出生成。
+                // 心魔与天劫：不在秘境列表里显示，只能通过突破弹窗进入；通关后 gameState.dungeons[id].completed 永久生效（见 completeTribulation）。
+                // 都是镜像 Boss（mirror，见 buildMirrorBoss）：怪物表里的 hp/atk/def/spd 只是占位，进入时按玩家实际输出生成。
                 // hpMult = 生命是玩家的几倍；dmgRatio = 它每次出手的期望伤害是玩家的几倍。类型一律「无」，不吃灵根克制。
-                // 数值由模拟标定（v7.02，标准玩家=当前境界炼器三件套、战斗等级=境界数）：满血带当前最好的食物能过，不带食物过不了，越往后越凶。
+                // 数值由模拟标定（标准玩家=当前境界炼器三件套、战斗等级=境界数）：满血带当前最好的食物能过，不带食物过不了，越往后越凶。
+                // v7.06 天劫按原著重排（"元婴、化神期每三百年一次小天劫，炼虚以上每三千年一次大天劫，威能逐次递增"）：
+                // 原来是炼虚四个小境界各一劫（等于每 250 年一劫）。按游戏的年数比例（元婴 500 年、化神 650 年）换算，
+                // 小天劫落在 元婴后期 / 化神初期 / 化神后期；大天劫每个大境界的瓶颈处一次——炼虚圆满、合体圆满、大乘中期、大乘圆满（飞升天劫）。
+                // kind 决定渡过后的永久加成（小天劫生命/防御 +2%，大天劫 +3%）。
+                // 天劫不是镜像：hitFrac = 每一击（命中后）打掉玩家生命上限的比例，interval = 固定出手间隔，hpMult = 血量是玩家的几倍。
+                // 标定（标准玩家带食物）：小天劫三次都约 100%，第一次大天劫约 90%，不带食物全部 0%。
+                // v7.07 合体起斗法核心是法则（法则之力 + 元气化形），合体后的三次大天劫按八法则平均等级标定：
+                // 平均 0 级 约 33% / 30% / 13%，10 级 约 88% / 73% / 60%，20 级 约 98% / 95% / 97%——悟道投入越深渡劫越稳。
                 tribulation21: {
                     id: 'tribulation21', name: '结婴心魔', desc: '金丹化婴之际心魔丛生：它是照着你此刻的实力生出来的，出手比你更重——满血、带足战斗食物再来', icon: '👹',
                     isTribulation: true, isHeartDemon: true, tribulationRealm: 21, minRealmIndex: 21, baseRealmIndex: 21,
@@ -384,33 +395,54 @@
                     monsters: [{ name: '心魔', type: '无', hp: 1000, atk: 100, spd: 50, def: 30, attackSpeed: 2.5, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { skillExp: 300 }
                 },
-                tribulation30: {
-                    id: 'tribulation30', name: '初劫', desc: '融入天地元气的第一道劫——照着你此刻的实力降下，备足食物再渡', icon: '⚡',
-                    isTribulation: true, tribulationRealm: 30, minRealmIndex: 30, baseRealmIndex: 30,
-                    mirror: { hpMult: 2, dmgRatio: 1.3 },      // 标准玩家带食物约 90% 过
-                    monsters: [{ name: '劫云傀儡', type: '无', hp: 5000, atk: 575, spd: 68, def: 90, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 1800 }],
-                    rewards: { coins: [4000, 6000], danhuo: [80, 140], shenshi: [70, 120], skillExp: 500 }
+                tribulation24: {
+                    id: 'tribulation24', name: '第一次小天劫', desc: '结婴三百年，第一道小天劫降下——照着你此刻的实力，备足食物再渡', icon: '⚡',
+                    isTribulation: true, kind: 'small', tribulationRealm: 24, minRealmIndex: 24, baseRealmIndex: 24,
+                    mirror: { hpMult: 1.5, hitFrac: 0.14, interval: 1.0 },
+                    monsters: [{ name: '劫云傀儡', type: '无', hp: 5000, atk: 500, spd: 60, def: 80, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [30000, 50000], shenshi: [60, 100], skillExp: 400 }
                 },
-                tribulation31: {
-                    id: 'tribulation31', name: '问心劫', desc: '劫中幻象丛生，照见修行路上的执念；比初劫更重', icon: '👁️',
-                    isTribulation: true, tribulationRealm: 31, minRealmIndex: 31, baseRealmIndex: 31,
-                    mirror: { hpMult: 2.25, dmgRatio: 1.35 },  // 约 70%
-                    monsters: [{ name: '执念幻影', type: '无', hp: 5250, atk: 600, spd: 74, def: 105, attackSpeed: 2.3, isBoss: true, drop: 'coins', dropQty: 2400 }],
-                    rewards: { coins: [5500, 8000], danhuo: [110, 180], shenshi: [95, 160], skillExp: 700 }
+                tribulation26: {
+                    id: 'tribulation26', name: '第二次小天劫', desc: '又是三百年，劫云再聚，比上一次更重', icon: '⚡',
+                    isTribulation: true, kind: 'small', tribulationRealm: 26, minRealmIndex: 26, baseRealmIndex: 26,
+                    mirror: { hpMult: 1.75, hitFrac: 0.15, interval: 1.0 },
+                    monsters: [{ name: '雷劫化身', type: '无', hp: 5000, atk: 500, spd: 60, def: 80, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [100000, 150000], shenshi: [100, 160], skillExp: 600 }
                 },
-                tribulation32: {
-                    id: 'tribulation32', name: '雷劫', desc: '九天玄雷劈落，涤荡道基中的驳杂之气；一劫重过一劫', icon: '🌩️',
-                    isTribulation: true, tribulationRealm: 32, minRealmIndex: 32, baseRealmIndex: 32,
-                    mirror: { hpMult: 2.5, dmgRatio: 1.35 },   // 约 70%
-                    monsters: [{ name: '雷劫化身', type: '无', hp: 5500, atk: 625, spd: 82, def: 120, attackSpeed: 2.1, isBoss: true, drop: 'coins', dropQty: 3200 }],
-                    rewards: { coins: [7500, 11000], danhuo: [150, 240], shenshi: [130, 210], skillExp: 950 }
+                tribulation28: {
+                    id: 'tribulation28', name: '第三次小天劫', desc: '人界最后一道小天劫，渡过之后便是飞升灵界', icon: '🌩️',
+                    isTribulation: true, kind: 'small', tribulationRealm: 28, minRealmIndex: 28, baseRealmIndex: 28,
+                    mirror: { hpMult: 2, hitFrac: 0.17, interval: 1.0 },
+                    monsters: [{ name: '雷劫化身', type: '无', hp: 5000, atk: 500, spd: 60, def: 80, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [250000, 350000], shenshi: [150, 240], skillExp: 800 }
                 },
                 tribulation33: {
-                    id: 'tribulation33', name: '大天劫', desc: '炼虚圆满前的终极考验：身与天地相融的最后一步，威力远胜前三劫', icon: '☄️',
-                    isTribulation: true, tribulationRealm: 33, minRealmIndex: 33, baseRealmIndex: 33,
-                    mirror: { hpMult: 2.5, dmgRatio: 1.4 },    // 约 40%；四劫不带食物都是 0%
-                    monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 4500 }],
-                    rewards: { coins: [10000, 15000], danhuo: [200, 320], shenshi: [180, 280], skillExp: 1300 }
+                    id: 'tribulation33', name: '第一次大天劫', desc: '炼虚之后每三千年一劫，威能远胜小天劫；纵有无限寿元，亦可能陨落于此', icon: '☄️',
+                    isTribulation: true, kind: 'big', tribulationRealm: 33, minRealmIndex: 33, baseRealmIndex: 33,
+                    mirror: { hpMult: 2, hitFrac: 0.195, interval: 1.0 },
+                    monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [800000, 1200000], shenshi: [250, 400], skillExp: 1300 }
+                },
+                tribulation37: {
+                    id: 'tribulation37', name: '第二次大天劫', desc: '三千年又至，劫数更凶', icon: '☄️',
+                    isTribulation: true, kind: 'big', tribulationRealm: 37, minRealmIndex: 37, baseRealmIndex: 37,
+                    mirror: { hpMult: 2.25, hitFrac: 0.25, interval: 1.0 },
+                    monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [4000000, 6000000], daoguo: [150, 250], skillExp: 2000 }
+                },
+                tribulation39: {
+                    id: 'tribulation39', name: '第三次大天劫', desc: '大乘修士也躲不过的三千年之劫', icon: '☄️',
+                    isTribulation: true, kind: 'big', tribulationRealm: 39, minRealmIndex: 39, baseRealmIndex: 39,
+                    mirror: { hpMult: 2.5, hitFrac: 0.29, interval: 1.0 },
+                    monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [15000000, 22000000], daoguo: [250, 400], skillExp: 3000 }
+                },
+                tribulation41: {
+                    id: 'tribulation41', name: '飞升天劫', desc: '飞升真仙前的最后一劫，九死一生——大乘修士多在此反复打磨、迟迟不敢渡', icon: '🌌',
+                    isTribulation: true, kind: 'big', tribulationRealm: 41, minRealmIndex: 41, baseRealmIndex: 41,
+                    mirror: { hpMult: 2.5, hitFrac: 0.32, interval: 1.0 },
+                    monsters: [{ name: '飞升劫雷', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [40000000, 60000000], daoguo: [400, 600], skillExp: 5000 }
                 }
             },
             skills: {
@@ -427,6 +459,9 @@
                         // 洗髓易经（v6.90）：原著设定，突破筑基除了筑基丹还要"洗髓易经改善凡人体质"——一次性操作，
                         // 不产出修为，完成后置 marrowCleansed 标记；练气十三层→筑基初期的突破除了丹药还会检查这个标记
                         marrow_cleansing: { name: '洗髓易经', desc: '洗涤经脉、改善凡人体质，为突破筑基做准备（一次性，清灵草×10）', duration: 200, output: { marrowCleanse: 1, skill: 'cultivation', exp: 300 }, requires: { cleangrass: 10 }, requiredRealmIndex: 13, unlocked: false },
+                        // 补灵根（v7.06，原著"突破到炼虚还需身具五行灵根，在灵界可通过补灵根之法解决"）：一次性，飞升灵界的前提之一。
+                        // requires 按玩家灵根改写（自己本就是五行之一的那一行不用补），见 syncFiveRootsRecipe()
+                        bulinggen: { name: '补全五行灵根', desc: '以五行之精补齐金木水火土五行灵根（一次性，飞升灵界的前提；五行之精在虚界秘境获得）', duration: 300, output: { fiveRoots: 1, skill: 'cultivation', exp: 3000 }, requires: { jin_essence: 2, mu_essence: 2, shui_essence: 2, huo_essence: 2, tu_essence: 2 }, requiredRealmIndex: 29, unlocked: false },
                         danding: { name: '凝立丹鼎', desc: '强化根基、为结丹做准备（一次性，灵矿石×8 + 玄晶×2）：结丹成功率 +10%', duration: 240, output: { danDing: 1, skill: 'cultivation', exp: 400 }, requires: { spiritore: 8, crystal: 2 }, requiredRealmIndex: 16, unlocked: false },
                         epiphany: { name: '顿悟', desc: '后期爆发', duration: 60, output: { cultivation: 500, skill: 'cultivation', exp: 80 }, requiredRealmIndex: 15, unlocked: false },   // 原索引6（筑基中期）→+9
                         // P6 结丹期配方（v6.89：原索引9/10/11 → 因练气改13层整体 +9 → 18/19/20）
@@ -453,7 +488,10 @@
                         taixu_manifest: { name: '太虚显化', desc: '炼虚期最终修炼法', duration: 450, output: { cultivation: 50000, skill: 'cultivation', exp: 2200 }, requiredRealmIndex: 32, unlocked: false },
                         // 大乘期配方（原索引29/30/31 → 38/39/40）
                         dacheng_convergence: { name: '大乘归一', desc: '大乘初期主力', duration: 260, output: { cultivation: 170000, skill: 'cultivation', exp: 4800 }, requiredRealmIndex: 38, unlocked: false },
-                        yuanying_growth: { name: '元婴蜕变', desc: '大乘中期高产', duration: 380, output: { cultivation: 320000, skill: 'cultivation', exp: 6000 }, requiredRealmIndex: 39, unlocked: false },
+                        // v7.08 元婴注灵：修为只有大乘归一的一半，另一半灵力注入元婴（nascentInfuse），攒够自动蜕变；蜕变没满时修为满了也继续
+                        nascent_infuse: { name: '元婴注灵', desc: '将灵力注入元婴：修为只得一半，每次积 1 点灵力，攒够自动蜕变一级（另耗元婴精魄）；修为满了也会继续', duration: 260, output: { cultivation: 85000, nascentInfuse: 1, skill: 'cultivation', exp: 4800 }, requiredRealmIndex: 38, unlocked: false },
+                        // 原名「元婴蜕变」，与道果页的元婴蜕变系统撞名却毫无关系，v7.08 改名（只是普通的高产修炼配方）
+                        yuanying_growth: { name: '大乘蕴灵', desc: '大乘中期高产', duration: 380, output: { cultivation: 320000, skill: 'cultivation', exp: 6000 }, requiredRealmIndex: 39, unlocked: false },
                         fadao_suppress: { name: '法则镇伏', desc: '大乘期最终修炼法', duration: 540, output: { cultivation: 560000, skill: 'cultivation', exp: 7500 }, requiredRealmIndex: 40, unlocked: false },
                         // 真仙境配方（原索引32 → 41）：不产出修为，直接打通一窍（xianqiao+1），
                         // 是大乘圆满→真仙初期、真仙初期→真仙后期这两次突破的唯一判定依据，见 attemptBreakthrough()
@@ -741,6 +779,12 @@
                 goldenpendant: { name: '结丹佩', icon: '📿', type: 'jewelry', sellPrice: 300, stats: { spd: 6, hp: 40 } },
                 lifesword: { name: '青竹蜂云剑', icon: '🎍', type: 'weapon', sellPrice: 0, stats: { atk: 68, spd: 3 } },  // 本命法宝：不可出售；stats 由 refreshLifeTreasureStats() 按境界与金丹品质实时改写
                 jinleizhu: { name: '万年金雷竹', icon: '🎋', type: 'material', sellPrice: 600 },
+                // 五行之精（v7.06）：虚界秘境掉落，补全五行灵根用
+                jin_essence: { name: '庚金之精', icon: '🟡', type: 'material', sellPrice: 1500 },
+                mu_essence: { name: '乙木之精', icon: '🟢', type: 'material', sellPrice: 1500 },
+                shui_essence: { name: '癸水之精', icon: '🔵', type: 'material', sellPrice: 1500 },
+                huo_essence: { name: '丙火之精', icon: '🔴', type: 'material', sellPrice: 1500 },
+                tu_essence: { name: '戊土之精', icon: '🟤', type: 'material', sellPrice: 1500 },
                 yuanyingarmor: { name: '元婴法衣', icon: '🥋', type: 'armor', sellPrice: 1100, stats: { def: 45, hp: 120 } },
                 yuanyingpendant: { name: '元婴佩', icon: '📿', type: 'jewelry', sellPrice: 700, stats: { spd: 10, hp: 80 } },
                 huashensword: { name: '化神剑', icon: '🗡️', type: 'weapon', sellPrice: 3500, stats: { atk: 110 } },
@@ -1059,12 +1103,15 @@
             if (typeof P.daoBody !== 'number') P.daoBody = 0;
             if (typeof P.daoLaw !== 'number') P.daoLaw = 0;
             if (typeof P.nascentSoul !== 'number') P.nascentSoul = 0;
+            if (typeof P.nascentInfuse !== 'number') P.nascentInfuse = 0;
             if (typeof P.coinRefine !== 'number') P.coinRefine = 0;
             if (typeof P.xianqiao !== 'number') P.xianqiao = 0;
             if (typeof P.marrowCleansed !== 'boolean') P.marrowCleansed = false;
             if (!ROOT_GRADES[P.rootGrade]) P.rootGrade = DEFAULT_ROOT_GRADE;
             if (typeof P.coreQuality !== 'number') P.coreQuality = P.realmIndex >= 18 ? 35 : 0;   // 已结丹的老存档按中品下限补一颗金丹
             if (typeof P.danDing !== 'boolean') P.danDing = false;
+            if (typeof P.fiveRoots !== 'boolean') P.fiveRoots = P.realmIndex >= 30;   // 已经飞升的老存档视为补过
+            syncFiveRootsRecipe();
             if (!P.btFails) P.btFails = {};
             if (typeof P.lifeTreasureTier !== 'number') P.lifeTreasureTier = 0;
             if (P.activeDomain === undefined) P.activeDomain = null;
@@ -1311,7 +1358,9 @@
         function getAvatarMod(key) {
             if (key !== 'atkPct' && key !== 'defPct') return 0;
             const lv = getAvatarLevel();
-            return key === 'atkPct' ? lv * AVATAR_ATK_PER_LEVEL : lv * AVATAR_DEF_PER_LEVEL;
+            // 合道后化身与本体融合（原著"合体期修士可将自身与元婴、化身融合"），化身加成翻倍
+            const fused = isFused() ? 2 : 1;
+            return (key === 'atkPct' ? lv * AVATAR_ATK_PER_LEVEL : lv * AVATAR_DEF_PER_LEVEL) * fused;
         }
         function upgradeAvatar() {
             const P = ensureCurrencyState();
@@ -1352,7 +1401,9 @@
 
         // ---- 道果（合体期货币）、道果强化与合道（v6.60） ----
         // 合体初期（索引 21）起解锁道果技能与货币。道果不能出售，用于：道果淬体（基础属性）、道果悟法（法则效果）、道果商城；
-        // 并可用丹火 + 神识融合凝练。合道：收回分身（不可逆），换取主行动大幅加速与属性 / 产出加成；晋升炼虚期必须已合道。
+        // 并可用丹火 + 神识融合凝练。合道：元婴分身与身外化身归于本体（不可逆），换取主行动大幅加速与属性 / 产出加成。
+        // v7.07：原著"合体期修士可将自身与元婴、化身融合……法力成倍增长"——合体期本身就是融合后的状态，
+        // 所以合道从「合体圆满前必须做」提前到「合体初期突破中期前必须做」（修炼时长标定本来就按合体初期即合道算）。
         const DAOGUO_ICON = ITEM_ICONS.daoguo;
         const DAO_BODY_MAX = 10, DAO_BODY_PER_LEVEL = 0.03;      // 道果淬体：生命 / 攻击 / 防御 +3%/级
         const DAO_LAW_MAX = 5, DAO_LAW_PER_LEVEL = 0.10;         // 道果悟法：全部法则效果 +10%/级
@@ -1364,7 +1415,7 @@
             outShenshi: 0.5,     // 神识产出 +50%
             outDaoguo: 0.3       // 道果产出 +30%
         };
-        const FUSION_REQUIRED_REALM = 37;   // v6.89：原索引28 → +9，合体圆满：晋升下一境界必须已合道
+        const FUSION_REQUIRED_REALM = 34;   // 合体初期起：晋升下一境界必须已合道（v7.07 由合体圆满 37 提前）
         // 聚灵培元（v6.76）：灵石的软性无底洞。技能设施买完之后灵石在大乘期完全没处花，
         // 加这个无等级上限、每级涨价的永久小额加成——价格指数增长（×1.15/级），买得越多越贵，
         // 早期几万灵石就能买、后期要吞掉大量灵石，让「灵石多到花不完」始终有地方去，
@@ -1446,7 +1497,7 @@
             const P = ensureCurrencyState();
             if (!isDaoguoUnlocked()) { showNotification('合体初期才能合道', '#c98a3e'); return; }
             if (isFused()) { showNotification('你已经合道了', '#c98a3e'); return; }
-            const ok = confirm('确定要合道吗？\n\n合道后你的分身将永久消失，且不可逆（无法解除、无法再召回分身，神识里的「分身强化」也会失效）。\n\n换来的是：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・神识产出 +50%、道果产出 +30%\n\n注意：晋升大乘期必须已合道。');
+            const ok = confirm('确定要合道吗？\n\n合道后元婴分身与身外化身都归于本体：分身永久消失，且不可逆（无法再召回分身，神识里的「分身强化」也会失效）。\n\n换来的是（法力成倍增长）：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・身外化身的攻击 / 防御加成翻倍\n・神识产出 +50%、道果产出 +30%\n\n注意：合体初期突破中期之前必须合道。');
             if (!ok) return;
             P.fusion = { active: true, at: Date.now() };
             getClones().forEach(c => { c.action = null; c.progress = 0; });
@@ -1462,8 +1513,8 @@
             const P = ensureCurrencyState();
             const bl = getDaoBody(), ll = getDaoLaw();
             const fusedCard = isFused()
-                ? `<div class="use-row"><div class="use-main"><b>🌟 已合道</b><div class="use-effect">所有主行动速度 +100% · 生命 / 攻击 / 防御 / 速度 +15% · 神识产出 +50% · 道果产出 +30%<br/>分身已收回体内，不可逆。</div></div><span class="use-max">已合道</span></div>`
-                : `<div class="use-row"><div class="use-main"><b>🌟 合道（不可逆）</b><div class="use-effect">收回你的分身：所有主行动速度 +100%、生命 / 攻击 / 防御 / 速度 +15%、神识产出 +50%、道果产出 +30%。<br/>代价：分身永久消失，无法解除。<b>晋升大乘期必须先合道。</b></div></div><button type="button" class="btn use-btn" onclick="startFusion()">合道</button></div>`;
+                ? `<div class="use-row"><div class="use-main"><b>🌟 已合道</b><div class="use-effect">所有主行动速度 +100% · 生命 / 攻击 / 防御 / 速度 +15% · 身外化身加成翻倍 · 神识产出 +50% · 道果产出 +30%<br/>分身与化身已归于本体，不可逆。</div></div><span class="use-max">已合道</span></div>`
+                : `<div class="use-row"><div class="use-main"><b>🌟 合道（不可逆）</b><div class="use-effect">元婴分身与身外化身归于本体：所有主行动速度 +100%、生命 / 攻击 / 防御 / 速度 +15%、身外化身加成翻倍、神识产出 +50%、道果产出 +30%。<br/>代价：分身永久消失，无法解除。<b>合体初期突破中期之前必须合道。</b></div></div><button type="button" class="btn use-btn" onclick="startFusion()">合道</button></div>`;
             const maxTimes = Math.floor(Math.min(P.danhuo / FUSE_COST.danhuo, P.shenshi / FUSE_COST.shenshi));
             return `
                 <div class="use-balance">${DAOGUO_ICON} 道果 <b>${Math.floor(P.daoguo)}</b><small>产出：道果技能的配方（凝练 / 培育 / 提炼 / 归元）· 合体级战斗区域胜利 · 天道秘境通关 · 丹火与神识融合。道果不能出售，只用来变强和购买商品。</small></div>
@@ -1620,13 +1671,13 @@
         }
 
         // ---- 炼虚期：天劫（v6.68） ----
-        // 原著设定：炼虚修士与天地元气相融，理论寿元无穷，但每 3000 年要渡一次大天劫，威力逐次递增，纵有无限寿元也可能陨落于劫数。
-        // 游戏化：炼虚 21-24 每个小境界各一场天劫（tribulation21-24，GAME_CONFIG.dungeons 里 isTribulation:true 的特殊单体 Boss 战），
-        // 不在秘境列表里出现，只能从突破弹窗的「⚡ 渡劫」进入；渡过一次永久生效（不会像普通秘境那样清空重来）。
-        // 失败沿用秘境战败的既有惩罚（损失 10% 修为、50% 食物、气血回到 50%），可以重新挑战，不会卡死进度。
-        const TRIBULATION_REALMS = [30, 31, 32, 33];   // v6.89：原索引21-24 → +9
-        const BREAKTHROUGH_GATE_REALMS = [21, ...TRIBULATION_REALMS];   // 突破前必须先打赢一场的境界：结丹圆满的结婴心魔 + 炼虚四劫（永久加成只算后者）
-        const TRIBULATION_HP_PCT = 0.03;   // 渡劫：每渡一劫永久生命 / 防御 +3%（身与天地相融，越来越难杀；4 劫渡满 +12%）
+        // 原著设定：元婴、化神期每三百年一次小天劫，炼虚以上每三千年一次大天劫，威能逐次递增，纵有无限寿元也可能陨落于劫数。
+        // 游戏化：天劫是 GAME_CONFIG.dungeons 里 isTribulation:true 的单体镜像 Boss 战，所在境界的修为满后、突破前必须先渡过，
+        // 不在秘境列表里出现，只能从突破弹窗的「⚡ 渡劫」进入；渡过一次永久生效。失败沿用秘境战败的惩罚（元婴起不掉修为，食物损失一半）。
+        // v7.06：小天劫（元婴后期、化神初期、化神后期）+ 大天劫（炼虚圆满、合体圆满、大乘中期、大乘圆满），见 GAME_CONFIG.dungeons 里的说明
+        const TRIBULATION_REALMS = [24, 26, 28, 33, 37, 39, 41];
+        const TRIBULATION_BODY_BONUS = { small: 0.02, big: 0.03 };   // 渡过一劫永久生命 / 防御加成（身与天地相融，越来越难杀；七劫渡满 +18%）
+        const BREAKTHROUGH_GATE_REALMS = [21, ...TRIBULATION_REALMS];   // 突破前必须先打赢一场的境界：结丹圆满的结婴心魔 + 天劫（永久加成只算天劫）
         // 小境界自动突破（v7.01）：修为满了、且这次突破不需要丹药 / 心魔 / 天劫 / 仙窍时直接突破，行动不中断，离线结算也连续突破。
         // 凡人→练气一层保留手动（新手任务在教「尝试突破」按钮）。设置里可关。
         function canAutoBreakthrough() {
@@ -1652,7 +1703,8 @@
             boss.hp = Math.round(s.hp.max * cfg.hpMult);
             boss.def = s.def;
             boss.spd = s.spd;
-            boss.attackSpeed = getPlayerAttackInterval();
+            // 天劫出手间隔固定（cfg.interval）：照抄玩家的话身法越高天劫出手越快，两次进食之间挨的击数变多，反而越强越难渡
+            boss.attackSpeed = cfg.interval || getPlayerAttackInterval();
             const hitBonus = getMod('hit');
             const pHit = Math.max(0.05, Math.min(Math.min(0.99, 0.95 + hitBonus), BATTLE_FORMULAS.calculateHitChance(s.spd, boss.spd) + hitBonus));
             const critRate = Math.min(1, BASE_CRIT.rate + getMod('crit'));
@@ -1660,7 +1712,9 @@
             const playerPerAttack = pHit * s.atk * (1 - 0.75 * boss.def / (s.atk + boss.def)) * getBattleSkillDmgMult() * (1 + qi)
                 * (1 + critRate * (BASE_CRIT.dmg + getMod('critDmg') - 1));
             const mHit = Math.max(0.05, Math.min(0.95, BATTLE_FORMULAS.calculateHitChance(boss.spd, s.spd) * (1 - Math.min(0.6, getMod('dodge')))));
-            const target = cfg.dmgRatio * playerPerAttack / mHit;
+            // 天劫用 hitFrac：每一击（命中后）打掉玩家生命上限的固定比例。食物一口能回满血，生死只看"几击之内会不会被打穿"，
+            // 若按玩家攻击力反推，攻击越高天劫越狠，等于惩罚练攻击；心魔是镜像，仍按 dmgRatio 跟玩家输出走
+            const target = cfg.hitFrac ? cfg.hitFrac * s.hp.max : cfg.dmgRatio * playerPerAttack / mHit;
             let lo = 1, hi = Math.max(10, target * 5);
             for (let i = 0; i < 50; i++) {
                 const mid = (lo + hi) / 2;
@@ -1675,12 +1729,12 @@
             const rec = gameState.dungeons && gameState.dungeons[tribulationIdFor(realmIndex)];
             return !!(rec && rec.completed);
         }
-        function getTribulationClearCount() {
-            return TRIBULATION_REALMS.filter(r => hasSurvivedTribulation(r)).length;
+        function getTribulationBonusOf(realmIndex) {
+            return TRIBULATION_BODY_BONUS[(GAME_CONFIG.dungeons[tribulationIdFor(realmIndex)] || {}).kind] || 0;
         }
         function getTribulationMod(key) {
             if (key !== 'hpPct' && key !== 'defPct') return 0;
-            return getTribulationClearCount() * TRIBULATION_HP_PCT;
+            return TRIBULATION_REALMS.filter(r => hasSurvivedTribulation(r)).reduce((sum, r) => sum + getTribulationBonusOf(r), 0);
         }
 
         // 突破弹窗里的「渡劫」入口：当前境界在 21-24 且这一劫还没渡过时显示
@@ -1711,13 +1765,13 @@
             const rewards = dungeon.rewards;
             let rewardMsg = dungeon.isHeartDemon
                 ? `👹 心魔已灭，道心通明——可以冲击元婴了\n`
-                : `⚡ 渡过${dungeon.name}！身与天地相融更进一步（生命 / 防御 永久 +${Math.round(TRIBULATION_HP_PCT * 100)}%）\n`;
+                : `⚡ 渡过${dungeon.name}！身与天地相融更进一步（生命 / 防御 永久 +${Math.round(getTribulationBonusOf(dungeon.tribulationRealm) * 100)}%）\n`;
             if (rewards.coins) {
                 const coins = rewards.coins[0] + Math.floor(Math.random() * (rewards.coins[1] - rewards.coins[0] + 1));
                 gameState.player.coins += coins;
-                rewardMsg += `+ ${coins} 灵石\n`;
+                rewardMsg += `+ ${fmtXP(coins)} 灵石\n`;
             }
-            [['danhuo', '丹火'], ['shenshi', '神识']].forEach(([kind, label]) => {
+            [['danhuo', '丹火'], ['shenshi', '神识'], ['daoguo', '道果']].forEach(([kind, label]) => {
                 const range = rewards[kind];
                 if (!range) return;
                 const amount = range[0] + Math.floor(Math.random() * (range[1] - range[0] + 1));
@@ -1735,58 +1789,58 @@
             saveGame();
         }
 
-        // ---- 大乘期：元婴蜕变与离体助战（v6.69） ----
+        // ---- 大乘期：元婴蜕变与离体助战（v6.69，v7.08 改为灵力注入 + 元婴真正出手） ----
         // 原著设定：大乘修士需将灵力不断注入元婴，使其从婴儿形态蜕变为青年形态，蜕变越深，元婴离体助战的威力越强。
-        // 游戏化：大乘初期（索引29）起解锁，花道果 + 元婴精魄（大乘级秘境 / 战斗区域掉落）把元婴蜕变等级从 0 升到 10 级，
-        // 每级增加元婴离体助战的攻击 / 暴击伤害加成（并入 getMod，战斗、修炼、生活技能全自动生效，和道则、渡劫一样不用逐处改代码）。
+        // 游戏化：修炼页「元婴注灵」配方（修为只得一半，另一半灌入元婴）每完成一次积 1 点灵力，攒够 nascentInfuseNeed(等级) 点、
+        // 并有元婴精魄 ×(等级+1)（大乘级秘境 / 战斗区域掉落）时自动蜕变一级，最多 10 级。
+        // 蜕变等级决定战斗中元婴离体出手的威力（见 NASCENT_STRIKE / PERIODIC_STRIKES），原来的被动攻击 / 暴伤加成取消。
         const NASCENT_MAX = 10;
-        const NASCENT_ATK_PER_LEVEL = 0.02;      // 元婴离体助战：攻击 +2%/级
-        const NASCENT_CRITDMG_PER_LEVEL = 0.02;   // 元婴离体助战：暴击伤害 +2%/级
         function getNascentSoul() { return gameState.player.nascentSoul || 0; }
-        function nascentCost(level) { return { daoguo: Math.round(60 * Math.pow(level + 1, 1.5)), essence: level + 1 }; }
         function nascentStageName(level) {
             if (level >= 8) return '青年形态';
             if (level >= 4) return '少年形态';
             return '婴儿形态';
         }
-        function getNascentMod(key) {
-            if (key !== 'atkPct' && key !== 'critDmg') return 0;
-            const lv = getNascentSoul();
-            return key === 'atkPct' ? lv * NASCENT_ATK_PER_LEVEL : lv * NASCENT_CRITDMG_PER_LEVEL;
+        // 注灵后检查能否蜕变；精魄不够时灵力停在门槛上，等精魄到手再蜕变
+        function tryNascentEvolve(silent = false) {
+            const P = gameState.player;
+            let evolved = 0;
+            while (getNascentSoul() < NASCENT_MAX && (P.nascentInfuse || 0) >= nascentInfuseNeed(getNascentSoul())) {
+                const lv = getNascentSoul(), essence = lv + 1;
+                const have = (P.inventory.find(i => i.id === 'nascentsoul_essence') || { qty: 0 }).qty;
+                if (have < essence) {
+                    P.nascentInfuse = nascentInfuseNeed(lv);
+                    if (!P.nascentWaitNotified && !silent) {
+                        showNotification(`👶 元婴灵力已足，蜕变还差元婴精魄（需要 ${essence}，现有 ${have}）——大乘级战斗区域 / 秘境掉落`, '#c98a3e');
+                        P.nascentWaitNotified = true;
+                    }
+                    break;
+                }
+                consumeItem('nascentsoul_essence', essence);
+                P.nascentInfuse -= nascentInfuseNeed(lv);
+                P.nascentSoul = lv + 1;
+                P.nascentWaitNotified = false;
+                evolved++;
+            }
+            if (getNascentSoul() >= NASCENT_MAX) P.nascentInfuse = 0;
+            if (evolved && !silent) showNotification(`👶 元婴蜕变！${nascentStageName(getNascentSoul())}（Lv.${getNascentSoul()}），离体出手威力升到攻击 ×${getNascentStrikeMult().toFixed(2)}`, '#b39ddb');
+            return evolved;
+        }
+        function isNascentInfusing(action) {
+            return !!(action && action.output && action.output.nascentInfuse) && gameState.player.realmIndex >= DACHENG_REALM && getNascentSoul() < NASCENT_MAX;
         }
 
-        function upgradeNascentSoul() {
-            const P = ensureCurrencyState();
-            const lv = getNascentSoul();
-            if (lv >= NASCENT_MAX) { showNotification('元婴已蜕变至青年形态巅峰', '#c98a3e'); return; }
-            const cost = nascentCost(lv);
-            if (P.daoguo < cost.daoguo) { spendNotify('daoguo', cost.daoguo); return; }
-            const have = (P.inventory.find(i => i.id === 'nascentsoul_essence') || { qty: 0 }).qty;
-            if (have < cost.essence) { showNotification(`元婴精魄不足：需要 ${cost.essence}，现有 ${have}`, '#c4483a', 'error'); return; }
-            P.daoguo -= cost.daoguo;
-            consumeItem('nascentsoul_essence', cost.essence);
-            P.nascentSoul = lv + 1;
-            showNotification(`👁️ 元婴蜕变成功！${nascentStageName(lv + 1)}，离体助战攻击 +${Math.round((lv + 1) * NASCENT_ATK_PER_LEVEL * 100)}%、暴击伤害 +${Math.round((lv + 1) * NASCENT_CRITDMG_PER_LEVEL * 100)}%`, '#b39ddb');
-            calculateStats();
-            updateUI();
-            renderSkillUses();
-            saveGame();
-        }
-
-        // 道果页面「元婴」卡片：大乘初期起显示在合道卡片下方
+        // 道果页面「元婴」卡片：大乘初期起显示，只展示进度（蜕变靠修炼页「元婴注灵」）
         function nascentUsesHtml() {
             if (!isDachengUnlocked()) return '';
             const P = gameState.player;
             const lv = getNascentSoul();
             const maxed = lv >= NASCENT_MAX;
-            const cost = nascentCost(lv);
             const have = (P.inventory.find(i => i.id === 'nascentsoul_essence') || { qty: 0 }).qty;
-            const affordable = !maxed && P.daoguo >= cost.daoguo && have >= cost.essence;
-            return `<div class="use-card"><div class="use-title">👁️ 元婴蜕变 <small>元婴离体助战：${nascentStageName(lv)}（Lv.${lv}/${NASCENT_MAX}），攻击 +${Math.round(lv * NASCENT_ATK_PER_LEVEL * 100)}%、暴击伤害 +${Math.round(lv * NASCENT_CRITDMG_PER_LEVEL * 100)}%</small></div>
-                <div class="use-row"><div class="use-main"><b>👁️ 蜕变</b> <span class="use-lv">Lv.${lv}/${NASCENT_MAX}</span>
-                    <div class="use-effect">${maxed ? '已至青年形态巅峰' : `下一级 → 攻击 +${Math.round((lv + 1) * NASCENT_ATK_PER_LEVEL * 100)}%、暴击伤害 +${Math.round((lv + 1) * NASCENT_CRITDMG_PER_LEVEL * 100)}%`}</div></div>
-                    ${maxed ? '<span class="use-max">已满级</span>'
-                        : `<button type="button" class="btn ${affordable ? '' : 'btn-secondary'} use-btn" onclick="upgradeNascentSoul()">${affordable ? '蜕变' : '不足'} ${DAOGUO_ICON}${cost.daoguo} + 👁️${cost.essence}</button>`}
+            return `<div class="use-card"><div class="use-title">👶 元婴蜕变 <small>${nascentStageName(lv)}（Lv.${lv}/${NASCENT_MAX}）：战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次，攻击 ×${getNascentStrikeMult().toFixed(2)}，无视防御</small></div>
+                <div class="use-row"><div class="use-main"><b>👶 注灵</b> <span class="use-lv">Lv.${lv}/${NASCENT_MAX}</span>
+                    <div class="use-effect">${maxed ? '已至青年形态巅峰' : `灵力 ${Math.floor(P.nascentInfuse || 0)}/${nascentInfuseNeed(lv)}（修炼页「元婴注灵」每次 +1）· 元婴精魄 ${have}/${lv + 1} · 下一级离体出手 攻击 ×${(NASCENT_STRIKE.base + NASCENT_STRIKE.perLevel * (lv + 1)).toFixed(2)}`}</div></div>
+                    ${maxed ? '<span class="use-max">已满级</span>' : ''}
                 </div></div>`;
         }
 
@@ -2151,6 +2205,15 @@
         // 元婴不灭（原著"元婴不灭，肉身被毁后可夺舍重生"）：元婴期起秘境战败不掉修为；
         // 且每次进入秘境第一次被击败时夺舍重生，以 NASCENT_REVIVE_HP 的生命继续战斗
         const NASCENT_SAFE_REALM = 22, NASCENT_REVIVE_HP = 0.4;
+        // 炼虚·身融天地（原著"使身体与天地融为一体，理论上不死不灭……纵有无限寿元，亦可能陨落于劫数之下"，v7.06）：
+        // 炼虚起战斗区域被击败不再退出循环（元气重凝，生命回到一半继续打；连败 AUTO_BATTLE_MAX_LOSS_STREAK 场才停），
+        // 秘境里可夺舍重生 VOID_DUNGEON_REVIVES 次；天劫例外，仍只有一次
+        const VOID_UNDYING_REALM = 30, VOID_DUNGEON_REVIVES = 3;
+        function getMaxDungeonRevives(dungeon) {
+            const r = gameState.player.realmIndex;
+            if (r < NASCENT_SAFE_REALM) return 0;
+            return dungeon && dungeon.isTribulation ? 1 : (r >= VOID_UNDYING_REALM ? VOID_DUNGEON_REVIVES : 1);
+        }
         // 结婴心魔（原著"需要充分准备应对结婴心魔"）：结丹圆满冲击元婴前必须先斩心魔——一场镜像战（tribulation21，见 buildMirrorBoss），
         // 复用天劫的「突破前必须通关」机制。"充分准备"就是备好食物、满血再进
         const HEART_DEMON_REALM = 21;
@@ -2189,6 +2252,16 @@
         // 飞升灵界（原著"化神大圆满后需要飞升到灵界"）：化神圆满→炼虚初期除化虚丹外，须先通关这个秘境找到空间节点
         const ASCEND_REALM = 29, ASCEND_DUNGEON = 'voidRealm';
         function hasAscendNode() { return !!(gameState.dungeons[ASCEND_DUNGEON] || {}).completed; }
+        // 补灵根：五行灵根是否齐全，以及按玩家自身灵根改写「补全五行灵根」配方的材料（本就是五行之一的那一行不用补；雷/冰/风异灵根五行都要补）
+        const FIVE_ROOT_ESSENCE = { metal: 'jin_essence', wood: 'mu_essence', water: 'shui_essence', fire: 'huo_essence', earth: 'tu_essence' };
+        function hasFiveRoots() { return !!gameState.player.fiveRoots; }
+        function syncFiveRootsRecipe() {
+            const recipe = gameState.skills && gameState.skills.cultivation && gameState.skills.cultivation.recipes.bulinggen;
+            if (!recipe) return;
+            const own = FIVE_ROOT_ESSENCE[gameState.player.spiritRoot];
+            recipe.requires = {};
+            Object.values(FIVE_ROOT_ESSENCE).forEach(id => { if (id !== own) recipe.requires[id] = 2; });
+        }
         function usesJingyuan() { const r = gameState.player.realmIndex; return r >= JINGYUAN.from && r <= JINGYUAN.to; }
         function getJingyuan() {
             const P = gameState.player;
@@ -2224,6 +2297,65 @@
         function getJingyuanCultMod() {
             return usesJingyuan() ? -JINGYUAN.cultPenalty * (1 - getJingyuan() / JINGYUAN.max) : 0;
         }
+        // ---- 合体期（v7.07） ----
+        // 原著"此境界斗法的核心不再是法力多寡，而是天地之力的运用……可随意驱使元气化形攻击，甚至初步借用法则之力"。
+        // 游戏化的整条线：化神参悟法则（悟道）→ 炼虚化虚为实（道则）→ 合体借用法则之力（法则的战斗效果翻倍）+ 元气化形（法则越深、化形越强）。
+        // 法则之力：合体起悟道法则里与斗法相关的效果 ×LAW_POWER_MULT（修炼速度、生活技能等不翻倍，不打乱时长标定）
+        const LAW_POWER_REALM = 34, LAW_POWER_MULT = 2;
+        const LAW_COMBAT_KEYS = new Set(['atkPct', 'hpPct', 'defPct', 'spdPct', 'crit', 'critDmg', 'dodge', 'hit', 'regen', 'foodPct']);
+        // 元气化形：合体起战斗中每 interval 秒额外一击，无视防御，伤害 = 攻击 × (base + perAvgLevel × 八法则平均等级) × 战斗等级加成
+        const QI_FORM = { realm: 34, interval: 3, base: 0.1, perAvgLevel: 0.025 };   // 法则平均 0 / 10 / 20 / 30 级：攻击 ×0.10 / 0.35 / 0.60 / 0.85
+        function getLawAvgLevel() { return LAW_IDS.reduce((sum, id) => sum + getLawInfo(id).level, 0) / LAW_IDS.length; }
+        function getQiFormMult() {
+            return gameState.player.realmIndex < QI_FORM.realm ? 0 : QI_FORM.base + QI_FORM.perAvgLevel * getLawAvgLevel();
+        }
+        // ---- 大乘期（v7.08） ----
+        // 原著"修士需将灵力不断注入元婴，使其从婴儿形态蜕变为青年形态。大乘期可令元婴离体助战，并初步掌握使用法则之力——
+        // 以法则压制群敌，打出恐怖攻击。然则法则之力极难领悟，纵使宝花始祖这般惊才绝艳者，亦仅堪堪入门"。
+        // 元婴线：元婴期结婴 → 合体合道（元婴归于本体）→ 大乘注灵蜕变、元婴离体助战。
+        // 法则线：化神参悟 → 炼虚化虚 → 合体借用（战斗效果翻倍、元气化形）→ 大乘掌握入门（压制群敌、法则之击）。
+        const DACHENG_REALM = 38;
+        // 元婴离体助战：大乘起战斗中每 interval 秒元婴出手一次，伤害 = 攻击 × (base + perLevel × 蜕变等级)
+        const NASCENT_STRIKE = { interval: 2, base: 0.15, perLevel: 0.05 };
+        // 元婴注灵：修炼「元婴注灵」每完成一次积 1 点灵力，蜕变到下一级要 NASCENT_INFUSE_PER_LEVEL × (当前等级+1) 点，另耗元婴精魄 ×(当前等级+1)
+        const NASCENT_INFUSE_PER_LEVEL = 40;
+        function nascentInfuseNeed(lv) { return NASCENT_INFUSE_PER_LEVEL * (lv + 1); }
+        // 法则入门：大乘期起，练满 LAW_MASTER_LEVEL 级的法则算「入门」。每入门一条，敌人攻击 / 防御 −LAW_MASTER_SUPPRESS；
+        // 有入门法则时每 LAW_STRIKE_INTERVAL 秒一记法则之击，伤害 = 攻击 × (1 + 入门条数)
+        const LAW_MASTER_LEVEL = 30, LAW_MASTER_SUPPRESS = 0.05, LAW_STRIKE_INTERVAL = 10;
+        function getMasteredLaws() {
+            if (gameState.player.realmIndex < DACHENG_REALM) return [];
+            return LAW_IDS.filter(id => getLawInfo(id).level >= LAW_MASTER_LEVEL);
+        }
+        function getLawSuppression() { return getMasteredLaws().length * LAW_MASTER_SUPPRESS; }
+        function getNascentStrikeMult() {
+            return gameState.player.realmIndex < DACHENG_REALM ? 0 : NASCENT_STRIKE.base + NASCENT_STRIKE.perLevel * getNascentSoul();
+        }
+        function getLawStrikeMult() { const n = getMasteredLaws().length; return n ? 1 + n : 0; }
+
+        // 战斗中定时触发的额外攻击（都无视防御，乘战斗技能等级加成）：合体的元气化形、大乘的元婴离体与法则之击
+        const PERIODIC_STRIKES = [
+            { key: 'qiForm', label: '🌀 元气化形', interval: QI_FORM.interval, mult: () => getQiFormMult() },
+            { key: 'nascent', label: '👶 元婴离体', interval: NASCENT_STRIKE.interval, mult: () => getNascentStrikeMult() },
+            { key: 'lawStrike', label: '☯️ 法则之击', interval: LAW_STRIKE_INTERVAL, mult: () => getLawStrikeMult() }
+        ];
+        const areaStrikeClock = {};   // 普通战斗区域的计时（一场只有两三秒，跨场累积）
+        function resetStrikeClock(holder) { PERIODIC_STRIKES.forEach(s => { holder[s.key + 'Timer'] = 0; }); }
+        // 按时间累积，到点的各打出一击；返回这一步打出的 [{ label, dmg }]
+        function tickPeriodicStrikes(holder, timeDelta) {
+            const hits = [];
+            PERIODIC_STRIKES.forEach(s => {
+                const mult = s.mult();
+                if (!mult) return;
+                const k = s.key + 'Timer';
+                holder[k] = (holder[k] || 0) + timeDelta;
+                if (holder[k] < s.interval) return;
+                holder[k] -= s.interval;
+                hits.push({ label: s.label, dmg: Math.max(1, Math.floor(gameState.player.stats.atk * mult * getBattleSkillDmgMult())) });
+            });
+            return hits;
+        }
+
         // ---- 修为里程碑（v7.05） ----
         // 元婴以后每个小境界动辄几小时到二十几小时，中间只有一根进度条。修为每到 25% / 50% / 75% 给一份「感悟」奖励：
         // 灵石 = 当前境界最好战斗区域 coinWins 场的收入（约十分钟的打怪收益），外加一份神识（元婴～炼虚）或道果（合体、大乘）。
@@ -2331,8 +2463,17 @@
             { from: 25, to: 25, title: '元婴大圆满', tip: `太虚幻境开放，通关一次即得化神机缘（成功率 +${HUASHEN_RATE.chance * 100}%）；炼好化神丹再冲击化神` },
             { from: 26, to: 26, title: '化神初期·沟通天地', tip: `出手调动天地灵气，伤害 +${JINGYUAN.dmg[0] * 100}%；人界灵气稀薄，每次出手耗精元，精元亏损会拖慢修炼。第二个分身、悟道、灵域开放` },
             { from: 27, to: 27, title: '化神中期·元神转化', tip: `天地灵气运用纯熟：伤害加成升到 +${JINGYUAN.dmg[1] * 100}%` },
-            { from: 28, to: 28, title: '化神后期·将近飞升', tip: '化神圆满后要找到通往灵界的空间节点才能飞升，可以先备化虚丹' },
-            { from: 29, to: 29, title: '化神大圆满·飞升在即', tip: '通关一次虚界秘境找到空间节点，再服化虚丹即可飞升灵界（炼虚期）；飞升后不再损耗精元' }
+            { from: 28, to: 28, title: '化神后期·将近飞升', tip: '化神圆满后要找到通往灵界的空间节点、补全五行灵根才能飞升，可以先备化虚丹' },
+            { from: 29, to: 29, title: '化神大圆满·飞升在即', tip: '通关虚界秘境找到空间节点、用五行之精补全五行灵根，再服化虚丹即可飞升灵界（炼虚期）' },
+            { from: 30, to: 30, title: '炼虚初期·身融天地', tip: `与天地元气相融：战斗区域被击败不再退出，秘境可夺舍重生 ${VOID_DUNGEON_REVIVES} 次（天劫除外）；化虚 / 道则开放` },
+            { from: 31, to: 32, title: '炼虚期·化虚为实', tip: '悟道页「化虚」把法则等级兑成道则，镶嵌进装备页的道基槽' },
+            { from: 33, to: 33, title: '炼虚圆满·大天劫', tip: '炼虚以上每三千年一次大天劫：突破合体前须先渡过第一次大天劫，威能远胜小天劫' },
+            { from: 34, to: 34, title: '合体初期·融合化力', tip: '道果页「合道」：元婴分身、身外化身归于本体，法力成倍增长；突破中期前必须合道' },
+            { from: 35, to: 36, title: '合体期·天地之力', tip: `斗法靠的是法则：悟道法则的战斗效果 ×${LAW_POWER_MULT}，元气化形随法则平均等级变强——多去悟道页参悟` },
+            { from: 37, to: 37, title: '合体圆满·第二次大天劫', tip: '突破大乘前须渡第二次大天劫；法则越深、化形越强，渡劫越稳' },
+            { from: 38, to: 38, title: '大乘初期·灵界至高', tip: '修炼页「元婴注灵」把灵力注入元婴，让它从婴儿形态蜕变为青年形态；战斗中元婴离体助战' },
+            { from: 39, to: 40, title: '大乘期·法则入门', tip: `法则练满 ${LAW_MASTER_LEVEL} 级即入门：压制群敌、打出法则之击。法则之力极难领悟，能入门一两条已是大成` },
+            { from: 41, to: 41, title: '大乘圆满·飞升在即', tip: '开辟仙窍打满 12 窍，再渡飞升天劫，即可飞升真仙' }
         ];
         function getRealmLore(idx) { return REALM_LORE.find(l => idx >= l.from && idx <= l.to) || null; }
 
@@ -2355,21 +2496,21 @@
             18: [`⚠ 境界未稳：刚结金丹，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%，之后境界稳固恢复正常`, '⚔️ 结丹对筑基期敌人有大境界压制（命中、伤害更高）', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🎋 本命法宝：凑齐「万年金雷竹」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青竹蜂云剑」。一生只能炼一把、不可出售；之后每个大境界都能在炼器页「祭炼」一重（同境界武器的材料 + 1 根金雷竹），威力超过同阶普通法器。金丹品质决定威力倍数和最多能祭炼几重（下品三重、中品四重、上品以上五重），祭炼到顶后再改用普通炼器武器', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
             19: ['⚔️ 天劫之地战斗区域开放'],
             21: ['🌌 元婴秘境开放', '👹 结婴心魔：修为满后，突破弹窗里要先「斩心魔」才能冲击元婴。心魔是照着你此刻的实力生出来的——生命、防御、速度与你相同，每次出手比你重两成，换装备它也跟着变；满血、装备好战斗食物再打基本能赢，空手去多半会输。战败损失一半食物，可以重来，打赢一次即可', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🟡 金丹品质会变成元婴品质，决定婴火强度、化神成功率和本命法宝能祭炼到第几重。现在用「金丹淬炼」打磨最快；突破元婴后只能靠「元婴温养」慢慢补（速度是四分之一），化神后彻底定型'],
-            22: ['🌟 修为里程碑：从元婴期起，每个小境界的修为到 25% / 50% / 75% 各得一份感悟奖励（约十分钟打怪的灵石，外加神识；合体期起改给道果），离线也照算', `🛡️ 元婴不灭：秘境战败不再损失修为（食物照常损失一半）；每次进入秘境，第一次被击败时元婴夺舍重生，以 ${NASCENT_REVIVE_HP * 100}% 生命继续战斗`, `🔥 婴火：炼丹、炼器耗时 −${YINGHUO_TIME[0] * 100}%～−${YINGHUO_TIME[1] * 100}%，炼丹翻倍、炼器省料概率 +${YINGHUO_BONUS[0] * 100}%～+${YINGHUO_BONUS[1] * 100}%，元婴品质越高越强（侧栏「境界感悟」显示你的实际数值）`, `⚠ 境界未稳：刚结元婴，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%`, '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
+            22: ['⚡ 小天劫：元婴、化神期每三百年一次——元婴后期、化神初期、化神后期修为满后，要先在突破弹窗里「渡劫」打赢才能突破。天劫照着你此刻的实力降下，满血、带足食物再渡；渡过一次生命 / 防御永久 +2%', '🌟 修为里程碑：从元婴期起，每个小境界的修为到 25% / 50% / 75% 各得一份感悟奖励（约十分钟打怪的灵石，外加神识；合体期起改给道果），离线也照算', `🛡️ 元婴不灭：秘境战败不再损失修为（食物照常损失一半）；每次进入秘境，第一次被击败时元婴夺舍重生，以 ${NASCENT_REVIVE_HP * 100}% 生命继续战斗`, `🔥 婴火：炼丹、炼器耗时 −${YINGHUO_TIME[0] * 100}%～−${YINGHUO_TIME[1] * 100}%，炼丹翻倍、炼器省料概率 +${YINGHUO_BONUS[0] * 100}%～+${YINGHUO_BONUS[1] * 100}%，元婴品质越高越强（侧栏「境界感悟」显示你的实际数值）`, `⚠ 境界未稳：刚结元婴，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%`, '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
             23: [`💨 瞬移神通：元婴稳固，闪避 +${TELEPORT_DODGE * 100}%`],
             24: ['⚔️ 深渊遗迹战斗区域开放', `📜 化神需要特殊功法：拥有「太虚元神诀」（商城）可让化神成功率 +${HUASHEN_RATE.art * 100}%，可以先攒灵石`],
             25: ['🌠 太虚幻境秘境开放：通关一次即得化神机缘', '💊 化神丹配方解锁，每次冲击化神服一颗', `⚡ 化神成功率极低：基础 ${HUASHEN_RATE.base * 100}% + 元婴品质最多 +${HUASHEN_RATE.quality * 100}% + 拥有「太虚元神诀」+${HUASHEN_RATE.art * 100}% + 通关太虚幻境（机缘）+${HUASHEN_RATE.chance * 100}%；失败耗掉丹药但不掉境界`],
-            26: [`🌊 调动天地灵气：从此每次出手伤害 +${JINGYUAN.dmg[0] * 100}%（化神中期起 +${JINGYUAN.dmg[1] * 100}%）。但人界灵气稀薄，每次出手耗 ${JINGYUAN.perAttack} 点精元（上限 ${JINGYUAN.max}，每分钟自然恢复 ${JINGYUAN.regenPerMin}）：精元耗尽就没有这份加成，而且精元越低修炼越慢（最多 −${JINGYUAN.cultPenalty * 100}%）——想专心修炼就少出手。侧栏「境界感悟」随时显示精元`, `💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%`, '☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
+            26: [`🌊 调动天地灵气：从此每次出手伤害 +${JINGYUAN.dmg[0] * 100}%（化神中期起 +${JINGYUAN.dmg[1] * 100}%）。但人界灵气稀薄，每次出手耗 ${JINGYUAN.perAttack} 点精元（上限 ${JINGYUAN.max}，每分钟自然恢复 ${JINGYUAN.regenPerMin}）：精元耗尽就没有这份加成，而且精元越低修炼越慢（最多 −${JINGYUAN.cultPenalty * 100}%）——想专心修炼就少出手。侧栏「境界感悟」随时显示精元`, `💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%`, '☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）。到了合体期，法则就是斗法的核心：战斗效果翻倍，还决定元气化形的威力和之后几次大天劫的难度，可以早点开始参悟', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
             27: [`🌊 天地灵气运用纯熟：出手伤害加成 +${JINGYUAN.dmg[0] * 100}% → +${JINGYUAN.dmg[1] * 100}%`],
             28: ['⚔️ 九幽冥渊战斗区域开放'],
-            29: ['🌫️ 虚界秘境开放：通关一次即找到通往灵界的空间节点——这是飞升灵界（突破炼虚）的前提', '💊 化虚丹配方解锁，飞升时服一颗'],
-            30: [`🌌 飞升灵界：这里灵气充沛，出手不再损耗精元，天地灵气的伤害加成（+${JINGYUAN.dmg[1] * 100}%）从此常驻，修炼也不再受精元拖累`, '🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', '⚡ 天劫开始：从这个境界起，每次突破小境界前，突破弹窗会先要求「渡劫」，打赢才能突破。天劫是照着你此刻的实力降下的，生命是你的两倍以上、出手比你重三到四成，一劫重过一劫：不带食物过不了，带足食物、满血再渡；初劫大多能过，大天劫往往要试几次。战败只损失食物，夺舍重生在这里能救你一次'],
+            29: ['🌫️ 虚界秘境开放：通关一次即找到通往灵界的空间节点——这是飞升灵界（突破炼虚）的前提', '🌈 补灵根：突破炼虚须身具金木水火土五行灵根。虚界秘境会掉落五行之精，每缺一行要 2 个（你本身就是的那一行不用；雷 / 冰 / 风异灵根五行都要补），凑齐后在修炼页「补全五行灵根」', '💊 化虚丹配方解锁，飞升时服一颗'],
+            30: [`🌌 飞升灵界：这里灵气充沛，出手不再损耗精元，天地灵气的伤害加成（+${JINGYUAN.dmg[1] * 100}%）从此常驻，修炼也不再受精元拖累`, '🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', `🌌 身融天地，不死不灭：战斗区域被击败不再退出循环（元气重凝，生命回到一半继续打，连败 3 场才停），秘境里可夺舍重生 ${VOID_DUNGEON_REVIVES} 次——但天劫例外，纵有无限寿元，亦可能陨落于劫数之下`, '☄️ 大天劫：炼虚以上每三千年一次，比小天劫凶得多——炼虚圆满、合体圆满、大乘中期、大乘圆满（飞升天劫）各一次，一劫重过一劫，后两次往往要试几次。渡过一次生命 / 防御永久 +3%'],
             32: ['⚔️ 化实之界战斗区域开放'],
             33: ['🌌 天道秘境开放', '💊 合体丹配方解锁，突破炼虚圆满前记得炼够'],
-            34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 道果页可以「合道」：收回全部分身（不可逆，之后不能再用分身），换所有主行动速度 +100%、生命/攻击/防御/速度 +15%、神识与道果产出提升——这个操作不急着现在做，但合体圆满突破到大乘期之前必须做', '⚔️ 道痕荒原战斗区域开放'],
+            34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 合体期以融合为本：道果页「合道」——元婴分身与身外化身归于本体（不可逆，之后不能再用分身），法力成倍增长：所有主行动速度 +100%、生命/攻击/防御/速度 +15%、身外化身加成翻倍、神识与道果产出提升。合体初期突破中期之前必须合道', `☯️ 借用法则之力：从此斗法的核心不再是法力多寡，而是天地之力——悟道法则里与战斗有关的效果（攻击、生命、防御、速度、暴击、闪避、命中、回复、食物）全部 ×${LAW_POWER_MULT}`, `🌀 元气化形：战斗中每 ${QI_FORM.interval} 秒额外打出一击，无视防御，伤害 = 攻击 × (${QI_FORM.base * 100}% + 八种法则平均等级 × ${QI_FORM.perAvgLevel * 100}%)——法则悟得越深，化形越强`, '⚔️ 道痕荒原战斗区域开放'],
             36: ['⚔️ 合一虚境战斗区域开放'],
-            37: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁（前提是已经合道），本境界圆满后必须先合道才能突破到大乘期'],
-            38: ['👁️ 元婴蜕变解锁：道果页花道果 + 元婴精魄升级（最多10级），从婴儿形态练到青年形态，被动加攻击和暴击伤害，不用手动操作', '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
+            37: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁，突破大乘时服一颗'],
+            38: [`👶 元婴离体助战：从此战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次（无视防御），威力随蜕变等级提高`, `👶 元婴蜕变：修炼页「元婴注灵」把灵力注入元婴——修为只得一半，每次积 1 点灵力，攒够就自动蜕变一级（另耗元婴精魄，大乘级战斗区域 / 秘境掉落），从婴儿形态练到青年形态共 10 级；修为满了也能继续注灵`, `☯️ 法则入门：大乘期起，任何一条法则练满 ${LAW_MASTER_LEVEL} 级就算「入门」——每入门一条，敌人攻击、防御 −${LAW_MASTER_SUPPRESS * 100}%（以法则压制群敌），并且每 ${LAW_STRIKE_INTERVAL} 秒打出一记法则之击（攻击 ×(1 + 入门条数)，无视防御）。法则之力极难领悟，练满一条要十几个小时`, '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
             40: ['⚔️ 灵界绝境战斗区域开放'],
             41: ['🌌 灵界至高战力已至，但大道并未到头——「修炼」页新增「开辟仙窍」配方：不产出修为，每次花太乙精华×5，直接打通一窍（xianqiao +1），累计 12 窍即可突破飞升为真仙初期，之前攒的修为不影响这次突破'],
             42: ['🌟 飞升成功，正式脱离"人"的范畴，寿元与天地同寿；但要承受"五衰"的前三衰（仙衰/窍衰/身衰）——刚飞升时生命/攻击/防御各 -7.5%，「修炼」页继续做「开辟仙窍」，每多打通一窍这份衰退就减少一点，攒满 24 窍时完全消退', '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放'],
@@ -2378,6 +2519,11 @@
         LIFE_REFINE_TIERS.slice(1).forEach((t, i) => {
             const limit = [null, null, null, '下品金丹的上限', '须中品以上金丹', '须上品以上金丹'][i + 1];
             (REALM_UNLOCKS[t.realm] = REALM_UNLOCKS[t.realm] || []).push(`🎍 炼器页可「祭炼青竹蜂云剑·${t.name}」（需先拥有本命法宝并祭炼到上一重）${limit ? '，' + limit : ''}`);
+        });
+        // 每个有天劫的境界都提示一次：本境界修为满后要先渡哪一劫
+        TRIBULATION_REALMS.forEach(r => {
+            const d = GAME_CONFIG.dungeons[tribulationIdFor(r)];
+            (REALM_UNLOCKS[r] = REALM_UNLOCKS[r] || []).unshift(`${d.icon} 本境界修为满后，须先渡「${d.name}」才能突破（突破弹窗里进入）：${d.desc}`);
         });
 
         function showRealmUnlockModal(realmIndex) {
@@ -2649,6 +2795,7 @@
             gameState.player.origin = origin;
             gameState.player.spiritRoot = spiritRoot;
             gameState.player.rootGrade = rootGrade;
+            syncFiveRootsRecipe();
 
             // 初始化玩家为凡人境界
             gameState.player.realmIndex = 0;
@@ -3853,6 +4000,12 @@
                 performPlayerAttack(monster);
                 gameState.player.attackTimer = 0;
             }
+            // 合体起元气化形、大乘起元婴离体 / 法则之击：定时额外攻击（无视防御）
+            tickPeriodicStrikes(gameState.dungeons, timeDelta).forEach(h => {
+                gameState.dungeons.currentMonsterHP -= h.dmg;
+                showDamageFloat(-h.dmg, false, false);
+                addBattleLog(`${h.label}：造成${h.dmg}点伤害（无视防御）`, 'player-hit');
+            });
 
             // 2. 怪物攻击计时
             gameState.dungeons.monsterAttackTimer += timeDelta;
@@ -3873,13 +4026,17 @@
             // 4. P0-4 自动进食逻辑（在死亡检查前）
             checkAndAutoEat();
 
-            // 5. 检查玩家状态：元婴期起每次秘境第一次被击败时夺舍重生，继续战斗
+            // 5. 检查玩家状态：元婴期起秘境里被击败可夺舍重生继续战斗（元婴/化神一次，炼虚起三次，天劫始终一次）
             if (gameState.player.stats.hp.current <= 0) {
-                if (gameState.player.realmIndex >= NASCENT_SAFE_REALM && !gameState.dungeons.nascentRevived) {
+                const maxRevives = getMaxDungeonRevives(dungeon);
+                const used = gameState.dungeons.nascentRevives || 0;
+                if (used < maxRevives) {
+                    gameState.dungeons.nascentRevives = used + 1;
                     gameState.dungeons.nascentRevived = true;
                     gameState.player.stats.hp.current = Math.floor(gameState.player.stats.hp.max * NASCENT_REVIVE_HP);
+                    const left = maxRevives - used - 1;
                     addBattleLog(`🛡️ 肉身被毁，元婴夺舍重生！生命恢复到 ${Math.round(NASCENT_REVIVE_HP * 100)}%`, 'victory');
-                    showNotification(`🛡️ 元婴不灭：夺舍重生，以 ${Math.round(NASCENT_REVIVE_HP * 100)}% 生命继续战斗（本次秘境仅此一次）`, '#b39ddb');
+                    showNotification(`🛡️ ${gameState.player.realmIndex >= VOID_UNDYING_REALM && !dungeon.isTribulation ? '身融天地' : '元婴不灭'}：夺舍重生，以 ${Math.round(NASCENT_REVIVE_HP * 100)}% 生命继续战斗（本次${dungeon.isTribulation ? '天劫' : '秘境'}还剩 ${left} 次）`, '#b39ddb');
                 } else {
                     handlePlayerDeath();
                     updateProgressBars();
@@ -3943,6 +4100,14 @@
                 } else {
                     battle.log.push('玩家攻击落空');
                 }
+                trimBattleLog(battle.log);
+            }
+            // 合体起元气化形、大乘起元婴离体 / 法则之击：定时额外攻击（无视防御）。普通战斗一场只有两三秒，计时跨场累积
+            if (enemy.currentHP > 0) {
+                tickPeriodicStrikes(areaStrikeClock, timeDelta).forEach(h => {
+                    enemy.currentHP -= h.dmg;
+                    battle.log.push(`${h.label}造成${h.dmg}点伤害（无视防御）`);
+                });
                 trimBattleLog(battle.log);
             }
 
@@ -4113,7 +4278,8 @@
 +${coins}灵石 +${exp}经验`, '#6fa980');
                 }
             } else if (battle.playerHP.current <= 0) {
-                showNotification(`💀 被${battle.currentEnemy.name}击败，重伤逃出${areaData.name}（血量恢复至50%）`, '#c4483a');
+                if (gameState.player.realmIndex >= VOID_UNDYING_REALM) battleLogEntries.push('🌌 肉身崩散，元气重凝（生命恢复至 50%），继续战斗');
+                else showNotification(`💀 被${battle.currentEnemy.name}击败，重伤逃出${areaData.name}（血量恢复至50%）`, '#c4483a');
             } else {
                 showNotification(`⚔️ 战斗失败，逃出${areaData.name}`, '#c4483a');
             }
@@ -4135,8 +4301,10 @@
             auto.streak = won ? 0 : auto.streak + 1;
             if (!won) auto.losses++;
             const died = !won && battle.playerHP.current <= 0;
-            if (died) {
-                showNotification('💀 你被击败了，本轮循环战斗结束', '#c4483a');
+            // 炼虚起身融天地：被击败不退出，只有连败太多场才停（防止打不过时无限送死）
+            const undying = gameState.player.realmIndex >= VOID_UNDYING_REALM;
+            if ((died && !undying) || (undying && auto.streak >= AUTO_BATTLE_MAX_LOSS_STREAK)) {
+                showNotification(undying ? `💀 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，本轮循环战斗结束（请检查装备与食物）` : '💀 你被击败了，本轮循环战斗结束', '#c4483a');
                 syncBattleMode();
                 clearActiveDomain('died');
                 switchPanel('battle');
@@ -4273,7 +4441,8 @@
                         r.danhuo += g.danhuo; r.shenshi += g.shenshi; r.daoguo += g.daoguo;
                     } else {
                         r.losses++;
-                        if (battle.playerHP.current <= 0) { r.died = true; break; }   // 被击败：与在线一致，循环结束
+                        // 被击败：与在线一致，循环结束；炼虚起身融天地，元气重凝后接着打，只受连败上限约束
+                        if (battle.playerHP.current <= 0 && gameState.player.realmIndex < VOID_UNDYING_REALM) { r.died = true; break; }
                         if (++streak >= AUTO_BATTLE_MAX_LOSS_STREAK) { r.stopped = true; break; }
                     }
                 }
@@ -4750,10 +4919,11 @@
         // 所以在战斗计算时用这个函数现算一份「打了灵域补丁」的怪物属性，不修改原始配置对象
         function getMonsterEffectiveStats(monster) {
             const domain = getActiveDomain();
-            if (!domain) return { atk: monster.atk, def: monster.def, spd: monster.spd };
-            const atkMod = 1 + (domain.effects.atkPct || 0);
-            const defMod = 1 + (domain.effects.defPct || 0);
-            const spdMod = 1 + (domain.effects.spdPct || 0);
+            const suppress = 1 - getLawSuppression();   // 大乘：入门的法则压制群敌
+            if (!domain && suppress === 1) return { atk: monster.atk, def: monster.def, spd: monster.spd };
+            const atkMod = (1 + ((domain && domain.effects.atkPct) || 0)) * suppress;
+            const defMod = (1 + ((domain && domain.effects.defPct) || 0)) * suppress;
+            const spdMod = 1 + ((domain && domain.effects.spdPct) || 0);
             return {
                 atk: Math.max(1, Math.round(monster.atk * atkMod)),
                 def: Math.max(0, Math.round(monster.def * defMod)),
@@ -5158,12 +5328,11 @@
                 else if (key === 'cultSpeed') total += getJingyuanCultMod();   // 人界化神期：精元亏损拖慢修炼
             }
             if ((key === 'atkPct' || key === 'defPct') && isRealmUnstable()) total -= UNSTABLE_PENALTY;
-            total += getLawTotals()[key] || 0;
+            total += (getLawTotals()[key] || 0) * (player.realmIndex >= LAW_POWER_REALM && LAW_COMBAT_KEYS.has(key) ? LAW_POWER_MULT : 1);   // 合体起借用法则之力
             total += getSkillUpgradeTotals()[key] || 0;   // 技能商店里已购置的设施
             total += getEquippedEffectSum(key);   // 装备物品自带的特效（含武器/护甲的修炼速度、道基镶嵌的道则）
             total += getDaoMod(key);   // 道果淬体 / 合道
             total += getTribulationMod(key);   // 渡劫：身与天地相融，每渡过一劫永久 +2.5% 生命 / 防御
-            total += getNascentMod(key);   // 元婴蜕变：元婴离体助战，攻击 / 暴击伤害随蜕变等级增长
             total += getCoinRefineMod(key);   // 聚灵培元：灵石的软性无底洞，永久小幅 +生命/攻击/防御
             total += getDomainMod(key);   // 化神期灵域：战斗中对双方同时生效的领域规则（玩家侧这一半）
             total += getAvatarMod(key);   // 化神期身外化身：永久小幅 +攻击/防御
@@ -5666,7 +5835,7 @@
                 return;
             }
             // 洗髓易经是一次性的，已经做过就不再重复消耗清灵草
-            if ((action.output.marrowCleanse && gameState.player.marrowCleansed) || (action.output.danDing && gameState.player.danDing)) {
+            if ((action.output.marrowCleanse && gameState.player.marrowCleansed) || (action.output.danDing && gameState.player.danDing) || (action.output.fiveRoots && hasFiveRoots())) {
                 showNotification(`已完成${action.name}（一次性）`, '#c98a3e');
                 gameState.currentAction = null;
                 gameState.currentActionProgress = 0;
@@ -5761,6 +5930,12 @@
                 gameState.player.marrowCleansed = true;
                 showNotification('🩸 洗髓易经完成，凡人体质脱胎换骨——突破筑基还需筑基丹', '#b39ddb');
             }
+            if (finalOutput.fiveRoots) {
+                gameState.player.fiveRoots = true;
+                gameState.currentAction = null;
+                gameState.currentActionProgress = 0;
+                showNotification('🌈 五行灵根已补全：金木水火土俱备，飞升灵界的条件之一已满足', '#b39ddb');
+            }
             if (finalOutput.danDing) {
                 gameState.player.danDing = true;
                 gameState.currentAction = null;
@@ -5773,6 +5948,10 @@
                 gameState.currentActionProgress = 0;
                 calculateStats();
                 showNotification(`🎍 青竹蜂云剑祭炼成功：${LIFE_REFINE_TIERS[finalOutput.lifeRefine].name}（攻击 ${getLifeTreasureStats().atk}）`, '#c2a25f', 'rare');
+            }
+            if (isNascentInfusing(action)) {
+                gameState.player.nascentInfuse = (gameState.player.nascentInfuse || 0) + action.output.nascentInfuse;
+                tryNascentEvolve();
             }
             // 金丹淬炼只在结丹期有效、元婴温养只在元婴期有效：化神后品质彻底定型
             if (isCoreTempering(action)) {
@@ -5820,9 +5999,9 @@
                 } else if (gameState.player.cultivationXP + finalOutput.cultivation >= realmCapacity) {
                     const wasFull = gameState.player.cultivationXP >= realmCapacity;
                     gameState.player.cultivationXP = realmCapacity;
-                    if (isCoreTempering(action)) {
-                        // 金丹淬炼 / 元婴温养：修为满了也继续打磨品质，只在刚满的那一次提示
-                        if (!wasFull) showNotification(`修为已达 ${currentRealm.name} 上限，可以突破；${action.name}仍会继续打磨品质`, '#c2a25f');
+                    if (isCoreTempering(action) || isNascentInfusing(action)) {
+                        // 金丹淬炼 / 元婴温养 / 元婴注灵：修为满了也继续，只在刚满的那一次提示
+                        if (!wasFull) showNotification(`修为已达 ${currentRealm.name} 上限，可以突破；${action.name}仍会继续`, '#c2a25f');
                     } else {
                         gameState.currentAction = null;
                         gameState.currentActionProgress = 0;
@@ -6217,6 +6396,9 @@
             }
             if (output.marrowCleanse) {
                 parts.push(gameState.player.marrowCleansed ? '🩸 已完成（一次性）' : '🩸 洗髓易经（一次性）');
+            }
+            if (output.fiveRoots) {
+                parts.push(hasFiveRoots() ? '🌈 已完成（一次性）' : '🌈 补全五行灵根（一次性，飞升前提）');
             }
             if (output.danDing) {
                 parts.push(gameState.player.danDing ? '⚱️ 已完成（一次性）' : `⚱️ 结丹成功率 +${DANDING_BONUS * 100}%（一次性）`);
@@ -6626,7 +6808,7 @@
                 showNotification('本命法宝与性命相连，一生只能炼制一件——你已经拥有青竹蜂云剑', '#c98a3e', 'normal');
                 return;
             }
-            if (actionObj.output && ((actionObj.output.marrowCleanse && gameState.player.marrowCleansed) || (actionObj.output.danDing && gameState.player.danDing))) {
+            if (actionObj.output && ((actionObj.output.marrowCleanse && gameState.player.marrowCleansed) || (actionObj.output.danDing && gameState.player.danDing) || (actionObj.output.fiveRoots && hasFiveRoots()))) {
                 showNotification(`${actionObj.name}已经完成（一次性）`, '#c98a3e', 'normal');
                 return;
             }
@@ -7704,7 +7886,9 @@
 
             // 初始化秘境战斗状态
             gameState.dungeons.currentDungeon = dungeonId;
-            gameState.dungeons.nascentRevived = false;   // 元婴夺舍重生：每次进入秘境一次
+            gameState.dungeons.nascentRevived = false;   // 元婴夺舍重生：每次进入秘境重新计数
+            gameState.dungeons.nascentRevives = 0;
+            resetStrikeClock(gameState.dungeons);
             gameState.dungeons.currentMonsterIndex = 0;
             gameState.dungeons.defeatCount = 0;
             gameState.dungeons.bossDefeated = false;
@@ -7900,7 +8084,9 @@
             const idx = P.realmIndex;
             const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, P.danDing, isRealmUnstable(), getLifeRefineTier(), ownsLifeTreasure(),
                 hasSurvivedTribulation(HEART_DEMON_REALM), hasHuashenArt(), hasHuashenChance(),
-                usesJingyuan() ? Math.floor(getJingyuan()) : '', hasAscendNode(), isHeavenQiOff(), JSON.stringify(P.btFails || {}), getXianqiao()].join('|');
+                usesJingyuan() ? Math.floor(getJingyuan()) : '', hasAscendNode(), isHeavenQiOff(), JSON.stringify(P.btFails || {}), getXianqiao(),
+                hasSurvivedTribulation(idx), hasFiveRoots(), isFused(), idx >= LAW_POWER_REALM ? getLawAvgLevel().toFixed(1) : '',
+                getNascentSoul(), Math.floor(P.nascentInfuse || 0)].join('|');
             if (key === realmLoreKey) return;   // 每个 tick 都会调用，内容没变就不重写 DOM
             realmLoreKey = key;
             const lore = getRealmLore(idx);
@@ -7922,7 +8108,7 @@
             if (idx >= NASCENT_SAFE_REALM) {
                 const pct = v => Math.round(Math.abs(v) * 100);
                 more.push(`<div>🔥 婴火：炼丹 / 炼器耗时 −${pct(getYinghuoMod('time:alchemy'))}%，炼丹翻倍、炼器省料 +${pct(getYinghuoMod('double:alchemy'))}%</div>`);
-                more.push(`<div>🛡️ 元婴不灭：秘境战败不掉修为，每次秘境可夺舍重生一次（${NASCENT_REVIVE_HP * 100}% 生命）${idx >= TELEPORT_REALM ? `；瞬移神通：闪避 +${TELEPORT_DODGE * 100}%` : ''}</div>`);
+                more.push(`<div>🛡️ 元婴不灭：秘境战败不掉修为${idx < VOID_UNDYING_REALM ? `，每次秘境可夺舍重生一次（${NASCENT_REVIVE_HP * 100}% 生命）` : ''}${idx >= TELEPORT_REALM ? `；瞬移神通：闪避 +${TELEPORT_DODGE * 100}%` : ''}</div>`);
             }
             if (idx >= JINGYUAN.from) {
                 const bonus = Math.round(getHeavenQiBonus() * 100);
@@ -7931,11 +8117,31 @@
                     const slow = Math.round(-getJingyuanCultMod() * 100);
                     now.push(`<div${j < JINGYUAN.perAttack ? ' style="color:#c98a3e"' : ''}>💧 精元 ${Math.floor(j)}/${JINGYUAN.max}${slow ? `，修炼 −${slow}%` : ''} · 天地灵气${off ? '已关闭（无加成、不耗精元）' : `伤害 +${bonus}%，每次出手耗 ${JINGYUAN.perAttack}`}
                         <button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="toggleHeavenQi()">${off ? '开启' : '关闭'}</button></div>`);
-                    if (idx === ASCEND_REALM) now.push(`<div>🌀 空间节点：${hasAscendNode() ? '已找到 ✅' : '未找到（通关一次虚界秘境）'}</div>`);
+                    if (idx === ASCEND_REALM) {
+                        now.push(`<div>🌀 空间节点：${hasAscendNode() ? '已找到 ✅' : '未找到（通关一次虚界秘境）'}</div>`);
+                        now.push(`<div>🌈 五行灵根：${hasFiveRoots() ? '已补全 ✅' : '未补全（虚界秘境掉落五行之精，修炼页「补全五行灵根」）'}</div>`);
+                    }
                 } else {
                     more.push(`<div>🌊 天地灵气：出手伤害 +${bonus}%（灵界灵气充沛，不耗精元）</div>`);
                 }
                 more.push(`<div>💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%</div>`);
+            }
+            if (idx >= FUSION_REQUIRED_REALM && !isFused()) now.push('<div style="color:#c98a3e">🌟 尚未合道：突破前必须先在道果页「合道」</div>');
+            if (idx >= LAW_POWER_REALM) {
+                now.push(`<div>☯️ 天地之力：法则平均 ${getLawAvgLevel().toFixed(1)} 级 · 法则战斗效果 ×${LAW_POWER_MULT} · 元气化形每 ${QI_FORM.interval} 秒一击（攻击 ×${getQiFormMult().toFixed(2)}，无视防御）</div>`);
+            }
+            if (idx >= DACHENG_REALM) {
+                const mastered = getMasteredLaws();
+                const closest = LAW_IDS.map(id => ({ id, lv: getLawInfo(id).level })).filter(l => l.lv < LAW_MASTER_LEVEL).sort((a, b) => b.lv - a.lv)[0];
+                now.push(`<div>☯️ 法则入门 ${mastered.length}/8${mastered.length ? `（${mastered.map(id => LAW_EFFECTS[id].name.replace('之法则', '')).join('、')}）：敌人攻防 −${Math.round(getLawSuppression() * 100)}%，每 ${LAW_STRIKE_INTERVAL} 秒法则之击 攻击 ×${getLawStrikeMult()}` : ''}${closest ? ` · 最接近入门：${LAW_EFFECTS[closest.id].name} ${closest.lv}/${LAW_MASTER_LEVEL}` : ''}</div>`);
+                now.push(`<div>👶 元婴：${nascentStageName(getNascentSoul())} Lv.${getNascentSoul()}/${NASCENT_MAX} · 离体每 ${NASCENT_STRIKE.interval} 秒出手 攻击 ×${getNascentStrikeMult().toFixed(2)}${getNascentSoul() < NASCENT_MAX ? ` · 注灵 ${Math.floor(P.nascentInfuse || 0)}/${nascentInfuseNeed(getNascentSoul())}` : ''}</div>`);
+            }
+            if (idx >= VOID_UNDYING_REALM) more.push(`<div>🌌 身融天地：战斗区域被击败不退出，秘境可夺舍重生 ${VOID_DUNGEON_REVIVES} 次（${NASCENT_REVIVE_HP * 100}% 生命；天劫仍只有一次）</div>`);
+            const tribBonus = getTribulationMod('hpPct');
+            if (tribBonus > 0) more.push(`<div>⚡ 已渡天劫 ${TRIBULATION_REALMS.filter(r => hasSurvivedTribulation(r)).length} 次：生命 / 防御 +${Math.round(tribBonus * 100)}%</div>`);
+            if (TRIBULATION_REALMS.includes(idx)) {
+                const d = GAME_CONFIG.dungeons[tribulationIdFor(idx)];
+                now.push(`<div>${d.icon} ${d.name}：${hasSurvivedTribulation(idx) ? '已渡过 ✅' : '修为满后须先渡劫才能突破（满血、带足食物）'}</div>`);
             }
             const nextRealm = GAME_CONFIG.realms[idx + 1];
             if (nextRealm && nextRealm.xianqiaoReq) now.push(`<div>☯️ 仙窍 ${getXianqiao()}/${nextRealm.xianqiaoReq}：修炼页「开辟仙窍」，打满即可突破</div>`);
@@ -8719,6 +8925,7 @@
                 if (realmIndex === ASCEND_REALM) {
                     const dn = GAME_CONFIG.dungeons[ASCEND_DUNGEON].name;
                     typeText += hasAscendNode() ? '｜已找到通往灵界的空间节点 ✅' : `｜须先找到通往灵界的空间节点：通关一次「${dn}」秘境（尚未完成 ❌）`;
+                    typeText += hasFiveRoots() ? '｜五行灵根已补全 ✅' : '｜须身具五行灵根：修炼页「补全五行灵根」（尚未完成 ❌）';
                 }
                 document.getElementById('btBreakthroughType').textContent = typeText;
 
@@ -8757,6 +8964,8 @@
                     button.textContent = '未完成洗髓易经';
                 } else if (realmIndex === ASCEND_REALM && pillReady && !hasAscendNode()) {
                     button.textContent = '尚未找到空间节点';
+                } else if (realmIndex === ASCEND_REALM && pillReady && !hasFiveRoots()) {
+                    button.textContent = '五行灵根未补全';
                 } else if (pillReady) {
                     button.textContent = realmIndex === ASCEND_REALM ? '🌟 服丹飞升 🌟' : '🌟 服丹突破 🌟';
                 } else {
@@ -8805,9 +9014,9 @@
                 return;
             }
 
-            // 合体圆满（FUSION_REQUIRED_REALM）起必须已合道才能晋升下一境界（大乘期，预留）
+            // 合体初期（FUSION_REQUIRED_REALM）起必须已合道才能晋升下一境界
             if (realmIndex >= FUSION_REQUIRED_REALM && !isFused()) {
-                showNotification('晋升下一境界必须先合道（在「道果」页面选择合道，不可逆）', '#c98a3e', 'warning');
+                showNotification('合体期以融合为本：突破前必须先合道（在「道果」页面选择合道，不可逆）', '#c98a3e', 'warning');
                 return;
             }
 
@@ -8826,6 +9035,10 @@
             // 化神圆满→炼虚初期是飞升灵界：先要找到通往灵界的空间节点
             if (realmIndex === ASCEND_REALM && !hasAscendNode()) {
                 showNotification(`尚未找到通往灵界的空间节点——先通关一次「${GAME_CONFIG.dungeons[ASCEND_DUNGEON].name}」秘境`, '#c98a3e', 'warning');
+                return;
+            }
+            if (realmIndex === ASCEND_REALM && !hasFiveRoots()) {
+                showNotification('突破炼虚须身具五行灵根——先在修炼页「补全五行灵根」（五行之精在虚界秘境获得）', '#c98a3e', 'warning');
                 return;
             }
 
@@ -9957,9 +10170,9 @@
                 if (completions <= 0) { gameState.currentAction = null; gameState.lastActiveTime = now; return; }
             }
             // 一次性的配方（洗髓易经 / 本命法宝）离线最多完成一次，完成后停下
-            const oneShotDone = (action.output.marrowCleanse && gameState.player.marrowCleansed) || (action.output.danDing && gameState.player.danDing)
+            const oneShotDone = (action.output.marrowCleanse && gameState.player.marrowCleansed) || (action.output.danDing && gameState.player.danDing) || (action.output.fiveRoots && hasFiveRoots())
                 || (action.unique && ownsLifeTreasure()) || (action.output.lifeRefine && !!lifeRefineBlock(action.output.lifeRefine));
-            if (action.output.marrowCleanse || action.output.danDing || action.unique || action.output.lifeRefine) {
+            if (action.output.marrowCleanse || action.output.danDing || action.output.fiveRoots || action.unique || action.output.lifeRefine) {
                 completions = oneShotDone ? 0 : Math.min(completions, 1);
                 if (completions <= 0) { gameState.currentAction = null; gameState.lastActiveTime = now; return; }
                 gameState.currentAction = null;
@@ -10077,8 +10290,17 @@
                 offlineRewards.cultivation = actualCultivation;
 
                 // 如果修为已满，停止行动（金丹淬炼除外：满了也继续打磨金丹品质）
-                if (gameState.player.cultivationXP >= finalCapacity && !isCoreTempering(action)) {
+                if (gameState.player.cultivationXP >= finalCapacity && !isCoreTempering(action) && !isNascentInfusing(action)) {
                     gameState.currentAction = null;
+                }
+            }
+            if (completions > 0 && isNascentInfusing(action)) {
+                const before = getNascentSoul();
+                gameState.player.nascentInfuse = (gameState.player.nascentInfuse || 0) + action.output.nascentInfuse * completions;
+                tryNascentEvolve(true);
+                if (getNascentSoul() > before) showNotification(`👶 离线期间元婴注灵，蜕变到 Lv.${getNascentSoul()}（${nascentStageName(getNascentSoul())}）`, '#b39ddb');
+                if (getNascentSoul() < NASCENT_MAX && gameState.player.nascentInfuse >= nascentInfuseNeed(getNascentSoul())) {
+                    tryNascentEvolve();   // 卡在精魄上：补一条提示
                 }
             }
             if (completions > 0 && isCoreTempering(action)) {
@@ -10092,6 +10314,7 @@
                 gameState.currentAction = null;
             }
             if (perAction.danDing && completions > 0) gameState.player.danDing = true;
+            if (perAction.fiveRoots && completions > 0) gameState.player.fiveRoots = true;
             checkRealmStability();
             if (perAction.lifeRefine && completions > 0) {
                 gameState.player.lifeTreasureTier = perAction.lifeRefine;
