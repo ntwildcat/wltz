@@ -488,7 +488,10 @@
                         taixu_manifest: { name: '太虚显化', desc: '炼虚期最终修炼法', duration: 450, output: { cultivation: 50000, skill: 'cultivation', exp: 2200 }, requiredRealmIndex: 32, unlocked: false },
                         // 大乘期配方（原索引29/30/31 → 38/39/40）
                         dacheng_convergence: { name: '大乘归一', desc: '大乘初期主力', duration: 260, output: { cultivation: 170000, skill: 'cultivation', exp: 4800 }, requiredRealmIndex: 38, unlocked: false },
-                        yuanying_growth: { name: '元婴蜕变', desc: '大乘中期高产', duration: 380, output: { cultivation: 320000, skill: 'cultivation', exp: 6000 }, requiredRealmIndex: 39, unlocked: false },
+                        // v7.08 元婴注灵：修为只有大乘归一的一半，另一半灵力注入元婴（nascentInfuse），攒够自动蜕变；蜕变没满时修为满了也继续
+                        nascent_infuse: { name: '元婴注灵', desc: '将灵力注入元婴：修为只得一半，每次积 1 点灵力，攒够自动蜕变一级（另耗元婴精魄）；修为满了也会继续', duration: 260, output: { cultivation: 85000, nascentInfuse: 1, skill: 'cultivation', exp: 4800 }, requiredRealmIndex: 38, unlocked: false },
+                        // 原名「元婴蜕变」，与道果页的元婴蜕变系统撞名却毫无关系，v7.08 改名（只是普通的高产修炼配方）
+                        yuanying_growth: { name: '大乘蕴灵', desc: '大乘中期高产', duration: 380, output: { cultivation: 320000, skill: 'cultivation', exp: 6000 }, requiredRealmIndex: 39, unlocked: false },
                         fadao_suppress: { name: '法则镇伏', desc: '大乘期最终修炼法', duration: 540, output: { cultivation: 560000, skill: 'cultivation', exp: 7500 }, requiredRealmIndex: 40, unlocked: false },
                         // 真仙境配方（原索引32 → 41）：不产出修为，直接打通一窍（xianqiao+1），
                         // 是大乘圆满→真仙初期、真仙初期→真仙后期这两次突破的唯一判定依据，见 attemptBreakthrough()
@@ -1100,6 +1103,7 @@
             if (typeof P.daoBody !== 'number') P.daoBody = 0;
             if (typeof P.daoLaw !== 'number') P.daoLaw = 0;
             if (typeof P.nascentSoul !== 'number') P.nascentSoul = 0;
+            if (typeof P.nascentInfuse !== 'number') P.nascentInfuse = 0;
             if (typeof P.coinRefine !== 'number') P.coinRefine = 0;
             if (typeof P.xianqiao !== 'number') P.xianqiao = 0;
             if (typeof P.marrowCleansed !== 'boolean') P.marrowCleansed = false;
@@ -1785,58 +1789,58 @@
             saveGame();
         }
 
-        // ---- 大乘期：元婴蜕变与离体助战（v6.69） ----
+        // ---- 大乘期：元婴蜕变与离体助战（v6.69，v7.08 改为灵力注入 + 元婴真正出手） ----
         // 原著设定：大乘修士需将灵力不断注入元婴，使其从婴儿形态蜕变为青年形态，蜕变越深，元婴离体助战的威力越强。
-        // 游戏化：大乘初期（索引29）起解锁，花道果 + 元婴精魄（大乘级秘境 / 战斗区域掉落）把元婴蜕变等级从 0 升到 10 级，
-        // 每级增加元婴离体助战的攻击 / 暴击伤害加成（并入 getMod，战斗、修炼、生活技能全自动生效，和道则、渡劫一样不用逐处改代码）。
+        // 游戏化：修炼页「元婴注灵」配方（修为只得一半，另一半灌入元婴）每完成一次积 1 点灵力，攒够 nascentInfuseNeed(等级) 点、
+        // 并有元婴精魄 ×(等级+1)（大乘级秘境 / 战斗区域掉落）时自动蜕变一级，最多 10 级。
+        // 蜕变等级决定战斗中元婴离体出手的威力（见 NASCENT_STRIKE / PERIODIC_STRIKES），原来的被动攻击 / 暴伤加成取消。
         const NASCENT_MAX = 10;
-        const NASCENT_ATK_PER_LEVEL = 0.02;      // 元婴离体助战：攻击 +2%/级
-        const NASCENT_CRITDMG_PER_LEVEL = 0.02;   // 元婴离体助战：暴击伤害 +2%/级
         function getNascentSoul() { return gameState.player.nascentSoul || 0; }
-        function nascentCost(level) { return { daoguo: Math.round(60 * Math.pow(level + 1, 1.5)), essence: level + 1 }; }
         function nascentStageName(level) {
             if (level >= 8) return '青年形态';
             if (level >= 4) return '少年形态';
             return '婴儿形态';
         }
-        function getNascentMod(key) {
-            if (key !== 'atkPct' && key !== 'critDmg') return 0;
-            const lv = getNascentSoul();
-            return key === 'atkPct' ? lv * NASCENT_ATK_PER_LEVEL : lv * NASCENT_CRITDMG_PER_LEVEL;
+        // 注灵后检查能否蜕变；精魄不够时灵力停在门槛上，等精魄到手再蜕变
+        function tryNascentEvolve(silent = false) {
+            const P = gameState.player;
+            let evolved = 0;
+            while (getNascentSoul() < NASCENT_MAX && (P.nascentInfuse || 0) >= nascentInfuseNeed(getNascentSoul())) {
+                const lv = getNascentSoul(), essence = lv + 1;
+                const have = (P.inventory.find(i => i.id === 'nascentsoul_essence') || { qty: 0 }).qty;
+                if (have < essence) {
+                    P.nascentInfuse = nascentInfuseNeed(lv);
+                    if (!P.nascentWaitNotified && !silent) {
+                        showNotification(`👶 元婴灵力已足，蜕变还差元婴精魄（需要 ${essence}，现有 ${have}）——大乘级战斗区域 / 秘境掉落`, '#c98a3e');
+                        P.nascentWaitNotified = true;
+                    }
+                    break;
+                }
+                consumeItem('nascentsoul_essence', essence);
+                P.nascentInfuse -= nascentInfuseNeed(lv);
+                P.nascentSoul = lv + 1;
+                P.nascentWaitNotified = false;
+                evolved++;
+            }
+            if (getNascentSoul() >= NASCENT_MAX) P.nascentInfuse = 0;
+            if (evolved && !silent) showNotification(`👶 元婴蜕变！${nascentStageName(getNascentSoul())}（Lv.${getNascentSoul()}），离体出手威力升到攻击 ×${getNascentStrikeMult().toFixed(2)}`, '#b39ddb');
+            return evolved;
+        }
+        function isNascentInfusing(action) {
+            return !!(action && action.output && action.output.nascentInfuse) && gameState.player.realmIndex >= DACHENG_REALM && getNascentSoul() < NASCENT_MAX;
         }
 
-        function upgradeNascentSoul() {
-            const P = ensureCurrencyState();
-            const lv = getNascentSoul();
-            if (lv >= NASCENT_MAX) { showNotification('元婴已蜕变至青年形态巅峰', '#c98a3e'); return; }
-            const cost = nascentCost(lv);
-            if (P.daoguo < cost.daoguo) { spendNotify('daoguo', cost.daoguo); return; }
-            const have = (P.inventory.find(i => i.id === 'nascentsoul_essence') || { qty: 0 }).qty;
-            if (have < cost.essence) { showNotification(`元婴精魄不足：需要 ${cost.essence}，现有 ${have}`, '#c4483a', 'error'); return; }
-            P.daoguo -= cost.daoguo;
-            consumeItem('nascentsoul_essence', cost.essence);
-            P.nascentSoul = lv + 1;
-            showNotification(`👁️ 元婴蜕变成功！${nascentStageName(lv + 1)}，离体助战攻击 +${Math.round((lv + 1) * NASCENT_ATK_PER_LEVEL * 100)}%、暴击伤害 +${Math.round((lv + 1) * NASCENT_CRITDMG_PER_LEVEL * 100)}%`, '#b39ddb');
-            calculateStats();
-            updateUI();
-            renderSkillUses();
-            saveGame();
-        }
-
-        // 道果页面「元婴」卡片：大乘初期起显示在合道卡片下方
+        // 道果页面「元婴」卡片：大乘初期起显示，只展示进度（蜕变靠修炼页「元婴注灵」）
         function nascentUsesHtml() {
             if (!isDachengUnlocked()) return '';
             const P = gameState.player;
             const lv = getNascentSoul();
             const maxed = lv >= NASCENT_MAX;
-            const cost = nascentCost(lv);
             const have = (P.inventory.find(i => i.id === 'nascentsoul_essence') || { qty: 0 }).qty;
-            const affordable = !maxed && P.daoguo >= cost.daoguo && have >= cost.essence;
-            return `<div class="use-card"><div class="use-title">👁️ 元婴蜕变 <small>元婴离体助战：${nascentStageName(lv)}（Lv.${lv}/${NASCENT_MAX}），攻击 +${Math.round(lv * NASCENT_ATK_PER_LEVEL * 100)}%、暴击伤害 +${Math.round(lv * NASCENT_CRITDMG_PER_LEVEL * 100)}%</small></div>
-                <div class="use-row"><div class="use-main"><b>👁️ 蜕变</b> <span class="use-lv">Lv.${lv}/${NASCENT_MAX}</span>
-                    <div class="use-effect">${maxed ? '已至青年形态巅峰' : `下一级 → 攻击 +${Math.round((lv + 1) * NASCENT_ATK_PER_LEVEL * 100)}%、暴击伤害 +${Math.round((lv + 1) * NASCENT_CRITDMG_PER_LEVEL * 100)}%`}</div></div>
-                    ${maxed ? '<span class="use-max">已满级</span>'
-                        : `<button type="button" class="btn ${affordable ? '' : 'btn-secondary'} use-btn" onclick="upgradeNascentSoul()">${affordable ? '蜕变' : '不足'} ${DAOGUO_ICON}${cost.daoguo} + 👁️${cost.essence}</button>`}
+            return `<div class="use-card"><div class="use-title">👶 元婴蜕变 <small>${nascentStageName(lv)}（Lv.${lv}/${NASCENT_MAX}）：战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次，攻击 ×${getNascentStrikeMult().toFixed(2)}，无视防御</small></div>
+                <div class="use-row"><div class="use-main"><b>👶 注灵</b> <span class="use-lv">Lv.${lv}/${NASCENT_MAX}</span>
+                    <div class="use-effect">${maxed ? '已至青年形态巅峰' : `灵力 ${Math.floor(P.nascentInfuse || 0)}/${nascentInfuseNeed(lv)}（修炼页「元婴注灵」每次 +1）· 元婴精魄 ${have}/${lv + 1} · 下一级离体出手 攻击 ×${(NASCENT_STRIKE.base + NASCENT_STRIKE.perLevel * (lv + 1)).toFixed(2)}`}</div></div>
+                    ${maxed ? '<span class="use-max">已满级</span>' : ''}
                 </div></div>`;
         }
 
@@ -2305,15 +2309,51 @@
         function getQiFormMult() {
             return gameState.player.realmIndex < QI_FORM.realm ? 0 : QI_FORM.base + QI_FORM.perAvgLevel * getLawAvgLevel();
         }
-        const areaQiFormClock = { qiFormTimer: 0 };   // 普通战斗区域的化形计时（跨场累积）
-        // 战斗里按时间累积，到点打出一击，返回伤害（0 = 这一步没出手）
-        function tickQiForm(holder, timeDelta) {
-            const mult = getQiFormMult();
-            if (!mult) return 0;
-            holder.qiFormTimer = (holder.qiFormTimer || 0) + timeDelta;
-            if (holder.qiFormTimer < QI_FORM.interval) return 0;
-            holder.qiFormTimer -= QI_FORM.interval;
-            return Math.max(1, Math.floor(gameState.player.stats.atk * mult * getBattleSkillDmgMult()));
+        // ---- 大乘期（v7.08） ----
+        // 原著"修士需将灵力不断注入元婴，使其从婴儿形态蜕变为青年形态。大乘期可令元婴离体助战，并初步掌握使用法则之力——
+        // 以法则压制群敌，打出恐怖攻击。然则法则之力极难领悟，纵使宝花始祖这般惊才绝艳者，亦仅堪堪入门"。
+        // 元婴线：元婴期结婴 → 合体合道（元婴归于本体）→ 大乘注灵蜕变、元婴离体助战。
+        // 法则线：化神参悟 → 炼虚化虚 → 合体借用（战斗效果翻倍、元气化形）→ 大乘掌握入门（压制群敌、法则之击）。
+        const DACHENG_REALM = 38;
+        // 元婴离体助战：大乘起战斗中每 interval 秒元婴出手一次，伤害 = 攻击 × (base + perLevel × 蜕变等级)
+        const NASCENT_STRIKE = { interval: 2, base: 0.15, perLevel: 0.05 };
+        // 元婴注灵：修炼「元婴注灵」每完成一次积 1 点灵力，蜕变到下一级要 NASCENT_INFUSE_PER_LEVEL × (当前等级+1) 点，另耗元婴精魄 ×(当前等级+1)
+        const NASCENT_INFUSE_PER_LEVEL = 40;
+        function nascentInfuseNeed(lv) { return NASCENT_INFUSE_PER_LEVEL * (lv + 1); }
+        // 法则入门：大乘期起，练满 LAW_MASTER_LEVEL 级的法则算「入门」。每入门一条，敌人攻击 / 防御 −LAW_MASTER_SUPPRESS；
+        // 有入门法则时每 LAW_STRIKE_INTERVAL 秒一记法则之击，伤害 = 攻击 × (1 + 入门条数)
+        const LAW_MASTER_LEVEL = 30, LAW_MASTER_SUPPRESS = 0.05, LAW_STRIKE_INTERVAL = 10;
+        function getMasteredLaws() {
+            if (gameState.player.realmIndex < DACHENG_REALM) return [];
+            return LAW_IDS.filter(id => getLawInfo(id).level >= LAW_MASTER_LEVEL);
+        }
+        function getLawSuppression() { return getMasteredLaws().length * LAW_MASTER_SUPPRESS; }
+        function getNascentStrikeMult() {
+            return gameState.player.realmIndex < DACHENG_REALM ? 0 : NASCENT_STRIKE.base + NASCENT_STRIKE.perLevel * getNascentSoul();
+        }
+        function getLawStrikeMult() { const n = getMasteredLaws().length; return n ? 1 + n : 0; }
+
+        // 战斗中定时触发的额外攻击（都无视防御，乘战斗技能等级加成）：合体的元气化形、大乘的元婴离体与法则之击
+        const PERIODIC_STRIKES = [
+            { key: 'qiForm', label: '🌀 元气化形', interval: QI_FORM.interval, mult: () => getQiFormMult() },
+            { key: 'nascent', label: '👶 元婴离体', interval: NASCENT_STRIKE.interval, mult: () => getNascentStrikeMult() },
+            { key: 'lawStrike', label: '☯️ 法则之击', interval: LAW_STRIKE_INTERVAL, mult: () => getLawStrikeMult() }
+        ];
+        const areaStrikeClock = {};   // 普通战斗区域的计时（一场只有两三秒，跨场累积）
+        function resetStrikeClock(holder) { PERIODIC_STRIKES.forEach(s => { holder[s.key + 'Timer'] = 0; }); }
+        // 按时间累积，到点的各打出一击；返回这一步打出的 [{ label, dmg }]
+        function tickPeriodicStrikes(holder, timeDelta) {
+            const hits = [];
+            PERIODIC_STRIKES.forEach(s => {
+                const mult = s.mult();
+                if (!mult) return;
+                const k = s.key + 'Timer';
+                holder[k] = (holder[k] || 0) + timeDelta;
+                if (holder[k] < s.interval) return;
+                holder[k] -= s.interval;
+                hits.push({ label: s.label, dmg: Math.max(1, Math.floor(gameState.player.stats.atk * mult * getBattleSkillDmgMult())) });
+            });
+            return hits;
         }
 
         // ---- 修为里程碑（v7.05） ----
@@ -2430,7 +2470,10 @@
             { from: 33, to: 33, title: '炼虚圆满·大天劫', tip: '炼虚以上每三千年一次大天劫：突破合体前须先渡过第一次大天劫，威能远胜小天劫' },
             { from: 34, to: 34, title: '合体初期·融合化力', tip: '道果页「合道」：元婴分身、身外化身归于本体，法力成倍增长；突破中期前必须合道' },
             { from: 35, to: 36, title: '合体期·天地之力', tip: `斗法靠的是法则：悟道法则的战斗效果 ×${LAW_POWER_MULT}，元气化形随法则平均等级变强——多去悟道页参悟` },
-            { from: 37, to: 37, title: '合体圆满·第二次大天劫', tip: '突破大乘前须渡第二次大天劫；法则越深、化形越强，渡劫越稳' }
+            { from: 37, to: 37, title: '合体圆满·第二次大天劫', tip: '突破大乘前须渡第二次大天劫；法则越深、化形越强，渡劫越稳' },
+            { from: 38, to: 38, title: '大乘初期·灵界至高', tip: '修炼页「元婴注灵」把灵力注入元婴，让它从婴儿形态蜕变为青年形态；战斗中元婴离体助战' },
+            { from: 39, to: 40, title: '大乘期·法则入门', tip: `法则练满 ${LAW_MASTER_LEVEL} 级即入门：压制群敌、打出法则之击。法则之力极难领悟，能入门一两条已是大成` },
+            { from: 41, to: 41, title: '大乘圆满·飞升在即', tip: '开辟仙窍打满 12 窍，再渡飞升天劫，即可飞升真仙' }
         ];
         function getRealmLore(idx) { return REALM_LORE.find(l => idx >= l.from && idx <= l.to) || null; }
 
@@ -2467,7 +2510,7 @@
             34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 合体期以融合为本：道果页「合道」——元婴分身与身外化身归于本体（不可逆，之后不能再用分身），法力成倍增长：所有主行动速度 +100%、生命/攻击/防御/速度 +15%、身外化身加成翻倍、神识与道果产出提升。合体初期突破中期之前必须合道', `☯️ 借用法则之力：从此斗法的核心不再是法力多寡，而是天地之力——悟道法则里与战斗有关的效果（攻击、生命、防御、速度、暴击、闪避、命中、回复、食物）全部 ×${LAW_POWER_MULT}`, `🌀 元气化形：战斗中每 ${QI_FORM.interval} 秒额外打出一击，无视防御，伤害 = 攻击 × (${QI_FORM.base * 100}% + 八种法则平均等级 × ${QI_FORM.perAvgLevel * 100}%)——法则悟得越深，化形越强`, '⚔️ 道痕荒原战斗区域开放'],
             36: ['⚔️ 合一虚境战斗区域开放'],
             37: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁，突破大乘时服一颗'],
-            38: ['👁️ 元婴蜕变解锁：道果页花道果 + 元婴精魄升级（最多10级），从婴儿形态练到青年形态，被动加攻击和暴击伤害，不用手动操作', '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
+            38: [`👶 元婴离体助战：从此战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次（无视防御），威力随蜕变等级提高`, `👶 元婴蜕变：修炼页「元婴注灵」把灵力注入元婴——修为只得一半，每次积 1 点灵力，攒够就自动蜕变一级（另耗元婴精魄，大乘级战斗区域 / 秘境掉落），从婴儿形态练到青年形态共 10 级；修为满了也能继续注灵`, `☯️ 法则入门：大乘期起，任何一条法则练满 ${LAW_MASTER_LEVEL} 级就算「入门」——每入门一条，敌人攻击、防御 −${LAW_MASTER_SUPPRESS * 100}%（以法则压制群敌），并且每 ${LAW_STRIKE_INTERVAL} 秒打出一记法则之击（攻击 ×(1 + 入门条数)，无视防御）。法则之力极难领悟，练满一条要十几个小时`, '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
             40: ['⚔️ 灵界绝境战斗区域开放'],
             41: ['🌌 灵界至高战力已至，但大道并未到头——「修炼」页新增「开辟仙窍」配方：不产出修为，每次花太乙精华×5，直接打通一窍（xianqiao +1），累计 12 窍即可突破飞升为真仙初期，之前攒的修为不影响这次突破'],
             42: ['🌟 飞升成功，正式脱离"人"的范畴，寿元与天地同寿；但要承受"五衰"的前三衰（仙衰/窍衰/身衰）——刚飞升时生命/攻击/防御各 -7.5%，「修炼」页继续做「开辟仙窍」，每多打通一窍这份衰退就减少一点，攒满 24 窍时完全消退', '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放'],
@@ -3957,13 +4000,12 @@
                 performPlayerAttack(monster);
                 gameState.player.attackTimer = 0;
             }
-            // 合体起：元气化形，定时额外一击（无视防御）
-            const qiForm = tickQiForm(gameState.dungeons, timeDelta);
-            if (qiForm) {
-                gameState.dungeons.currentMonsterHP -= qiForm;
-                showDamageFloat(-qiForm, false, false);
-                addBattleLog(`🌀 元气化形：造成${qiForm}点伤害（无视防御）`, 'player-hit');
-            }
+            // 合体起元气化形、大乘起元婴离体 / 法则之击：定时额外攻击（无视防御）
+            tickPeriodicStrikes(gameState.dungeons, timeDelta).forEach(h => {
+                gameState.dungeons.currentMonsterHP -= h.dmg;
+                showDamageFloat(-h.dmg, false, false);
+                addBattleLog(`${h.label}：造成${h.dmg}点伤害（无视防御）`, 'player-hit');
+            });
 
             // 2. 怪物攻击计时
             gameState.dungeons.monsterAttackTimer += timeDelta;
@@ -4060,11 +4102,12 @@
                 }
                 trimBattleLog(battle.log);
             }
-            // 合体起：元气化形，定时额外一击（无视防御）。普通战斗一场只有两三秒，计时跨场累积，不随每场重置
-            const qiForm = enemy.currentHP > 0 ? tickQiForm(areaQiFormClock, timeDelta) : 0;
-            if (qiForm) {
-                enemy.currentHP -= qiForm;
-                battle.log.push(`🌀 元气化形造成${qiForm}点伤害（无视防御）`);
+            // 合体起元气化形、大乘起元婴离体 / 法则之击：定时额外攻击（无视防御）。普通战斗一场只有两三秒，计时跨场累积
+            if (enemy.currentHP > 0) {
+                tickPeriodicStrikes(areaStrikeClock, timeDelta).forEach(h => {
+                    enemy.currentHP -= h.dmg;
+                    battle.log.push(`${h.label}造成${h.dmg}点伤害（无视防御）`);
+                });
                 trimBattleLog(battle.log);
             }
 
@@ -4876,10 +4919,11 @@
         // 所以在战斗计算时用这个函数现算一份「打了灵域补丁」的怪物属性，不修改原始配置对象
         function getMonsterEffectiveStats(monster) {
             const domain = getActiveDomain();
-            if (!domain) return { atk: monster.atk, def: monster.def, spd: monster.spd };
-            const atkMod = 1 + (domain.effects.atkPct || 0);
-            const defMod = 1 + (domain.effects.defPct || 0);
-            const spdMod = 1 + (domain.effects.spdPct || 0);
+            const suppress = 1 - getLawSuppression();   // 大乘：入门的法则压制群敌
+            if (!domain && suppress === 1) return { atk: monster.atk, def: monster.def, spd: monster.spd };
+            const atkMod = (1 + ((domain && domain.effects.atkPct) || 0)) * suppress;
+            const defMod = (1 + ((domain && domain.effects.defPct) || 0)) * suppress;
+            const spdMod = 1 + ((domain && domain.effects.spdPct) || 0);
             return {
                 atk: Math.max(1, Math.round(monster.atk * atkMod)),
                 def: Math.max(0, Math.round(monster.def * defMod)),
@@ -5289,7 +5333,6 @@
             total += getEquippedEffectSum(key);   // 装备物品自带的特效（含武器/护甲的修炼速度、道基镶嵌的道则）
             total += getDaoMod(key);   // 道果淬体 / 合道
             total += getTribulationMod(key);   // 渡劫：身与天地相融，每渡过一劫永久 +2.5% 生命 / 防御
-            total += getNascentMod(key);   // 元婴蜕变：元婴离体助战，攻击 / 暴击伤害随蜕变等级增长
             total += getCoinRefineMod(key);   // 聚灵培元：灵石的软性无底洞，永久小幅 +生命/攻击/防御
             total += getDomainMod(key);   // 化神期灵域：战斗中对双方同时生效的领域规则（玩家侧这一半）
             total += getAvatarMod(key);   // 化神期身外化身：永久小幅 +攻击/防御
@@ -5906,6 +5949,10 @@
                 calculateStats();
                 showNotification(`🎍 青竹蜂云剑祭炼成功：${LIFE_REFINE_TIERS[finalOutput.lifeRefine].name}（攻击 ${getLifeTreasureStats().atk}）`, '#c2a25f', 'rare');
             }
+            if (isNascentInfusing(action)) {
+                gameState.player.nascentInfuse = (gameState.player.nascentInfuse || 0) + action.output.nascentInfuse;
+                tryNascentEvolve();
+            }
             // 金丹淬炼只在结丹期有效、元婴温养只在元婴期有效：化神后品质彻底定型
             if (isCoreTempering(action)) {
                 const before = getCoreGradeName();
@@ -5952,9 +5999,9 @@
                 } else if (gameState.player.cultivationXP + finalOutput.cultivation >= realmCapacity) {
                     const wasFull = gameState.player.cultivationXP >= realmCapacity;
                     gameState.player.cultivationXP = realmCapacity;
-                    if (isCoreTempering(action)) {
-                        // 金丹淬炼 / 元婴温养：修为满了也继续打磨品质，只在刚满的那一次提示
-                        if (!wasFull) showNotification(`修为已达 ${currentRealm.name} 上限，可以突破；${action.name}仍会继续打磨品质`, '#c2a25f');
+                    if (isCoreTempering(action) || isNascentInfusing(action)) {
+                        // 金丹淬炼 / 元婴温养 / 元婴注灵：修为满了也继续，只在刚满的那一次提示
+                        if (!wasFull) showNotification(`修为已达 ${currentRealm.name} 上限，可以突破；${action.name}仍会继续`, '#c2a25f');
                     } else {
                         gameState.currentAction = null;
                         gameState.currentActionProgress = 0;
@@ -7841,7 +7888,7 @@
             gameState.dungeons.currentDungeon = dungeonId;
             gameState.dungeons.nascentRevived = false;   // 元婴夺舍重生：每次进入秘境重新计数
             gameState.dungeons.nascentRevives = 0;
-            gameState.dungeons.qiFormTimer = 0;
+            resetStrikeClock(gameState.dungeons);
             gameState.dungeons.currentMonsterIndex = 0;
             gameState.dungeons.defeatCount = 0;
             gameState.dungeons.bossDefeated = false;
@@ -8038,7 +8085,8 @@
             const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, P.danDing, isRealmUnstable(), getLifeRefineTier(), ownsLifeTreasure(),
                 hasSurvivedTribulation(HEART_DEMON_REALM), hasHuashenArt(), hasHuashenChance(),
                 usesJingyuan() ? Math.floor(getJingyuan()) : '', hasAscendNode(), isHeavenQiOff(), JSON.stringify(P.btFails || {}), getXianqiao(),
-                hasSurvivedTribulation(idx), hasFiveRoots(), isFused(), idx >= LAW_POWER_REALM ? getLawAvgLevel().toFixed(1) : ''].join('|');
+                hasSurvivedTribulation(idx), hasFiveRoots(), isFused(), idx >= LAW_POWER_REALM ? getLawAvgLevel().toFixed(1) : '',
+                getNascentSoul(), Math.floor(P.nascentInfuse || 0)].join('|');
             if (key === realmLoreKey) return;   // 每个 tick 都会调用，内容没变就不重写 DOM
             realmLoreKey = key;
             const lore = getRealmLore(idx);
@@ -8081,6 +8129,12 @@
             if (idx >= FUSION_REQUIRED_REALM && !isFused()) now.push('<div style="color:#c98a3e">🌟 尚未合道：突破前必须先在道果页「合道」</div>');
             if (idx >= LAW_POWER_REALM) {
                 now.push(`<div>☯️ 天地之力：法则平均 ${getLawAvgLevel().toFixed(1)} 级 · 法则战斗效果 ×${LAW_POWER_MULT} · 元气化形每 ${QI_FORM.interval} 秒一击（攻击 ×${getQiFormMult().toFixed(2)}，无视防御）</div>`);
+            }
+            if (idx >= DACHENG_REALM) {
+                const mastered = getMasteredLaws();
+                const closest = LAW_IDS.map(id => ({ id, lv: getLawInfo(id).level })).filter(l => l.lv < LAW_MASTER_LEVEL).sort((a, b) => b.lv - a.lv)[0];
+                now.push(`<div>☯️ 法则入门 ${mastered.length}/8${mastered.length ? `（${mastered.map(id => LAW_EFFECTS[id].name.replace('之法则', '')).join('、')}）：敌人攻防 −${Math.round(getLawSuppression() * 100)}%，每 ${LAW_STRIKE_INTERVAL} 秒法则之击 攻击 ×${getLawStrikeMult()}` : ''}${closest ? ` · 最接近入门：${LAW_EFFECTS[closest.id].name} ${closest.lv}/${LAW_MASTER_LEVEL}` : ''}</div>`);
+                now.push(`<div>👶 元婴：${nascentStageName(getNascentSoul())} Lv.${getNascentSoul()}/${NASCENT_MAX} · 离体每 ${NASCENT_STRIKE.interval} 秒出手 攻击 ×${getNascentStrikeMult().toFixed(2)}${getNascentSoul() < NASCENT_MAX ? ` · 注灵 ${Math.floor(P.nascentInfuse || 0)}/${nascentInfuseNeed(getNascentSoul())}` : ''}</div>`);
             }
             if (idx >= VOID_UNDYING_REALM) more.push(`<div>🌌 身融天地：战斗区域被击败不退出，秘境可夺舍重生 ${VOID_DUNGEON_REVIVES} 次（${NASCENT_REVIVE_HP * 100}% 生命；天劫仍只有一次）</div>`);
             const tribBonus = getTribulationMod('hpPct');
@@ -10236,8 +10290,17 @@
                 offlineRewards.cultivation = actualCultivation;
 
                 // 如果修为已满，停止行动（金丹淬炼除外：满了也继续打磨金丹品质）
-                if (gameState.player.cultivationXP >= finalCapacity && !isCoreTempering(action)) {
+                if (gameState.player.cultivationXP >= finalCapacity && !isCoreTempering(action) && !isNascentInfusing(action)) {
                     gameState.currentAction = null;
+                }
+            }
+            if (completions > 0 && isNascentInfusing(action)) {
+                const before = getNascentSoul();
+                gameState.player.nascentInfuse = (gameState.player.nascentInfuse || 0) + action.output.nascentInfuse * completions;
+                tryNascentEvolve(true);
+                if (getNascentSoul() > before) showNotification(`👶 离线期间元婴注灵，蜕变到 Lv.${getNascentSoul()}（${nascentStageName(getNascentSoul())}）`, '#b39ddb');
+                if (getNascentSoul() < NASCENT_MAX && gameState.player.nascentInfuse >= nascentInfuseNeed(getNascentSoul())) {
+                    tryNascentEvolve();   // 卡在精魄上：补一条提示
                 }
             }
             if (completions > 0 && isCoreTempering(action)) {
