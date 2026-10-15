@@ -64,8 +64,8 @@
                 // 真仙境（索引33-34，v6.88）：飞升后的全新阶段，不再靠修为突破——大乘圆满起「修炼」页新增
                 // 「开辟仙窍」配方，一次打通一窍，累计 12 窍触发大乘圆满→真仙初期的突破，累计 24 窍触发
                 // 真仙初期→真仙后期；nextReq 沿用曲线只作显示参考，真正的突破判定见 attemptBreakthrough()。
-                // 肉身脱离人的范畴、以窍代修的同时也要扛「五衰」的前三衰（仙衰/窍衰/身衰）：刚飞升时
-                // hp/atk/def 有一份衰退惩罚，仙窍越打通越少，24窍打满时完全消退（getXianShuaiMod）
+                // v7.09：渡过飞升天劫后才能化灵气为仙灵力（开辟仙窍，大乘圆满最多 12 窍）；真仙道体随仙窍变强，
+                // 真仙初期还要渡五衰的前三衰（仙衰 / 窍衰 / 身衰，见 XIAN_SHUAI）
                 { name: '真仙初期', nextReq: 626000, xianqiaoReq: 12 },
                 { name: '真仙后期', nextReq: 674000, xianqiaoReq: 24 }
             ],
@@ -438,11 +438,35 @@
                     rewards: { coins: [15000000, 22000000], daoguo: [250, 400], skillExp: 3000 }
                 },
                 tribulation41: {
-                    id: 'tribulation41', name: '飞升天劫', desc: '飞升真仙前的最后一劫，九死一生——大乘修士多在此反复打磨、迟迟不敢渡', icon: '🌌',
+                    id: 'tribulation41', name: '飞升天劫', desc: '飞仙之劫，九死一生——渡过之后体内灵气才能化为仙灵力', icon: '🌌',
                     isTribulation: true, kind: 'big', tribulationRealm: 41, minRealmIndex: 41, baseRealmIndex: 41,
                     mirror: { hpMult: 2.5, hitFrac: 0.32, interval: 1.0 },
                     monsters: [{ name: '飞升劫雷', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [40000000, 60000000], daoguo: [400, 600], skillExp: 5000 }
+                },
+                // 真仙五衰的前三衰（v7.09）：真仙初期仙窍打到 15 / 18 / 21 窍时依次降临（见 XIAN_SHUAI），各带一种衰退，
+                // 渡过（打赢一次）即消除；三衰都渡过才能突破真仙后期。和天劫一样是镜像 Boss，只从境界感悟 / 突破弹窗进入。
+                // hitFrac 0.24（每击打掉 24% 生命，约 5 击打穿）比飞升天劫 0.32 宽：一个境界连渡三场，且已经渡过最难的飞升天劫
+                shuaiXian: {
+                    id: 'shuaiXian', name: '仙衰', desc: '仙灵力自行外泄，打通仙窍越来越慢', icon: '🥀',
+                    isTribulation: true, isShuai: true, minRealmIndex: 42, baseRealmIndex: 42,
+                    mirror: { hpMult: 2.5, hitFrac: 0.24, interval: 1.0 },
+                    monsters: [{ name: '仙衰之气', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [20000000, 30000000], daoguo: [200, 300], skillExp: 3000 }
+                },
+                shuaiQiao: {
+                    id: 'shuaiQiao', name: '窍衰', desc: '新开的仙窍黯淡无光，道体失去支撑', icon: '🕳️',
+                    isTribulation: true, isShuai: true, minRealmIndex: 42, baseRealmIndex: 42,
+                    mirror: { hpMult: 2.5, hitFrac: 0.24, interval: 1.0 },
+                    monsters: [{ name: '窍衰之影', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [20000000, 30000000], daoguo: [200, 300], skillExp: 3000 }
+                },
+                shuaiShen: {
+                    id: 'shuaiShen', name: '身衰', desc: '道体衰败，生命、攻击、防御一齐下滑', icon: '🍂',
+                    isTribulation: true, isShuai: true, minRealmIndex: 42, baseRealmIndex: 42,
+                    mirror: { hpMult: 2.5, hitFrac: 0.24, interval: 1.0 },
+                    monsters: [{ name: '身衰之相', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [20000000, 30000000], daoguo: [200, 300], skillExp: 3000 }
                 }
             },
             skills: {
@@ -498,7 +522,8 @@
                         // v7.05：基础耗时 300 秒 → 226800 秒。原来在太乙化元经 ×15、合道 ×2 下每窍只要 10 秒，大乘初中后期各二十多小时之后，
                         // 大乘圆满和真仙两个境界几分钟就结束。现在每窍约 2.1 小时，12 窍约 25 小时 = 大乘期总时长（81 小时）的 31%，
                         // 与其他大境界「圆满占 31%」一致；大乘初中后期的 nextReq 相应调低，大乘总时长不变。
-                        open_orifice: { name: '开辟仙窍', desc: '肉身化道体，以窍代修：太乙精华×5 换一窍，12窍飞升真仙初期，24窍圆满真仙后期', duration: 226800, output: { xianqiao: 1, skill: 'cultivation', exp: 8000 }, requires: { taiyiessence: 5 }, requiredRealmIndex: 41, unlocked: false }
+                        // v7.09：大乘圆满须先渡飞升天劫才能开，且最多开到 12 窍（灵气全部化为仙灵力）；真仙初期继续开到 24 窍
+                        open_orifice: { name: '开辟仙窍', desc: '渡过飞升天劫后，体内灵气化为仙灵力冲开仙窍：太乙精华×5 换一窍，大乘圆满开满 12 窍即全部转化、飞升真仙初期；真仙期开到 24 窍为真仙后期', duration: 226800, output: { xianqiao: 1, skill: 'cultivation', exp: 8000 }, requires: { taiyiessence: 5 }, requiredRealmIndex: 41, unlocked: false }
                     },
                     actions: {}
                 },
@@ -1742,6 +1767,15 @@
             const box = document.getElementById('btTribulation');
             if (!box) return;
             const realmIndex = gameState.player.realmIndex;
+            const shuai = getActiveShuai()[0];
+            if (shuai) {
+                const d = GAME_CONFIG.dungeons[shuai.id];
+                box.style.display = 'block';
+                box.innerHTML = `<div class="bt-guide-title">${d.icon} ${d.name}已降临（${shuai.effect}）</div>
+                    <div class="bt-guide-line">${d.desc}。渡过即消；三衰都渡过才能突破真仙后期</div>
+                    <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); maybeSelectDomainThenEnter(() => enterDungeon('${shuai.id}'));">${d.icon} 渡${d.name}</button>`;
+                return;
+            }
             if (!BREAKTHROUGH_GATE_REALMS.includes(realmIndex) || hasSurvivedTribulation(realmIndex)) { box.style.display = 'none'; return; }
             const dungeon = GAME_CONFIG.dungeons[tribulationIdFor(realmIndex)];
             box.style.display = 'block';
@@ -1763,7 +1797,10 @@
             gameState.currentActionProgress = 0;
 
             const rewards = dungeon.rewards;
-            let rewardMsg = dungeon.isHeartDemon
+            let rewardMsg = dungeon.isShuai
+                ? `${dungeon.icon} 渡过${dungeon.name}！衰退已消除（${(XIAN_SHUAI.find(sh => sh.id === dungeonId) || {}).effect}）${getPendingShuai().length ? `（三衰还剩 ${getPendingShuai().length}）` : '——三衰已渡尽'}
+`
+                : dungeon.isHeartDemon
                 ? `👹 心魔已灭，道心通明——可以冲击元婴了\n`
                 : `⚡ 渡过${dungeon.name}！身与天地相融更进一步（生命 / 防御 永久 +${Math.round(getTribulationBonusOf(dungeon.tribulationRealm) * 100)}%）\n`;
             if (rewards.coins) {
@@ -1844,19 +1881,65 @@
                 </div></div>`;
         }
 
-        // ---- 真仙境：飞升后打通仙窍（v6.88） ----
-        // 大乘圆满（32）起，「修炼」页新增「开辟仙窍」配方，一次打通一窍（不产出修为，直接给 xianqiao +1）。
-        // 12 窍触发大乘圆满→真仙初期的突破，24 窍触发真仙初期→真仙后期；两次突破都不再看 cultivationXP，
-        // 见 attemptBreakthrough() 里的特判。五衰的前三衰（仙衰/窍衰/身衰）合并成一份随仙窍数递减的负加成，
-        // 不拆成三个数值上分不清的小 debuff：刚飞升（真仙初期，12窍）时 hp/atk/def 各 -7.5%，24 窍打满时归零。
+        // ---- 真仙境：飞升后打通仙窍（v6.88，v7.09 按原著重做） ----
+        // 原著：渡过飞仙劫后，体内灵气转化为仙灵力，全部转化完毕即为真仙；真仙身体成为道体，可以运用法则之力，
+        // 但要面对五衰的前三衰（仙衰、窍衰、身衰）；修炼不再以法力为主而是打通仙窍，十二窍真仙初期、二十四窍真仙后期。
+        // 游戏化：
+        //   · 大乘圆满先渡飞升天劫，之后「开辟仙窍」才开始把灵气化为仙灵力——打通 12 窍即全部转化，突破真仙初期；
+        //     大乘圆满最多开到 12 窍（xianqiaoCap），真仙初期继续开到 24 窍。
+        //   · 道体（getXianMod）：真仙起每个亮着的仙窍生命 / 防御 +1%（12 窍 +12%，24 窍 +24%）。
+        //   · 运用法则之力：真仙起法则之击间隔 10 秒 → 5 秒（LAW_STRIKE_INTERVAL_XIAN）。
+        //   · 三衰（XIAN_SHUAI）：真仙初期仙窍到 15 / 18 / 21 窍时依次降临，没渡过就一直生效；三衰都渡过才能突破真仙后期。
+        //     状态完全由「仙窍数 + 对应关卡是否通关」推出，离线也不用额外记录。
         function isAscendUnlocked() { return gameState.player.realmIndex >= 41; }   // v6.89：原索引32 → +9
+        const XIAN_REALM = 42;                   // 真仙初期
         const XIAN_ORIFICE_MAX = 24;
-        const XIAN_SHUAI_MAX_PENALTY = 0.15;
+        const XIAN_CONVERT_ORIFICES = 12;        // 大乘圆满：灵气全部化为仙灵力 = 打通 12 窍
+        const DAO_BODY_PER_ORIFICE = 0.01;       // 道体：每个亮着的仙窍生命 / 防御 +1%
+        const XIAN_SHUAI = [
+            { id: 'shuaiXian', at: 15, effect: '开辟仙窍耗时 ×1.5', orificeTime: 1.5 },
+            { id: 'shuaiQiao', at: 18, effect: '最近打通的 3 个仙窍黯淡、不算道体加成', dimOrifices: 3 },
+            { id: 'shuaiShen', at: 21, effect: '生命 / 攻击 / 防御 −15%', bodyPenalty: 0.15 }
+        ];
         function getXianqiao() { return Math.min(XIAN_ORIFICE_MAX, gameState.player.xianqiao || 0); }
-        function getXianShuaiMod(key) {
-            if (key !== 'hpPct' && key !== 'atkPct' && key !== 'defPct') return 0;
-            if (gameState.player.realmIndex < 42) return 0;   // v6.89：原索引33（真仙初期）→ +9
-            return -XIAN_SHUAI_MAX_PENALTY * (1 - getXianqiao() / XIAN_ORIFICE_MAX);
+        // 当前境界最多能打通到几窍：大乘圆满未渡飞升天劫为 0（不渡劫灵气无从转化），渡劫后 12；真仙起 24
+        function xianqiaoCap() {
+            const r = gameState.player.realmIndex;
+            if (r >= XIAN_REALM) return XIAN_ORIFICE_MAX;
+            if (r === 41) return hasSurvivedTribulation(41) ? XIAN_CONVERT_ORIFICES : 0;
+            return 0;
+        }
+        function orificeBlockReason() {
+            const r = gameState.player.realmIndex, cap = xianqiaoCap();
+            if (r === 41 && !hasSurvivedTribulation(41)) return '须先渡过飞升天劫，灵气才能化为仙灵力（境界感悟面板「⚡ 渡劫」）';
+            if (getXianqiao() >= cap) return r === 41 ? `灵气已全部化为仙灵力（${cap} 窍），可以飞升真仙初期了` : '☯️ 仙窍已全部打通';
+            return '';
+        }
+        function isShuaiDone(sh) { const rec = gameState.dungeons && gameState.dungeons[sh.id]; return !!(rec && rec.completed); }
+        // 正在生效（已降临、未渡过）的衰：只在真仙初期出现，真仙后期已经全部渡过
+        function getActiveShuai() {
+            if (gameState.player.realmIndex !== XIAN_REALM) return [];
+            return XIAN_SHUAI.filter(sh => getXianqiao() >= sh.at && !isShuaiDone(sh));
+        }
+        function getPendingShuai() { return XIAN_SHUAI.filter(sh => !isShuaiDone(sh)); }
+        function getBrightOrifices() {
+            return Math.max(0, getXianqiao() - getActiveShuai().reduce((n, sh) => n + (sh.dimOrifices || 0), 0));
+        }
+        function getOrificeTimeMult() { return getActiveShuai().reduce((m, sh) => m * (sh.orificeTime || 1), 1); }
+        function getXianMod(key) {
+            if (gameState.player.realmIndex < XIAN_REALM) return 0;
+            let v = 0;
+            if (key === 'hpPct' || key === 'defPct') v += DAO_BODY_PER_ORIFICE * getBrightOrifices();
+            if (key === 'hpPct' || key === 'atkPct' || key === 'defPct') v -= getActiveShuai().reduce((n, sh) => n + (sh.bodyPenalty || 0), 0);
+            return v;
+        }
+        // 仙窍数增加后检查有没有衰降临（在线 / 离线都调）
+        function announceShuai(before) {
+            if (gameState.player.realmIndex !== XIAN_REALM) return;
+            XIAN_SHUAI.filter(sh => before < sh.at && getXianqiao() >= sh.at && !isShuaiDone(sh)).forEach(sh => {
+                const d = GAME_CONFIG.dungeons[sh.id];
+                showNotification(`${d.icon} ${d.name}降临：${d.desc}（${sh.effect}）——境界感悟面板可「渡衰」，渡过即消`, '#c4483a', 'warning');
+            });
         }
 
         // 当前打开的是丹火 / 神识 / 炼丹面板时刷新对应的「用途」区
@@ -2323,6 +2406,8 @@
         // 法则入门：大乘期起，练满 LAW_MASTER_LEVEL 级的法则算「入门」。每入门一条，敌人攻击 / 防御 −LAW_MASTER_SUPPRESS；
         // 有入门法则时每 LAW_STRIKE_INTERVAL 秒一记法则之击，伤害 = 攻击 × (1 + 入门条数)
         const LAW_MASTER_LEVEL = 30, LAW_MASTER_SUPPRESS = 0.05, LAW_STRIKE_INTERVAL = 10;
+        const LAW_STRIKE_INTERVAL_XIAN = 5;   // 真仙「可以运用法则之力」：法则之击间隔减半
+        function getLawStrikeInterval() { return gameState.player.realmIndex >= 42 ? LAW_STRIKE_INTERVAL_XIAN : LAW_STRIKE_INTERVAL; }
         function getMasteredLaws() {
             if (gameState.player.realmIndex < DACHENG_REALM) return [];
             return LAW_IDS.filter(id => getLawInfo(id).level >= LAW_MASTER_LEVEL);
@@ -2337,7 +2422,7 @@
         const PERIODIC_STRIKES = [
             { key: 'qiForm', label: '🌀 元气化形', interval: QI_FORM.interval, mult: () => getQiFormMult() },
             { key: 'nascent', label: '👶 元婴离体', interval: NASCENT_STRIKE.interval, mult: () => getNascentStrikeMult() },
-            { key: 'lawStrike', label: '☯️ 法则之击', interval: LAW_STRIKE_INTERVAL, mult: () => getLawStrikeMult() }
+            { key: 'lawStrike', label: '☯️ 法则之击', interval: () => getLawStrikeInterval(), mult: () => getLawStrikeMult() }
         ];
         const areaStrikeClock = {};   // 普通战斗区域的计时（一场只有两三秒，跨场累积）
         function resetStrikeClock(holder) { PERIODIC_STRIKES.forEach(s => { holder[s.key + 'Timer'] = 0; }); }
@@ -2348,9 +2433,10 @@
                 const mult = s.mult();
                 if (!mult) return;
                 const k = s.key + 'Timer';
+                const interval = typeof s.interval === 'function' ? s.interval() : s.interval;
                 holder[k] = (holder[k] || 0) + timeDelta;
-                if (holder[k] < s.interval) return;
-                holder[k] -= s.interval;
+                if (holder[k] < interval) return;
+                holder[k] -= interval;
                 hits.push({ label: s.label, dmg: Math.max(1, Math.floor(gameState.player.stats.atk * mult * getBattleSkillDmgMult())) });
             });
             return hits;
@@ -2473,7 +2559,9 @@
             { from: 37, to: 37, title: '合体圆满·第二次大天劫', tip: '突破大乘前须渡第二次大天劫；法则越深、化形越强，渡劫越稳' },
             { from: 38, to: 38, title: '大乘初期·灵界至高', tip: '修炼页「元婴注灵」把灵力注入元婴，让它从婴儿形态蜕变为青年形态；战斗中元婴离体助战' },
             { from: 39, to: 40, title: '大乘期·法则入门', tip: `法则练满 ${LAW_MASTER_LEVEL} 级即入门：压制群敌、打出法则之击。法则之力极难领悟，能入门一两条已是大成` },
-            { from: 41, to: 41, title: '大乘圆满·飞升在即', tip: '开辟仙窍打满 12 窍，再渡飞升天劫，即可飞升真仙' }
+            { from: 41, to: 41, title: '大乘圆满·飞仙劫', tip: '先渡飞升天劫；渡过后体内灵气开始化为仙灵力——修炼页「开辟仙窍」，打通 12 窍即全部转化，飞升真仙' },
+            { from: 42, to: 42, title: '真仙初期·道体与三衰', tip: '修炼不再看修为，而是打通仙窍；道体随仙窍变强。15 / 18 / 21 窍时仙衰、窍衰、身衰依次降临，渡尽三衰、打满 24 窍为真仙后期' },
+            { from: 43, to: 43, title: '真仙后期', tip: '二十四窍尽开、三衰已渡，道体圆满——当前实现的至高境界' }
         ];
         function getRealmLore(idx) { return REALM_LORE.find(l => idx >= l.from && idx <= l.to) || null; }
 
@@ -2512,16 +2600,16 @@
             37: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁，突破大乘时服一颗'],
             38: [`👶 元婴离体助战：从此战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次（无视防御），威力随蜕变等级提高`, `👶 元婴蜕变：修炼页「元婴注灵」把灵力注入元婴——修为只得一半，每次积 1 点灵力，攒够就自动蜕变一级（另耗元婴精魄，大乘级战斗区域 / 秘境掉落），从婴儿形态练到青年形态共 10 级；修为满了也能继续注灵`, `☯️ 法则入门：大乘期起，任何一条法则练满 ${LAW_MASTER_LEVEL} 级就算「入门」——每入门一条，敌人攻击、防御 −${LAW_MASTER_SUPPRESS * 100}%（以法则压制群敌），并且每 ${LAW_STRIKE_INTERVAL} 秒打出一记法则之击（攻击 ×(1 + 入门条数)，无视防御）。法则之力极难领悟，练满一条要十几个小时`, '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
             40: ['⚔️ 灵界绝境战斗区域开放'],
-            41: ['🌌 灵界至高战力已至，但大道并未到头——「修炼」页新增「开辟仙窍」配方：不产出修为，每次花太乙精华×5，直接打通一窍（xianqiao +1），累计 12 窍即可突破飞升为真仙初期，之前攒的修为不影响这次突破'],
-            42: ['🌟 飞升成功，正式脱离"人"的范畴，寿元与天地同寿；但要承受"五衰"的前三衰（仙衰/窍衰/身衰）——刚飞升时生命/攻击/防御各 -7.5%，「修炼」页继续做「开辟仙窍」，每多打通一窍这份衰退就减少一点，攒满 24 窍时完全消退', '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放'],
-            43: ['🏁 真仙后期，24 窍全部打通，五衰前三衰的负面完全消退——当前实现的至高战力，暂无下一境界']
+            41: [`🌌 飞仙劫：一进大乘圆满就可以渡「飞升天劫」（境界感悟面板或突破弹窗进入）。渡过之后体内灵气才开始化为仙灵力——「修炼」页「开辟仙窍」：不产出修为，每次花太乙精华×5 冲开一窍，大乘圆满最多开到 ${XIAN_CONVERT_ORIFICES} 窍，开满即灵气全部转化，可以突破真仙初期（之前攒的修为不影响这次突破）`],
+            42: [`🌟 成就真仙，身体化为道体：每个亮着的仙窍生命 / 防御 +${DAO_BODY_PER_ORIFICE * 100}%（现在 ${XIAN_CONVERT_ORIFICES} 窍 +${XIAN_CONVERT_ORIFICES}%，开满 24 窍 +24%）`, `☯️ 运用法则之力：法则之击的间隔从 ${LAW_STRIKE_INTERVAL} 秒缩短到 ${LAW_STRIKE_INTERVAL_XIAN} 秒`, `🥀 五衰之前三衰：仙窍开到 ${XIAN_SHUAI.map(sh => sh.at).join(' / ')} 窍时，仙衰（${XIAN_SHUAI[0].effect}）、窍衰（${XIAN_SHUAI[1].effect}）、身衰（${XIAN_SHUAI[2].effect}）依次降临，一直生效到渡过为止（各是一场天劫式的单挑，境界感悟面板「渡衰」）。三衰渡尽、打满 24 窍才能突破真仙后期`, '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放'],
+            43: ['🏁 真仙后期：二十四窍尽开、三衰已渡，道体生命 / 防御 +24%——当前实现的至高境界，暂无下一境界'],
         };
         LIFE_REFINE_TIERS.slice(1).forEach((t, i) => {
             const limit = [null, null, null, '下品金丹的上限', '须中品以上金丹', '须上品以上金丹'][i + 1];
             (REALM_UNLOCKS[t.realm] = REALM_UNLOCKS[t.realm] || []).push(`🎍 炼器页可「祭炼青竹蜂云剑·${t.name}」（需先拥有本命法宝并祭炼到上一重）${limit ? '，' + limit : ''}`);
         });
         // 每个有天劫的境界都提示一次：本境界修为满后要先渡哪一劫
-        TRIBULATION_REALMS.forEach(r => {
+        TRIBULATION_REALMS.filter(r => r !== 41).forEach(r => {   // 飞升天劫不看修为，41 的提示单独写在上面
             const d = GAME_CONFIG.dungeons[tribulationIdFor(r)];
             (REALM_UNLOCKS[r] = REALM_UNLOCKS[r] || []).unshift(`${d.icon} 本境界修为满后，须先渡「${d.name}」才能突破（突破弹窗里进入）：${d.desc}`);
         });
@@ -5336,7 +5424,7 @@
             total += getCoinRefineMod(key);   // 聚灵培元：灵石的软性无底洞，永久小幅 +生命/攻击/防御
             total += getDomainMod(key);   // 化神期灵域：战斗中对双方同时生效的领域规则（玩家侧这一半）
             total += getAvatarMod(key);   // 化神期身外化身：永久小幅 +攻击/防御
-            total += getXianShuaiMod(key);   // 真仙境五衰（前三衰合并）：飞升代价，随仙窍数打通递减至归零
+            total += getXianMod(key);   // 真仙：道体（每个亮着的仙窍生命 / 防御 +1%）与三衰
             return total;
         }
 
@@ -5507,10 +5595,12 @@
             if (skill === 'cultivation') {
                 const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
                 const cultMult = 1 + getMod('cultSpeed');   // 悟道法则的修炼速度加成
+                // 仙衰：仙灵力外泄，开辟仙窍变慢
+                const shuai = recipeKey && (GAME_CONFIG.skills.cultivation.recipes[recipeKey] || {}).output?.xianqiao ? getOrificeTimeMult() : 1;
                 if (currentArt) {
-                    return duration / (currentArt.speedMultiplier * cultMult); // 倍率越高，持续时间越短
+                    return duration * shuai / (currentArt.speedMultiplier * cultMult); // 倍率越高，持续时间越短
                 }
-                return duration / cultMult;
+                return duration * shuai / cultMult;
             } else {
                 // 灵根/功法的耗时特效（下限30%，避免叠加后过快）
                 const timeMod = Math.max(0.3, 1 + getSkillMod('time', skill) + getMasteryBonus(skill, recipeKey).time);
@@ -5827,9 +5917,9 @@
             const action = getAction(act.skill, act.action);
             if (!action.output) return;
 
-            // 仙窍已经打满（24）时「开辟仙窍」直接停止，不再消耗太乙精华——真仙后期已经是当前实现的上限
-            if (action.output.xianqiao && getXianqiao() >= XIAN_ORIFICE_MAX) {
-                showNotification('☯️ 仙窍已全部打通', '#c98a3e');
+            // 到了当前境界能开的上限（大乘圆满未渡飞升天劫 0 窍、渡劫后 12 窍；真仙 24 窍）时「开辟仙窍」直接停止，不再消耗太乙精华
+            if (action.output.xianqiao && getXianqiao() >= xianqiaoCap()) {
+                showNotification(orificeBlockReason(), '#c98a3e');
                 gameState.currentAction = null;
                 gameState.currentActionProgress = 0;
                 return;
@@ -5922,9 +6012,13 @@
             }
             if (finalOutput.danhuo || finalOutput.shenshi || finalOutput.daoguo) addCurrency(finalOutput);
             if (finalOutput.xianqiao) {
-                gameState.player.xianqiao = Math.min(XIAN_ORIFICE_MAX, (gameState.player.xianqiao || 0) + finalOutput.xianqiao);
-                showNotification(`☯️ 打通一窍：仙窍 ${gameState.player.xianqiao}/${XIAN_ORIFICE_MAX}`, '#b39ddb');
-                calculateStats();   // 仙窍数变了，五衰惩罚要立刻重算
+                const before = getXianqiao();
+                gameState.player.xianqiao = Math.min(xianqiaoCap(), before + finalOutput.xianqiao);
+                showNotification(gameState.player.realmIndex < XIAN_REALM
+                    ? `☯️ 灵气化为仙灵力，冲开一窍：${getXianqiao()}/${XIAN_CONVERT_ORIFICES}${getXianqiao() >= XIAN_CONVERT_ORIFICES ? '——全部转化完毕，可以飞升真仙初期' : ''}`
+                    : `☯️ 打通一窍：仙窍 ${getXianqiao()}/${XIAN_ORIFICE_MAX}`, '#b39ddb');
+                announceShuai(before);
+                calculateStats();   // 仙窍数变了，道体 / 三衰要立刻重算
             }
             if (finalOutput.marrowCleanse) {
                 gameState.player.marrowCleansed = true;
@@ -6772,6 +6866,10 @@
                     } else if (currentArt && !currentArt.unlockedRecipes.includes(action)) {
                         showNotification(`🔒 当前功法 ${currentArt.name} 不支持此配方`, '#c98a3e', 'normal');
                     }
+                    return;
+                }
+                if (actionObj.output && actionObj.output.xianqiao && orificeBlockReason()) {
+                    showNotification(orificeBlockReason(), '#c98a3e', 'normal');
                     return;
                 }
             } else if (skill === 'battle') {
@@ -8086,7 +8184,7 @@
                 hasSurvivedTribulation(HEART_DEMON_REALM), hasHuashenArt(), hasHuashenChance(),
                 usesJingyuan() ? Math.floor(getJingyuan()) : '', hasAscendNode(), isHeavenQiOff(), JSON.stringify(P.btFails || {}), getXianqiao(),
                 hasSurvivedTribulation(idx), hasFiveRoots(), isFused(), idx >= LAW_POWER_REALM ? getLawAvgLevel().toFixed(1) : '',
-                getNascentSoul(), Math.floor(P.nascentInfuse || 0)].join('|');
+                getNascentSoul(), Math.floor(P.nascentInfuse || 0), XIAN_SHUAI.map(isShuaiDone).join()].join('|');
             if (key === realmLoreKey) return;   // 每个 tick 都会调用，内容没变就不重写 DOM
             realmLoreKey = key;
             const lore = getRealmLore(idx);
@@ -8133,7 +8231,7 @@
             if (idx >= DACHENG_REALM) {
                 const mastered = getMasteredLaws();
                 const closest = LAW_IDS.map(id => ({ id, lv: getLawInfo(id).level })).filter(l => l.lv < LAW_MASTER_LEVEL).sort((a, b) => b.lv - a.lv)[0];
-                now.push(`<div>☯️ 法则入门 ${mastered.length}/8${mastered.length ? `（${mastered.map(id => LAW_EFFECTS[id].name.replace('之法则', '')).join('、')}）：敌人攻防 −${Math.round(getLawSuppression() * 100)}%，每 ${LAW_STRIKE_INTERVAL} 秒法则之击 攻击 ×${getLawStrikeMult()}` : ''}${closest ? ` · 最接近入门：${LAW_EFFECTS[closest.id].name} ${closest.lv}/${LAW_MASTER_LEVEL}` : ''}</div>`);
+                now.push(`<div>☯️ 法则入门 ${mastered.length}/8${mastered.length ? `（${mastered.map(id => LAW_EFFECTS[id].name.replace('之法则', '')).join('、')}）：敌人攻防 −${Math.round(getLawSuppression() * 100)}%，每 ${getLawStrikeInterval()} 秒法则之击 攻击 ×${getLawStrikeMult()}` : ''}${closest ? ` · 最接近入门：${LAW_EFFECTS[closest.id].name} ${closest.lv}/${LAW_MASTER_LEVEL}` : ''}</div>`);
                 now.push(`<div>👶 元婴：${nascentStageName(getNascentSoul())} Lv.${getNascentSoul()}/${NASCENT_MAX} · 离体每 ${NASCENT_STRIKE.interval} 秒出手 攻击 ×${getNascentStrikeMult().toFixed(2)}${getNascentSoul() < NASCENT_MAX ? ` · 注灵 ${Math.floor(P.nascentInfuse || 0)}/${nascentInfuseNeed(getNascentSoul())}` : ''}</div>`);
             }
             if (idx >= VOID_UNDYING_REALM) more.push(`<div>🌌 身融天地：战斗区域被击败不退出，秘境可夺舍重生 ${VOID_DUNGEON_REVIVES} 次（${NASCENT_REVIVE_HP * 100}% 生命；天劫仍只有一次）</div>`);
@@ -8141,10 +8239,27 @@
             if (tribBonus > 0) more.push(`<div>⚡ 已渡天劫 ${TRIBULATION_REALMS.filter(r => hasSurvivedTribulation(r)).length} 次：生命 / 防御 +${Math.round(tribBonus * 100)}%</div>`);
             if (TRIBULATION_REALMS.includes(idx)) {
                 const d = GAME_CONFIG.dungeons[tribulationIdFor(idx)];
-                now.push(`<div>${d.icon} ${d.name}：${hasSurvivedTribulation(idx) ? '已渡过 ✅' : '修为满后须先渡劫才能突破（满血、带足食物）'}</div>`);
+                now.push(`<div>${d.icon} ${d.name}：${hasSurvivedTribulation(idx) ? '已渡过 ✅' : idx === 41 ? `须先渡劫，灵气才能化为仙灵力（满血、带足食物）<button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${tribulationIdFor(41)}'))">⚡ 渡劫</button>` : '修为满后须先渡劫才能突破（满血、带足食物）'}</div>`);
             }
             const nextRealm = GAME_CONFIG.realms[idx + 1];
-            if (nextRealm && nextRealm.xianqiaoReq) now.push(`<div>☯️ 仙窍 ${getXianqiao()}/${nextRealm.xianqiaoReq}：修炼页「开辟仙窍」，打满即可突破</div>`);
+            if (nextRealm && nextRealm.xianqiaoReq) {
+                now.push(idx === 41
+                    ? `<div>☯️ 仙灵力转化 ${getXianqiao()}/${nextRealm.xianqiaoReq} 窍：${hasSurvivedTribulation(41) ? '修炼页「开辟仙窍」，全部转化即飞升真仙初期' : '渡过飞升天劫后开始'}</div>`
+                    : `<div>☯️ 仙窍 ${getXianqiao()}/${nextRealm.xianqiaoReq}：修炼页「开辟仙窍」，打满且三衰渡尽即可突破</div>`);
+            }
+            if (idx >= XIAN_REALM) {
+                const dim = getXianqiao() - getBrightOrifices();
+                now.push(`<div>🌟 道体：${getBrightOrifices()} 个仙窍${dim ? `（${dim} 窍黯淡）` : ''}，生命 / 防御 +${Math.round(getBrightOrifices() * DAO_BODY_PER_ORIFICE * 100)}%</div>`);
+            }
+            if (idx === XIAN_REALM) {
+                XIAN_SHUAI.forEach(sh => {
+                    const d = GAME_CONFIG.dungeons[sh.id];
+                    if (isShuaiDone(sh)) { more.push(`<div>${d.icon} ${d.name}：已渡过 ✅</div>`); return; }
+                    if (getXianqiao() < sh.at) { now.push(`<div style="color:#888">${d.icon} ${d.name}：仙窍 ${sh.at} 窍时降临（${sh.effect}）</div>`); return; }
+                    now.push(`<div style="color:#c4483a">${d.icon} ${d.name}生效中：${sh.effect}
+                        <button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${sh.id}'))">渡${d.name}</button></div>`);
+                });
+            }
             const next = [13, 17, 21, 25].find(i => i >= idx);
             if (next !== undefined && idx >= next - 4) {
                 const prep = next === 13 ? (P.marrowCleansed ? ' · 洗髓易经 ✅' : ' · 洗髓易经未完成')
@@ -8902,9 +9017,12 @@
                 // 真仙境两次突破：不看修为/丹药，看仙窍数量（12窍飞升真仙初期，24窍圆满真仙后期）
                 document.getElementById('btModalTitle').textContent = `✨ 突破${nextRealm.name} ✨`;
                 const have = getXianqiao(), need = nextRealm.xianqiaoReq;
-                document.getElementById('btBreakthroughType').textContent = `以窍代修：仙窍 ${have}/${need}`;
+                const pending = realmIndex === XIAN_REALM ? getPendingShuai() : [];
+                document.getElementById('btBreakthroughType').textContent = realmIndex === 41
+                    ? `渡飞升天劫后灵气化为仙灵力：已转化 ${have}/${need} 窍`
+                    : `以窍代修：仙窍 ${have}/${need}${realmIndex === XIAN_REALM ? `｜三衰 ${XIAN_SHUAI.length - pending.length}/${XIAN_SHUAI.length} 已渡` : ''}`;
                 const button = document.getElementById('btButton');
-                button.textContent = have >= need ? '🌟 飞升突破 🌟' : `仙窍不足（${have}/${need}）`;
+                button.textContent = have < need ? `仙窍不足（${have}/${need}）` : pending.length ? `三衰未渡尽（${pending.length}）` : '🌟 飞升突破 🌟';
             } else if (isMajorBreakthrough && nextRealm) {
                 // 大境界突破
                 document.getElementById('btModalTitle').textContent = realmIndex === ASCEND_REALM ? `✨ 飞升灵界（${nextRealm.name}）✨` : `✨ 突破${nextRealm ? nextRealm.name : '大道尽头'} ✨`;
@@ -8999,6 +9117,11 @@
             if (nextRealm && nextRealm.xianqiaoReq) {
                 if (getXianqiao() < nextRealm.xianqiaoReq) {
                     showNotification(`仙窍不足：已打通 ${getXianqiao()}/${nextRealm.xianqiaoReq}，去「修炼」页做「开辟仙窍」`, '#c98a3e', 'warning');
+                    return;
+                }
+                if (realmIndex === XIAN_REALM && getPendingShuai().length) {
+                    showNotification(`三衰未渡尽（还剩 ${getPendingShuai().map(sh => GAME_CONFIG.dungeons[sh.id].name).join('、')}），不能突破真仙后期`, '#c98a3e', 'warning');
+                    showBreakthroughModal();
                     return;
                 }
             } else if (gameState.player.cultivationXP < currentRealm.nextReq) {
@@ -10161,12 +10284,22 @@
             // 把离开前已经做了一半的进度算进去，结算后的零头留作进行中的进度——耗时以小时计的行动（开辟仙窍）不能每次离线都丢掉零头
             const offlineBudget = actualOfflineSeconds + Math.max(0, gameState.currentActionProgress || 0);
             let completions = Math.floor(offlineBudget / duration);
-            const fullCompletions = completions;
-            const offlineLeftover = offlineBudget - completions * duration;
+            let fullCompletions = completions;
+            let offlineLeftover = offlineBudget - completions * duration;
 
-            // 「开辟仙窍」离线时也要卡 24 窍上限，不然会把仙窍打过头之外，还会白白多扣不该扣的太乙精华
+            // 「开辟仙窍」离线时也要卡当前境界的上限（大乘圆满 12 窍、真仙 24 窍），不然会把仙窍打过头之外，还会白白多扣不该扣的太乙精华；
+            // 离线途中仙衰降临的话，之后每窍按仙衰的耗时算——逐窍累加
             if (action.output && action.output.xianqiao) {
-                completions = Math.min(completions, XIAN_ORIFICE_MAX - getXianqiao());
+                const xianShuai = XIAN_SHUAI[0], baseDur = duration / getOrificeTimeMult();
+                let left = offlineBudget, q = getXianqiao(), n = 0;
+                while (q < xianqiaoCap()) {
+                    const d = baseDur * (gameState.player.realmIndex === XIAN_REALM && q >= xianShuai.at && !isShuaiDone(xianShuai) ? xianShuai.orificeTime : 1);
+                    if (left < d) break;
+                    left -= d; q++; n++;
+                }
+                completions = n;
+                fullCompletions = q < xianqiaoCap() ? n : n + 1;   // 打到上限就停，不保留零头
+                offlineLeftover = left;
                 if (completions <= 0) { gameState.currentAction = null; gameState.lastActiveTime = now; return; }
             }
             // 一次性的配方（洗髓易经 / 本命法宝）离线最多完成一次，完成后停下
@@ -10229,7 +10362,10 @@
             gameState.player.coins += offlineRewards.coins;
             addCurrency(offlineRewards);
             if (offlineRewards.xianqiao) {
-                gameState.player.xianqiao = Math.min(XIAN_ORIFICE_MAX, (gameState.player.xianqiao || 0) + offlineRewards.xianqiao);
+                const before = getXianqiao();
+                gameState.player.xianqiao = Math.min(xianqiaoCap(), before + offlineRewards.xianqiao);
+                announceShuai(before);
+                calculateStats();
             }
 
             // 处理修为，检查是否会超过本境界上限
