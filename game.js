@@ -2654,7 +2654,7 @@
         // 老存档（境界已超过练气初期）迁移时直接标记为已完成，不再显示任务条。
         const NEWBIE_QUESTS = [
             { title: '吐纳灵气', panel: 'cultivation', target: ['cultivation', 'basic'],
-              desc: '你现在只是个凡人。在「修炼」页点下面高亮的「吐纳灵气」开始修炼——行动会<b>自动重复</b>，不用一直点。左侧（手机在顶部）是各个技能页的入口。',
+              desc: '你现在只是个凡人。在「修炼」页点下面高亮的「吐纳灵气」开始修炼——行动会<b>自动重复</b>，不用一直点。左侧栏（手机上是内容上方那一排标签）是各个技能页的入口。',
               need: { act: 'cultivation.basic', n: 1 }, reward: { coins: 20 } },
             { title: '踏入练气', panel: 'cultivation', target: ['cultivation', 'basic'],
               desc: '继续修炼，等上方「修为进度」满了，会出现「尝试突破」按钮，点它突破到<b>练气一层</b>。突破会让属性大涨，并解锁新配方和战斗区域。',
@@ -6682,6 +6682,46 @@
             return card;
         }
 
+        // 长列表折叠（v7.10）：配方 / 战斗区域按解锁顺序排，玩到后期最上面全是过时的、最下面全是远期才解锁的，
+        // 手机上要翻好几屏才找到正在用的。现在：过时的收进顶部「更早的…」，未解锁的只露下一个，其余收进底部「尚未解锁」。
+        // 正在进行的行动永远留在外面；折叠区展开状态按列表记住（列表经常整体重绘）。
+        const listFoldOpen = {};
+        function foldActionList(container, entries, noun) {
+            const isActive = e => e.card.classList.contains('active') || e.card.classList.contains('clone-active');
+            const older = entries.filter(e => e.unlocked && e.obsolete && !isActive(e));
+            const locked = entries.filter(e => !e.unlocked);
+            const farLocked = locked.slice(1);
+            const fold = (key, label, items) => {
+                const id = container.id + ':' + key;
+                const d = document.createElement('details');
+                d.className = 'list-fold list-fold-' + key;
+                d.open = !!listFoldOpen[id];
+                d.addEventListener('toggle', () => { listFoldOpen[id] = d.open; });
+                d.innerHTML = `<summary>${label}（${items.length}）</summary><div class="list-fold-body"></div>`;
+                const body = d.querySelector('.list-fold-body');
+                items.forEach(e => body.appendChild(e.card));
+                return d;
+            };
+            if (older.length) container.appendChild(fold('older', `更早的${noun}`, older));
+            entries.filter(e => !older.includes(e) && !farLocked.includes(e)).forEach(e => container.appendChild(e.card));
+            if (farLocked.length) container.appendChild(fold('locked', '尚未解锁', farLocked));
+        }
+        // 只产出修为的普通修炼配方（可以被更高级的取代）
+        function isPlainCultivationRecipe(recipe) {
+            return Object.keys(recipe.output || {}).every(k => k === 'cultivation' || k === 'skill' || k === 'exp');
+        }
+        // 特殊修炼配方已经没用了：一次性的做完了、淬炼过了有效境界、仙窍 / 注灵满了
+        function isSpentCultivationRecipe(recipe) {
+            const o = recipe.output || {}, P = gameState.player;
+            if (o.marrowCleanse) return !!P.marrowCleansed;
+            if (o.danDing) return !!P.danDing;
+            if (o.fiveRoots) return hasFiveRoots();
+            if (o.coreTemper) return P.realmIndex > (recipe.temperUntil || 21);
+            if (o.nascentInfuse) return getNascentSoul() >= NASCENT_MAX;
+            if (o.xianqiao) return getXianqiao() >= XIAN_ORIFICE_MAX;
+            return false;
+        }
+
         function generateRecipeList(skillName) {
             const skill = gameState.skills[skillName];
             if (!skill || !skill.recipes) return;
@@ -6697,16 +6737,22 @@
             const sortedEntries = Object.entries(skill.recipes).sort(([, a], [, b]) =>
                 getRecipeUnlockState(skillName, a).requiredValue - getRecipeUnlockState(skillName, b).requiredValue);
 
+            const entries = [];
             sortedEntries.forEach(([key, recipe]) => {
                 try {
                     const card = renderRecipeCard(skillName, key, recipe);
-                    if (card) {
-                        actionList.appendChild(card);
-                    }
+                    if (card) entries.push({ card, unlocked: getRecipeUnlockState(skillName, recipe).unlocked, recipe });
                 } catch (e) {
                     console.error('[ERROR] Failed to render recipe card:', key, e);
                 }
             });
+            // 修炼：普通修炼配方只留最好的 3 个在外面，其余收进「更早的配方」；有特殊作用的配方（淬炼、洗髓、注灵、仙窍…）用得上就一直留在外面
+            if (skillName === 'cultivation') {
+                const plain = entries.filter(e => e.unlocked && isPlainCultivationRecipe(e.recipe));
+                plain.slice(0, Math.max(0, plain.length - 3)).forEach(e => { e.obsolete = true; });
+                entries.filter(e => e.unlocked && !isPlainCultivationRecipe(e.recipe) && isSpentCultivationRecipe(e.recipe)).forEach(e => { e.obsolete = true; });
+            }
+            foldActionList(actionList, entries, '配方');
 
             // 显示第一个配方的详情
             const firstRecipeKey = Object.keys(skill.recipes)[0];
@@ -6793,7 +6839,8 @@
                 counterPreview.style.display = 'block';
             }
 
-            Object.entries(skill.actions).forEach(([key, action]) => {
+            const entries = [];
+            Object.entries(skill.actions).sort(([, a], [, b]) => a.areaData.minLevel - b.areaData.minLevel).forEach(([key, action]) => {
                 const div = document.createElement('div');
                 const isActive = gameState.currentAction && gameState.currentAction.skill === 'battle' && gameState.currentAction.action === key;
 
@@ -6834,8 +6881,12 @@
                     div.style.opacity = '0.5';
                     div.style.cursor = 'not-allowed';
                 }
-                actionList.appendChild(div);
+                entries.push({ card: div, unlocked: !isDisabled });
             });
+            // 能打的区域只留最高的 3 个在外面，其余收进「更早的区域」
+            const open = entries.filter(e => e.unlocked);
+            open.slice(0, Math.max(0, open.length - 3)).forEach(e => { e.obsolete = true; });
+            foldActionList(actionList, entries, '区域');
         }
 
         function selectAction(skill, action) {
@@ -8271,6 +8322,14 @@
             const oldDetails = box.querySelector('details');
             const wasOpen = !!(oldDetails && oldDetails.open);
             box.innerHTML = now.join('') + `<details${wasOpen ? ' open' : ''} style="margin-top:6px;"><summary style="cursor:pointer;color:#7fae9a;">已有的加成（${more.length} 项）</summary>${more.join('')}</details>`;
+            // 手机端顶部那一条：只放「眼下要关心的」；有按钮（渡劫 / 渡衰 / 精元开关）或警示时在标题上标出来
+            const mBox = document.getElementById('realmLoreMobileBox'), mSum = document.getElementById('realmLoreMobileSummary');
+            if (mBox && mSum) {
+                const body = now.slice(lore ? 1 : 0).join('');
+                mBox.innerHTML = body;
+                const todo = (body.match(/<button/g) || []).length;
+                mSum.innerHTML = `📜 ${lore ? lore.title : '境界感悟'}${todo ? ` <span class="rl-badge">${todo} 项待办</span>` : ''}`;
+            }
         }
 
         function updateProgressBars() {

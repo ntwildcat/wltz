@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=13.38">
+    <link rel="stylesheet" href="style.css?v=13.39">
 
 </head>
 <body data-panel="cultivation">
@@ -140,6 +140,12 @@
 
                 <!-- 新手任务条（任务全部完成后自动隐藏） -->
                 <div id="questBanner" class="quest-banner" style="display: none;"></div>
+
+                <!-- 手机端境界感悟：侧栏在手机上排到页面最底部，渡劫 / 渡衰 / 精元开关等入口放这里（桌面端隐藏） -->
+                <details id="realmLoreMobile" class="realm-lore-mobile">
+                    <summary id="realmLoreMobileSummary">📜 境界感悟</summary>
+                    <div id="realmLoreMobileBox"></div>
+                </details>
 
                 <!-- 面板容器 -->
                 <div class="panel-container">
@@ -821,7 +827,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.88"></script>
+    <script src="game.js?v=13.89"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

@@ -2189,3 +2189,28 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .combatant { min-width: 0; }
 .combatant-stats { flex-wrap: wrap; }
 @media (max-width: 768px) { .battle-status { gap: var(--spacing-sm); } .combatant { padding: var(--spacing-sm); } .combatant-stats span { padding: 2px 6px; } }
+
+
+/* ===== v7.10 列表折叠 / 手机端境界感悟 ===== */
+/* 过时的配方 / 区域收进顶部「更早的…」，远期未解锁的收进底部「尚未解锁」 */
+.list-fold { grid-column: 1 / -1; }
+.list-fold > summary { cursor: pointer; list-style: none; padding: 8px 12px; border: 1px dashed var(--border-l3); border-radius: var(--radius-md); color: var(--text-l3); font-size: 0.9em; }
+.list-fold > summary::-webkit-details-marker { display: none; }
+.list-fold > summary::before { content: '▸ '; color: var(--text-l4); }
+.list-fold[open] > summary::before { content: '▾ '; }
+.list-fold-body { display: grid; grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); gap: var(--spacing-md); margin-top: var(--spacing-md); }
+/* 未解锁卡片不再放大锁图占位 */
+.action-item.disabled .rc-art.locked { height: 26px; font-size: 18px; margin: 2px 0; }
+
+.realm-lore-mobile { display: none; }
+@media (max-width: 768px) {
+    .list-fold-body { grid-template-columns: 1fr; }
+    .realm-lore-mobile { display: block; margin: 0 0 12px; padding: 10px 12px; background: var(--bg-l2); border: 1px solid var(--border-l3); border-left: 3px solid var(--bronze); border-radius: var(--radius-md); font-size: 0.88em; line-height: 1.7; color: #9ca69f; }
+    .realm-lore-mobile > summary { cursor: pointer; list-style: none; color: var(--text-l2); font-weight: bold; }
+    .realm-lore-mobile > summary::-webkit-details-marker { display: none; }
+    .realm-lore-mobile > summary::after { content: ' ▸'; color: var(--text-l4); font-weight: normal; }
+    .realm-lore-mobile[open] > summary::after { content: ' ▾'; }
+    .realm-lore-mobile #realmLoreMobileBox { margin-top: 6px; }
+    .rl-badge { margin-left: 6px; padding: 1px 8px; border-radius: 10px; background: var(--cinnabar-2); color: #fff; font-size: 0.82em; font-weight: normal; }
+    body.in-battle .realm-lore-mobile { display: none; }
+}
