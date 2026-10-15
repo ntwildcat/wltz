@@ -367,6 +367,7 @@
                         ],
                         random: [
                             { id: 'taiyiessence', qty: [5, 9], probability: 1 },
+                            { id: 'xianlingjing', qty: [3, 6], probability: 1 },
                             { id: 'voidcrystal', qty: [6, 11], probability: 1 }
                         ],
                         coins: [42000, 67000],
@@ -552,7 +553,8 @@
                         void_nectar: { name: '虚无仙酿', desc: '悟道果 ×4 + 悟道茶 ×5 + 虚晶 ×1（战斗食物：恢复3500生命）', duration: 100, output: { items: [{ id: 'void_nectar', qty: 2 }], skill: 'alchemy', exp: 1300 }, requiredLevel: 54, requires: { daofruit: 4, tea: 5, voidcrystal: 1 }, unlocked: false },
                         // 大乘期炼丹（索引70/74解锁）
                         dacheng_pill_alchemy: { name: '大乘丹', desc: '九叶莲 ×12 + 悟道茶 ×14 + 太乙精华 ×3（合体圆满突破必需）', duration: 210, output: { items: [{ id: 'dachengpill', qty: 1 }], skill: 'alchemy', exp: 2600 }, requiredLevel: 70, requires: { lotus: 12, tea: 14, taiyiessence: 3 }, unlocked: false },
-                        taiyi_nectar: { name: '太乙琼浆', desc: '悟道果 ×5 + 悟道茶 ×6 + 太乙精华 ×1（战斗食物：恢复6500生命）', duration: 150, output: { items: [{ id: 'taiyi_nectar', qty: 2 }], skill: 'alchemy', exp: 3000 }, requiredLevel: 74, requires: { daofruit: 5, tea: 6, taiyiessence: 1 }, unlocked: false }
+                        taiyi_nectar: { name: '太乙琼浆', desc: '悟道果 ×5 + 悟道茶 ×6 + 太乙精华 ×1（战斗食物：恢复6500生命）', duration: 150, output: { items: [{ id: 'taiyi_nectar', qty: 2 }], skill: 'alchemy', exp: 3000 }, requiredLevel: 74, requires: { daofruit: 5, tea: 6, taiyiessence: 1 }, unlocked: false },
+                        xian_dew: { name: '仙灵玉露', desc: '悟道果 ×5 + 悟道茶 ×6 + 仙灵晶 ×1（战斗食物：恢复9500生命）', duration: 170, output: { items: [{ id: 'xian_dew', qty: 2 }], skill: 'alchemy', exp: 3600 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { daofruit: 5, tea: 6, xianlingjing: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -594,7 +596,11 @@
                         dacheng_sword: { name: '大乘剑', desc: '太乙精华 ×4 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengsword', qty: 1 }], skill: 'forging', exp: 3400 }, requiredLevel: 76, requires: { taiyiessence: 4, chaosstone: 4 }, unlocked: false },
                         life_refine_5: { name: '祭炼青竹蜂云剑·五重', desc: '万年金雷竹 ×1 + 太乙精华 ×4 + 混沌石 ×4｜本命法宝攻击升至大乘级（须上品以上金丹）', duration: 180, output: { lifeRefine: 5, skill: 'forging', exp: 3400 }, requiredLevel: 76, requiredRealmIndex: 38, requires: { jinleizhu: 1, taiyiessence: 4, chaosstone: 4 }, unlocked: false },
                         dacheng_armor: { name: '大乘法衣', desc: '太乙精华 ×5 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengarmor', qty: 1 }], skill: 'forging', exp: 3600 }, requiredLevel: 78, requires: { taiyiessence: 5, chaosstone: 4 }, unlocked: false },
-                        dacheng_pendant: { name: '大乘佩', desc: '太乙精华 ×3 + 灵晶 ×5', duration: 170, output: { items: [{ id: 'dachengpendant', qty: 1 }], skill: 'forging', exp: 3800 }, requiredLevel: 80, requires: { taiyiessence: 3, spiritcrystal: 5 }, unlocked: false }
+                        dacheng_pendant: { name: '大乘佩', desc: '太乙精华 ×3 + 灵晶 ×5', duration: 170, output: { items: [{ id: 'dachengpendant', qty: 1 }], skill: 'forging', exp: 3800 }, requiredLevel: 80, requires: { taiyiessence: 3, spiritcrystal: 5 }, unlocked: false },
+                        // 真仙装备（v7.17）：炼器已满级，改由境界解锁；属性约为大乘装备的 1.35 倍
+                        xian_sword: { name: '真仙剑', desc: '仙灵晶 ×4 + 太乙精华 ×3', duration: 200, output: { items: [{ id: 'xiansword', qty: 1 }], skill: 'forging', exp: 4200 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 4, taiyiessence: 3 }, unlocked: false },
+                        xian_armor: { name: '真仙法衣', desc: '仙灵晶 ×5 + 混沌石 ×4', duration: 200, output: { items: [{ id: 'xianarmor', qty: 1 }], skill: 'forging', exp: 4400 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 5, chaosstone: 4 }, unlocked: false },
+                        xian_pendant: { name: '真仙佩', desc: '仙灵晶 ×3 + 灵晶 ×5', duration: 190, output: { items: [{ id: 'xianpendant', qty: 1 }], skill: 'forging', exp: 4600 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 3, spiritcrystal: 5 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -633,7 +639,8 @@
                         chaosstone: { name: '采混沌石', desc: '产出混沌石', duration: 50, output: { items: [{ id: 'chaosstone', qty: 1 }], skill: 'mining', exp: 600 }, requiredLevel: 43, unlocked: false },
                         daostone: { name: '采天道石', desc: '产出天道石（化虚丹与合体级装备的共用材料）', duration: 60, output: { items: [{ id: 'daostone', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false },
                         voidcrystal: { name: '采虚晶', desc: '产出虚晶（炼虚期材料，化虚 / 炼虚装备）', duration: 60, output: { items: [{ id: 'voidcrystal', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false },
-                        taiyiessence: { name: '采太乙精华', desc: '产出太乙精华（大乘丹与大乘装备的共用材料）', duration: 75, output: { items: [{ id: 'taiyiessence', qty: 1 }], skill: 'mining', exp: 1300 }, requiredLevel: 70, unlocked: false }
+                        taiyiessence: { name: '采太乙精华', desc: '产出太乙精华（大乘丹与大乘装备的共用材料）', duration: 75, output: { items: [{ id: 'taiyiessence', qty: 1 }], skill: 'mining', exp: 1300 }, requiredLevel: 70, unlocked: false },
+                        xianlingjing: { name: '采仙灵晶', desc: '产出仙灵晶（真仙装备与仙灵玉露的材料）', duration: 110, output: { items: [{ id: 'xianlingjing', qty: 1 }], skill: 'mining', exp: 1800 }, requiredLevel: 80, requiredRealmIndex: 42, unlocked: false }
                     },
                     actions: {}
                 },
@@ -740,6 +747,8 @@
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', sellPrice: 80, effect: { workSpeed: 0.95 } },
                 // 礼包码专属（测试用）：所有工作耗时 ×0.01（速度 ×100），修炼速度 ×100；只能通过礼包码获得
                 test_ring: { name: '天机灵环', icon: '💍', type: 'jewelry', sellPrice: 10000, effect: { workSpeed: 0.01, cultSpeed: 99 } },
+                // 开发者测试用（v7.17）：所有生活技能 / 悟道耗时 ×1/500、修炼速度 ×500；不进任何掉落 / 商城 / 配方，只手动加进测试存档
+                test_ring_500: { name: '天机灵环·极', icon: '💍', type: 'jewelry', sellPrice: 0, effect: { workSpeed: 0.002, cultSpeed: 499 } },
 
                 // P6 丹火相关物品
                 danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed', sellPrice: 50 },
@@ -789,6 +798,12 @@
                 dachengarmor: { name: '大乘法衣', icon: '🥼', type: 'armor', sellPrice: 15500, stats: { def: 175, hp: 480 } },
                 dachengpendant: { name: '大乘佩', icon: '📿', type: 'jewelry', sellPrice: 10000, stats: { spd: 36, hp: 310 } },
                 taiyi_nectar: { name: '太乙琼浆', icon: '🍶', type: 'food', sellPrice: 6000 },
+                // 真仙期（v7.17）：仙灵晶材料链——九霄战场 / 太清仙域掉落、采矿可采，炼真仙装备与仙灵玉露
+                xianlingjing: { name: '仙灵晶', icon: '💠', type: 'ore', sellPrice: 6000 },
+                xiansword: { name: '真仙剑', icon: '🗡️', type: 'weapon', sellPrice: 19000, stats: { atk: 430 } },
+                xianarmor: { name: '真仙法衣', icon: '🥼', type: 'armor', sellPrice: 21000, stats: { def: 236, hp: 650 } },
+                xianpendant: { name: '真仙佩', icon: '📿', type: 'jewelry', sellPrice: 13500, stats: { spd: 48, hp: 420 } },
+                xian_dew: { name: '仙灵玉露', icon: '🍶', type: 'food', sellPrice: 9000 },
                 nascentsoul_essence: { name: '元婴精魄', icon: '👁️', type: 'material', sellPrice: 2000 },
 
                 // P6/P7 新作物
@@ -967,6 +982,15 @@
                     cooldown: 3.0,
                     minRealm: 38,             // v6.89：原索引29 → +9，大乘初期
                     description: '大乘修士以太乙精华炼制，灵界至高一脉的战斗补给，恢复量远超此前一切战斗食物'
+                },
+                xian_dew: {
+                    id: 'xian_dew',
+                    name: '仙灵玉露',
+                    icon: '🍶',
+                    hpRestore: 9500,          // 恢复HP（v7.17 真仙期）
+                    cooldown: 3.0,
+                    minRealm: 42,
+                    description: '以仙灵晶化开的玉露，真仙修士的战斗补给'
                 }
             },
             // 默认食物配置
@@ -1025,6 +1049,7 @@
                 immortalore: svg(rock('#c9b479', '#8a743a', `<path d="M9 22L14 15L18 20L24 12" stroke="#fff2b0" stroke-width="1.8"/>${sparkle(8, 9, 2.6)}${sparkle(25, 24, 2.2)}${sparkle(23, 7, 2)}`)),
                 chaosstone: svg(`<circle cx="16" cy="16" r="12" fill="#2a2440"/><path d="M16 4A12 12 0 0 1 16 28A6 6 0 0 1 16 16A6 6 0 0 0 16 4Z" fill="#6a4fa8" stroke="none"/><circle cx="16" cy="10" r="1.8" fill="#2a2440" stroke="none"/><circle cx="16" cy="22" r="1.8" fill="#c9b8f0" stroke="none"/><circle cx="16" cy="16" r="12" stroke="#8a72c8" stroke-width=".8"/>`),
                 spiritstone: svg(`<path d="M8 10L16 4L24 10L26 21L16 28L6 21Z" fill="#59c9b0"/><path d="M8 10L16 15L24 10M16 15V28M6 21L16 15L26 21" stroke="#c6fff0" stroke-width=".9"/><path d="M8 10L6 21L16 15Z" fill="#3ea08e" stroke="none" opacity=".7"/>${sparkle(24, 5, 2.2)}`),
+                test_ring_500: svg(`<circle cx="16" cy="19" r="8" stroke="#c8b8ff" stroke-width="3.4"/><circle cx="16" cy="19" r="8" stroke="#5a3ea8" stroke-width=".8"/><path d="M11.5 9L16 3.5L20.5 9L16 14Z" fill="#ff9ad8"/><path d="M16 3.5V14M11.5 9H20.5" stroke="#fff0fa" stroke-width=".8"/>${sparkle(26, 6, 2.4)}${sparkle(6, 25, 2)}${sparkle(26, 27, 1.8)}`),
                 test_ring: svg(`<circle cx="16" cy="19" r="8" stroke="#e2c27a" stroke-width="3.4"/><circle cx="16" cy="19" r="8" stroke="#8a6a2a" stroke-width=".8"/><path d="M11.5 9L16 3.5L20.5 9L16 14Z" fill="#7fe0e8"/><path d="M16 3.5V14M11.5 9H20.5" stroke="#dffcff" stroke-width=".8"/>${sparkle(26, 6, 2.4)}${sparkle(6, 25, 2)}`),
                 jade: svg(`<path d="M12 4Q16 8 20 4" stroke="#c9b07a" stroke-width="1.3"/><circle cx="16" cy="18" r="10" fill="#7fc49a"/><circle cx="16" cy="18" r="3.6" fill="#1c1812" stroke-width="1"/><path d="M9 14Q11 10 15 9" stroke="#d6ffe6" stroke-width="1.4" opacity=".8"/><path d="M16 12V14M16 22V24M10 18H12M20 18H22" stroke="#4f9a72" stroke-width=".8"/>`),
                 // —— 丹药 ——
@@ -1085,6 +1110,11 @@
                 dachengsword: svg(sword('#fff4d8', '#fff', '#e8b84a', '<circle cx="16" cy="16" r="15" stroke="#f3d36a" stroke-width="1.2" opacity=".8"/>')),
                 dachengarmor: svg(robe('#fff4d8', '#e8b84a', '<path d="M12 24Q14 22 16 24Q18 22 20 24" stroke="#f0d888" stroke-width="1"/>')),
                 dachengpendant: svg(pendant('#f3d36a', '#fff4d8', `${sparkle(25, 22, 2.6)}<circle cx="16" cy="20" r="8" stroke="#f3d36a" stroke-width=".9" opacity=".8"/>`)),
+                xianlingjing: svg(rock('#cbbcff', '#5a3ea8', `<path d="M16 6V26M10 11L22 21M22 11L10 21" stroke="#f4efff" stroke-width="1" opacity=".85"/>${sparkle(8, 8, 2.6, '#f4efff')}${sparkle(25, 23, 2.2, '#f4efff')}`)),
+                xiansword: svg(sword('#f4efff', '#fff', '#a88ae8', '<circle cx="16" cy="16" r="15" stroke="#cbbcff" stroke-width="1.2" opacity=".85"/>')),
+                xianarmor: svg(robe('#f4efff', '#a88ae8', '<path d="M12 24Q14 22 16 24Q18 22 20 24" stroke="#d8ccff" stroke-width="1"/>')),
+                xianpendant: svg(pendant('#a88ae8', '#f4efff', `${sparkle(25, 22, 2.6, '#f4efff')}<circle cx="16" cy="20" r="8" stroke="#cbbcff" stroke-width=".9" opacity=".85"/>`)),
+                xian_dew: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#5a3ea8"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#b8a4f4"/><path d="M10 18Q16 21 22 18" stroke="#f4efff" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2, '#f4efff')}${sparkle(9, 9, 1.8, '#f4efff')}`),
                 taiyi_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#8a6a1a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#f3d36a"/><path d="M10 18Q16 21 22 18" stroke="#fff8dc" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2)}${sparkle(9, 9, 1.8)}`),
                 nascentsoul_essence: svg(`<circle cx="16" cy="16" r="11" fill="#e6e0f8" opacity=".85"/><circle cx="16" cy="16" r="7" fill="#b39ddb"/><circle cx="16" cy="16" r="3" fill="#3a1a6a" stroke="none"/><circle cx="14" cy="14" r="1.2" fill="#fff" stroke="none"/>${sparkle(25, 8, 2.2)}${sparkle(7, 24, 2)}`)
             };
@@ -1129,6 +1159,7 @@
             if (typeof P.daoLaw !== 'number') P.daoLaw = 0;
             if (typeof P.nascentSoul !== 'number') P.nascentSoul = 0;
             if (typeof P.nascentInfuse !== 'number') P.nascentInfuse = 0;
+            if (!P.endless || typeof P.endless !== 'object') P.endless = {};
             if (typeof P.coinRefine !== 'number') P.coinRefine = 0;
             if (typeof P.xianqiao !== 'number') P.xianqiao = 0;
             if (typeof P.marrowCleansed !== 'boolean') P.marrowCleansed = false;
@@ -1342,7 +1373,7 @@
 
         function renderDanhuoUses() {
             const el = document.getElementById('danhuoUses');
-            if (el) el.innerHTML = danhuoUsesHtml();
+            if (el) el.innerHTML = danhuoUsesHtml() + endlessUsesHtml('qiling');
         }
 
         function danhuoUsesHtml() {
@@ -1369,7 +1400,7 @@
 
         function renderShenshiUses() {
             const el = document.getElementById('shenshiUses');
-            if (el) el.innerHTML = shenshiUsesHtml();
+            if (el) el.innerHTML = shenshiUsesHtml() + endlessUsesHtml('shenhun');
         }
 
         // ---- 化神期：身外化身（v6.77，被动加成） ----
@@ -1476,6 +1507,42 @@
         function daoLawCost(level) { return Math.round(25 * Math.pow(level + 1, 1.5)); }
         function isDaoguoUnlocked() { return gameState.player.realmIndex >= 34; }   // v6.89：原索引25 → +9
         function isFused() { return !!(gameState.player.fusion && gameState.player.fusion.active); }
+        // ---- 大乘以后的无上限修炼（v7.17）：给后期溢出的丹火 / 神识 / 道果一个一直花得出去的地方 ----
+        // 审查发现：丹火 / 神识 / 道果原有用途全部加满只要约 1.5 万 / 1.4 万 / 2100，大乘期战斗区域一小时就能攒够，之后只剩数字在涨。
+        // 三条修炼都没有等级上限，费用每级 ×1.15（效果线性增长、费用指数增长，越往后越慢，不会失控）。
+        const ENDLESS_REFINES = {
+            qiling:  { cur: 'danhuo',  icon: '🔥', name: '器灵温养', title: '以丹火温养法宝器灵', unit: '全部装备属性', per: 0.01, base: 2000, realm: 38 },
+            shenhun: { cur: 'shenshi', icon: '👁️', name: '神魂参悟', title: '以神识推演法则', unit: '悟道参悟经验', per: 0.03, base: 2000, realm: 38 },
+            benyuan: { cur: 'daoguo',  icon: '🍎', name: '本源温养', title: '以道果温养本源', unit: '生命 / 防御', per: 0.01, base: 600, realm: 38 }
+        };
+        const ENDLESS_GROWTH = 1.15;
+        function getEndless(k) { return ((gameState.player.endless || {})[k]) || 0; }
+        function endlessCost(k, lv) { return Math.round(ENDLESS_REFINES[k].base * Math.pow(ENDLESS_GROWTH, lv)); }
+        function getEndlessMod(key) {
+            if (key === 'gearPct') return getEndless('qiling') * ENDLESS_REFINES.qiling.per;
+            if (key === 'exp:wudao') return getEndless('shenhun') * ENDLESS_REFINES.shenhun.per;
+            if (key === 'hpPct' || key === 'defPct') return getEndless('benyuan') * ENDLESS_REFINES.benyuan.per;
+            return 0;
+        }
+        function upgradeEndless(k) {
+            const P = ensureCurrencyState(), cfg = ENDLESS_REFINES[k];
+            if (P.realmIndex < cfg.realm) { showNotification(`🔒 ${cfg.name}需要${getRealmName(cfg.realm)}`, '#c98a3e'); return; }
+            const lv = getEndless(k), cost = endlessCost(k, lv);
+            if ((P[cfg.cur] || 0) < cost) { spendNotify(cfg.cur, cost); return; }
+            P[cfg.cur] -= cost;
+            P.endless = Object.assign({}, P.endless, { [k]: lv + 1 });
+            invalidateLawTotals();
+            calculateStats();
+            showNotification(`${cfg.icon} ${cfg.name} Lv.${lv + 1}：${cfg.unit} +${Math.round((lv + 1) * cfg.per * 100)}%`, '#6f9c8a');
+            afterCurrencySpend();
+        }
+        function endlessUsesHtml(k) {
+            const cfg = ENDLESS_REFINES[k];
+            if (gameState.player.realmIndex < cfg.realm) return '';
+            const lv = getEndless(k), pct = v => Math.round(v * 100);
+            return `<div class="use-card"><div class="use-title">${cfg.icon} ${cfg.name} <small>${cfg.title}：${cfg.unit}每级 +${pct(cfg.per)}%，无等级上限，费用每级 ×${ENDLESS_GROWTH}</small></div>${useRow(`${cfg.icon} ${cfg.name}`, `Lv.${lv}`, `当前 +${pct(lv * cfg.per)}% → +${pct((lv + 1) * cfg.per)}%`, endlessCost(k, lv), cfg.cur, `upgradeEndless('${k}')`, false)}</div>`;
+        }
+
         function getDaoBody() { return gameState.player.daoBody || 0; }
         function getDaoLaw() { return gameState.player.daoLaw || 0; }
 
@@ -1555,7 +1622,7 @@
 
         function renderDaoguoUses() {
             const el = document.getElementById('daoguoUses');
-            if (el) el.innerHTML = daoguoUsesHtml();
+            if (el) el.innerHTML = daoguoUsesHtml() + endlessUsesHtml('benyuan');
         }
 
         // 灵石商城顶部的「聚灵培元」卡片：跟丹火/神识/道果商城顶部的强化区一个风格
@@ -1739,7 +1806,8 @@
             const mHit = Math.max(0.05, Math.min(0.95, BATTLE_FORMULAS.calculateHitChance(boss.spd, s.spd) * (1 - Math.min(0.6, getMod('dodge')))));
             // 天劫用 hitFrac：每一击（命中后）打掉玩家生命上限的固定比例。食物一口能回满血，生死只看"几击之内会不会被打穿"，
             // 若按玩家攻击力反推，攻击越高天劫越狠，等于惩罚练攻击；心魔是镜像，仍按 dmgRatio 跟玩家输出走
-            const target = cfg.hitFrac ? cfg.hitFrac * s.hp.max : cfg.dmgRatio * playerPerAttack / mHit;
+            // 失败保底：每失败一次劫力减弱 8%（天劫按每击占生命比例减，心魔按镜像伤害倍率减）
+            const target = (cfg.hitFrac ? cfg.hitFrac * s.hp.max : cfg.dmgRatio * playerPerAttack / mHit) * getTribPityMult(dungeon.id);
             let lo = 1, hi = Math.max(10, target * 5);
             for (let i = 0; i < 50; i++) {
                 const mid = (lo + hi) / 2;
@@ -1750,6 +1818,24 @@
             return oldMax;
         }
         function tribulationIdFor(realmIndex) { return `tribulation${realmIndex}`; }
+        // 天劫 / 心魔 / 三衰的失败保底（v7.16）：大境界突破失败有保底，渡劫却没有，法则没练够的玩家在大乘两劫只有一两成通过率，
+        // 每次失败还丢一半食物、越输越弱。现在每失败一次劫力减弱 8%（最多 5 次、共 40%），失败只丢 20% 食物。
+        // 按比例减而不是减固定百分点：天劫强弱取决于"几击打穿你"（取整），飞升天劫 32% 减 5 个点到 27% 仍是 4 击打穿，等于没减；
+        // 减 40% 到约 19% 才变成 6 击。
+        const TRIB_PITY = { maxFails: 5, per: 0.08 };
+        function getTribFails(dungeonId) { return Math.min(TRIB_PITY.maxFails, ((gameState.dungeons && gameState.dungeons[dungeonId]) || {}).fails || 0); }
+        function getTribPityMult(dungeonId) { return 1 - TRIB_PITY.per * getTribFails(dungeonId); }
+        function getEffectiveHitFrac(dungeon) { return dungeon.mirror.hitFrac * getTribPityMult(dungeon.id); }
+        // 入口处的说明：每击打掉多少生命（含保底）+ 大乘前后对法则的建议
+        function tribulationHint(dungeon) {
+            const fails = getTribFails(dungeon.id);
+            const parts = [];
+            if (dungeon.mirror && dungeon.mirror.hitFrac) parts.push(`每击约打掉你 ${Math.round(getEffectiveHitFrac(dungeon) * 100)}% 生命`);
+            if (fails) parts.push(`已失败 ${fails} 次，劫力已减弱 ${Math.round((1 - getTribPityMult(dungeon.id)) * 100)}%${fails >= TRIB_PITY.maxFails ? '（已到最低）' : ''}`);
+            const r = dungeon.tribulationRealm;
+            if (r >= 37) parts.push(`法则平均 ${getLawAvgLevel().toFixed(0)} 级（建议 ${r >= 41 ? 20 : 10} 级以上，法则越深越稳）`);
+            return parts.join(' · ');
+        }
         function hasSurvivedTribulation(realmIndex) {
             const rec = gameState.dungeons && gameState.dungeons[tribulationIdFor(realmIndex)];
             return !!(rec && rec.completed);
@@ -1773,6 +1859,7 @@
                 box.style.display = 'block';
                 box.innerHTML = `<div class="bt-guide-title">${d.icon} ${d.name}已降临（${shuai.effect}）</div>
                     <div class="bt-guide-line">${d.desc}。渡过即消；三衰都渡过才能突破真仙后期</div>
+                    <div class="bt-guide-line" style="color:var(--text-l4)">${tribulationHint(d)}</div>
                     <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); maybeSelectDomainThenEnter(() => enterDungeon('${shuai.id}'));">${d.icon} 渡${d.name}</button>`;
                 return;
             }
@@ -1781,6 +1868,7 @@
             box.style.display = 'block';
             box.innerHTML = `<div class="bt-guide-title">${dungeon.isHeartDemon ? '👹 冲击元婴前须先斩灭心魔' : '⚡ 需先渡过本境界的天劫'}</div>
                 <div class="bt-guide-line">${dungeon.icon} ${dungeon.name}：${dungeon.desc}</div>
+                ${tribulationHint(dungeon) ? `<div class="bt-guide-line" style="color:var(--text-l4)">${tribulationHint(dungeon)}</div>` : ''}
                 <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); maybeSelectDomainThenEnter(() => enterDungeon('${tribulationIdFor(realmIndex)}'));">${dungeon.isHeartDemon ? '👹 斩心魔' : '⚡ 渡劫'}</button>`;
         }
 
@@ -2437,7 +2525,7 @@
                 holder[k] = (holder[k] || 0) + timeDelta;
                 if (holder[k] < interval) return;
                 holder[k] -= interval;
-                hits.push({ label: s.label, dmg: Math.max(1, Math.floor(gameState.player.stats.atk * mult * getBattleSkillDmgMult())) });
+                hits.push({ key: s.key, label: s.label, dmg: Math.max(1, Math.floor(gameState.player.stats.atk * mult * getBattleSkillDmgMult())) });
             });
             return hits;
         }
@@ -2598,10 +2686,10 @@
             34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 合体期以融合为本：道果页「合道」——元婴分身与身外化身归于本体（不可逆，之后不能再用分身），法力成倍增长：所有主行动速度 +100%、生命/攻击/防御/速度 +15%、身外化身加成翻倍、神识与道果产出提升。合体初期突破中期之前必须合道', `☯️ 借用法则之力：从此斗法的核心不再是法力多寡，而是天地之力——悟道法则里与战斗有关的效果（攻击、生命、防御、速度、暴击、闪避、命中、回复、食物）全部 ×${LAW_POWER_MULT}`, `🌀 元气化形：战斗中每 ${QI_FORM.interval} 秒额外打出一击，无视防御，伤害 = 攻击 × (${QI_FORM.base * 100}% + 八种法则平均等级 × ${QI_FORM.perAvgLevel * 100}%)——法则悟得越深，化形越强`, '⚔️ 道痕荒原战斗区域开放'],
             36: ['⚔️ 合一虚境战斗区域开放'],
             37: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁，突破大乘时服一颗'],
-            38: [`👶 元婴离体助战：从此战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次（无视防御），威力随蜕变等级提高`, `👶 元婴蜕变：修炼页「元婴注灵」把灵力注入元婴——修为只得一半，每次积 1 点灵力，攒够就自动蜕变一级（另耗元婴精魄，大乘级战斗区域 / 秘境掉落），从婴儿形态练到青年形态共 10 级；修为满了也能继续注灵`, `☯️ 法则入门：大乘期起，任何一条法则练满 ${LAW_MASTER_LEVEL} 级就算「入门」——每入门一条，敌人攻击、防御 −${LAW_MASTER_SUPPRESS * 100}%（以法则压制群敌），并且每 ${LAW_STRIKE_INTERVAL} 秒打出一记法则之击（攻击 ×(1 + 入门条数)，无视防御）。法则之力极难领悟，练满一条要十几个小时`, '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
+            38: [`👶 元婴离体助战：从此战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次（无视防御），威力随蜕变等级提高`, `👶 元婴蜕变：修炼页「元婴注灵」把灵力注入元婴——修为只得一半，每次积 1 点灵力，攒够就自动蜕变一级（另耗元婴精魄，大乘级战斗区域 / 秘境掉落），从婴儿形态练到青年形态共 10 级；修为满了也能继续注灵`, `☯️ 法则入门：大乘期起，任何一条法则练满 ${LAW_MASTER_LEVEL} 级就算「入门」——每入门一条，敌人攻击、防御 −${LAW_MASTER_SUPPRESS * 100}%（以法则压制群敌），并且每 ${LAW_STRIKE_INTERVAL} 秒打出一记法则之击（攻击 ×(1 + 入门条数)，无视防御）。法则之力极难领悟，练满一条要十几个小时`, '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放', `♾️ 三条无上限修炼（费用每级 ×${ENDLESS_GROWTH}）：丹火页「器灵温养」全部装备属性每级 +1%，神识页「神魂参悟」悟道参悟经验每级 +3%，道果页「本源温养」生命 / 防御每级 +1%——原有用途加满以后，丹火 / 神识 / 道果仍有去处`],
             40: ['⚔️ 灵界绝境战斗区域开放'],
             41: [`🌌 飞仙劫：一进大乘圆满就可以渡「飞升天劫」（境界感悟面板或突破弹窗进入）。渡过之后体内灵气才开始化为仙灵力——「修炼」页「开辟仙窍」：不产出修为，每次花太乙精华×5 冲开一窍，大乘圆满最多开到 ${XIAN_CONVERT_ORIFICES} 窍，开满即灵气全部转化，可以突破真仙初期（之前攒的修为不影响这次突破）`],
-            42: [`🌟 成就真仙，身体化为道体：每个亮着的仙窍生命 / 防御 +${DAO_BODY_PER_ORIFICE * 100}%（现在 ${XIAN_CONVERT_ORIFICES} 窍 +${XIAN_CONVERT_ORIFICES}%，开满 24 窍 +24%）`, `☯️ 运用法则之力：法则之击的间隔从 ${LAW_STRIKE_INTERVAL} 秒缩短到 ${LAW_STRIKE_INTERVAL_XIAN} 秒`, `🥀 五衰之前三衰：仙窍开到 ${XIAN_SHUAI.map(sh => sh.at).join(' / ')} 窍时，仙衰（${XIAN_SHUAI[0].effect}）、窍衰（${XIAN_SHUAI[1].effect}）、身衰（${XIAN_SHUAI[2].effect}）依次降临，一直生效到渡过为止（各是一场天劫式的单挑，境界感悟面板「渡衰」）。三衰渡尽、打满 24 窍才能突破真仙后期`, '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放'],
+            42: [`🌟 成就真仙，身体化为道体：每个亮着的仙窍生命 / 防御 +${DAO_BODY_PER_ORIFICE * 100}%（现在 ${XIAN_CONVERT_ORIFICES} 窍 +${XIAN_CONVERT_ORIFICES}%，开满 24 窍 +24%）`, `☯️ 运用法则之力：法则之击的间隔从 ${LAW_STRIKE_INTERVAL} 秒缩短到 ${LAW_STRIKE_INTERVAL_XIAN} 秒`, `🥀 五衰之前三衰：仙窍开到 ${XIAN_SHUAI.map(sh => sh.at).join(' / ')} 窍时，仙衰（${XIAN_SHUAI[0].effect}）、窍衰（${XIAN_SHUAI[1].effect}）、身衰（${XIAN_SHUAI[2].effect}）依次降临，一直生效到渡过为止（各是一场天劫式的单挑，境界感悟面板「渡衰」）。三衰渡尽、打满 24 窍才能突破真仙后期`, '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放', '💠 仙灵晶：九霄战场 / 太清仙域掉落，采矿页「采仙灵晶」也能采；炼器页可炼真仙剑 / 真仙法衣 / 真仙佩（约为大乘装备的 1.35 倍），炼丹页可炼仙灵玉露（恢复 9500 生命）'],
             43: ['🏁 真仙后期：二十四窍尽开、三衰已渡，道体生命 / 防御 +24%——当前实现的至高境界，暂无下一境界'],
         };
         LIFE_REFINE_TIERS.slice(1).forEach((t, i) => {
@@ -2654,7 +2742,7 @@
         // 老存档（境界已超过练气初期）迁移时直接标记为已完成，不再显示任务条。
         const NEWBIE_QUESTS = [
             { title: '吐纳灵气', panel: 'cultivation', target: ['cultivation', 'basic'],
-              desc: '你现在只是个凡人。在「修炼」页点下面高亮的「吐纳灵气」开始修炼——行动会<b>自动重复</b>，不用一直点。左侧（手机在顶部）是各个技能页的入口。',
+              desc: '你现在只是个凡人。在「修炼」页点下面高亮的「吐纳灵气」开始修炼——行动会<b>自动重复</b>，不用一直点。左侧栏（手机上是内容上方那一排标签）是各个技能页的入口。',
               need: { act: 'cultivation.basic', n: 1 }, reward: { coins: 20 } },
             { title: '踏入练气', panel: 'cultivation', target: ['cultivation', 'basic'],
               desc: '继续修炼，等上方「修为进度」满了，会出现「尝试突破」按钮，点它突破到<b>练气一层</b>。突破会让属性大涨，并解锁新配方和战斗区域。',
@@ -3416,6 +3504,8 @@
 
                 // P1-1 显示伤害飘字和日志
                 showDamageFloat(-monsterDmg, true, isMonsterCrit);
+                const curDungeon = GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon];
+                if (curDungeon && curDungeon.isTribulation) showTribulationFlash(curDungeon);
                 addBattleLog(`${isMonsterCrit ? '暴击！' : ''}受到${monsterDmg}点伤害`, 'monster-hit');
             } else {
                 // P1-1 显示敌人未命中日志
@@ -3425,6 +3515,7 @@
 
         // 处理怪物死亡
         function handleMonsterDeath(dungeonId, monster) {
+            showDefeatBurst();
             gameState.dungeons.defeatCount++;
             const dropCoins = Math.floor(monster.dropQty * (0.8 + Math.random() * 0.4));
             gameState.player.coins += dropCoins;
@@ -3521,11 +3612,16 @@
             deathRecord.cultivationLost = lostCultivation;
             checkRealmStability();
 
-            // 2. 损失食物（50%）
+            // 2. 损失食物（50%；天劫 / 心魔 / 三衰只丢 20%，并记一次失败给下次减弱劫力）
+            const foodLossRate = dungeon.isTribulation ? 0.2 : 0.5;
+            if (dungeon.isTribulation) {
+                const rec = gameState.dungeons[dungeonId] || (gameState.dungeons[dungeonId] = { completed: false });
+                rec.fails = (rec.fails || 0) + 1;
+            }
             let foodLost = 0;
             gameState.player.inventory.forEach(item => {
                 if (GAME_CONFIG.items[item.id] && GAME_CONFIG.items[item.id].type === 'food') {
-                    const lose = Math.ceil(item.qty * 0.5);
+                    const lose = Math.ceil(item.qty * foodLossRate);
                     item.qty -= lose;
                     foodLost += lose;
                 }
@@ -3551,7 +3647,8 @@
             const damagePercent = ((hpBefore - gameState.player.stats.hp.current) / gameState.player.stats.hp.max * 100).toFixed(0);
             const notificationText = `✗ 被${monster.name}击败！\n\n` +
                                     (nascentSafe ? `${dungeon.isHeartDemon ? '心魔未除' : '元婴不灭'}：修为无损\n` : `丢失修为: ${lostCultivation} (10%)\n`) +
-                                    `丢失食物: ${foodLost}份 (50%)\n` +
+                                    `丢失食物: ${foodLost}份 (${Math.round(foodLossRate * 100)}%)\n` +
+                                    (dungeon.isTribulation ? `下次再渡：劫力减弱至 ${Math.round(getTribPityMult(dungeonId) * 100)}%（失败 ${getTribFails(dungeonId)}/${TRIB_PITY.maxFails} 次封顶）\n` : '') +
                                     `血量: ${gameState.player.stats.hp.current}/${gameState.player.stats.hp.max} (+50%)`;
             showNotification(notificationText, '#c4483a', 'danger');
 
@@ -3694,7 +3791,7 @@
 
             document.getElementById('playerNameBattle').textContent = gameState.player.name || '玩家';
             document.getElementById('monsterNameBattle').textContent = monster.name || '敌人';
-            document.getElementById('monsterSprite').innerHTML = monster.icon || '👾';
+            setMonsterSprite(monster.icon, monster);
 
             addBattleLog(`与${monster.name}开始战斗！`, 'info');
         }
@@ -3783,6 +3880,69 @@
             el.style.display = '';
         }
 
+        // ---- 界面反馈动画（v7.15） ----
+        // 原来除了突破特效和伤害数字，战斗受击、换怪、击杀、配方完成、技能升级都没有任何动作反馈。
+        // 全部是短促的 CSS 动画（0.2–0.9 秒），只在画面可见时播放；系统开启「减少动态效果」时整体不播。
+        const fxReducedMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+        function fxReduced() { return document.hidden || !!(fxReducedMQ && fxReducedMQ.matches); }
+        // 重新播放一次某个 class 上的动画（连续触发时从头播）
+        function pulseClass(el, cls) {
+            if (!el || fxReduced()) return;
+            el.classList.remove(cls);
+            void el.offsetWidth;
+            el.classList.add(cls);
+        }
+        // 敌人头像的动作（出场 / 受击 / 暴击）互斥：同时挂两个时写在后面的样式会盖住前一个
+        function spriteAnim(cls) {
+            const el = document.getElementById('monsterSprite');
+            if (!el || fxReduced()) return;
+            el.classList.remove('spawn', 'hit', 'hit-crit');
+            void el.offsetWidth;
+            el.classList.add(cls);
+        }
+        // 敌人头像：换了一只敌人时从下方浮现
+        let lastSpriteEnemy = null;
+        function setMonsterSprite(icon, enemyRef) {
+            const el = document.getElementById('monsterSprite');
+            if (!el) return;
+            if (enemyRef === lastSpriteEnemy) return;
+            lastSpriteEnemy = enemyRef;
+            el.innerHTML = icon || '👾';
+            spriteAnim('spawn');
+        }
+        // 击杀：敌人位置迸开一团墨色光尘（独立元素，不会被下一只敌人的出场动画打断）
+        function showDefeatBurst() {
+            const scene = document.querySelector('.battle-scene');
+            if (!scene || fxReduced()) return;
+            const b = document.createElement('div');
+            b.className = 'defeat-burst';
+            scene.appendChild(b);
+            setTimeout(() => b.remove(), 900);
+        }
+        // 天劫 / 心魔 / 三衰出手时整块战斗画面闪一下
+        function showTribulationFlash(dungeon) {
+            const scene = document.querySelector('.battle-scene');
+            if (!scene || fxReduced()) return;
+            const f = document.createElement('div');
+            f.className = 'trib-flash ' + (dungeon.isHeartDemon ? 'trib-demon' : dungeon.isShuai ? 'trib-shuai' : 'trib-thunder');
+            scene.appendChild(f);
+            setTimeout(() => f.remove(), 700);
+        }
+        // 元气化形 / 元婴离体 / 法则之击：带名字的飘字，各自一种颜色
+        function showStrikeFloat(h) {
+            const floatLayer = document.getElementById('damageFloatLayer');
+            if (!floatLayer || fxReduced()) return;
+            const d = document.createElement('div');
+            d.className = 'damage-float strike strike-' + (h.key || 'qiForm');
+            d.innerHTML = `<small>${h.label.replace(/^\S+\s/, '')}</small>-${h.dmg}`;
+            const side = Math.random() < 0.5 ? 6 : 62;   // 落在敌人头像左右两侧，不挡头像（left 是飘字左边缘）
+            d.style.left = (side + Math.random() * 10) + '%';
+            d.style.top = '60px';
+            floatLayer.appendChild(d);
+            spriteAnim('hit');
+            setTimeout(() => d.remove(), 1600);
+        }
+
         // P1-1 显示伤害飘字
         // isCrit：暴击伤害单独加大字号+变色+弹跳动画（.damage-float.crit，样式见 style.css），
         // 不然暴击和普通攻击视觉上完全一样，只有战斗日志里一句「暴击！」文字能看出区别，容易被忽略
@@ -3810,6 +3970,11 @@
 
             // 1.5秒后移除
             setTimeout(() => floatDiv.remove(), 1500);
+            // 受击动作：敌人挨打时抖一下、发白（暴击更猛并带一道剑光）；自己挨打时状态栏泛红
+            if (damage < 0) {
+                if (isPlayer) pulseClass(document.querySelector('.combatant.player'), 'hurt');
+                else spriteAnim(isCrit ? 'hit-crit' : 'hit');
+            }
         }
 
         // P1-1 添加战斗日志
@@ -4091,7 +4256,7 @@
             // 合体起元气化形、大乘起元婴离体 / 法则之击：定时额外攻击（无视防御）
             tickPeriodicStrikes(gameState.dungeons, timeDelta).forEach(h => {
                 gameState.dungeons.currentMonsterHP -= h.dmg;
-                showDamageFloat(-h.dmg, false, false);
+                showStrikeFloat(h);
                 addBattleLog(`${h.label}：造成${h.dmg}点伤害（无视防御）`, 'player-hit');
             });
 
@@ -4154,6 +4319,7 @@
             // performNormalBattleTick（只在有画面时跑）里读这两个字段再显示，避免离线模拟白白操作 DOM
             battle._lastPlayerAttack = null;
             battle._lastEnemyAttack = null;
+            battle._lastStrikes = null;
 
             // battle.turnCount 继续沿用：现在只表示「已经过去的秒数」，用于超时保护和离线模拟的时间换算
             battle.turnCount = (battle.turnCount || 0) + timeDelta;
@@ -4194,6 +4360,7 @@
             if (enemy.currentHP > 0) {
                 tickPeriodicStrikes(areaStrikeClock, timeDelta).forEach(h => {
                     enemy.currentHP -= h.dmg;
+                    (battle._lastStrikes = battle._lastStrikes || []).push(h);
                     battle.log.push(`${h.label}造成${h.dmg}点伤害（无视防御）`);
                 });
                 trimBattleLog(battle.log);
@@ -4232,6 +4399,8 @@
             // 只在有画面的实时 tick 里读 stepNormalBattle 写的战果字段，离线批量模拟不会走到这里
             if (battle._lastPlayerAttack) showDamageFloat(-battle._lastPlayerAttack.dmg, false, battle._lastPlayerAttack.crit);
             if (battle._lastEnemyAttack) showDamageFloat(-battle._lastEnemyAttack.dmg, true, battle._lastEnemyAttack.crit);
+            (battle._lastStrikes || []).forEach(showStrikeFloat);
+            if (battle.currentEnemy.currentHP <= 0) showDefeatBurst();
 
             // 更新UI
             updateNormalBattleUI();
@@ -4326,7 +4495,7 @@
             setText('playerDef', player.stats.def);
             setText('monsterAtk', battle.currentEnemy.atk);
             setText('monsterDef', battle.currentEnemy.def);
-            document.getElementById('monsterSprite').innerHTML = battle.currentEnemy.icon || '👾';
+            setMonsterSprite(battle.currentEnemy.icon, battle.currentEnemy);
 
             // 更新战斗日志（共用日志，仅在有新条目时重绘，保留用户的滚动位置）
             renderBattleLog();
@@ -4424,7 +4593,7 @@
             taiyiField:        [{ id: 'taiyiessence', p: 0.12, qty: 1 }, { id: 'chaosstone', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.02, qty: 1 }],
             lingjieAbyss:      [{ id: 'taiyiessence', p: 0.20, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.03, qty: 1 }],
             // 太乙精华概率比上一档更高：这是「开辟仙窍」的唯一材料，真仙境的战斗本身就是仙窍材料的主要来源
-            xianbattle:        [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'daofruit', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.04, qty: 1 }]
+            xianbattle:        [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'xianlingjing', p: 0.15, qty: 1 }, { id: 'daofruit', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.04, qty: 1 }]
         };
 
         // 掉落数量文字（如 1–2 / 1）
@@ -5425,6 +5594,7 @@
             total += getDomainMod(key);   // 化神期灵域：战斗中对双方同时生效的领域规则（玩家侧这一半）
             total += getAvatarMod(key);   // 化神期身外化身：永久小幅 +攻击/防御
             total += getXianMod(key);   // 真仙：道体（每个亮着的仙窍生命 / 防御 +1%）与三衰
+            total += getEndlessMod(key);   // 大乘以后的无上限修炼：器灵温养 / 神魂参悟 / 本源温养
             return total;
         }
 
@@ -5874,6 +6044,7 @@
                 skill.level++;
                 const effect = calculateSkillLevelEffect(skillName, skill.level);
                 showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#6f9c8a', 'normal');
+                if (!document.hidden) showQuickCelebration(`${skill.name} 升至 Lv.${skill.level}`);
                 const ms = LIFE_SKILLS.includes(skillName) && milestonesOf(skillName).find(m => m.level === skill.level);
                 if (ms) showNotification(`🏅 ${skill.name}达到 Lv.${ms.level} 里程碑：${ms.desc}`, '#b89a5b');
             }
@@ -6099,7 +6270,8 @@
                     } else {
                         gameState.currentAction = null;
                         gameState.currentActionProgress = 0;
-                        showNotification(`修为已达 ${currentRealm.name} 上限，请进行突破`, '#c2a25f');
+                        const orificeRealm = (GAME_CONFIG.realms[gameState.player.realmIndex + 1] || {}).xianqiaoReq;
+                        showNotification(orificeRealm ? `${currentRealm.name}以窍代修：修为再多也不能突破，请做修炼页「开辟仙窍」` : `修为已达 ${currentRealm.name} 上限，请进行突破`, '#c2a25f');
                     }
                 } else {
                     // 正常增加修为
@@ -6113,7 +6285,36 @@
             recipeSessionCounts[__countKey] = (recipeSessionCounts[__countKey] || 0) + 1;
             if (bonus.batch) return;   // 极速行动（耗时 < 0.5 秒）：由调用方节流刷新界面 / 存档，否则每秒几十次全界面重绘会卡死页面
             updateUI();
+            showGainFloat(act.skill, actionKey, finalOutput);
             saveGame();
+        }
+
+        // 配方完成时在卡片上方飘出这次的收获（v7.15）：修为 / 第一件产物 / 仙窍等，挂在页面最上层，卡片重绘也不影响
+        let lastGainFloatAt = 0;
+        function showGainFloat(skill, actionKey, out) {
+            if (fxReduced() || !out) return;
+            const now = performance.now();
+            if (now - lastGainFloatAt < 350) return;   // 很快的配方不刷屏
+            const card = document.getElementById('action-' + skill + '-' + actionKey);
+            if (!card || !card.offsetParent) return;
+            const r = card.getBoundingClientRect();
+            if (r.bottom < 0 || r.top > window.innerHeight) return;
+            const item = (out.items || []).find(i => i.qty > 0);
+            const cfg = item && GAME_CONFIG.items[item.id];
+            const text = out.cultivation ? `+${fmtXP(out.cultivation)} 修为`
+                : out.xianqiao ? `+${out.xianqiao} 仙窍`
+                : item ? `+${item.qty} ${cfg ? cfg.name : ''}`
+                : out.danhuo ? `+${out.danhuo} 丹火` : out.shenshi ? `+${out.shenshi} 神识` : out.daoguo ? `+${out.daoguo} 道果`
+                : out.exp ? `+${out.exp} 经验` : '';
+            if (!text) return;
+            lastGainFloatAt = now;
+            const f = document.createElement('div');
+            f.className = 'gain-float' + (item && !out.cultivation ? ' gain-item' : '');
+            f.innerHTML = (item && cfg && cfg.icon && !out.cultivation ? `<span class="gain-ico">${cfg.icon}</span>` : '') + text;
+            f.style.left = (r.left + r.width / 2) + 'px';
+            f.style.top = (r.top + Math.min(36, r.height / 3)) + 'px';
+            document.body.appendChild(f);
+            setTimeout(() => f.remove(), 1300);
         }
 
         // 计算技能等级效果显示文本
@@ -6240,10 +6441,17 @@
             }
         }
 
+        const OFFLINE_HOURS_MAX = 24;
+        function clampOfflineHours(v) { v = parseInt(v); return Number.isFinite(v) ? Math.min(OFFLINE_HOURS_MAX, Math.max(1, v)) : OFFLINE_HOURS_MAX; }
         function updateSetting(settingName, value) {
             // 转换值类型
             if (settingName === 'maxOfflineHours' || settingName === 'fontScale' || settingName === 'notificationSeconds') {
                 value = parseInt(value);
+            }
+            if (settingName === 'maxOfflineHours') {
+                value = clampOfflineHours(value);
+                const input = document.getElementById('maxOfflineHours');
+                if (input) input.value = value;   // 输入了超出范围的数，把输入框也改回实际生效的值
             }
             gameState.settings[settingName] = value;
             updateSettingDisplay(settingName);
@@ -6578,7 +6786,7 @@
             const materials = checkMaterialAvailability(recipe);
 
             // 4. 判断类名
-            let className = 'action-item';
+            let className = 'action-item recipe-card';
             if (isActive) className += ' active';
             if (!unlockState.unlocked) className += ' disabled';
             if (isQuestTarget(skillName, recipeKey)) className += ' quest-target';
@@ -6682,6 +6890,46 @@
             return card;
         }
 
+        // 长列表折叠（v7.10）：配方 / 战斗区域按解锁顺序排，玩到后期最上面全是过时的、最下面全是远期才解锁的，
+        // 手机上要翻好几屏才找到正在用的。现在：过时的收进顶部「更早的…」，未解锁的只露下一个，其余收进底部「尚未解锁」。
+        // 正在进行的行动永远留在外面；折叠区展开状态按列表记住（列表经常整体重绘）。
+        const listFoldOpen = {};
+        function foldActionList(container, entries, noun) {
+            const isActive = e => e.card.classList.contains('active') || e.card.classList.contains('clone-active');
+            const older = entries.filter(e => e.unlocked && e.obsolete && !isActive(e));
+            const locked = entries.filter(e => !e.unlocked);
+            const farLocked = locked.slice(1);
+            const fold = (key, label, items) => {
+                const id = container.id + ':' + key;
+                const d = document.createElement('details');
+                d.className = 'list-fold list-fold-' + key;
+                d.open = !!listFoldOpen[id];
+                d.addEventListener('toggle', () => { listFoldOpen[id] = d.open; });
+                d.innerHTML = `<summary>${label}（${items.length}）</summary><div class="list-fold-body"></div>`;
+                const body = d.querySelector('.list-fold-body');
+                items.forEach(e => body.appendChild(e.card));
+                return d;
+            };
+            if (older.length) container.appendChild(fold('older', `更早的${noun}`, older));
+            entries.filter(e => !older.includes(e) && !farLocked.includes(e)).forEach(e => container.appendChild(e.card));
+            if (farLocked.length) container.appendChild(fold('locked', '尚未解锁', farLocked));
+        }
+        // 只产出修为的普通修炼配方（可以被更高级的取代）
+        function isPlainCultivationRecipe(recipe) {
+            return Object.keys(recipe.output || {}).every(k => k === 'cultivation' || k === 'skill' || k === 'exp');
+        }
+        // 特殊修炼配方已经没用了：一次性的做完了、淬炼过了有效境界、仙窍 / 注灵满了
+        function isSpentCultivationRecipe(recipe) {
+            const o = recipe.output || {}, P = gameState.player;
+            if (o.marrowCleanse) return !!P.marrowCleansed;
+            if (o.danDing) return !!P.danDing;
+            if (o.fiveRoots) return hasFiveRoots();
+            if (o.coreTemper) return P.realmIndex > (recipe.temperUntil || 21);
+            if (o.nascentInfuse) return getNascentSoul() >= NASCENT_MAX;
+            if (o.xianqiao) return getXianqiao() >= XIAN_ORIFICE_MAX;
+            return false;
+        }
+
         function generateRecipeList(skillName) {
             const skill = gameState.skills[skillName];
             if (!skill || !skill.recipes) return;
@@ -6697,16 +6945,24 @@
             const sortedEntries = Object.entries(skill.recipes).sort(([, a], [, b]) =>
                 getRecipeUnlockState(skillName, a).requiredValue - getRecipeUnlockState(skillName, b).requiredValue);
 
+            const entries = [];
             sortedEntries.forEach(([key, recipe]) => {
                 try {
                     const card = renderRecipeCard(skillName, key, recipe);
-                    if (card) {
-                        actionList.appendChild(card);
-                    }
+                    if (card) entries.push({ card, unlocked: getRecipeUnlockState(skillName, recipe).unlocked, recipe });
                 } catch (e) {
                     console.error('[ERROR] Failed to render recipe card:', key, e);
                 }
             });
+            // 修炼：普通修炼配方只留最好的 3 个在外面，其余收进「更早的配方」；有特殊作用的配方（淬炼、洗髓、注灵、仙窍…）用得上就一直留在外面
+            if (skillName === 'cultivation') {
+                const plain = entries.filter(e => e.unlocked && isPlainCultivationRecipe(e.recipe));
+                // 大乘圆满起突破只看仙窍，普通修炼配方全部收起（修为在这两个境界已经不推动突破，挂着等于白挂）
+                const keep = gameState.player.realmIndex >= 41 ? 0 : 3;
+                plain.slice(0, Math.max(0, plain.length - keep)).forEach(e => { e.obsolete = true; });
+                entries.filter(e => e.unlocked && !isPlainCultivationRecipe(e.recipe) && isSpentCultivationRecipe(e.recipe)).forEach(e => { e.obsolete = true; });
+            }
+            foldActionList(actionList, entries, '配方');
 
             // 显示第一个配方的详情
             const firstRecipeKey = Object.keys(skill.recipes)[0];
@@ -6793,7 +7049,8 @@
                 counterPreview.style.display = 'block';
             }
 
-            Object.entries(skill.actions).forEach(([key, action]) => {
+            const entries = [];
+            Object.entries(skill.actions).sort(([, a], [, b]) => a.areaData.minLevel - b.areaData.minLevel).forEach(([key, action]) => {
                 const div = document.createElement('div');
                 const isActive = gameState.currentAction && gameState.currentAction.skill === 'battle' && gameState.currentAction.action === key;
 
@@ -6834,8 +7091,12 @@
                     div.style.opacity = '0.5';
                     div.style.cursor = 'not-allowed';
                 }
-                actionList.appendChild(div);
+                entries.push({ card: div, unlocked: !isDisabled });
             });
+            // 能打的区域只留最高的 3 个在外面，其余收进「更早的区域」
+            const open = entries.filter(e => e.unlocked);
+            open.slice(0, Math.max(0, open.length - 3)).forEach(e => { e.obsolete = true; });
+            foldActionList(actionList, entries, '区域');
         }
 
         function selectAction(skill, action) {
@@ -8184,7 +8445,8 @@
                 hasSurvivedTribulation(HEART_DEMON_REALM), hasHuashenArt(), hasHuashenChance(),
                 usesJingyuan() ? Math.floor(getJingyuan()) : '', hasAscendNode(), isHeavenQiOff(), JSON.stringify(P.btFails || {}), getXianqiao(),
                 hasSurvivedTribulation(idx), hasFiveRoots(), isFused(), idx >= LAW_POWER_REALM ? getLawAvgLevel().toFixed(1) : '',
-                getNascentSoul(), Math.floor(P.nascentInfuse || 0), XIAN_SHUAI.map(isShuaiDone).join()].join('|');
+                getNascentSoul(), Math.floor(P.nascentInfuse || 0), XIAN_SHUAI.map(isShuaiDone).join(), P.cultivationXP >= GAME_CONFIG.realms[idx].nextReq,
+                TRIBULATION_REALMS.includes(idx) ? getTribFails(tribulationIdFor(idx)) : '', XIAN_SHUAI.map(sh => getTribFails(sh.id)).join()].join('|');
             if (key === realmLoreKey) return;   // 每个 tick 都会调用，内容没变就不重写 DOM
             realmLoreKey = key;
             const lore = getRealmLore(idx);
@@ -8239,7 +8501,11 @@
             if (tribBonus > 0) more.push(`<div>⚡ 已渡天劫 ${TRIBULATION_REALMS.filter(r => hasSurvivedTribulation(r)).length} 次：生命 / 防御 +${Math.round(tribBonus * 100)}%</div>`);
             if (TRIBULATION_REALMS.includes(idx)) {
                 const d = GAME_CONFIG.dungeons[tribulationIdFor(idx)];
-                now.push(`<div>${d.icon} ${d.name}：${hasSurvivedTribulation(idx) ? '已渡过 ✅' : idx === 41 ? `须先渡劫，灵气才能化为仙灵力（满血、带足食物）<button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${tribulationIdFor(41)}'))">⚡ 渡劫</button>` : '修为满后须先渡劫才能突破（满血、带足食物）'}</div>`);
+                // 渡劫按钮：大乘圆满一进来就能渡（渡完才能化仙灵力）；其他境界修为满了才出现。带 lore-todo 的按钮才算「待办」
+                const tribBtn = `<button type="button" class="btn btn-secondary lore-todo" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${tribulationIdFor(idx)}'))">⚡ 渡劫</button>`;
+                const xpFull = P.cultivationXP >= GAME_CONFIG.realms[idx].nextReq;
+                const hint = hasSurvivedTribulation(idx) ? '' : tribulationHint(d);
+                now.push(`<div>${d.icon} ${d.name}：${hasSurvivedTribulation(idx) ? '已渡过 ✅' : idx === 41 ? `须先渡劫，灵气才能化为仙灵力（满血、带足食物）${tribBtn}` : xpFull ? `修为已满，渡过才能突破（满血、带足食物）${tribBtn}` : '修为满后须先渡劫才能突破（满血、带足食物）'}${hint ? `<br><small style="color:var(--text-l4)">${hint}</small>` : ''}</div>`);
             }
             const nextRealm = GAME_CONFIG.realms[idx + 1];
             if (nextRealm && nextRealm.xianqiaoReq) {
@@ -8257,7 +8523,7 @@
                     if (isShuaiDone(sh)) { more.push(`<div>${d.icon} ${d.name}：已渡过 ✅</div>`); return; }
                     if (getXianqiao() < sh.at) { now.push(`<div style="color:#888">${d.icon} ${d.name}：仙窍 ${sh.at} 窍时降临（${sh.effect}）</div>`); return; }
                     now.push(`<div style="color:#c4483a">${d.icon} ${d.name}生效中：${sh.effect}
-                        <button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${sh.id}'))">渡${d.name}</button></div>`);
+                        <button type="button" class="btn btn-secondary lore-todo" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${sh.id}'))">渡${d.name}</button><br><small style="color:var(--text-l4)">${tribulationHint(d)}</small></div>`);
                 });
             }
             const next = [13, 17, 21, 25].find(i => i >= idx);
@@ -8271,6 +8537,14 @@
             const oldDetails = box.querySelector('details');
             const wasOpen = !!(oldDetails && oldDetails.open);
             box.innerHTML = now.join('') + `<details${wasOpen ? ' open' : ''} style="margin-top:6px;"><summary style="cursor:pointer;color:#7fae9a;">已有的加成（${more.length} 项）</summary>${more.join('')}</details>`;
+            // 手机端顶部那一条：只放「眼下要关心的」；有按钮（渡劫 / 渡衰 / 精元开关）或警示时在标题上标出来
+            const mBox = document.getElementById('realmLoreMobileBox'), mSum = document.getElementById('realmLoreMobileSummary');
+            if (mBox && mSum) {
+                const body = now.slice(lore ? 1 : 0).join('');
+                mBox.innerHTML = body;
+                const todo = (body.match(/lore-todo/g) || []).length;
+                mSum.innerHTML = `📜 ${lore ? lore.title : '境界感悟'}${todo ? ` <span class="rl-badge">${todo} 项待办</span>` : ''}`;
+            }
         }
 
         function updateProgressBars() {
@@ -8283,7 +8557,10 @@
                 ? Math.min(100, Math.max(0, (getXianqiao() - orificeBase) / (orificeNeed - orificeBase) * 100))
                 : Math.min((gameState.player.cultivationXP / realm.nextReq) * 100, 100);
             document.getElementById('cultivationBar').style.width = percentage + '%';
-            document.getElementById('cultivationProgress').style.width = percentage + '%';
+            const cultBar = document.getElementById('cultivationProgress');
+            cultBar.style.width = percentage + '%';
+            cultBar.classList.toggle('full', percentage >= 100);   // 修为满了：进度条泛光呼吸，提示可以突破
+            cultBar.classList.toggle('flowing', !!(gameState.currentAction && gameState.currentAction.skill === 'cultivation'));   // 正在修炼：一道流光缓缓扫过
             document.getElementById('progressText').textContent = Math.round(percentage) + '%';
             // 修为显示：达到上限时提示可突破；大境界缺丹药时明确写出缺什么
             const full = orificeNeed ? getXianqiao() >= orificeNeed : gameState.player.cultivationXP >= realm.nextReq;
@@ -9216,6 +9493,77 @@
         const fxEase = t => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
         const fxRand = (a, b) => a + Math.random() * (b - a);
 
+        // ---- 所有突破特效共用的一层（v7.15）：水墨压暗背景 → 各境界自己的画面 → 浮动灵气微粒 → 泛光 → 高潮闪光 ----
+        // 原来各特效只盖一层半透明底，底下界面文字透出来和标题混在一起，图形也全是平涂没有光感。
+        // peak = 该境界画面的高潮时刻（金光贯天 / 金丹凝成 / 法则雷落……），标题、闪光、光尘都对准它。
+        const FX_PEAK = { qi: 2.1, foundation: 2.3, core: 2.0, nascent: 2.7, law: 1.9, unity: 2.4, voidfx: 3.0, dacheng: 3.3, minor: 0.25 };
+        // 各境界画面的中心高度（占屏幕高度的比例），闪光和光尘从这里迸出
+        const FX_CY = { qi: 0.32, foundation: 0.7, core: 0.32, nascent: 0.36, law: 0.32, unity: 0.32, voidfx: 0.32, dacheng: 0.34, minor: 0.42 };
+        let fxCy = 0.42;
+        const FX_TINT = { qi: null, foundation: '232, 200, 120', core: '240, 200, 90', nascent: '150, 240, 226', law: '176, 168, 255', unity: '200, 220, 160', voidfx: '190, 170, 255', dacheng: '236, 196, 255', minor: '232, 204, 140' };
+        function fxBackdrop(ctx, W, H, t, dur, major) {
+            const a = Math.min(1, t / 0.45) * Math.max(0, Math.min(1, (dur - t) / 0.6));
+            const cy = major ? H * 0.45 : H * 0.38;
+            const g = ctx.createRadialGradient(W / 2, cy, 0, W / 2, cy, Math.max(W, H) * 0.8);
+            if (major) {
+                g.addColorStop(0, `rgba(18, 16, 11, ${0.74 * a})`);
+                g.addColorStop(1, `rgba(3, 3, 2, ${0.94 * a})`);
+            } else {   // 小境界不挡操作：只在文字周围压暗一圈
+                g.addColorStop(0, `rgba(12, 11, 8, ${0.62 * a})`);
+                g.addColorStop(0.35, `rgba(12, 11, 8, ${0.32 * a})`);
+                g.addColorStop(1, 'rgba(12, 11, 8, 0)');
+            }
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, W, H);
+        }
+        function fxMakeMotes(major, W, H) {
+            const n = major ? 70 : 0;
+            return {
+                drift: Array.from({ length: n }, () => ({ x: fxRand(0, W), y: fxRand(0, H), r: fxRand(0.6, 2.2), v: fxRand(12, 40), ph: fxRand(0, 6.28), sway: fxRand(6, 18) })),
+                burst: Array.from({ length: major ? 46 : 22 }, () => ({ a: fxRand(0, 6.28), v: fxRand(0.35, 1), r: fxRand(1, 2.8), life: fxRand(0.7, 1.4) }))
+            };
+        }
+        function fxMotes(ctx, W, H, t, dur, peak, m, tint, major) {
+            const fadeOut = Math.max(0, Math.min(1, (dur - t) / 0.7));
+            ctx.globalCompositeOperation = 'lighter';
+            m.drift.forEach(q => {   // 天地灵气：缓缓上浮、明灭闪烁
+                const y = ((q.y - t * q.v) % H + H) % H;
+                const x = q.x + Math.sin(t * 1.3 + q.ph) * q.sway;
+                const tw = 0.35 + 0.65 * Math.abs(Math.sin(t * 2.2 + q.ph));
+                ctx.fillStyle = `rgba(${tint}, ${0.55 * tw * Math.min(1, t / 0.6) * fadeOut})`;
+                ctx.beginPath(); ctx.arc(x, y, q.r, 0, Math.PI * 2); ctx.fill();
+            });
+            const bt = t - peak;   // 高潮时从中心迸出一圈光尘
+            if (bt > 0) {
+                const cx = W / 2, cy = H * fxCy, R = Math.min(W, H) * (major ? 0.55 : 0.32);
+                m.burst.forEach(q => {
+                    const k = bt / q.life;
+                    if (k >= 1) return;
+                    const d = fxEase(k) * R * q.v;
+                    ctx.fillStyle = `rgba(${tint}, ${0.9 * (1 - k)})`;
+                    ctx.beginPath(); ctx.arc(cx + Math.cos(q.a) * d, cy + Math.sin(q.a) * d, q.r * (1 - k * 0.6), 0, Math.PI * 2); ctx.fill();
+                });
+            }
+            ctx.globalCompositeOperation = 'source-over';
+        }
+        function fxFlash(ctx, W, H, t, peak, tint, major) {
+            const bt = t - peak;
+            if (bt < 0 || bt > 1.2) return;
+            const cx = W / 2, cy = H * fxCy;
+            const a = (major ? 0.5 : 0.28) * Math.exp(-bt / 0.2);
+            ctx.globalCompositeOperation = 'lighter';
+            const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.7);
+            g.addColorStop(0, `rgba(255, 246, 220, ${a})`);
+            g.addColorStop(0.3, `rgba(${tint}, ${a * 0.5})`);
+            g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+            const k = Math.min(1, bt / 0.9);   // 冲击波：一圈迅速扩散变淡的光环
+            ctx.strokeStyle = `rgba(${tint}, ${0.7 * (1 - k)})`;
+            ctx.lineWidth = (major ? 5 : 3) * (1 - k) + 0.5;
+            ctx.beginPath(); ctx.arc(cx, cy, 20 + fxEase(k) * Math.max(W, H) * (major ? 0.6 : 0.3), 0, Math.PI * 2); ctx.stroke();
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
         // ---- 各特效的绘制函数：draw(ctx, W, H, t, s)，t 为秒，s 为该特效的持久状态 ----
         function fxDrawMinor(ctx, W, H, t, s) {
             const cx = W / 2, cy = H * 0.42;
@@ -9729,9 +10077,12 @@
             let cfg = major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null;
             if (cfg && cfg.kind === 'qi') cfg = { ...cfg, line: `${(SPIRIT_ROOT_EFFECTS[gameState.player.spiritRoot] || {}).name || '灵根'}觉醒，引气入体` };
             const dur = major ? cfg.dur : 1.6;
+            const peak = major ? (FX_PEAK[cfg.kind] || dur * 0.5) : FX_PEAK.minor;
             const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             const el = document.createElement('div');
             el.className = 'fx-overlay ' + (major ? 'fx-major fx-' + cfg.kind : 'fx-minor') + (reduce ? ' fx-reduced' : '');
+            el.style.setProperty('--fx-dur', dur + 's');
+            el.style.setProperty('--fx-peak', Math.max(0, peak - 0.15) + 's');
             el.setAttribute('aria-hidden', 'true');
             el.innerHTML = (reduce ? '' : '<canvas class="fx-canvas"></canvas>') + (major
                 ? `<div class="fx-text"><div class="fx-title">${cfg.name.split('').join(' ')}</div><div class="fx-sub">${realmName} · ${cfg.line}</div><div class="fx-skip">点击任意处跳过</div></div>`
@@ -9750,11 +10101,33 @@
             const ctx = canvas.getContext('2d');
             const drawer = FX_DRAWERS[major ? cfg.kind : 'minor'];
             const s = {};
+            const kindKey = major ? cfg.kind : 'minor';
+            fxCy = FX_CY[kindKey] || 0.4;
+            const tint = FX_TINT[kindKey] || (() => { const hex = ROOT_FX_COLORS[gameState.player.spiritRoot] || '#d8c078'; return [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(', '); })();
+            const motes = fxMakeMotes(major, W, H);
+            // 泛光：把画面缩到 1/4 再放大叠加（相当于便宜的模糊），亮的地方自然晕开
+            const bloom = document.createElement('canvas');
+            bloom.width = Math.max(1, Math.ceil(W / 4)); bloom.height = Math.max(1, Math.ceil(H / 4));
+            const bctx = bloom.getContext('2d');
             fxState.draw = t => {
                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
                 ctx.clearRect(0, 0, W, H);
+                ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+                fxBackdrop(ctx, W, H, t, dur, major);
+                ctx.save();
                 ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic'; ctx.globalAlpha = 1; ctx.shadowBlur = 0;
                 drawer(ctx, W, H, t, s);
+                ctx.restore();
+                fxMotes(ctx, W, H, t, dur, peak, motes, tint, major);
+                bctx.clearRect(0, 0, bloom.width, bloom.height);
+                bctx.drawImage(canvas, 0, 0, bloom.width, bloom.height);
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.globalAlpha = major ? 0.6 : 0.45;
+                ctx.drawImage(bloom, 0, 0, canvas.width, canvas.height);
+                ctx.restore();
+                fxFlash(ctx, W, H, t, peak, tint, major);
             };
             const start = performance.now();
             const frame = now => {
@@ -10037,6 +10410,7 @@
                 theme: 'dark'
             }, gameState.settings || {});
             delete gameState.settings.enableSoundEffects;
+            gameState.settings.maxOfflineHours = clampOfflineHours(gameState.settings.maxOfflineHours);
         }
 
         // ---- 多存档（最多 3 个槽位）----
@@ -10699,10 +11073,7 @@
                 // 更新当前功法显示
                 const artDisplayDiv = document.querySelector('#currentArtDisplay');
                 if (artDisplayDiv) {
-                    artDisplayDiv.innerHTML = `
-                        <div style="color: #c2a25f; font-weight: bold;">${currentArt.name}</div>
-                        <div style="font-size: 0.8em; color: #aaa; margin-top: 4px;">速度倍率：<span style="color: #7d9bb5;">${currentArt.speedMultiplier.toFixed(1)}x</span></div>
-                    `;
+                    artDisplayDiv.innerHTML = `<b class="art-name">${currentArt.name}</b><span class="art-speed">修炼速度 ×${currentArt.speedMultiplier.toFixed(1)}</span>`;
                 }
                 // 更新功法速度显示
                 const artSpeedDisplay = document.getElementById('artSpeedDisplay');
@@ -10828,13 +11199,103 @@
         }).observe(document.body, { childList: true, subtree: true });
         enhanceClickables();
 
+        // ==================== 美术：界面小图标（v7.12） ====================
+        // 面板文字里常用的 emoji 换成统一画风的线描图标（24×24，描边用 currentColor，跟随 .glyph 的颜色）；
+        // 货币直接用已有的彩色物品图标；灵根色点保留五行颜色。没收录的 emoji 仍走下面的铜色滤镜。
+        // 图标后面藏一份原 emoji 文字（.glyph-txt），textContent / 读屏都不受影响。
+        const UI_GLYPHS = (() => {
+            const g = (inner, cls = '') => ({ html: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`, cls });
+            const dot = c => ({ html: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5" fill="${c}" stroke="#2b2016" stroke-width="1.2"/><circle cx="10" cy="10" r="1.8" fill="#fff" opacity=".35"/></svg>`, cls: 'glyph-color' });
+            const raw = html => ({ html, cls: 'glyph-color' });
+            const star4 = (x, y, r) => { const k = r * 0.14; return `M${x} ${y - r}C${x + k} ${y - k} ${x + k} ${y - k} ${x + r} ${y}C${x + k} ${y + k} ${x + k} ${y + k} ${x} ${y + r}C${x - k} ${y + k} ${x - k} ${y + k} ${x - r} ${y}C${x - k} ${y - k} ${x - k} ${y - k} ${x} ${y - r}Z`; };
+            const drop = 'M12 3.5C15.5 8 18 11.2 18 14a6 6 0 0 1-12 0c0-2.8 2.5-6 6-10.5Z';
+            const demon = g('<path d="M7.5 9C5.5 8 4.5 6 5 3.5c1.5 1 3 2 4 3.5M16.5 9c2-1 3-3 2.5-5.5-1.5 1-3 2-4 3.5"/><path d="M6 13a6 6 0 0 1 12 0c0 4-2.7 7.5-6 7.5S6 17 6 13Z"/><path d="M8.5 12.2l2.2 1.2M15.5 12.2l-2.2 1.2M9.5 17.2h5"/>');
+            const book = g('<path d="M12 6.5c-2-1.5-5-2-8.5-1.5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5c-3.5-.5-6.5 0-8.5 1.5ZM12 6.5v13"/>');
+            return {
+                '⚔': g('<path d="M4 4l11 11M13 17l4-4M16.5 16.5l3 3"/><path d="M20 4L9 15M11 17l-4-4M7.5 16.5l-3 3"/>'),
+                '🗡': g('<path d="M20 4l-1.2 4.2-9.2 9.2-3-3 9.2-9.2Z"/><path d="M5 13l6 6M7.8 16.2L4 20"/>'),
+                '🔒': g('<rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3M12 14.5v2.5"/>', 'glyph-dim'),
+                '☯': g('<circle cx="12" cy="12" r="9"/><path d="M12 3a4.5 4.5 0 0 1 0 9a4.5 4.5 0 0 0 0 9a9 9 0 0 0 0-18Z" fill="currentColor"/><circle cx="12" cy="7.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="16.5" r="1.3" fill="#15140f" stroke="none"/>'),
+                '🌟': g(`<path d="${star4(12, 12, 9)}"/>`),
+                '✨': g(`<path d="${star4(10, 13.5, 7.5)}"/><path d="${star4(18.5, 5.5, 3.2)}"/>`),
+                '🌀': g('<path d="M12.6 11.4a1.1 1.1 0 1 0-1.2 1.2a2.6 2.6 0 1 0 2.6-2.6a4.4 4.4 0 1 0 4.4 4.4a6.4 6.4 0 1 0-6.4 6.4"/>'),
+                '⚡': g('<path d="M13.5 2.5L5.5 13.5h6l-1.5 8 8-11h-6Z"/>'),
+                '🌌': g('<circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="8.5" ry="3" transform="rotate(-25 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>'),
+                '☄': g('<circle cx="16.5" cy="7.5" r="3.2"/><path d="M14 10L4 20M12.5 7.5L5 15M16.5 11L9.5 18.5"/>'),
+                '🌾': g('<path d="M12 21V6"/><path d="M12 9c-2.6-.6-3.8-2.4-3.8-4.8 2.6.6 3.8 2.4 3.8 4.8Zm0 0c2.6-.6 3.8-2.4 3.8-4.8-2.6.6-3.8 2.4-3.8 4.8ZM12 14c-2.6-.6-3.8-2.4-3.8-4.8 2.6.6 3.8 2.4 3.8 4.8Zm0 0c2.6-.6 3.8-2.4 3.8-4.8-2.6.6-3.8 2.4-3.8 4.8Z"/>'),
+                '💊': g('<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.6 8.6l4.8 6.8"/>'),
+                '🛡': g('<path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6Z"/><path d="M12 7v10"/>'),
+                '📜': g('<path d="M7 5h11.5v12.5a2 2 0 0 1-2 2H5.5"/><path d="M5.5 19.5a2 2 0 0 0 2-2V5a2 2 0 0 0-4 0v2.5H7"/><path d="M10.5 9h5M10.5 12.5h5"/>'),
+                '👶': g('<path d="M6.5 7a7.8 7.8 0 0 1 11 0"/><circle cx="12" cy="10.5" r="3"/><path d="M7.5 20.5c0-3.3 2-5.6 4.5-5.6s4.5 2.3 4.5 5.6Z"/>'),
+                '🧘': g('<circle cx="12" cy="5" r="2.2"/><path d="M12 7.5v5.5M7.5 12.5l4.5-2.2 4.5 2.2M5 18.5c3-2.8 11-2.8 14 0M7 20.5h10"/>'),
+                '⚠': g('<path d="M12 3.5L21.5 20h-19Z"/><path d="M12 9.5v5"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/>', 'glyph-warn'),
+                '👹': demon, '😈': demon,
+                '🎍': g('<path d="M9 21V3M15 21V7M7.5 8h3M7.5 14h3M13.5 11.5h3M13.5 17h3"/><path d="M15 7c1.5-2.2 3.5-3.3 6-3.3-1 2.2-3 3.5-6 3.3Z"/>'),
+                '🔮': g('<circle cx="12" cy="10" r="6.5"/><path d="M8.5 17.5h7l1.5 3h-10ZM9 8a3.5 3.5 0 0 1 3-2.5"/>'),
+                '👤': g('<circle cx="12" cy="8" r="3.8"/><path d="M4.5 20.5c0-4 3.4-7 7.5-7s7.5 3 7.5 7"/>'),
+                '🎓': g('<path d="M2.5 9L12 5l9.5 4L12 13Z"/><path d="M6.5 11v4.5c3 2 8 2 11 0V11M21.5 9v5"/>'),
+                '💀': g('<path d="M12 3a7 7 0 0 0-7 7c0 2.6 1.4 4.3 3 5.3V19.5h8v-4.2c1.6-1 3-2.7 3-5.3a7 7 0 0 0-7-7Z"/><circle cx="9.3" cy="10.5" r="1.4" fill="currentColor"/><circle cx="14.7" cy="10.5" r="1.4" fill="currentColor"/><path d="M10.5 19.5v-2.2M13.5 19.5v-2.2"/>'),
+                '⚱': g('<path d="M4 9h16M5.5 9v3a6.5 6.5 0 0 0 13 0V9M7.5 9V5.5M16.5 9V5.5M8.5 17.5l-1.2 3.5M15.5 17.5l1.2 3.5M12 18.5v3"/>'),
+                '🌊': g('<path d="M3 9.5c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 14.5c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 19.5c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/>'),
+                '🌱': g('<path d="M12 20.5v-8"/><path d="M12 12.5C12 9 9.5 7 5.5 7c0 3.5 2.5 5.5 6.5 5.5ZM12 13.5c0-3 2.2-5 5.5-5 0 3-2.2 5-5.5 5Z"/><path d="M7 20.5h10"/>'),
+                '🌿': g('<path d="M6 20C9 15 12 9 18.5 4.5"/><path d="M9.5 15C7 15 5 13.5 4.5 11c2.5 0 4.5 1.5 5 4ZM12.5 11c-.3-2.6.8-4.6 3-5.8.3 2.6-.8 4.6-3 5.8ZM13 13.5c2.5-.8 4.6 0 6 2-2.5.8-4.6 0-6-2Z"/>'),
+                '💧': g(`<path d="${drop}"/><path d="M9 14.5a3 3 0 0 0 2 2.5"/>`),
+                '🩸': g(`<path d="${drop}" fill="currentColor"/>`, 'glyph-warn'),
+                '🌈': g('<path d="M3 18a9 9 0 0 1 18 0M6.5 18a5.5 5.5 0 0 1 11 0M10 18a2 2 0 0 1 4 0"/>'),
+                '🧪': g('<path d="M9.5 3.5h5M10.5 3.5v6L5 19a1.5 1.5 0 0 0 1.3 2h11.4a1.5 1.5 0 0 0 1.3-2l-5.5-9.5v-6M7.6 15h8.8"/>'),
+                '📖': book, '🕮': book,
+                '🔨': g('<path d="M13.5 10l6.5 6.5a1.5 1.5 0 0 1-2.1 2.1L11.4 12.1"/><path d="M4 8.5l5-5 4.5 4.5-5 5Z"/>'),
+                '⛏': g('<path d="M4.5 20.5L15 10"/><path d="M9.5 5Q18 5.5 19 14.5" stroke-width="2.6"/>'),
+                '📦': g('<path d="M12 3l8 4v10l-8 4-8-4V7Z"/><path d="M4 7l8 4 8-4M12 11v10"/>'),
+                '🎁': g('<rect x="4" y="9" width="16" height="11.5" rx="1"/><path d="M3 9h18M12 9v11.5M12 9c-1-3.5-5.5-4.5-5.5-1.8 0 1.5 2.5 1.8 5.5 1.8Zm0 0c1-3.5 5.5-4.5 5.5-1.8 0 1.5-2.5 1.8-5.5 1.8Z"/>'),
+                '🥀': g('<path d="M8 21V12C8 7 11 4.5 14.5 4.5S20 7 19.5 10.5"/><path d="M17 11h5l-.8 3.2c-.4 1.8-3 1.8-3.4 0Z"/><path d="M5 21h14M14.5 18.5c1.3-.8 2.6-.6 3.4.4"/>'),
+                '🕳': g('<ellipse cx="12" cy="14" rx="8.5" ry="4"/><ellipse cx="12" cy="14.5" rx="5" ry="2" fill="currentColor"/>'),
+                '🍂': g('<path d="M5 19C5 11 10 5 19.5 4.5 19 14 13 19 5 19Z"/><path d="M5 19l9-9M9.5 14.5h4M12 12V8.5"/>'),
+                '🏁': g('<path d="M5.5 21V3.5"/><path d="M5.5 4.5c4-2 6.5 2 13 0v9c-6.5 2-9-2-13 0"/>'),
+                '📌': g('<path d="M9 3.5h6M10 3.5l-.5 6L6.5 13h11l-3-3.5-.5-6M12 13v7.5"/>'),
+                '📊': g('<path d="M3 20.5h18M6 20V13M10.5 20V6.5M15 20v-9M19.5 20v-5"/>'),
+                '✅': g('<rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M8 12.5l3 3 5.5-6"/>', 'glyph-ok'),
+                '❌': g('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>', 'glyph-warn'),
+                '🏪': g('<path d="M4 9.5L5.5 4h13L20 9.5M4 9.5c0 1.5 1.2 2.5 2.7 2.5S9.3 11 9.3 9.5c0 1.5 1.2 2.5 2.7 2.5s2.7-1 2.7-2.5c0 1.5 1.2 2.5 2.6 2.5S20 11 20 9.5M5.5 12v8.5h13V12M10 20.5V15h4v5.5"/>'),
+                '⚙': g('<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>'),
+                '🎒': g('<path d="M9 7h6l-1.3 2.3c3.6 1.4 5.3 4.4 5.3 7.4 0 2.8-2.6 4.3-7 4.3s-7-1.5-7-4.3c0-3 1.7-6 5.3-7.4Z"/><path d="M8.5 4.5L12 7l3.5-2.5M9.5 9.5h5"/>'),
+                '📿': g('<circle cx="12" cy="4.5" r="1.6"/><circle cx="17.3" cy="6.7" r="1.6"/><circle cx="19.5" cy="12" r="1.6"/><circle cx="17.3" cy="17.3" r="1.6"/><circle cx="6.7" cy="17.3" r="1.6"/><circle cx="4.5" cy="12" r="1.6"/><circle cx="6.7" cy="6.7" r="1.6"/><path d="M12 19v2.5M10.5 21.5h3"/>'),
+                '🌙': g('<path d="M19 14.5A7.5 7.5 0 1 1 9.5 5a6 6 0 0 0 9.5 9.5Z"/>'),
+                '🔔': g('<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15ZM10 20.5a2 2 0 0 0 4 0"/>'),
+                '⏰': g('<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4.5l3 2M4 5.5l3-2.5M20 5.5l-3-2.5"/>'),
+                '🔁': g('<path d="M4 10.5V9a3 3 0 0 1 3-3h12M16 3l3 3-3 3M20 13.5V15a3 3 0 0 1-3 3H5M8 21l-3-3 3-3"/>'),
+                '❄': g('<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5L12 7l2.5-2.5M9.5 19.5L12 17l2.5 2.5"/>'),
+                '🌪': g('<path d="M3.5 5h17M5.5 9h13M8 13h9M10 17h5.5M12 21h2"/>'),
+                '🍶': g('<path d="M10 3.5h4M10.5 3.5v3c-3 1.5-4.5 4-4.5 7.5 0 4 2.5 6.5 6 6.5s6-2.5 6-6.5c0-3.5-1.5-6-4.5-7.5v-3M7 13h10"/>'),
+                '🔍': g('<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>'),
+                '⭕': g('<circle cx="12" cy="12" r="7.5"/>'),
+                '🏛': g('<path d="M3 9.5L12 4l9 5.5M4.5 9.5h15M6 9.5v8.5M10 9.5v8.5M14 9.5v8.5M18 9.5v8.5M3.5 18.5h17M3 21h18"/>'),
+                '⏱': g('<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M10 3h4M12 3v3M18.5 6.5l1.5-1.5"/>'),
+                '⏹': g('<rect x="6" y="6" width="12" height="12" rx="1.5"/>'),
+                '⭐': g('<path d="M12 3.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9l-5.3 2.7 1-5.8-4.2-4.1 5.9-.9Z"/>'),
+                '❤': g('<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/>', 'glyph-warn'),
+                '💪': g('<path d="M3.5 9.5v5M6.5 7v10M17.5 7v10M20.5 9.5v5M6.5 12h11"/>'),
+                '🍽': g('<circle cx="12" cy="13" r="6"/><circle cx="12" cy="13" r="3"/><path d="M3.5 4v5c0 1 .7 1.5 1.5 1.5S6.5 10 6.5 9V4M5 10.5V20M20.5 4c-1.5 0-2.5 2-2.5 5s1 3.5 2.5 3.5V20"/>'),
+                '💾': g('<path d="M5 4h11.5L20 7.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M8 4v5h7V4M7.5 20v-6h9v6"/>'),
+                '🗑': g('<path d="M4.5 6.5h15M9.5 6.5V4h5v2.5M6.5 6.5l1 13.5h9l1-13.5M10 10.5v6M14 10.5v6"/>'),
+                '📥': g('<path d="M12 3.5v10M8 9.5l4 4 4-4M4 14.5v4.5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4.5"/>'),
+                '📤': g('<path d="M12 13.5v-10M8 7.5l4-4 4 4M4 14.5v4.5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4.5"/>'),
+                '🔀': g('<path d="M4 7h3.5c4.5 0 4.5 10 9 10H20M4 17h3.5c1.8 0 2.8-1.6 3.6-3.5M13 10.5C13.8 8.6 14.8 7 16.5 7H20M17 4l3 3-3 3M17 14l3 3-3 3"/>'),
+                '📝': g('<path d="M14 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/><path d="M8.5 9h4M8.5 13h6M8.5 17h6M18 3l2.5 2.5-7 7H11v-2.5Z"/>'),
+                '💡': g('<path d="M9 17.5h6M10 20.5h4M12 3.5a6 6 0 0 0-3.5 10.9c.4.4.5.9.5 1.4v1.7h6v-1.7c0-.5.2-1 .5-1.4A6 6 0 0 0 12 3.5Z"/>'),
+                '🎨': g('<path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.5 0 2-1 1.5-2.2-.6-1.3.2-2.8 1.7-2.8H17a3.5 3.5 0 0 0 3.5-3.5c0-4.7-3.8-8.5-8.5-8.5Z"/><circle cx="8" cy="10.5" r="1.1" fill="currentColor"/><circle cx="11.5" cy="7.5" r="1.1" fill="currentColor"/><circle cx="15.5" cy="9" r="1.1" fill="currentColor"/>'),
+                '💎': raw(COIN_ICON), '🔥': raw(DANHUO_ICON), '👁': raw(SHENSHI_ICON), '🍎': raw(DAOGUO_ICON),
+                '🟡': dot('#d8b24a'), '🟢': dot('#6fae6a'), '🔵': dot('#5a8ac8'), '🔴': dot('#c4483a'), '🟤': dot('#9a6a3a'), '🟣': dot('#8a6ad0'), '⚪': dot('#d8d0bc'), '⚫': dot('#3a362c')
+            };
+        })();
+
         // ==================== 美术：彩色 emoji 统一染成褪色铜色 ====================
         // 把文字里的 emoji 包进 <span class="emo">，样式里用滤镜做成单色铜色，与整体色板一致
         const EMOJI_TEST = /\p{Extended_Pictographic}/u;
         const EMOJI_SPLIT = /(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*)/gu;
         function tintEmoji(root) {
             if (!root) return;
-            const skip = 'script, style, textarea, select, option, title, .emo';
+            const skip = 'script, style, textarea, select, option, title, .emo, .glyph';
             const nodes = [];
             if (root.nodeType === 3) {
                 nodes.push(root);
@@ -10851,8 +11312,15 @@
                     if (!part) return;
                     if (i % 2 === 1) {
                         const span = document.createElement('span');
-                        span.className = 'emo';
-                        span.textContent = part;
+                        const glyph = UI_GLYPHS[part.replace(/️/g, '')];
+                        if (glyph) {
+                            span.className = 'glyph' + (glyph.cls ? ' ' + glyph.cls : '');
+                            span.innerHTML = glyph.html + '<span class="glyph-txt"></span>';
+                            span.lastChild.textContent = part;
+                        } else {
+                            span.className = 'emo';
+                            span.textContent = part;
+                        }
                         frag.appendChild(span);
                     } else {
                         frag.appendChild(document.createTextNode(part));

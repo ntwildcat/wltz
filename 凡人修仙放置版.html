@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0c19">
     <title>凡人修仙放置版</title>
-    <link rel="stylesheet" href="style.css?v=13.38">
+    <link rel="stylesheet" href="style.css?v=13.54">
 
 </head>
 <body data-panel="cultivation">
@@ -141,6 +141,12 @@
                 <!-- 新手任务条（任务全部完成后自动隐藏） -->
                 <div id="questBanner" class="quest-banner" style="display: none;"></div>
 
+                <!-- 手机端境界感悟：侧栏在手机上排到页面最底部，渡劫 / 渡衰 / 精元开关等入口放这里（桌面端隐藏） -->
+                <details id="realmLoreMobile" class="realm-lore-mobile">
+                    <summary id="realmLoreMobileSummary">📜 境界感悟</summary>
+                    <div id="realmLoreMobileBox"></div>
+                </details>
+
                 <!-- 面板容器 -->
                 <div class="panel-container">
                     <!-- 主面板 -->
@@ -167,14 +173,13 @@
                             <div class="panel-title">🧘 修炼</div>
                             <div class="skill-exp-header" data-skill="cultivation"></div>
 
-                            <!-- 功法选择器 -->
-                            <div style="background: rgba(59,130,246,0.1); border: 1px solid #7d9bb5; border-radius: 4px; padding: 12px; margin-bottom: 15px;">
-                                <div style="font-size: 0.9em; color: #7d9bb5; font-weight: bold; margin-bottom: 8px;">📜 当前功法</div>
-                                <div id="currentArtDisplay" style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 3px; margin-bottom: 10px;">
-                                    <div style="color: #c2a25f; font-weight: bold;">基础功法</div>
-                                    <div style="font-size: 0.8em; color: #aaa; margin-top: 4px;">速度倍率：<span id="artSpeedDisplay">1.0</span>x</div>
+                            <!-- 功法：一行显示当前功法与速度，切换是次要操作（描边按钮） -->
+                            <div class="art-card">
+                                <div class="art-card-main">
+                                    <span class="art-card-label">功法</span>
+                                    <div id="currentArtDisplay"><b class="art-name">引气诀</b><span class="art-speed">修炼速度 ×<span id="artSpeedDisplay">1.0</span></span></div>
                                 </div>
-                                <button id="switchArtBtn" class="btn" style="width: 100%; font-size: 0.9em;" onclick="showArtSwitchModal()">🔄 切换功法</button>
+                                <button id="switchArtBtn" class="btn btn-secondary art-switch" onclick="showArtSwitchModal()">切换功法</button>
                             </div>
 
                             <div class="action-list" id="cultivationActions">
@@ -457,15 +462,15 @@
                                 <div class="stat-title">📖 玩法介绍</div>
                                 <div class="stat-row">
                                     <span class="stat-label">新手引导:</span>
-                                    <button class="btn" onclick="showTutorial(0)" style="padding: 6px 16px;">重新查看</button>
+                                    <button class="btn btn-secondary" onclick="showTutorial(0)" style="padding: 6px 16px;">重新查看</button>
                                 </div>
                                 <div class="stat-row">
                                     <span class="stat-label">新手任务:</span>
-                                    <button class="btn" onclick="showQuestList()" style="padding: 6px 16px;">查看任务</button>
+                                    <button class="btn btn-secondary" onclick="showQuestList()" style="padding: 6px 16px;">查看任务</button>
                                 </div>
                                 <div class="stat-row">
                                     <span class="stat-label">境界解锁一览:</span>
-                                    <button class="btn" onclick="showRealmUnlockList()" style="padding: 6px 16px;">查看</button>
+                                    <button class="btn btn-secondary" onclick="showRealmUnlockList()" style="padding: 6px 16px;">查看</button>
                                 </div>
                             </div>
 
@@ -821,7 +826,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=13.88"></script>
+    <script src="game.js?v=14.06"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
