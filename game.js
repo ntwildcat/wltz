@@ -6578,7 +6578,7 @@
             const materials = checkMaterialAvailability(recipe);
 
             // 4. 判断类名
-            let className = 'action-item';
+            let className = 'action-item recipe-card';
             if (isActive) className += ' active';
             if (!unlockState.unlocked) className += ' disabled';
             if (isQuestTarget(skillName, recipeKey)) className += ' quest-target';
@@ -10758,10 +10758,7 @@
                 // 更新当前功法显示
                 const artDisplayDiv = document.querySelector('#currentArtDisplay');
                 if (artDisplayDiv) {
-                    artDisplayDiv.innerHTML = `
-                        <div style="color: #c2a25f; font-weight: bold;">${currentArt.name}</div>
-                        <div style="font-size: 0.8em; color: #aaa; margin-top: 4px;">速度倍率：<span style="color: #7d9bb5;">${currentArt.speedMultiplier.toFixed(1)}x</span></div>
-                    `;
+                    artDisplayDiv.innerHTML = `<b class="art-name">${currentArt.name}</b><span class="art-speed">修炼速度 ×${currentArt.speedMultiplier.toFixed(1)}</span>`;
                 }
                 // 更新功法速度显示
                 const artSpeedDisplay = document.getElementById('artSpeedDisplay');

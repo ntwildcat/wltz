@@ -2214,3 +2214,68 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
     .rl-badge { margin-left: 6px; padding: 1px 8px; border-radius: 10px; background: var(--cinnabar-2); color: #fff; font-size: 0.82em; font-weight: normal; }
     body.in-battle .realm-lore-mobile { display: none; }
 }
+
+/* ===== v7.11 视觉统一（第一步：修炼页 + 全局底层） =====
+   原则：墨底分 4 级、古铜管结构与选中、玉青管进度与正向数值；朱砂只留给境界印章、主要操作和需要立刻处理的提醒。
+   主面板保留一层框，里面的内容只用底色区分，不再框套框。 */
+:root {
+    --text-l4: #9a917c;          /* 原 #857d69 在卡片底色上对比度只有 3.9，提亮到 ≥4.6 */
+    --jade: #6f9c8a;
+    --jade-dim: #3f5a50;
+}
+
+/* 朱砂收回：进度条、选中卡片、标签选中、标题下划线改用玉青 / 古铜 */
+.progress-fill { background: var(--jade); }
+.action-item.active { background: var(--bg-l3); border-color: var(--bronze); box-shadow: inset 3px 0 0 var(--bronze); }
+.mobile-skill-btn.active { border-color: var(--bronze); background: var(--bg-l3); box-shadow: none; color: var(--text-l1); }
+.mobile-tab-item.active { box-shadow: inset 0 2px 0 var(--bronze); }
+.panel-title::after { background: var(--bronze); }
+#globalProgressFill { background: var(--jade); }
+
+/* 主面板：单层框，去掉内衬双线和角上的朱砂菱形 */
+.main-panel { box-shadow: none; }
+.main-panel::before, .main-panel::after { display: none; }
+
+/* 页面标题：缩小、去发光，和技能等级条合成一组 */
+.panel-title { font-size: 1.35em; text-shadow: none; margin-bottom: 0; padding-bottom: 10px; }
+.panel-content .skill-exp-header { background: transparent; border: none; border-radius: 0; padding: 10px 0 14px; margin-bottom: 14px; border-bottom: 1px solid var(--border-l4); }
+.panel-content .skill-exp-header .skill-exp-name { display: none; }
+.skill-exp-top { margin-bottom: 4px; }
+.skill-exp-level { font-family: var(--font-title); letter-spacing: 0.05em; color: var(--text-l2); }
+.skill-exp-track { height: 4px; border: none; border-radius: 0; background: #0e0d0a; }
+.skill-exp-fill { background: var(--jade); }
+
+/* 分身条：去框，只留底色 */
+.clone-bar { border: none; background: var(--bg-l2); }
+
+/* 功法：一行，切换是描边次按钮 */
+.art-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; padding: 10px 12px; background: var(--bg-l2); }
+.art-card-main { display: flex; align-items: baseline; gap: 10px; min-width: 0; flex-wrap: wrap; }
+.art-card-label { color: var(--text-l4); font-size: 0.85em; }
+#currentArtDisplay { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.art-name { font-family: var(--font-title); color: var(--text-l1); font-size: 1.05em; letter-spacing: 0.05em; }
+.art-speed { color: var(--jade); font-size: 0.85em; }
+.btn.art-switch { flex: none; width: auto; padding: 6px 14px; font-size: 0.88em; min-height: 0; }
+
+/* 配方卡片：去掉早期主题残留的藏青底，未解锁 = 降低透明度的墨色卡 */
+.action-item.disabled, .action-item.disabled:hover { background: var(--bg-l2); border-color: var(--border-l4); box-shadow: none; }
+.recipe-lock-hint { background: transparent; color: var(--text-l4); padding: 0; }
+.recipe-card .rc-name { font-family: var(--font-title); color: var(--text-l1); }
+.recipe-card .recipe-output { color: var(--text-l3); }
+.recipe-session-count { background: var(--bg-l1); color: var(--text-l3); border: 1px solid var(--border-l4); }
+
+@media (max-width: 768px) {
+    .btn.art-switch { min-height: 36px !important; font-size: 0.88em !important; }
+    /* 手机上配方卡片改成横排：左边小图，右边名称 / 耗时 / 产出，进度条和精通条占满一行 */
+    .action-item.recipe-card { display: grid; grid-template-columns: 36px 1fr; column-gap: 12px; row-gap: 1px; align-items: center; text-align: left; min-height: 0 !important; padding: 10px 12px !important; }
+    .recipe-card .rc-art { grid-column: 1; grid-row: 1 / span 3; height: 36px; width: 36px; font-size: 24px; margin: 0; align-self: start; }
+    .recipe-card > :not(.rc-art):not(.recipe-session-count) { grid-column: 2; }
+    .recipe-card .rc-name { font-size: 1em; padding-right: 56px; }
+    .recipe-card .recipe-materials { justify-content: flex-start; }
+    .action-item.recipe-card > .action-progress-bar, .action-item.recipe-card > .rc-mastery, .action-item.recipe-card > .clone-btn { grid-column: 1 / -1; }
+    /* 技能页的标题在手机上和上方标签（「修炼 Lv.46」）重复，收起；等级与经验条保留 */
+    .panel-content:has(> .skill-exp-header) > .panel-title { display: none; }
+    .panel-content .skill-exp-header { padding-top: 0; }
+    .recipe-card .action-progress-bar { margin-top: 6px; }
+    .action-item.disabled .rc-art.locked { height: 36px; font-size: 18px; }
+}
