@@ -2437,7 +2437,7 @@
                 holder[k] = (holder[k] || 0) + timeDelta;
                 if (holder[k] < interval) return;
                 holder[k] -= interval;
-                hits.push({ label: s.label, dmg: Math.max(1, Math.floor(gameState.player.stats.atk * mult * getBattleSkillDmgMult())) });
+                hits.push({ key: s.key, label: s.label, dmg: Math.max(1, Math.floor(gameState.player.stats.atk * mult * getBattleSkillDmgMult())) });
             });
             return hits;
         }
@@ -3416,6 +3416,8 @@
 
                 // P1-1 显示伤害飘字和日志
                 showDamageFloat(-monsterDmg, true, isMonsterCrit);
+                const curDungeon = GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon];
+                if (curDungeon && curDungeon.isTribulation) showTribulationFlash(curDungeon);
                 addBattleLog(`${isMonsterCrit ? '暴击！' : ''}受到${monsterDmg}点伤害`, 'monster-hit');
             } else {
                 // P1-1 显示敌人未命中日志
@@ -3425,6 +3427,7 @@
 
         // 处理怪物死亡
         function handleMonsterDeath(dungeonId, monster) {
+            showDefeatBurst();
             gameState.dungeons.defeatCount++;
             const dropCoins = Math.floor(monster.dropQty * (0.8 + Math.random() * 0.4));
             gameState.player.coins += dropCoins;
@@ -3694,7 +3697,7 @@
 
             document.getElementById('playerNameBattle').textContent = gameState.player.name || '玩家';
             document.getElementById('monsterNameBattle').textContent = monster.name || '敌人';
-            document.getElementById('monsterSprite').innerHTML = monster.icon || '👾';
+            setMonsterSprite(monster.icon, monster);
 
             addBattleLog(`与${monster.name}开始战斗！`, 'info');
         }
@@ -3783,6 +3786,69 @@
             el.style.display = '';
         }
 
+        // ---- 界面反馈动画（v7.15） ----
+        // 原来除了突破特效和伤害数字，战斗受击、换怪、击杀、配方完成、技能升级都没有任何动作反馈。
+        // 全部是短促的 CSS 动画（0.2–0.9 秒），只在画面可见时播放；系统开启「减少动态效果」时整体不播。
+        const fxReducedMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+        function fxReduced() { return document.hidden || !!(fxReducedMQ && fxReducedMQ.matches); }
+        // 重新播放一次某个 class 上的动画（连续触发时从头播）
+        function pulseClass(el, cls) {
+            if (!el || fxReduced()) return;
+            el.classList.remove(cls);
+            void el.offsetWidth;
+            el.classList.add(cls);
+        }
+        // 敌人头像的动作（出场 / 受击 / 暴击）互斥：同时挂两个时写在后面的样式会盖住前一个
+        function spriteAnim(cls) {
+            const el = document.getElementById('monsterSprite');
+            if (!el || fxReduced()) return;
+            el.classList.remove('spawn', 'hit', 'hit-crit');
+            void el.offsetWidth;
+            el.classList.add(cls);
+        }
+        // 敌人头像：换了一只敌人时从下方浮现
+        let lastSpriteEnemy = null;
+        function setMonsterSprite(icon, enemyRef) {
+            const el = document.getElementById('monsterSprite');
+            if (!el) return;
+            if (enemyRef === lastSpriteEnemy) return;
+            lastSpriteEnemy = enemyRef;
+            el.innerHTML = icon || '👾';
+            spriteAnim('spawn');
+        }
+        // 击杀：敌人位置迸开一团墨色光尘（独立元素，不会被下一只敌人的出场动画打断）
+        function showDefeatBurst() {
+            const scene = document.querySelector('.battle-scene');
+            if (!scene || fxReduced()) return;
+            const b = document.createElement('div');
+            b.className = 'defeat-burst';
+            scene.appendChild(b);
+            setTimeout(() => b.remove(), 900);
+        }
+        // 天劫 / 心魔 / 三衰出手时整块战斗画面闪一下
+        function showTribulationFlash(dungeon) {
+            const scene = document.querySelector('.battle-scene');
+            if (!scene || fxReduced()) return;
+            const f = document.createElement('div');
+            f.className = 'trib-flash ' + (dungeon.isHeartDemon ? 'trib-demon' : dungeon.isShuai ? 'trib-shuai' : 'trib-thunder');
+            scene.appendChild(f);
+            setTimeout(() => f.remove(), 700);
+        }
+        // 元气化形 / 元婴离体 / 法则之击：带名字的飘字，各自一种颜色
+        function showStrikeFloat(h) {
+            const floatLayer = document.getElementById('damageFloatLayer');
+            if (!floatLayer || fxReduced()) return;
+            const d = document.createElement('div');
+            d.className = 'damage-float strike strike-' + (h.key || 'qiForm');
+            d.innerHTML = `<small>${h.label.replace(/^\S+\s/, '')}</small>-${h.dmg}`;
+            const side = Math.random() < 0.5 ? 6 : 62;   // 落在敌人头像左右两侧，不挡头像（left 是飘字左边缘）
+            d.style.left = (side + Math.random() * 10) + '%';
+            d.style.top = '60px';
+            floatLayer.appendChild(d);
+            spriteAnim('hit');
+            setTimeout(() => d.remove(), 1600);
+        }
+
         // P1-1 显示伤害飘字
         // isCrit：暴击伤害单独加大字号+变色+弹跳动画（.damage-float.crit，样式见 style.css），
         // 不然暴击和普通攻击视觉上完全一样，只有战斗日志里一句「暴击！」文字能看出区别，容易被忽略
@@ -3810,6 +3876,11 @@
 
             // 1.5秒后移除
             setTimeout(() => floatDiv.remove(), 1500);
+            // 受击动作：敌人挨打时抖一下、发白（暴击更猛并带一道剑光）；自己挨打时状态栏泛红
+            if (damage < 0) {
+                if (isPlayer) pulseClass(document.querySelector('.combatant.player'), 'hurt');
+                else spriteAnim(isCrit ? 'hit-crit' : 'hit');
+            }
         }
 
         // P1-1 添加战斗日志
@@ -4091,7 +4162,7 @@
             // 合体起元气化形、大乘起元婴离体 / 法则之击：定时额外攻击（无视防御）
             tickPeriodicStrikes(gameState.dungeons, timeDelta).forEach(h => {
                 gameState.dungeons.currentMonsterHP -= h.dmg;
-                showDamageFloat(-h.dmg, false, false);
+                showStrikeFloat(h);
                 addBattleLog(`${h.label}：造成${h.dmg}点伤害（无视防御）`, 'player-hit');
             });
 
@@ -4154,6 +4225,7 @@
             // performNormalBattleTick（只在有画面时跑）里读这两个字段再显示，避免离线模拟白白操作 DOM
             battle._lastPlayerAttack = null;
             battle._lastEnemyAttack = null;
+            battle._lastStrikes = null;
 
             // battle.turnCount 继续沿用：现在只表示「已经过去的秒数」，用于超时保护和离线模拟的时间换算
             battle.turnCount = (battle.turnCount || 0) + timeDelta;
@@ -4194,6 +4266,7 @@
             if (enemy.currentHP > 0) {
                 tickPeriodicStrikes(areaStrikeClock, timeDelta).forEach(h => {
                     enemy.currentHP -= h.dmg;
+                    (battle._lastStrikes = battle._lastStrikes || []).push(h);
                     battle.log.push(`${h.label}造成${h.dmg}点伤害（无视防御）`);
                 });
                 trimBattleLog(battle.log);
@@ -4232,6 +4305,8 @@
             // 只在有画面的实时 tick 里读 stepNormalBattle 写的战果字段，离线批量模拟不会走到这里
             if (battle._lastPlayerAttack) showDamageFloat(-battle._lastPlayerAttack.dmg, false, battle._lastPlayerAttack.crit);
             if (battle._lastEnemyAttack) showDamageFloat(-battle._lastEnemyAttack.dmg, true, battle._lastEnemyAttack.crit);
+            (battle._lastStrikes || []).forEach(showStrikeFloat);
+            if (battle.currentEnemy.currentHP <= 0) showDefeatBurst();
 
             // 更新UI
             updateNormalBattleUI();
@@ -4326,7 +4401,7 @@
             setText('playerDef', player.stats.def);
             setText('monsterAtk', battle.currentEnemy.atk);
             setText('monsterDef', battle.currentEnemy.def);
-            document.getElementById('monsterSprite').innerHTML = battle.currentEnemy.icon || '👾';
+            setMonsterSprite(battle.currentEnemy.icon, battle.currentEnemy);
 
             // 更新战斗日志（共用日志，仅在有新条目时重绘，保留用户的滚动位置）
             renderBattleLog();
@@ -5874,6 +5949,7 @@
                 skill.level++;
                 const effect = calculateSkillLevelEffect(skillName, skill.level);
                 showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#6f9c8a', 'normal');
+                if (!document.hidden) showQuickCelebration(`${skill.name} 升至 Lv.${skill.level}`);
                 const ms = LIFE_SKILLS.includes(skillName) && milestonesOf(skillName).find(m => m.level === skill.level);
                 if (ms) showNotification(`🏅 ${skill.name}达到 Lv.${ms.level} 里程碑：${ms.desc}`, '#b89a5b');
             }
@@ -6113,7 +6189,36 @@
             recipeSessionCounts[__countKey] = (recipeSessionCounts[__countKey] || 0) + 1;
             if (bonus.batch) return;   // 极速行动（耗时 < 0.5 秒）：由调用方节流刷新界面 / 存档，否则每秒几十次全界面重绘会卡死页面
             updateUI();
+            showGainFloat(act.skill, actionKey, finalOutput);
             saveGame();
+        }
+
+        // 配方完成时在卡片上方飘出这次的收获（v7.15）：修为 / 第一件产物 / 仙窍等，挂在页面最上层，卡片重绘也不影响
+        let lastGainFloatAt = 0;
+        function showGainFloat(skill, actionKey, out) {
+            if (fxReduced() || !out) return;
+            const now = performance.now();
+            if (now - lastGainFloatAt < 350) return;   // 很快的配方不刷屏
+            const card = document.getElementById('action-' + skill + '-' + actionKey);
+            if (!card || !card.offsetParent) return;
+            const r = card.getBoundingClientRect();
+            if (r.bottom < 0 || r.top > window.innerHeight) return;
+            const item = (out.items || []).find(i => i.qty > 0);
+            const cfg = item && GAME_CONFIG.items[item.id];
+            const text = out.cultivation ? `+${fmtXP(out.cultivation)} 修为`
+                : out.xianqiao ? `+${out.xianqiao} 仙窍`
+                : item ? `+${item.qty} ${cfg ? cfg.name : ''}`
+                : out.danhuo ? `+${out.danhuo} 丹火` : out.shenshi ? `+${out.shenshi} 神识` : out.daoguo ? `+${out.daoguo} 道果`
+                : out.exp ? `+${out.exp} 经验` : '';
+            if (!text) return;
+            lastGainFloatAt = now;
+            const f = document.createElement('div');
+            f.className = 'gain-float' + (item && !out.cultivation ? ' gain-item' : '');
+            f.innerHTML = (item && cfg && cfg.icon && !out.cultivation ? `<span class="gain-ico">${cfg.icon}</span>` : '') + text;
+            f.style.left = (r.left + r.width / 2) + 'px';
+            f.style.top = (r.top + Math.min(36, r.height / 3)) + 'px';
+            document.body.appendChild(f);
+            setTimeout(() => f.remove(), 1300);
         }
 
         // 计算技能等级效果显示文本
@@ -8342,7 +8447,10 @@
                 ? Math.min(100, Math.max(0, (getXianqiao() - orificeBase) / (orificeNeed - orificeBase) * 100))
                 : Math.min((gameState.player.cultivationXP / realm.nextReq) * 100, 100);
             document.getElementById('cultivationBar').style.width = percentage + '%';
-            document.getElementById('cultivationProgress').style.width = percentage + '%';
+            const cultBar = document.getElementById('cultivationProgress');
+            cultBar.style.width = percentage + '%';
+            cultBar.classList.toggle('full', percentage >= 100);   // 修为满了：进度条泛光呼吸，提示可以突破
+            cultBar.classList.toggle('flowing', !!(gameState.currentAction && gameState.currentAction.skill === 'cultivation'));   // 正在修炼：一道流光缓缓扫过
             document.getElementById('progressText').textContent = Math.round(percentage) + '%';
             // 修为显示：达到上限时提示可突破；大境界缺丹药时明确写出缺什么
             const full = orificeNeed ? getXianqiao() >= orificeNeed : gameState.player.cultivationXP >= realm.nextReq;
@@ -9275,6 +9383,77 @@
         const fxEase = t => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
         const fxRand = (a, b) => a + Math.random() * (b - a);
 
+        // ---- 所有突破特效共用的一层（v7.15）：水墨压暗背景 → 各境界自己的画面 → 浮动灵气微粒 → 泛光 → 高潮闪光 ----
+        // 原来各特效只盖一层半透明底，底下界面文字透出来和标题混在一起，图形也全是平涂没有光感。
+        // peak = 该境界画面的高潮时刻（金光贯天 / 金丹凝成 / 法则雷落……），标题、闪光、光尘都对准它。
+        const FX_PEAK = { qi: 2.1, foundation: 2.3, core: 2.0, nascent: 2.7, law: 1.9, unity: 2.4, voidfx: 3.0, dacheng: 3.3, minor: 0.25 };
+        // 各境界画面的中心高度（占屏幕高度的比例），闪光和光尘从这里迸出
+        const FX_CY = { qi: 0.32, foundation: 0.7, core: 0.32, nascent: 0.36, law: 0.32, unity: 0.32, voidfx: 0.32, dacheng: 0.34, minor: 0.42 };
+        let fxCy = 0.42;
+        const FX_TINT = { qi: null, foundation: '232, 200, 120', core: '240, 200, 90', nascent: '150, 240, 226', law: '176, 168, 255', unity: '200, 220, 160', voidfx: '190, 170, 255', dacheng: '236, 196, 255', minor: '232, 204, 140' };
+        function fxBackdrop(ctx, W, H, t, dur, major) {
+            const a = Math.min(1, t / 0.45) * Math.max(0, Math.min(1, (dur - t) / 0.6));
+            const cy = major ? H * 0.45 : H * 0.38;
+            const g = ctx.createRadialGradient(W / 2, cy, 0, W / 2, cy, Math.max(W, H) * 0.8);
+            if (major) {
+                g.addColorStop(0, `rgba(18, 16, 11, ${0.74 * a})`);
+                g.addColorStop(1, `rgba(3, 3, 2, ${0.94 * a})`);
+            } else {   // 小境界不挡操作：只在文字周围压暗一圈
+                g.addColorStop(0, `rgba(12, 11, 8, ${0.62 * a})`);
+                g.addColorStop(0.35, `rgba(12, 11, 8, ${0.32 * a})`);
+                g.addColorStop(1, 'rgba(12, 11, 8, 0)');
+            }
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, W, H);
+        }
+        function fxMakeMotes(major, W, H) {
+            const n = major ? 70 : 0;
+            return {
+                drift: Array.from({ length: n }, () => ({ x: fxRand(0, W), y: fxRand(0, H), r: fxRand(0.6, 2.2), v: fxRand(12, 40), ph: fxRand(0, 6.28), sway: fxRand(6, 18) })),
+                burst: Array.from({ length: major ? 46 : 22 }, () => ({ a: fxRand(0, 6.28), v: fxRand(0.35, 1), r: fxRand(1, 2.8), life: fxRand(0.7, 1.4) }))
+            };
+        }
+        function fxMotes(ctx, W, H, t, dur, peak, m, tint, major) {
+            const fadeOut = Math.max(0, Math.min(1, (dur - t) / 0.7));
+            ctx.globalCompositeOperation = 'lighter';
+            m.drift.forEach(q => {   // 天地灵气：缓缓上浮、明灭闪烁
+                const y = ((q.y - t * q.v) % H + H) % H;
+                const x = q.x + Math.sin(t * 1.3 + q.ph) * q.sway;
+                const tw = 0.35 + 0.65 * Math.abs(Math.sin(t * 2.2 + q.ph));
+                ctx.fillStyle = `rgba(${tint}, ${0.55 * tw * Math.min(1, t / 0.6) * fadeOut})`;
+                ctx.beginPath(); ctx.arc(x, y, q.r, 0, Math.PI * 2); ctx.fill();
+            });
+            const bt = t - peak;   // 高潮时从中心迸出一圈光尘
+            if (bt > 0) {
+                const cx = W / 2, cy = H * fxCy, R = Math.min(W, H) * (major ? 0.55 : 0.32);
+                m.burst.forEach(q => {
+                    const k = bt / q.life;
+                    if (k >= 1) return;
+                    const d = fxEase(k) * R * q.v;
+                    ctx.fillStyle = `rgba(${tint}, ${0.9 * (1 - k)})`;
+                    ctx.beginPath(); ctx.arc(cx + Math.cos(q.a) * d, cy + Math.sin(q.a) * d, q.r * (1 - k * 0.6), 0, Math.PI * 2); ctx.fill();
+                });
+            }
+            ctx.globalCompositeOperation = 'source-over';
+        }
+        function fxFlash(ctx, W, H, t, peak, tint, major) {
+            const bt = t - peak;
+            if (bt < 0 || bt > 1.2) return;
+            const cx = W / 2, cy = H * fxCy;
+            const a = (major ? 0.5 : 0.28) * Math.exp(-bt / 0.2);
+            ctx.globalCompositeOperation = 'lighter';
+            const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.7);
+            g.addColorStop(0, `rgba(255, 246, 220, ${a})`);
+            g.addColorStop(0.3, `rgba(${tint}, ${a * 0.5})`);
+            g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+            const k = Math.min(1, bt / 0.9);   // 冲击波：一圈迅速扩散变淡的光环
+            ctx.strokeStyle = `rgba(${tint}, ${0.7 * (1 - k)})`;
+            ctx.lineWidth = (major ? 5 : 3) * (1 - k) + 0.5;
+            ctx.beginPath(); ctx.arc(cx, cy, 20 + fxEase(k) * Math.max(W, H) * (major ? 0.6 : 0.3), 0, Math.PI * 2); ctx.stroke();
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
         // ---- 各特效的绘制函数：draw(ctx, W, H, t, s)，t 为秒，s 为该特效的持久状态 ----
         function fxDrawMinor(ctx, W, H, t, s) {
             const cx = W / 2, cy = H * 0.42;
@@ -9788,9 +9967,12 @@
             let cfg = major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null;
             if (cfg && cfg.kind === 'qi') cfg = { ...cfg, line: `${(SPIRIT_ROOT_EFFECTS[gameState.player.spiritRoot] || {}).name || '灵根'}觉醒，引气入体` };
             const dur = major ? cfg.dur : 1.6;
+            const peak = major ? (FX_PEAK[cfg.kind] || dur * 0.5) : FX_PEAK.minor;
             const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             const el = document.createElement('div');
             el.className = 'fx-overlay ' + (major ? 'fx-major fx-' + cfg.kind : 'fx-minor') + (reduce ? ' fx-reduced' : '');
+            el.style.setProperty('--fx-dur', dur + 's');
+            el.style.setProperty('--fx-peak', Math.max(0, peak - 0.15) + 's');
             el.setAttribute('aria-hidden', 'true');
             el.innerHTML = (reduce ? '' : '<canvas class="fx-canvas"></canvas>') + (major
                 ? `<div class="fx-text"><div class="fx-title">${cfg.name.split('').join(' ')}</div><div class="fx-sub">${realmName} · ${cfg.line}</div><div class="fx-skip">点击任意处跳过</div></div>`
@@ -9809,11 +9991,33 @@
             const ctx = canvas.getContext('2d');
             const drawer = FX_DRAWERS[major ? cfg.kind : 'minor'];
             const s = {};
+            const kindKey = major ? cfg.kind : 'minor';
+            fxCy = FX_CY[kindKey] || 0.4;
+            const tint = FX_TINT[kindKey] || (() => { const hex = ROOT_FX_COLORS[gameState.player.spiritRoot] || '#d8c078'; return [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(', '); })();
+            const motes = fxMakeMotes(major, W, H);
+            // 泛光：把画面缩到 1/4 再放大叠加（相当于便宜的模糊），亮的地方自然晕开
+            const bloom = document.createElement('canvas');
+            bloom.width = Math.max(1, Math.ceil(W / 4)); bloom.height = Math.max(1, Math.ceil(H / 4));
+            const bctx = bloom.getContext('2d');
             fxState.draw = t => {
                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
                 ctx.clearRect(0, 0, W, H);
+                ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+                fxBackdrop(ctx, W, H, t, dur, major);
+                ctx.save();
                 ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic'; ctx.globalAlpha = 1; ctx.shadowBlur = 0;
                 drawer(ctx, W, H, t, s);
+                ctx.restore();
+                fxMotes(ctx, W, H, t, dur, peak, motes, tint, major);
+                bctx.clearRect(0, 0, bloom.width, bloom.height);
+                bctx.drawImage(canvas, 0, 0, bloom.width, bloom.height);
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.globalAlpha = major ? 0.6 : 0.45;
+                ctx.drawImage(bloom, 0, 0, canvas.width, canvas.height);
+                ctx.restore();
+                fxFlash(ctx, W, H, t, peak, tint, major);
             };
             const start = performance.now();
             const frame = now => {
