@@ -367,6 +367,7 @@
                         ],
                         random: [
                             { id: 'taiyiessence', qty: [5, 9], probability: 1 },
+                            { id: 'xianlingjing', qty: [3, 6], probability: 1 },
                             { id: 'voidcrystal', qty: [6, 11], probability: 1 }
                         ],
                         coins: [42000, 67000],
@@ -552,7 +553,8 @@
                         void_nectar: { name: '虚无仙酿', desc: '悟道果 ×4 + 悟道茶 ×5 + 虚晶 ×1（战斗食物：恢复3500生命）', duration: 100, output: { items: [{ id: 'void_nectar', qty: 2 }], skill: 'alchemy', exp: 1300 }, requiredLevel: 54, requires: { daofruit: 4, tea: 5, voidcrystal: 1 }, unlocked: false },
                         // 大乘期炼丹（索引70/74解锁）
                         dacheng_pill_alchemy: { name: '大乘丹', desc: '九叶莲 ×12 + 悟道茶 ×14 + 太乙精华 ×3（合体圆满突破必需）', duration: 210, output: { items: [{ id: 'dachengpill', qty: 1 }], skill: 'alchemy', exp: 2600 }, requiredLevel: 70, requires: { lotus: 12, tea: 14, taiyiessence: 3 }, unlocked: false },
-                        taiyi_nectar: { name: '太乙琼浆', desc: '悟道果 ×5 + 悟道茶 ×6 + 太乙精华 ×1（战斗食物：恢复6500生命）', duration: 150, output: { items: [{ id: 'taiyi_nectar', qty: 2 }], skill: 'alchemy', exp: 3000 }, requiredLevel: 74, requires: { daofruit: 5, tea: 6, taiyiessence: 1 }, unlocked: false }
+                        taiyi_nectar: { name: '太乙琼浆', desc: '悟道果 ×5 + 悟道茶 ×6 + 太乙精华 ×1（战斗食物：恢复6500生命）', duration: 150, output: { items: [{ id: 'taiyi_nectar', qty: 2 }], skill: 'alchemy', exp: 3000 }, requiredLevel: 74, requires: { daofruit: 5, tea: 6, taiyiessence: 1 }, unlocked: false },
+                        xian_dew: { name: '仙灵玉露', desc: '悟道果 ×5 + 悟道茶 ×6 + 仙灵晶 ×1（战斗食物：恢复9500生命）', duration: 170, output: { items: [{ id: 'xian_dew', qty: 2 }], skill: 'alchemy', exp: 3600 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { daofruit: 5, tea: 6, xianlingjing: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -594,7 +596,11 @@
                         dacheng_sword: { name: '大乘剑', desc: '太乙精华 ×4 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengsword', qty: 1 }], skill: 'forging', exp: 3400 }, requiredLevel: 76, requires: { taiyiessence: 4, chaosstone: 4 }, unlocked: false },
                         life_refine_5: { name: '祭炼青竹蜂云剑·五重', desc: '万年金雷竹 ×1 + 太乙精华 ×4 + 混沌石 ×4｜本命法宝攻击升至大乘级（须上品以上金丹）', duration: 180, output: { lifeRefine: 5, skill: 'forging', exp: 3400 }, requiredLevel: 76, requiredRealmIndex: 38, requires: { jinleizhu: 1, taiyiessence: 4, chaosstone: 4 }, unlocked: false },
                         dacheng_armor: { name: '大乘法衣', desc: '太乙精华 ×5 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengarmor', qty: 1 }], skill: 'forging', exp: 3600 }, requiredLevel: 78, requires: { taiyiessence: 5, chaosstone: 4 }, unlocked: false },
-                        dacheng_pendant: { name: '大乘佩', desc: '太乙精华 ×3 + 灵晶 ×5', duration: 170, output: { items: [{ id: 'dachengpendant', qty: 1 }], skill: 'forging', exp: 3800 }, requiredLevel: 80, requires: { taiyiessence: 3, spiritcrystal: 5 }, unlocked: false }
+                        dacheng_pendant: { name: '大乘佩', desc: '太乙精华 ×3 + 灵晶 ×5', duration: 170, output: { items: [{ id: 'dachengpendant', qty: 1 }], skill: 'forging', exp: 3800 }, requiredLevel: 80, requires: { taiyiessence: 3, spiritcrystal: 5 }, unlocked: false },
+                        // 真仙装备（v7.17）：炼器已满级，改由境界解锁；属性约为大乘装备的 1.35 倍
+                        xian_sword: { name: '真仙剑', desc: '仙灵晶 ×4 + 太乙精华 ×3', duration: 200, output: { items: [{ id: 'xiansword', qty: 1 }], skill: 'forging', exp: 4200 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 4, taiyiessence: 3 }, unlocked: false },
+                        xian_armor: { name: '真仙法衣', desc: '仙灵晶 ×5 + 混沌石 ×4', duration: 200, output: { items: [{ id: 'xianarmor', qty: 1 }], skill: 'forging', exp: 4400 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 5, chaosstone: 4 }, unlocked: false },
+                        xian_pendant: { name: '真仙佩', desc: '仙灵晶 ×3 + 灵晶 ×5', duration: 190, output: { items: [{ id: 'xianpendant', qty: 1 }], skill: 'forging', exp: 4600 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 3, spiritcrystal: 5 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -633,7 +639,8 @@
                         chaosstone: { name: '采混沌石', desc: '产出混沌石', duration: 50, output: { items: [{ id: 'chaosstone', qty: 1 }], skill: 'mining', exp: 600 }, requiredLevel: 43, unlocked: false },
                         daostone: { name: '采天道石', desc: '产出天道石（化虚丹与合体级装备的共用材料）', duration: 60, output: { items: [{ id: 'daostone', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false },
                         voidcrystal: { name: '采虚晶', desc: '产出虚晶（炼虚期材料，化虚 / 炼虚装备）', duration: 60, output: { items: [{ id: 'voidcrystal', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false },
-                        taiyiessence: { name: '采太乙精华', desc: '产出太乙精华（大乘丹与大乘装备的共用材料）', duration: 75, output: { items: [{ id: 'taiyiessence', qty: 1 }], skill: 'mining', exp: 1300 }, requiredLevel: 70, unlocked: false }
+                        taiyiessence: { name: '采太乙精华', desc: '产出太乙精华（大乘丹与大乘装备的共用材料）', duration: 75, output: { items: [{ id: 'taiyiessence', qty: 1 }], skill: 'mining', exp: 1300 }, requiredLevel: 70, unlocked: false },
+                        xianlingjing: { name: '采仙灵晶', desc: '产出仙灵晶（真仙装备与仙灵玉露的材料）', duration: 110, output: { items: [{ id: 'xianlingjing', qty: 1 }], skill: 'mining', exp: 1800 }, requiredLevel: 80, requiredRealmIndex: 42, unlocked: false }
                     },
                     actions: {}
                 },
@@ -789,6 +796,12 @@
                 dachengarmor: { name: '大乘法衣', icon: '🥼', type: 'armor', sellPrice: 15500, stats: { def: 175, hp: 480 } },
                 dachengpendant: { name: '大乘佩', icon: '📿', type: 'jewelry', sellPrice: 10000, stats: { spd: 36, hp: 310 } },
                 taiyi_nectar: { name: '太乙琼浆', icon: '🍶', type: 'food', sellPrice: 6000 },
+                // 真仙期（v7.17）：仙灵晶材料链——九霄战场 / 太清仙域掉落、采矿可采，炼真仙装备与仙灵玉露
+                xianlingjing: { name: '仙灵晶', icon: '💠', type: 'ore', sellPrice: 6000 },
+                xiansword: { name: '真仙剑', icon: '🗡️', type: 'weapon', sellPrice: 19000, stats: { atk: 430 } },
+                xianarmor: { name: '真仙法衣', icon: '🥼', type: 'armor', sellPrice: 21000, stats: { def: 236, hp: 650 } },
+                xianpendant: { name: '真仙佩', icon: '📿', type: 'jewelry', sellPrice: 13500, stats: { spd: 48, hp: 420 } },
+                xian_dew: { name: '仙灵玉露', icon: '🍶', type: 'food', sellPrice: 9000 },
                 nascentsoul_essence: { name: '元婴精魄', icon: '👁️', type: 'material', sellPrice: 2000 },
 
                 // P6/P7 新作物
@@ -967,6 +980,15 @@
                     cooldown: 3.0,
                     minRealm: 38,             // v6.89：原索引29 → +9，大乘初期
                     description: '大乘修士以太乙精华炼制，灵界至高一脉的战斗补给，恢复量远超此前一切战斗食物'
+                },
+                xian_dew: {
+                    id: 'xian_dew',
+                    name: '仙灵玉露',
+                    icon: '🍶',
+                    hpRestore: 9500,          // 恢复HP（v7.17 真仙期）
+                    cooldown: 3.0,
+                    minRealm: 42,
+                    description: '以仙灵晶化开的玉露，真仙修士的战斗补给'
                 }
             },
             // 默认食物配置
@@ -1085,6 +1107,11 @@
                 dachengsword: svg(sword('#fff4d8', '#fff', '#e8b84a', '<circle cx="16" cy="16" r="15" stroke="#f3d36a" stroke-width="1.2" opacity=".8"/>')),
                 dachengarmor: svg(robe('#fff4d8', '#e8b84a', '<path d="M12 24Q14 22 16 24Q18 22 20 24" stroke="#f0d888" stroke-width="1"/>')),
                 dachengpendant: svg(pendant('#f3d36a', '#fff4d8', `${sparkle(25, 22, 2.6)}<circle cx="16" cy="20" r="8" stroke="#f3d36a" stroke-width=".9" opacity=".8"/>`)),
+                xianlingjing: svg(rock('#cbbcff', '#5a3ea8', `<path d="M16 6V26M10 11L22 21M22 11L10 21" stroke="#f4efff" stroke-width="1" opacity=".85"/>${sparkle(8, 8, 2.6, '#f4efff')}${sparkle(25, 23, 2.2, '#f4efff')}`)),
+                xiansword: svg(sword('#f4efff', '#fff', '#a88ae8', '<circle cx="16" cy="16" r="15" stroke="#cbbcff" stroke-width="1.2" opacity=".85"/>')),
+                xianarmor: svg(robe('#f4efff', '#a88ae8', '<path d="M12 24Q14 22 16 24Q18 22 20 24" stroke="#d8ccff" stroke-width="1"/>')),
+                xianpendant: svg(pendant('#a88ae8', '#f4efff', `${sparkle(25, 22, 2.6, '#f4efff')}<circle cx="16" cy="20" r="8" stroke="#cbbcff" stroke-width=".9" opacity=".85"/>`)),
+                xian_dew: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#5a3ea8"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#b8a4f4"/><path d="M10 18Q16 21 22 18" stroke="#f4efff" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2, '#f4efff')}${sparkle(9, 9, 1.8, '#f4efff')}`),
                 taiyi_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#8a6a1a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#f3d36a"/><path d="M10 18Q16 21 22 18" stroke="#fff8dc" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2)}${sparkle(9, 9, 1.8)}`),
                 nascentsoul_essence: svg(`<circle cx="16" cy="16" r="11" fill="#e6e0f8" opacity=".85"/><circle cx="16" cy="16" r="7" fill="#b39ddb"/><circle cx="16" cy="16" r="3" fill="#3a1a6a" stroke="none"/><circle cx="14" cy="14" r="1.2" fill="#fff" stroke="none"/>${sparkle(25, 8, 2.2)}${sparkle(7, 24, 2)}`)
             };
@@ -1129,6 +1156,7 @@
             if (typeof P.daoLaw !== 'number') P.daoLaw = 0;
             if (typeof P.nascentSoul !== 'number') P.nascentSoul = 0;
             if (typeof P.nascentInfuse !== 'number') P.nascentInfuse = 0;
+            if (!P.endless || typeof P.endless !== 'object') P.endless = {};
             if (typeof P.coinRefine !== 'number') P.coinRefine = 0;
             if (typeof P.xianqiao !== 'number') P.xianqiao = 0;
             if (typeof P.marrowCleansed !== 'boolean') P.marrowCleansed = false;
@@ -1342,7 +1370,7 @@
 
         function renderDanhuoUses() {
             const el = document.getElementById('danhuoUses');
-            if (el) el.innerHTML = danhuoUsesHtml();
+            if (el) el.innerHTML = danhuoUsesHtml() + endlessUsesHtml('qiling');
         }
 
         function danhuoUsesHtml() {
@@ -1369,7 +1397,7 @@
 
         function renderShenshiUses() {
             const el = document.getElementById('shenshiUses');
-            if (el) el.innerHTML = shenshiUsesHtml();
+            if (el) el.innerHTML = shenshiUsesHtml() + endlessUsesHtml('shenhun');
         }
 
         // ---- 化神期：身外化身（v6.77，被动加成） ----
@@ -1476,6 +1504,42 @@
         function daoLawCost(level) { return Math.round(25 * Math.pow(level + 1, 1.5)); }
         function isDaoguoUnlocked() { return gameState.player.realmIndex >= 34; }   // v6.89：原索引25 → +9
         function isFused() { return !!(gameState.player.fusion && gameState.player.fusion.active); }
+        // ---- 大乘以后的无上限修炼（v7.17）：给后期溢出的丹火 / 神识 / 道果一个一直花得出去的地方 ----
+        // 审查发现：丹火 / 神识 / 道果原有用途全部加满只要约 1.5 万 / 1.4 万 / 2100，大乘期战斗区域一小时就能攒够，之后只剩数字在涨。
+        // 三条修炼都没有等级上限，费用每级 ×1.15（效果线性增长、费用指数增长，越往后越慢，不会失控）。
+        const ENDLESS_REFINES = {
+            qiling:  { cur: 'danhuo',  icon: '🔥', name: '器灵温养', title: '以丹火温养法宝器灵', unit: '全部装备属性', per: 0.01, base: 2000, realm: 38 },
+            shenhun: { cur: 'shenshi', icon: '👁️', name: '神魂参悟', title: '以神识推演法则', unit: '悟道参悟经验', per: 0.03, base: 2000, realm: 38 },
+            benyuan: { cur: 'daoguo',  icon: '🍎', name: '本源温养', title: '以道果温养本源', unit: '生命 / 防御', per: 0.01, base: 600, realm: 38 }
+        };
+        const ENDLESS_GROWTH = 1.15;
+        function getEndless(k) { return ((gameState.player.endless || {})[k]) || 0; }
+        function endlessCost(k, lv) { return Math.round(ENDLESS_REFINES[k].base * Math.pow(ENDLESS_GROWTH, lv)); }
+        function getEndlessMod(key) {
+            if (key === 'gearPct') return getEndless('qiling') * ENDLESS_REFINES.qiling.per;
+            if (key === 'exp:wudao') return getEndless('shenhun') * ENDLESS_REFINES.shenhun.per;
+            if (key === 'hpPct' || key === 'defPct') return getEndless('benyuan') * ENDLESS_REFINES.benyuan.per;
+            return 0;
+        }
+        function upgradeEndless(k) {
+            const P = ensureCurrencyState(), cfg = ENDLESS_REFINES[k];
+            if (P.realmIndex < cfg.realm) { showNotification(`🔒 ${cfg.name}需要${getRealmName(cfg.realm)}`, '#c98a3e'); return; }
+            const lv = getEndless(k), cost = endlessCost(k, lv);
+            if ((P[cfg.cur] || 0) < cost) { spendNotify(cfg.cur, cost); return; }
+            P[cfg.cur] -= cost;
+            P.endless = Object.assign({}, P.endless, { [k]: lv + 1 });
+            invalidateLawTotals();
+            calculateStats();
+            showNotification(`${cfg.icon} ${cfg.name} Lv.${lv + 1}：${cfg.unit} +${Math.round((lv + 1) * cfg.per * 100)}%`, '#6f9c8a');
+            afterCurrencySpend();
+        }
+        function endlessUsesHtml(k) {
+            const cfg = ENDLESS_REFINES[k];
+            if (gameState.player.realmIndex < cfg.realm) return '';
+            const lv = getEndless(k), pct = v => Math.round(v * 100);
+            return `<div class="use-card"><div class="use-title">${cfg.icon} ${cfg.name} <small>${cfg.title}：${cfg.unit}每级 +${pct(cfg.per)}%，无等级上限，费用每级 ×${ENDLESS_GROWTH}</small></div>${useRow(`${cfg.icon} ${cfg.name}`, `Lv.${lv}`, `当前 +${pct(lv * cfg.per)}% → +${pct((lv + 1) * cfg.per)}%`, endlessCost(k, lv), cfg.cur, `upgradeEndless('${k}')`, false)}</div>`;
+        }
+
         function getDaoBody() { return gameState.player.daoBody || 0; }
         function getDaoLaw() { return gameState.player.daoLaw || 0; }
 
@@ -1555,7 +1619,7 @@
 
         function renderDaoguoUses() {
             const el = document.getElementById('daoguoUses');
-            if (el) el.innerHTML = daoguoUsesHtml();
+            if (el) el.innerHTML = daoguoUsesHtml() + endlessUsesHtml('benyuan');
         }
 
         // 灵石商城顶部的「聚灵培元」卡片：跟丹火/神识/道果商城顶部的强化区一个风格
@@ -2619,10 +2683,10 @@
             34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 合体期以融合为本：道果页「合道」——元婴分身与身外化身归于本体（不可逆，之后不能再用分身），法力成倍增长：所有主行动速度 +100%、生命/攻击/防御/速度 +15%、身外化身加成翻倍、神识与道果产出提升。合体初期突破中期之前必须合道', `☯️ 借用法则之力：从此斗法的核心不再是法力多寡，而是天地之力——悟道法则里与战斗有关的效果（攻击、生命、防御、速度、暴击、闪避、命中、回复、食物）全部 ×${LAW_POWER_MULT}`, `🌀 元气化形：战斗中每 ${QI_FORM.interval} 秒额外打出一击，无视防御，伤害 = 攻击 × (${QI_FORM.base * 100}% + 八种法则平均等级 × ${QI_FORM.perAvgLevel * 100}%)——法则悟得越深，化形越强`, '⚔️ 道痕荒原战斗区域开放'],
             36: ['⚔️ 合一虚境战斗区域开放'],
             37: ['🌟 太乙圣域秘境开放', '💊 大乘丹配方解锁，突破大乘时服一颗'],
-            38: [`👶 元婴离体助战：从此战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次（无视防御），威力随蜕变等级提高`, `👶 元婴蜕变：修炼页「元婴注灵」把灵力注入元婴——修为只得一半，每次积 1 点灵力，攒够就自动蜕变一级（另耗元婴精魄，大乘级战斗区域 / 秘境掉落），从婴儿形态练到青年形态共 10 级；修为满了也能继续注灵`, `☯️ 法则入门：大乘期起，任何一条法则练满 ${LAW_MASTER_LEVEL} 级就算「入门」——每入门一条，敌人攻击、防御 −${LAW_MASTER_SUPPRESS * 100}%（以法则压制群敌），并且每 ${LAW_STRIKE_INTERVAL} 秒打出一记法则之击（攻击 ×(1 + 入门条数)，无视防御）。法则之力极难领悟，练满一条要十几个小时`, '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放'],
+            38: [`👶 元婴离体助战：从此战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次（无视防御），威力随蜕变等级提高`, `👶 元婴蜕变：修炼页「元婴注灵」把灵力注入元婴——修为只得一半，每次积 1 点灵力，攒够就自动蜕变一级（另耗元婴精魄，大乘级战斗区域 / 秘境掉落），从婴儿形态练到青年形态共 10 级；修为满了也能继续注灵`, `☯️ 法则入门：大乘期起，任何一条法则练满 ${LAW_MASTER_LEVEL} 级就算「入门」——每入门一条，敌人攻击、防御 −${LAW_MASTER_SUPPRESS * 100}%（以法则压制群敌），并且每 ${LAW_STRIKE_INTERVAL} 秒打出一记法则之击（攻击 ×(1 + 入门条数)，无视防御）。法则之力极难领悟，练满一条要十几个小时`, '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放', `♾️ 三条无上限修炼（费用每级 ×${ENDLESS_GROWTH}）：丹火页「器灵温养」全部装备属性每级 +1%，神识页「神魂参悟」悟道参悟经验每级 +3%，道果页「本源温养」生命 / 防御每级 +1%——原有用途加满以后，丹火 / 神识 / 道果仍有去处`],
             40: ['⚔️ 灵界绝境战斗区域开放'],
             41: [`🌌 飞仙劫：一进大乘圆满就可以渡「飞升天劫」（境界感悟面板或突破弹窗进入）。渡过之后体内灵气才开始化为仙灵力——「修炼」页「开辟仙窍」：不产出修为，每次花太乙精华×5 冲开一窍，大乘圆满最多开到 ${XIAN_CONVERT_ORIFICES} 窍，开满即灵气全部转化，可以突破真仙初期（之前攒的修为不影响这次突破）`],
-            42: [`🌟 成就真仙，身体化为道体：每个亮着的仙窍生命 / 防御 +${DAO_BODY_PER_ORIFICE * 100}%（现在 ${XIAN_CONVERT_ORIFICES} 窍 +${XIAN_CONVERT_ORIFICES}%，开满 24 窍 +24%）`, `☯️ 运用法则之力：法则之击的间隔从 ${LAW_STRIKE_INTERVAL} 秒缩短到 ${LAW_STRIKE_INTERVAL_XIAN} 秒`, `🥀 五衰之前三衰：仙窍开到 ${XIAN_SHUAI.map(sh => sh.at).join(' / ')} 窍时，仙衰（${XIAN_SHUAI[0].effect}）、窍衰（${XIAN_SHUAI[1].effect}）、身衰（${XIAN_SHUAI[2].effect}）依次降临，一直生效到渡过为止（各是一场天劫式的单挑，境界感悟面板「渡衰」）。三衰渡尽、打满 24 窍才能突破真仙后期`, '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放'],
+            42: [`🌟 成就真仙，身体化为道体：每个亮着的仙窍生命 / 防御 +${DAO_BODY_PER_ORIFICE * 100}%（现在 ${XIAN_CONVERT_ORIFICES} 窍 +${XIAN_CONVERT_ORIFICES}%，开满 24 窍 +24%）`, `☯️ 运用法则之力：法则之击的间隔从 ${LAW_STRIKE_INTERVAL} 秒缩短到 ${LAW_STRIKE_INTERVAL_XIAN} 秒`, `🥀 五衰之前三衰：仙窍开到 ${XIAN_SHUAI.map(sh => sh.at).join(' / ')} 窍时，仙衰（${XIAN_SHUAI[0].effect}）、窍衰（${XIAN_SHUAI[1].effect}）、身衰（${XIAN_SHUAI[2].effect}）依次降临，一直生效到渡过为止（各是一场天劫式的单挑，境界感悟面板「渡衰」）。三衰渡尽、打满 24 窍才能突破真仙后期`, '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放', '💠 仙灵晶：九霄战场 / 太清仙域掉落，采矿页「采仙灵晶」也能采；炼器页可炼真仙剑 / 真仙法衣 / 真仙佩（约为大乘装备的 1.35 倍），炼丹页可炼仙灵玉露（恢复 9500 生命）'],
             43: ['🏁 真仙后期：二十四窍尽开、三衰已渡，道体生命 / 防御 +24%——当前实现的至高境界，暂无下一境界'],
         };
         LIFE_REFINE_TIERS.slice(1).forEach((t, i) => {
@@ -4526,7 +4590,7 @@
             taiyiField:        [{ id: 'taiyiessence', p: 0.12, qty: 1 }, { id: 'chaosstone', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.02, qty: 1 }],
             lingjieAbyss:      [{ id: 'taiyiessence', p: 0.20, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.03, qty: 1 }],
             // 太乙精华概率比上一档更高：这是「开辟仙窍」的唯一材料，真仙境的战斗本身就是仙窍材料的主要来源
-            xianbattle:        [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'daofruit', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.04, qty: 1 }]
+            xianbattle:        [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'xianlingjing', p: 0.15, qty: 1 }, { id: 'daofruit', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.04, qty: 1 }]
         };
 
         // 掉落数量文字（如 1–2 / 1）
@@ -5527,6 +5591,7 @@
             total += getDomainMod(key);   // 化神期灵域：战斗中对双方同时生效的领域规则（玩家侧这一半）
             total += getAvatarMod(key);   // 化神期身外化身：永久小幅 +攻击/防御
             total += getXianMod(key);   // 真仙：道体（每个亮着的仙窍生命 / 防御 +1%）与三衰
+            total += getEndlessMod(key);   // 大乘以后的无上限修炼：器灵温养 / 神魂参悟 / 本源温养
             return total;
         }
 
