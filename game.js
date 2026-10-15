@@ -10884,13 +10884,103 @@
         }).observe(document.body, { childList: true, subtree: true });
         enhanceClickables();
 
+        // ==================== 美术：界面小图标（v7.12） ====================
+        // 面板文字里常用的 emoji 换成统一画风的线描图标（24×24，描边用 currentColor，跟随 .glyph 的颜色）；
+        // 货币直接用已有的彩色物品图标；灵根色点保留五行颜色。没收录的 emoji 仍走下面的铜色滤镜。
+        // 图标后面藏一份原 emoji 文字（.glyph-txt），textContent / 读屏都不受影响。
+        const UI_GLYPHS = (() => {
+            const g = (inner, cls = '') => ({ html: `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`, cls });
+            const dot = c => ({ html: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5" fill="${c}" stroke="#2b2016" stroke-width="1.2"/><circle cx="10" cy="10" r="1.8" fill="#fff" opacity=".35"/></svg>`, cls: 'glyph-color' });
+            const raw = html => ({ html, cls: 'glyph-color' });
+            const star4 = (x, y, r) => { const k = r * 0.14; return `M${x} ${y - r}C${x + k} ${y - k} ${x + k} ${y - k} ${x + r} ${y}C${x + k} ${y + k} ${x + k} ${y + k} ${x} ${y + r}C${x - k} ${y + k} ${x - k} ${y + k} ${x - r} ${y}C${x - k} ${y - k} ${x - k} ${y - k} ${x} ${y - r}Z`; };
+            const drop = 'M12 3.5C15.5 8 18 11.2 18 14a6 6 0 0 1-12 0c0-2.8 2.5-6 6-10.5Z';
+            const demon = g('<path d="M7.5 9C5.5 8 4.5 6 5 3.5c1.5 1 3 2 4 3.5M16.5 9c2-1 3-3 2.5-5.5-1.5 1-3 2-4 3.5"/><path d="M6 13a6 6 0 0 1 12 0c0 4-2.7 7.5-6 7.5S6 17 6 13Z"/><path d="M8.5 12.2l2.2 1.2M15.5 12.2l-2.2 1.2M9.5 17.2h5"/>');
+            const book = g('<path d="M12 6.5c-2-1.5-5-2-8.5-1.5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5c-3.5-.5-6.5 0-8.5 1.5ZM12 6.5v13"/>');
+            return {
+                '⚔': g('<path d="M4 4l11 11M13 17l4-4M16.5 16.5l3 3"/><path d="M20 4L9 15M11 17l-4-4M7.5 16.5l-3 3"/>'),
+                '🗡': g('<path d="M20 4l-1.2 4.2-9.2 9.2-3-3 9.2-9.2Z"/><path d="M5 13l6 6M7.8 16.2L4 20"/>'),
+                '🔒': g('<rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3M12 14.5v2.5"/>', 'glyph-dim'),
+                '☯': g('<circle cx="12" cy="12" r="9"/><path d="M12 3a4.5 4.5 0 0 1 0 9a4.5 4.5 0 0 0 0 9a9 9 0 0 0 0-18Z" fill="currentColor"/><circle cx="12" cy="7.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="16.5" r="1.3" fill="#15140f" stroke="none"/>'),
+                '🌟': g(`<path d="${star4(12, 12, 9)}"/>`),
+                '✨': g(`<path d="${star4(10, 13.5, 7.5)}"/><path d="${star4(18.5, 5.5, 3.2)}"/>`),
+                '🌀': g('<path d="M12.6 11.4a1.1 1.1 0 1 0-1.2 1.2a2.6 2.6 0 1 0 2.6-2.6a4.4 4.4 0 1 0 4.4 4.4a6.4 6.4 0 1 0-6.4 6.4"/>'),
+                '⚡': g('<path d="M13.5 2.5L5.5 13.5h6l-1.5 8 8-11h-6Z"/>'),
+                '🌌': g('<circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="8.5" ry="3" transform="rotate(-25 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>'),
+                '☄': g('<circle cx="16.5" cy="7.5" r="3.2"/><path d="M14 10L4 20M12.5 7.5L5 15M16.5 11L9.5 18.5"/>'),
+                '🌾': g('<path d="M12 21V6"/><path d="M12 9c-2.6-.6-3.8-2.4-3.8-4.8 2.6.6 3.8 2.4 3.8 4.8Zm0 0c2.6-.6 3.8-2.4 3.8-4.8-2.6.6-3.8 2.4-3.8 4.8ZM12 14c-2.6-.6-3.8-2.4-3.8-4.8 2.6.6 3.8 2.4 3.8 4.8Zm0 0c2.6-.6 3.8-2.4 3.8-4.8-2.6.6-3.8 2.4-3.8 4.8Z"/>'),
+                '💊': g('<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.6 8.6l4.8 6.8"/>'),
+                '🛡': g('<path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6Z"/><path d="M12 7v10"/>'),
+                '📜': g('<path d="M7 5h11.5v12.5a2 2 0 0 1-2 2H5.5"/><path d="M5.5 19.5a2 2 0 0 0 2-2V5a2 2 0 0 0-4 0v2.5H7"/><path d="M10.5 9h5M10.5 12.5h5"/>'),
+                '👶': g('<path d="M6.5 7a7.8 7.8 0 0 1 11 0"/><circle cx="12" cy="10.5" r="3"/><path d="M7.5 20.5c0-3.3 2-5.6 4.5-5.6s4.5 2.3 4.5 5.6Z"/>'),
+                '🧘': g('<circle cx="12" cy="5" r="2.2"/><path d="M12 7.5v5.5M7.5 12.5l4.5-2.2 4.5 2.2M5 18.5c3-2.8 11-2.8 14 0M7 20.5h10"/>'),
+                '⚠': g('<path d="M12 3.5L21.5 20h-19Z"/><path d="M12 9.5v5"/><circle cx="12" cy="17.2" r=".6" fill="currentColor"/>', 'glyph-warn'),
+                '👹': demon, '😈': demon,
+                '🎍': g('<path d="M9 21V3M15 21V7M7.5 8h3M7.5 14h3M13.5 11.5h3M13.5 17h3"/><path d="M15 7c1.5-2.2 3.5-3.3 6-3.3-1 2.2-3 3.5-6 3.3Z"/>'),
+                '🔮': g('<circle cx="12" cy="10" r="6.5"/><path d="M8.5 17.5h7l1.5 3h-10ZM9 8a3.5 3.5 0 0 1 3-2.5"/>'),
+                '👤': g('<circle cx="12" cy="8" r="3.8"/><path d="M4.5 20.5c0-4 3.4-7 7.5-7s7.5 3 7.5 7"/>'),
+                '🎓': g('<path d="M2.5 9L12 5l9.5 4L12 13Z"/><path d="M6.5 11v4.5c3 2 8 2 11 0V11M21.5 9v5"/>'),
+                '💀': g('<path d="M12 3a7 7 0 0 0-7 7c0 2.6 1.4 4.3 3 5.3V19.5h8v-4.2c1.6-1 3-2.7 3-5.3a7 7 0 0 0-7-7Z"/><circle cx="9.3" cy="10.5" r="1.4" fill="currentColor"/><circle cx="14.7" cy="10.5" r="1.4" fill="currentColor"/><path d="M10.5 19.5v-2.2M13.5 19.5v-2.2"/>'),
+                '⚱': g('<path d="M4 9h16M5.5 9v3a6.5 6.5 0 0 0 13 0V9M7.5 9V5.5M16.5 9V5.5M8.5 17.5l-1.2 3.5M15.5 17.5l1.2 3.5M12 18.5v3"/>'),
+                '🌊': g('<path d="M3 9.5c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 14.5c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 19.5c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/>'),
+                '🌱': g('<path d="M12 20.5v-8"/><path d="M12 12.5C12 9 9.5 7 5.5 7c0 3.5 2.5 5.5 6.5 5.5ZM12 13.5c0-3 2.2-5 5.5-5 0 3-2.2 5-5.5 5Z"/><path d="M7 20.5h10"/>'),
+                '🌿': g('<path d="M6 20C9 15 12 9 18.5 4.5"/><path d="M9.5 15C7 15 5 13.5 4.5 11c2.5 0 4.5 1.5 5 4ZM12.5 11c-.3-2.6.8-4.6 3-5.8.3 2.6-.8 4.6-3 5.8ZM13 13.5c2.5-.8 4.6 0 6 2-2.5.8-4.6 0-6-2Z"/>'),
+                '💧': g(`<path d="${drop}"/><path d="M9 14.5a3 3 0 0 0 2 2.5"/>`),
+                '🩸': g(`<path d="${drop}" fill="currentColor"/>`, 'glyph-warn'),
+                '🌈': g('<path d="M3 18a9 9 0 0 1 18 0M6.5 18a5.5 5.5 0 0 1 11 0M10 18a2 2 0 0 1 4 0"/>'),
+                '🧪': g('<path d="M9.5 3.5h5M10.5 3.5v6L5 19a1.5 1.5 0 0 0 1.3 2h11.4a1.5 1.5 0 0 0 1.3-2l-5.5-9.5v-6M7.6 15h8.8"/>'),
+                '📖': book, '🕮': book,
+                '🔨': g('<path d="M13.5 10l6.5 6.5a1.5 1.5 0 0 1-2.1 2.1L11.4 12.1"/><path d="M4 8.5l5-5 4.5 4.5-5 5Z"/>'),
+                '⛏': g('<path d="M4.5 20.5L15 10"/><path d="M9.5 5Q18 5.5 19 14.5" stroke-width="2.6"/>'),
+                '📦': g('<path d="M12 3l8 4v10l-8 4-8-4V7Z"/><path d="M4 7l8 4 8-4M12 11v10"/>'),
+                '🎁': g('<rect x="4" y="9" width="16" height="11.5" rx="1"/><path d="M3 9h18M12 9v11.5M12 9c-1-3.5-5.5-4.5-5.5-1.8 0 1.5 2.5 1.8 5.5 1.8Zm0 0c1-3.5 5.5-4.5 5.5-1.8 0 1.5-2.5 1.8-5.5 1.8Z"/>'),
+                '🥀': g('<path d="M8 21V12C8 7 11 4.5 14.5 4.5S20 7 19.5 10.5"/><path d="M17 11h5l-.8 3.2c-.4 1.8-3 1.8-3.4 0Z"/><path d="M5 21h14M14.5 18.5c1.3-.8 2.6-.6 3.4.4"/>'),
+                '🕳': g('<ellipse cx="12" cy="14" rx="8.5" ry="4"/><ellipse cx="12" cy="14.5" rx="5" ry="2" fill="currentColor"/>'),
+                '🍂': g('<path d="M5 19C5 11 10 5 19.5 4.5 19 14 13 19 5 19Z"/><path d="M5 19l9-9M9.5 14.5h4M12 12V8.5"/>'),
+                '🏁': g('<path d="M5.5 21V3.5"/><path d="M5.5 4.5c4-2 6.5 2 13 0v9c-6.5 2-9-2-13 0"/>'),
+                '📌': g('<path d="M9 3.5h6M10 3.5l-.5 6L6.5 13h11l-3-3.5-.5-6M12 13v7.5"/>'),
+                '📊': g('<path d="M3 20.5h18M6 20V13M10.5 20V6.5M15 20v-9M19.5 20v-5"/>'),
+                '✅': g('<rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M8 12.5l3 3 5.5-6"/>', 'glyph-ok'),
+                '❌': g('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>', 'glyph-warn'),
+                '🏪': g('<path d="M4 9.5L5.5 4h13L20 9.5M4 9.5c0 1.5 1.2 2.5 2.7 2.5S9.3 11 9.3 9.5c0 1.5 1.2 2.5 2.7 2.5s2.7-1 2.7-2.5c0 1.5 1.2 2.5 2.6 2.5S20 11 20 9.5M5.5 12v8.5h13V12M10 20.5V15h4v5.5"/>'),
+                '⚙': g('<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>'),
+                '🎒': g('<path d="M9 7h6l-1.3 2.3c3.6 1.4 5.3 4.4 5.3 7.4 0 2.8-2.6 4.3-7 4.3s-7-1.5-7-4.3c0-3 1.7-6 5.3-7.4Z"/><path d="M8.5 4.5L12 7l3.5-2.5M9.5 9.5h5"/>'),
+                '📿': g('<circle cx="12" cy="4.5" r="1.6"/><circle cx="17.3" cy="6.7" r="1.6"/><circle cx="19.5" cy="12" r="1.6"/><circle cx="17.3" cy="17.3" r="1.6"/><circle cx="6.7" cy="17.3" r="1.6"/><circle cx="4.5" cy="12" r="1.6"/><circle cx="6.7" cy="6.7" r="1.6"/><path d="M12 19v2.5M10.5 21.5h3"/>'),
+                '🌙': g('<path d="M19 14.5A7.5 7.5 0 1 1 9.5 5a6 6 0 0 0 9.5 9.5Z"/>'),
+                '🔔': g('<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15ZM10 20.5a2 2 0 0 0 4 0"/>'),
+                '⏰': g('<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4.5l3 2M4 5.5l3-2.5M20 5.5l-3-2.5"/>'),
+                '🔁': g('<path d="M4 10.5V9a3 3 0 0 1 3-3h12M16 3l3 3-3 3M20 13.5V15a3 3 0 0 1-3 3H5M8 21l-3-3 3-3"/>'),
+                '❄': g('<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5L12 7l2.5-2.5M9.5 19.5L12 17l2.5 2.5"/>'),
+                '🌪': g('<path d="M3.5 5h17M5.5 9h13M8 13h9M10 17h5.5M12 21h2"/>'),
+                '🍶': g('<path d="M10 3.5h4M10.5 3.5v3c-3 1.5-4.5 4-4.5 7.5 0 4 2.5 6.5 6 6.5s6-2.5 6-6.5c0-3.5-1.5-6-4.5-7.5v-3M7 13h10"/>'),
+                '🔍': g('<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>'),
+                '⭕': g('<circle cx="12" cy="12" r="7.5"/>'),
+                '🏛': g('<path d="M3 9.5L12 4l9 5.5M4.5 9.5h15M6 9.5v8.5M10 9.5v8.5M14 9.5v8.5M18 9.5v8.5M3.5 18.5h17M3 21h18"/>'),
+                '⏱': g('<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M10 3h4M12 3v3M18.5 6.5l1.5-1.5"/>'),
+                '⏹': g('<rect x="6" y="6" width="12" height="12" rx="1.5"/>'),
+                '⭐': g('<path d="M12 3.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9l-5.3 2.7 1-5.8-4.2-4.1 5.9-.9Z"/>'),
+                '❤': g('<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/>', 'glyph-warn'),
+                '💪': g('<path d="M3.5 9.5v5M6.5 7v10M17.5 7v10M20.5 9.5v5M6.5 12h11"/>'),
+                '🍽': g('<circle cx="12" cy="13" r="6"/><circle cx="12" cy="13" r="3"/><path d="M3.5 4v5c0 1 .7 1.5 1.5 1.5S6.5 10 6.5 9V4M5 10.5V20M20.5 4c-1.5 0-2.5 2-2.5 5s1 3.5 2.5 3.5V20"/>'),
+                '💾': g('<path d="M5 4h11.5L20 7.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M8 4v5h7V4M7.5 20v-6h9v6"/>'),
+                '🗑': g('<path d="M4.5 6.5h15M9.5 6.5V4h5v2.5M6.5 6.5l1 13.5h9l1-13.5M10 10.5v6M14 10.5v6"/>'),
+                '📥': g('<path d="M12 3.5v10M8 9.5l4 4 4-4M4 14.5v4.5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4.5"/>'),
+                '📤': g('<path d="M12 13.5v-10M8 7.5l4-4 4 4M4 14.5v4.5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4.5"/>'),
+                '🔀': g('<path d="M4 7h3.5c4.5 0 4.5 10 9 10H20M4 17h3.5c1.8 0 2.8-1.6 3.6-3.5M13 10.5C13.8 8.6 14.8 7 16.5 7H20M17 4l3 3-3 3M17 14l3 3-3 3"/>'),
+                '📝': g('<path d="M14 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/><path d="M8.5 9h4M8.5 13h6M8.5 17h6M18 3l2.5 2.5-7 7H11v-2.5Z"/>'),
+                '💡': g('<path d="M9 17.5h6M10 20.5h4M12 3.5a6 6 0 0 0-3.5 10.9c.4.4.5.9.5 1.4v1.7h6v-1.7c0-.5.2-1 .5-1.4A6 6 0 0 0 12 3.5Z"/>'),
+                '🎨': g('<path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.5 0 2-1 1.5-2.2-.6-1.3.2-2.8 1.7-2.8H17a3.5 3.5 0 0 0 3.5-3.5c0-4.7-3.8-8.5-8.5-8.5Z"/><circle cx="8" cy="10.5" r="1.1" fill="currentColor"/><circle cx="11.5" cy="7.5" r="1.1" fill="currentColor"/><circle cx="15.5" cy="9" r="1.1" fill="currentColor"/>'),
+                '💎': raw(COIN_ICON), '🔥': raw(DANHUO_ICON), '👁': raw(SHENSHI_ICON), '🍎': raw(DAOGUO_ICON),
+                '🟡': dot('#d8b24a'), '🟢': dot('#6fae6a'), '🔵': dot('#5a8ac8'), '🔴': dot('#c4483a'), '🟤': dot('#9a6a3a'), '🟣': dot('#8a6ad0'), '⚪': dot('#d8d0bc'), '⚫': dot('#3a362c')
+            };
+        })();
+
         // ==================== 美术：彩色 emoji 统一染成褪色铜色 ====================
         // 把文字里的 emoji 包进 <span class="emo">，样式里用滤镜做成单色铜色，与整体色板一致
         const EMOJI_TEST = /\p{Extended_Pictographic}/u;
         const EMOJI_SPLIT = /(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*)/gu;
         function tintEmoji(root) {
             if (!root) return;
-            const skip = 'script, style, textarea, select, option, title, .emo';
+            const skip = 'script, style, textarea, select, option, title, .emo, .glyph';
             const nodes = [];
             if (root.nodeType === 3) {
                 nodes.push(root);
@@ -10907,8 +10997,15 @@
                     if (!part) return;
                     if (i % 2 === 1) {
                         const span = document.createElement('span');
-                        span.className = 'emo';
-                        span.textContent = part;
+                        const glyph = UI_GLYPHS[part.replace(/️/g, '')];
+                        if (glyph) {
+                            span.className = 'glyph' + (glyph.cls ? ' ' + glyph.cls : '');
+                            span.innerHTML = glyph.html + '<span class="glyph-txt"></span>';
+                            span.lastChild.textContent = part;
+                        } else {
+                            span.className = 'emo';
+                            span.textContent = part;
+                        }
                         frag.appendChild(span);
                     } else {
                         frag.appendChild(document.createTextNode(part));

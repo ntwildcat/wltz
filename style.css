@@ -2279,3 +2279,19 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
     .recipe-card .action-progress-bar { margin-top: 6px; }
     .action-item.disabled .rc-art.locked { height: 36px; font-size: 18px; }
 }
+
+/* ===== v7.12 界面小图标：emoji → 线描图标（UI_GLYPHS） ===== */
+.glyph { display: inline-block; position: relative; width: 1.1em; height: 1.1em; vertical-align: -0.18em; color: var(--text-l2); line-height: 1; }
+.glyph > svg { width: 100%; height: 100%; display: block; }
+.glyph-color > svg, .glyph-color > .ico { width: 100%; height: 100%; }
+.glyph-dim { color: var(--text-l4); }
+.glyph-warn { color: var(--cinnabar-2); }
+.glyph-ok { color: var(--jade); }
+.glyph-txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* 境界感悟里的行内按钮（渡劫 / 渡衰 / 精元开关）：手机端不套用 44px 大按钮 */
+@media (max-width: 768px) {
+    #realmLoreBox .btn, #realmLoreMobileBox .btn { min-height: 0 !important; padding: 1px 10px !important; font-size: 0.92em !important; margin-left: 6px; vertical-align: baseline; }
+}
+/* 设置页：标签不折行，右侧说明文字自己换行；「查看」类按钮是次要操作 */
+#panel-settings .stat-row > .stat-label { flex: none; white-space: nowrap; margin-right: 10px; }
+#panel-settings .stat-row > label:not(.stat-label) { flex: 1; min-width: 0; }
