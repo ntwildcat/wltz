@@ -747,6 +747,8 @@
                 jade: { name: '灵玉', icon: '📿', type: 'jewelry', sellPrice: 80, effect: { workSpeed: 0.95 } },
                 // 礼包码专属（测试用）：所有工作耗时 ×0.01（速度 ×100），修炼速度 ×100；只能通过礼包码获得
                 test_ring: { name: '天机灵环', icon: '💍', type: 'jewelry', sellPrice: 10000, effect: { workSpeed: 0.01, cultSpeed: 99 } },
+                // 开发者测试用（v7.17）：所有生活技能 / 悟道耗时 ×1/500、修炼速度 ×500；不进任何掉落 / 商城 / 配方，只手动加进测试存档
+                test_ring_500: { name: '天机灵环·极', icon: '💍', type: 'jewelry', sellPrice: 0, effect: { workSpeed: 0.002, cultSpeed: 499 } },
 
                 // P6 丹火相关物品
                 danhuo_seed: { name: '丹火种子', icon: '🔥', type: 'seed', sellPrice: 50 },
@@ -1047,6 +1049,7 @@
                 immortalore: svg(rock('#c9b479', '#8a743a', `<path d="M9 22L14 15L18 20L24 12" stroke="#fff2b0" stroke-width="1.8"/>${sparkle(8, 9, 2.6)}${sparkle(25, 24, 2.2)}${sparkle(23, 7, 2)}`)),
                 chaosstone: svg(`<circle cx="16" cy="16" r="12" fill="#2a2440"/><path d="M16 4A12 12 0 0 1 16 28A6 6 0 0 1 16 16A6 6 0 0 0 16 4Z" fill="#6a4fa8" stroke="none"/><circle cx="16" cy="10" r="1.8" fill="#2a2440" stroke="none"/><circle cx="16" cy="22" r="1.8" fill="#c9b8f0" stroke="none"/><circle cx="16" cy="16" r="12" stroke="#8a72c8" stroke-width=".8"/>`),
                 spiritstone: svg(`<path d="M8 10L16 4L24 10L26 21L16 28L6 21Z" fill="#59c9b0"/><path d="M8 10L16 15L24 10M16 15V28M6 21L16 15L26 21" stroke="#c6fff0" stroke-width=".9"/><path d="M8 10L6 21L16 15Z" fill="#3ea08e" stroke="none" opacity=".7"/>${sparkle(24, 5, 2.2)}`),
+                test_ring_500: svg(`<circle cx="16" cy="19" r="8" stroke="#c8b8ff" stroke-width="3.4"/><circle cx="16" cy="19" r="8" stroke="#5a3ea8" stroke-width=".8"/><path d="M11.5 9L16 3.5L20.5 9L16 14Z" fill="#ff9ad8"/><path d="M16 3.5V14M11.5 9H20.5" stroke="#fff0fa" stroke-width=".8"/>${sparkle(26, 6, 2.4)}${sparkle(6, 25, 2)}${sparkle(26, 27, 1.8)}`),
                 test_ring: svg(`<circle cx="16" cy="19" r="8" stroke="#e2c27a" stroke-width="3.4"/><circle cx="16" cy="19" r="8" stroke="#8a6a2a" stroke-width=".8"/><path d="M11.5 9L16 3.5L20.5 9L16 14Z" fill="#7fe0e8"/><path d="M16 3.5V14M11.5 9H20.5" stroke="#dffcff" stroke-width=".8"/>${sparkle(26, 6, 2.4)}${sparkle(6, 25, 2)}`),
                 jade: svg(`<path d="M12 4Q16 8 20 4" stroke="#c9b07a" stroke-width="1.3"/><circle cx="16" cy="18" r="10" fill="#7fc49a"/><circle cx="16" cy="18" r="3.6" fill="#1c1812" stroke-width="1"/><path d="M9 14Q11 10 15 9" stroke="#d6ffe6" stroke-width="1.4" opacity=".8"/><path d="M16 12V14M16 22V24M10 18H12M20 18H22" stroke="#4f9a72" stroke-width=".8"/>`),
                 // —— 丹药 ——
