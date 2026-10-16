@@ -6942,8 +6942,14 @@
 
             // 按解锁等级/境界从低到高排序，不再是 GAME_CONFIG 里写的原始顺序——配方是分多个版本陆续加的，
             // 新配方大多直接追加在对象末尾，写入顺序跟需要的等级早就对不上了（用户反馈：很多配方顺序不是按等级来的）
-            const sortedEntries = Object.entries(skill.recipes).sort(([, a], [, b]) =>
-                getRecipeUnlockState(skillName, a).requiredValue - getRecipeUnlockState(skillName, b).requiredValue);
+            // v7.18：排序键固定为「所需等级 → 所需境界」（修炼只看境界）。原来用 getRecipeUnlockState().requiredValue，
+            // 那是"当前卡住你的条件"的数值：等级够了、境界不够时变成境界索引（22、42），和等级混在一起比，
+            // 祭炼青竹蜂云剑·一重（36 级 / 元婴）会排到 20 级和 25 级之间、仙灵玉露（80 级 / 真仙）排到 40 级和 45 级之间。
+            const sortKey = r => skillName === 'cultivation' ? [r.requiredRealmIndex || 0, 0] : [r.requiredLevel || 1, r.requiredRealmIndex || 0];
+            const sortedEntries = Object.entries(skill.recipes).sort(([, a], [, b]) => {
+                const ka = sortKey(a), kb = sortKey(b);
+                return ka[0] - kb[0] || ka[1] - kb[1];
+            });
 
             const entries = [];
             sortedEntries.forEach(([key, recipe]) => {
