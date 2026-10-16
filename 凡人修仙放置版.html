@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#e9e2cf">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#15140f">
     <title>凡人修仙放置版</title>
     <script>
         // 配色主题（v7.20）：全局偏好，不跟存档走；在样式表加载前就写到 <html data-theme>，避免首屏先闪一下别的配色
         (function () {
             var THEMES = { xuanzhi: '#e9e2cf', qinglv: '#0b1517', xuanye: '#0c0b17', songyan: '#15140f' };
-            var t = 'xuanzhi';
+            var t = 'songyan';
             try { var saved = localStorage.getItem('xiuxianTheme'); if (saved && THEMES[saved]) t = saved; } catch (e) {}
             document.documentElement.setAttribute('data-theme', t);
             var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', THEMES[t]);
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=13.61">
+    <link rel="stylesheet" href="style.css?v=13.62">
 
 </head>
 <body data-panel="cultivation">
@@ -503,10 +503,10 @@
                                 <div class="stat-row">
                                     <label class="stat-label" for="colorTheme">配色主题:</label>
                                     <select id="colorTheme" name="colorTheme" autocomplete="off" onchange="setColorTheme(this.value)">
-                                        <option value="xuanzhi">宣纸墨韵（浅色，默认）</option>
+                                        <option value="songyan">松烟铜器（默认）</option>
+                                        <option value="xuanzhi">宣纸墨韵（浅色）</option>
                                         <option value="qinglv">青绿山水</option>
                                         <option value="xuanye">玄夜星宿</option>
-                                        <option value="songyan">松烟铜器（旧版配色）</option>
                                     </select>
                                 </div>
                                 <div class="stat-row">
@@ -845,7 +845,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=14.17"></script>
+    <script src="game.js?v=14.18"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

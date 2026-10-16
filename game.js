@@ -6530,12 +6530,12 @@
         }
 
         // 显示设置：字体大小（缩放根字号，界面里以 em 为单位的文字随之缩放）
-        // 配色主题（v7.20）：宣纸墨韵（默认）/ 青绿山水 / 玄夜星宿 / 松烟铜器。全局偏好存 localStorage['xiuxianTheme']，
+        // 配色主题（v7.20）：松烟铜器（默认）/ 宣纸墨韵 / 青绿山水 / 玄夜星宿。全局偏好存 localStorage['xiuxianTheme']，
         // 页面 <head> 里的小脚本在样式表生效前就套上，这里负责切换和同步设置页的下拉框
         const COLOR_THEMES = { xuanzhi: '#e9e2cf', qinglv: '#0b1517', xuanye: '#0c0b17', songyan: '#15140f' };
-        function getColorTheme() { const t = document.documentElement.getAttribute('data-theme'); return COLOR_THEMES[t] ? t : 'xuanzhi'; }
+        function getColorTheme() { const t = document.documentElement.getAttribute('data-theme'); return COLOR_THEMES[t] ? t : 'songyan'; }
         function setColorTheme(t) {
-            if (!COLOR_THEMES[t]) t = 'xuanzhi';
+            if (!COLOR_THEMES[t]) t = 'songyan';
             // 切换瞬间关掉过渡：否则各元素按 0.3s 渐变、半途是两套配色混在一起；折叠的 <details> 里元素的过渡还会卡在旧颜色
             const root = document.documentElement;
             root.classList.add('theme-switching');

@@ -2124,15 +2124,15 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 
 
 /* ==========================================================================
-   v7.20 配色主题：宣纸墨韵（默认）/ 青绿山水 / 玄夜星宿 / 松烟铜器
-   <html data-theme> 由页面头部的小脚本在样式表生效前写好；没有该属性时按宣纸墨韵。
+   v7.20 配色主题：松烟铜器（默认）/ 宣纸墨韵 / 青绿山水 / 玄夜星宿
+   <html data-theme> 由页面头部的小脚本在样式表生效前写好；没有该属性时按松烟铜器。
    各主题只换这组变量，界面里的颜色一律引用变量（不要再写死颜色，否则浅色主题会出现深色块 / 看不见的白字）。
    语义：bg-l1 主面板底、bg-l2 卡片、bg-l3 抬起 / 选中、bg-sunken 进度条底槽与输入框；
         bronze 结构与选中、jade 进度与正向数值、cinnabar 境界印章 / 主按钮 / 待办；
         text-l1 正文、text-l2 强调（标题 / 数值）、text-l3 次要、text-l4 提示（对比度均 ≥ 4.5）；
         gold 金色强调字、azure 冷色信息字、on-accent 朱砂按钮上的字、overlay 弹窗遮罩、page-glow 页面顶部的一层光
    ========================================================================== */
-:root, :root[data-theme="xuanzhi"] {
+:root[data-theme="xuanzhi"] {
     --float-crit: #b07a10; --float-qi: #2a7d62; --float-nascent: #1f7685; --float-law: #5e44b3; --float-shadow: 0 0 3px rgba(255, 252, 244, 0.95), 0 1px 2px rgba(60, 48, 30, 0.35); --float-crit-shadow: 0 0 4px rgba(255, 252, 244, 0.95), 0 1px 3px rgba(60, 48, 30, 0.4);
     color-scheme: light;
     --ink: #e9e2cf; --inkstone: #f3eddf; --inkstone-2: #e6dcc6; --paper: #fbf6ea;
@@ -2171,7 +2171,7 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
     --on-accent: #f6f3ff; --overlay: rgba(5, 4, 12, 0.8); --page-glow: rgba(139, 123, 216, 0.32);
     --shadow-lg: 0 4px 14px rgba(0, 0, 0, 0.65);
 }
-:root[data-theme="songyan"] {
+:root, :root[data-theme="songyan"] {
     --float-crit: #f3c34d; --float-qi: #8fcfb3; --float-nascent: #a8ecf0; --float-law: #d8c8ff; --float-shadow: 2px 2px 4px #000; --float-crit-shadow: 0 0 6px rgba(243, 195, 77, 0.7), 2px 2px 4px #000;
     color-scheme: dark;
     --ink: #15140f; --inkstone: #1f1e18; --inkstone-2: #292720; --paper: #dcd1b6;
@@ -2192,7 +2192,7 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
         radial-gradient(1px 1px at 55% 45%, rgba(255, 255, 255, 0.3), transparent), radial-gradient(1px 1px at 10% 70%, rgba(255, 255, 255, 0.35), transparent);
 }
 /* 宣纸墨韵：纸纹压淡，滚动条改浅 */
-:root[data-theme="xuanzhi"] body::before, :root:not([data-theme]) body::before { opacity: 0.035; }
+:root[data-theme="xuanzhi"] body::before { opacity: 0.035; }
 
 /* 飘字与血条数字：飘字颜色 / 光晕随主题；血条数字统一白字加深色描边，压在填充条或空底槽上都看得清 */
 .damage-float, .damage-float.strike { text-shadow: var(--float-shadow); }
