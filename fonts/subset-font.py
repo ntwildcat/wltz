@@ -17,7 +17,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL = 'https://raw.githubusercontent.com/google/fonts/main/ofl/zhimangxing/ZhiMangXing-Regular.ttf'
 EXTRA = ("暴击斩破碎灭杀化形元婴离体法则之击金木水火土风雷冰道祖劫雷霆天罚心魔恶善尸自我衰败胜利击败重生夺舍狂暴领域灵域叠域"
          "证道侵蚀同化收敛突破成功失败境界飞升渡过仙凡入道封印未解锁一二三四五六七八九十百千万亿零〇+-−×%！？·…「」：，。"
-         "散修长生录一介问道壹贰叁新建角色存档试玩版点击跳过——VS"
+         "散修长生录一介问道壹贰叁新建角色存档试玩版点击跳过——VS闭关归来功法切换继续修行"
          "0123456789+-.%xX!?")
 
 

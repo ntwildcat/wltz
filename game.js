@@ -8709,7 +8709,10 @@
                         <button class="btn equip-btn" onclick="equipFromBag('${i.id}')">装备</button></div>`;
                 }).join('');
             });
-            box.innerHTML = `<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（可以在炼器里打造）</div>'}`;
+            // v7.28 顶部立绘：随境界变化（气焰 / 金丹 / 元婴 / 光环 / 法则环），装了武器才持剑
+            const hero = typeof BattleArt !== 'undefined'
+                ? `<div class="equip-hero">${BattleArt.portrait(gameState.player.spiritRoot, gameState.player.realmIndex, { sword: !!eq.weapon, caption: `${gameState.player.name || '散修'} · ${getRealmName(gameState.player.realmIndex)}` })}</div>` : '';
+            box.innerHTML = `${hero}<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（可以在炼器里打造）</div>'}`;
         }
 
         // 旧存档迁移：装备曾同时保留在背包里，现在装备栏与背包分开。每件已装备的物品从背包扣掉 1 件；
@@ -9472,7 +9475,13 @@
             nameEl.textContent = gameState.player.name || '-';
             nameEl.title = gameState.player.name || '';   // 名字被截断时可悬停查看全名
             const realm = GAME_CONFIG.realms[gameState.player.realmIndex];
-            document.getElementById('realmDisplay').textContent = realm.name;
+            const realmEl = document.getElementById('realmDisplay');
+            if (realmEl.textContent !== realm.name) {
+                const changed = !!realmEl.textContent && realmEl.dataset.realm !== undefined;
+                realmEl.textContent = realm.name;
+                realmEl.dataset.realm = gameState.player.realmIndex;
+                if (changed) pulseClass(realmEl, 'stamped');   // v7.28：境界变了，印章重新盖一下
+            }
             const nextCfg = GAME_CONFIG.realms[gameState.player.realmIndex + 1];
             document.getElementById('nextBreakthrough').textContent = isDaozu() ? '大道尽头' : isGateRealm(nextCfg) ? getRealmGates().map(g => `${g.label} ${g.need}`).join(' · ') : fmtXP(realm.nextReq);
             renderRealmLore();
@@ -12238,7 +12247,7 @@
                 // 更新当前功法显示
                 const artDisplayDiv = document.querySelector('#currentArtDisplay');
                 if (artDisplayDiv) {
-                    artDisplayDiv.innerHTML = `<b class="art-name">${currentArt.name}</b><span class="art-speed">修炼速度 ×${currentArt.speedMultiplier.toFixed(1)}</span>`;
+                    artDisplayDiv.innerHTML = `${currentArt.icon && String(currentArt.icon).startsWith('<svg') ? `<span class="art-icon">${currentArt.icon}</span>` : ''}<b class="art-name">${currentArt.name}</b><span class="art-speed">修炼速度 ×${currentArt.speedMultiplier.toFixed(1)}</span>`;
                 }
                 // 更新功法速度显示
                 const artSpeedDisplay = document.getElementById('artSpeedDisplay');

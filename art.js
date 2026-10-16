@@ -58,11 +58,11 @@ const BattleArt = (() => {
             <path d="M47 85 Q60 89 75 85" stroke="${c}" stroke-width="2.4" fill="none" opacity=".9"/>
             <path d="M49 13 L71 9" stroke="${c}" stroke-width="1.6" stroke-linecap="round"/>
             ${eyes(u, eyeC, 'M66 28.5 L70.5 27.8')}
-            <g class="bs-sword">
-                <path d="M92 79 L96 81 L121 147 L118 148 Z" fill="${c}" opacity=".45" filter="url(#glow${u})"/>
+            ${opts.sword === false ? '' : `<g class="bs-sword">
+                <path d="M92 79 L96 81 L121 147 L118 148 Z" fill="${opts.swordColor || c}" opacity=".45" filter="url(#glow${u})"/>
                 <path d="M92.6 79.4 L95.4 80.8 L120 146.6 L118.4 147.2 Z" fill="#f4faff"/>
                 <path d="M87 77 L99 85" stroke="${INK}" stroke-width="3.4" stroke-linecap="round"/>
-            </g>`;
+            </g>`}`;
         return svg('0 0 124 160', body, 'bs-player-art' + (opts.mirror ? ' bs-mirror' : ''));
     }
 
@@ -343,5 +343,23 @@ const BattleArt = (() => {
             <div class="vs-skip">点击跳过</div>
         </div>`;
     }
-    return { player, enemy, scene, tierOf, meditator, burstLines, startHero, versus, archetypeOf, colorOf, slash, speedLines, stamp, claw, lightning, nascent, inkBurst, ELEMENT, ROOT };
+    // ---------------- 装备页立绘：随境界变化的修士 ----------------
+    // 筑基前气焰淡、筑基起旺；结丹起丹田一颗金丹；元婴起肩头飘着金色元婴；真仙起脑后光环；道祖身边环绕八个法则字
+    function portrait(root = 'wood', realm = 0, opts = {}) {
+        const c = colorOf(root);
+        const aura = realm >= 30 ? 'hi' : realm >= 14 ? 'mid' : 'low';
+        const laws = '金木水火土风雷冰'.split('');
+        return `<div class="pt-stage">
+            <div class="pt-bg">${scene(tierOf(realm))}</div>
+            ${realm >= 50 ? `<div class="pt-laws" style="--c:${c}">${laws.map((g, i) => `<span style="--i:${i}">${g}</span>`).join('')}</div>` : ''}
+            <div class="pt-figure pt-aura-${aura}" style="--c:${c}">
+                ${realm >= 42 ? '<div class="pt-halo"></div>' : ''}
+                ${player(root, { sword: opts.sword !== false })}
+                ${realm >= 18 ? '<div class="pt-core"></div>' : ''}
+                ${realm >= 22 ? `<svg class="pt-nascent" viewBox="0 0 40 40"><g fill="#ffd86b" filter="drop-shadow(0 0 4px #ffd86b)"><circle cx="20" cy="11" r="6"/><path d="M12 18 Q20 15 28 18 L30 32 Q20 36 10 32 Z"/></g></svg>` : ''}
+            </div>
+            ${opts.caption ? `<div class="pt-caption">${opts.caption}</div>` : ''}
+        </div>`;
+    }
+    return { player, enemy, scene, tierOf, meditator, burstLines, startHero, versus, portrait, archetypeOf, colorOf, slash, speedLines, stamp, claw, lightning, nascent, inkBurst, ELEMENT, ROOT };
 })();
