@@ -35,7 +35,7 @@ Steamworks 后台的菜单名称偶尔会改版，下面写的是大致位置；
 
 ---
 
-## 第二步【你】在后台配置成就（36 个）
+## 第二步【你】在后台配置成就（42 个）
 
 位置：应用后台 →「统计与成就」→「成就」。每个成就点「新建成就」，填写下表的四项并上传两张图标，**API 名称必须一字不差**（游戏靠它解锁成就）。全部填完点「**发布**」，改动才会生效。
 
@@ -67,7 +67,7 @@ Steamworks 后台的菜单名称偶尔会改版，下面写的是大致位置；
 | 20 | `ACH_LIFE_SWORD_5` | 五重祭炼 | 把青冥剑祭炼到五重 | `ACH_LIFE_SWORD_5.jpg` / `ACH_LIFE_SWORD_5_locked.jpg` |
 | 21 | `ACH_DACHENG` | 大乘 | 突破到大乘初期 | `ACH_DACHENG.jpg` / `ACH_DACHENG_locked.jpg` |
 | 22 | `ACH_LAW_MASTER` | 法则入门 | 任一法则练到 30 级 | `ACH_LAW_MASTER.jpg` / `ACH_LAW_MASTER_locked.jpg` |
-| 23 | `ACH_ALL_DUNGEONS` | 踏遍秘境 | 通关全部 12 个秘境 | `ACH_ALL_DUNGEONS.jpg` / `ACH_ALL_DUNGEONS_locked.jpg` |
+| 23 | `ACH_ALL_DUNGEONS` | 踏遍秘境 | 通关全部 13 个秘境 | `ACH_ALL_DUNGEONS.jpg` / `ACH_ALL_DUNGEONS_locked.jpg` |
 | 24 | `ACH_SKILL_80` | 一代宗师 | 任一生活技能达到 80 级（满级） | `ACH_SKILL_80.jpg` / `ACH_SKILL_80_locked.jpg` |
 | 25 | `ACH_COINS_100M` | 富甲一方 | 同时持有 1 亿灵石 | `ACH_COINS_100M.jpg` / `ACH_COINS_100M_locked.jpg` |
 | 26 | `ACH_FLY_TRIB` | 飞升天劫 | 渡过飞升天劫 | `ACH_FLY_TRIB.jpg` / `ACH_FLY_TRIB_locked.jpg` |
@@ -81,8 +81,14 @@ Steamworks 后台的菜单名称偶尔会改版，下面写的是大致位置；
 | 34 | `ACH_JINXIAN_LATE` | 六十穴尽开 | 仙穴开满 60 穴，突破到金仙后期 | `ACH_JINXIAN_LATE.jpg` / `ACH_JINXIAN_LATE_locked.jpg` |
 | 35 | `ACH_TAIYI` | 太乙 | 肉身化为玉身，突破到太乙初期 | `ACH_TAIYI.jpg` / `ACH_TAIYI_locked.jpg` |
 | 36 | `ACH_TAIYI_LATE` | 小世界初成 | 推演小世界到 Lv.10，突破到太乙后期 | `ACH_TAIYI_LATE.jpg` / `ACH_TAIYI_LATE_locked.jpg` |
+| 37 | `ACH_SOUL` | 神魂大成 | 淬炼神魂九重 | `ACH_SOUL.jpg` / `ACH_SOUL_locked.jpg` |
+| 38 | `ACH_DALUO` | 大罗 | 突破到大罗初期 | `ACH_DALUO.jpg` / `ACH_DALUO_locked.jpg` |
+| 39 | `ACH_ORIGIN` | 本源三十 | 凝结 30 道法则本源 | `ACH_ORIGIN.jpg` / `ACH_ORIGIN_locked.jpg` |
+| 40 | `ACH_CORPSE` | 斩尽三尸 | 斩出善尸、恶尸、自我尸 | `ACH_CORPSE.jpg` / `ACH_CORPSE_locked.jpg` |
+| 41 | `ACH_DAOZU` | 道祖 | 证道，成就道祖 | `ACH_DAOZU.jpg` / `ACH_DAOZU_locked.jpg` |
+| 42 | `ACH_DAO_HEART` | 道心自守 | 身为道祖而自降修为，不被天道吞噬 | `ACH_DAO_HEART.jpg` / `ACH_DAO_HEART_locked.jpg` |
 
-> 36 个逐个填比较费时。如果你愿意，可以在我这边的内置浏览器里自己登录 Steamworks（密码由你输入），我来逐个填表；每次点「保存 / 发布」前会先问你。
+> 42 个逐个填比较费时。如果你愿意，可以在我这边的内置浏览器里自己登录 Steamworks（密码由你输入），我来逐个填表；每次点「保存 / 发布」前会先问你。
 
 以后加新成就时，我会同步更新游戏、这张表和图标，你只需要在后台补上新增的那几个。
 

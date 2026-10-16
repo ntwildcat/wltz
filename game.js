@@ -74,7 +74,12 @@
                 { name: '金仙初期', nextReq: 700000, xianqiaoReq: 36, temperReq: 9 },
                 { name: '金仙后期', nextReq: 730000, xianqiaoReq: 60 },
                 { name: '太乙初期', nextReq: 760000, jadeReq: 9 },
-                { name: '太乙后期', nextReq: 790000, worldReq: 10 }
+                { name: '太乙后期', nextReq: 790000, worldReq: 10 },
+                // 大罗 / 道祖（v7.24）：大罗初期 = 淬炼神魂九重（神魂大成）；大罗后期 = 凝结法则本源 10 道；
+                // 道祖（最终境界，不分前后期）= 斩尽三尸（大罗后期的三场斩尸，见 XIAN_SHUAI）+ 以一条 50 级法则打赢证道之战
+                { name: '大罗初期', nextReq: 820000, soulReq: 9 },
+                { name: '大罗后期', nextReq: 850000, originReq: 10 },
+                { name: '道祖', nextReq: 880000, proveReq: 1 }
             ],
             // P2功能：秘境系统
             dungeons: {
@@ -459,6 +464,37 @@
                         skillExp: 7000
                     }
                 },
+                luotianRealm: {
+                    id: 'luotianRealm',
+                    name: '罗天仙域',
+                    desc: '大罗修士的试炼场·通关掉落玄黄精与鸿蒙精华（大罗装备、凝结法则本源的材料）',
+                    icon: '🌠',
+                    minRealmIndex: 48,
+                    baseRealmIndex: 48,
+                    recommendedLevel: '大罗初期~道祖',
+                    monsters: [
+                        { name: '罗天巡使', type: '金', hp: 387000, atk: 1000, spd: 112, def: 305, attackSpeed: 2.2, drop: 'coins', dropQty: 29300 },
+                        { name: '本源灵傀', type: '无', hp: 452000, atk: 1070, spd: 108, def: 336, attackSpeed: 2.3, drop: 'coins', dropQty: 33200 },
+                        { name: '三尸幻影', type: '火', hp: 419000, atk: 1131, spd: 116, def: 290, attackSpeed: 2.1, drop: 'coins', dropQty: 36500 },
+                        { name: '界面守望', type: '土', hp: 500000, atk: 1177, spd: 104, def: 377, attackSpeed: 2.4, drop: 'coins', dropQty: 39900 },
+                        { name: '罗天大圣', type: '无', hp: 967000, atk: 1417, spd: 110, def: 420, attackSpeed: 3.4, isBoss: true, drop: 'coins', dropQty: 126700 }
+                    ],
+                    rewards: {
+                        fixed: [
+                            { id: 'nascentsoul_essence', qty: [7, 12] }
+                        ],
+                        random: [
+                            { id: 'taiyiessence', qty: [8, 14], probability: 1 },
+                            { id: 'xuanhuang', qty: [3, 6], probability: 1 },
+                            { id: 'yupo', qty: [3, 6], probability: 1 }
+                        ],
+                        coins: [128000, 203000],
+                        danhuo: [2680, 4640],
+                        shenshi: [2350, 3990],
+                        daoguo: [390, 640],
+                        skillExp: 9500
+                    }
+                },
                 tribulation21: {
                     id: 'tribulation21', name: '结婴心魔', desc: '金丹化婴之际心魔丛生：它是照着你此刻的实力生出来的，出手比你更重——满血、带足战斗食物再来', icon: '👹',
                     isTribulation: true, isHeartDemon: true, tribulationRealm: 21, minRealmIndex: 21, baseRealmIndex: 21,
@@ -556,6 +592,40 @@
                     mirror: { hpMult: 2.5, hitFrac: 0.33, interval: 1.0 },
                     monsters: [{ name: '戾衰凶煞', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [40000000, 60000000], daoguo: [400, 600], skillExp: 5000 }
+                },
+                // 大罗后期的三尸（v7.24，见 XIAN_SHUAI 的 corpse 项）：镜像单挑，赢了 = 分离，化作化身；输了 = 被夺舍，折损一道法则本源。
+                // 难度递增（标准玩家 = 大罗后期、大罗三件套、法则本源 10、8 灵根各测）：善尸 hitFrac 0.30、恶尸 0.33（三尸都在时恶尸噬心
+                // 让敌人攻击再 +20%，法则 0 / 10 / 20 级约 44% / 75% / 94%，与戾衰相当）、自我尸 0.40（最像本体，留到最后打法则 0 级约五成、10 级约 94%）
+                corpseShan: {
+                    id: 'corpseShan', name: '善尸', desc: '执念于善的分身，以善念牵绊本体、欲取而代之', icon: '🕊️',
+                    isTribulation: true, isShuai: true, minRealmIndex: 49, baseRealmIndex: 49,
+                    mirror: { hpMult: 2.5, hitFrac: 0.3, interval: 1.0 },
+                    monsters: [{ name: '善尸', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [80000000, 120000000], daoguo: [700, 1000], skillExp: 7000 }
+                },
+                corpseE: {
+                    id: 'corpseE', name: '恶尸', desc: '执念于恶的分身，噬心夺魄，一心夺舍本体', icon: '👹',
+                    isTribulation: true, isShuai: true, minRealmIndex: 49, baseRealmIndex: 49,
+                    mirror: { hpMult: 2.5, hitFrac: 0.33, interval: 1.0 },
+                    monsters: [{ name: '恶尸', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [80000000, 120000000], daoguo: [700, 1000], skillExp: 7000 }
+                },
+                corpseWo: {
+                    id: 'corpseWo', name: '自我尸', desc: '执念于自我的分身，与本体最像、也最想成为本体', icon: '🪞',
+                    isTribulation: true, isShuai: true, minRealmIndex: 49, baseRealmIndex: 49,
+                    mirror: { hpMult: 2.5, hitFrac: 0.40, interval: 1.0 },
+                    monsters: [{ name: '自我尸', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [80000000, 120000000], daoguo: [700, 1000], skillExp: 7000 }
+                },
+                // 证道之战（v7.24）：一条法则只能有一位道祖——灭杀现任道祖方能取而代之。从境界感悟面板选法则进入（Boss 名随法则变）。
+                // 最终 Boss，看法则底子：法则之击按入门条数成倍增长，所以按「证道法则 50 级之外还有几条入门（≥30）」标定——
+                // hpMult 12 / hitFrac 0.42 时另有 1 / 2 / 3 / 4 / 5 条入门的通过率约 17% / 21% / 46% / 96% / 100%（另有渡劫保底）
+                zhengdao: {
+                    id: 'zhengdao', name: '证道之战', desc: '灭杀这条法则的现任道祖，取而代之', icon: '⚖️',
+                    isTribulation: true, minRealmIndex: 49, baseRealmIndex: 50,
+                    mirror: { hpMult: 12, hitFrac: 0.42, interval: 1.0 },
+                    monsters: [{ name: '道祖', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
+                    rewards: { coins: [200000000, 300000000], daoguo: [1500, 2200], skillExp: 10000 }
                 }
             },
             skills: {
@@ -619,6 +689,9 @@
                         nascent_temper: { name: '淬炼元婴', desc: '仙灵晶 ×3 + 元婴精魄 ×2：淬炼一次元婴，成功率随元婴品质（即金丹品质），失败只损材料；九次功成才能进阶金仙，每成一次元婴离体伤害提高', duration: 108000, output: { nascentTemper: 1, skill: 'cultivation', exp: 9000 }, requires: { xianlingjing: 3, nascentsoul_essence: 2 }, requiredRealmIndex: 43, unlocked: false },
                         jade_body: { name: '玉身转化', desc: '仙金 ×4 + 鸿蒙精华 ×3：把肉身一寸寸化为玉身，九转功成即可突破太乙；成为太乙后玉身生命 / 防御 +20%', duration: 324000, output: { jadeBody: 1, skill: 'cultivation', exp: 12000 }, requires: { xianjin: 4, taiyiessence: 3 }, requiredRealmIndex: 45, unlocked: false },
                         world_deduce: { name: '推演小世界', desc: '玉魄 ×2 + 鸿蒙精华 ×2：推演体内小世界，每 3 次升一级（最高 30 级）；小世界每小时产出灵石、道果、丹火、神识（离线照算），Lv.10 可突破太乙后期', duration: 140400, output: { worldDeduce: 1, skill: 'cultivation', exp: 14000 }, requires: { yupo: 2, taiyiessence: 2 }, requiredRealmIndex: 46, unlocked: false },
+                        // 大罗（v7.24）：淬炼神魂 270000 ≈ 2.5 小时 / 重（九重约 22 小时）；凝结法则本源 324000 ≈ 3 小时 / 道（10 道约 30 小时，之后可一直凝结）
+                        soul_temper: { name: '淬炼神魂', desc: '玉魄 ×3 + 元婴精魄 ×3：身是玉身、法是道丝，再把意（神魂）淬炼九重，神魂大成即可进阶大罗', duration: 270000, output: { soulTemper: 1, skill: 'cultivation', exp: 16000 }, requires: { yupo: 3, nascentsoul_essence: 3 }, requiredRealmIndex: 47, unlocked: false },
+                        law_origin: { name: '凝结法则本源', desc: '玄黄精 ×3 + 鸿蒙精华 ×3：在体内凝结一道法则本源，每道攻击 / 生命 / 防御 +3%，不设上限；10 道可突破大罗后期', duration: 324000, output: { lawOrigin: 1, skill: 'cultivation', exp: 18000 }, requires: { xuanhuang: 3, taiyiessence: 3 }, requiredRealmIndex: 48, unlocked: false },
                     },
                     actions: {}
                 },
@@ -651,6 +724,7 @@
                         xian_dew: { name: '仙灵玉露', desc: '悟道果 ×5 + 悟道茶 ×6 + 仙灵晶 ×1（战斗食物：恢复9500生命）', duration: 170, output: { items: [{ id: 'xian_dew', qty: 2 }], skill: 'alchemy', exp: 3600 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { daofruit: 5, tea: 6, xianlingjing: 1 }, unlocked: false },
                         jinsui_nectar: { name: '金髓仙浆', desc: '悟道果 ×5 + 悟道茶 ×6 + 仙金 ×1（战斗食物：恢复13000生命）', duration: 190, output: { items: [{ id: 'jinsui_nectar', qty: 2 }], skill: 'alchemy', exp: 4200 }, requiredLevel: 80, requiredRealmIndex: 44, requires: { daofruit: 5, tea: 6, xianjin: 1 }, unlocked: false },
                         yupo_jelly: { name: '玉魄琼脂', desc: '悟道果 ×5 + 悟道茶 ×6 + 玉魄 ×1（战斗食物：恢复18000生命）', duration: 210, output: { items: [{ id: 'yupo_jelly', qty: 2 }], skill: 'alchemy', exp: 4800 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { daofruit: 5, tea: 6, yupo: 1 }, unlocked: false },
+                        xuanhuang_dew: { name: '玄黄玉液', desc: '悟道果 ×5 + 悟道茶 ×6 + 玄黄精 ×1（战斗食物：恢复24000生命）', duration: 230, output: { items: [{ id: 'xuanhuang_dew', qty: 2 }], skill: 'alchemy', exp: 5400 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { daofruit: 5, tea: 6, xuanhuang: 1 }, unlocked: false },
                     },
                     actions: {}
                 },
@@ -704,6 +778,9 @@
                         taiyi_sword: { name: '太乙剑', desc: '玉魄 ×4 + 仙金 ×3', duration: 230, output: { items: [{ id: 'taiyisword', qty: 1 }], skill: 'forging', exp: 6000 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 4, xianjin: 3 }, unlocked: false },
                         taiyi_armor: { name: '太乙法衣', desc: '玉魄 ×5 + 仙灵晶 ×4', duration: 230, output: { items: [{ id: 'taiyiarmor', qty: 1 }], skill: 'forging', exp: 6200 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 5, xianlingjing: 4 }, unlocked: false },
                         taiyi_pendant: { name: '太乙佩', desc: '玉魄 ×3 + 灵晶 ×6', duration: 220, output: { items: [{ id: 'taiyipendant', qty: 1 }], skill: 'forging', exp: 6400 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 3, spiritcrystal: 6 }, unlocked: false },
+                        daluo_sword: { name: '大罗剑', desc: '玄黄精 ×4 + 玉魄 ×3', duration: 245, output: { items: [{ id: 'daluosword', qty: 1 }], skill: 'forging', exp: 7000 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 4, yupo: 3 }, unlocked: false },
+                        daluo_armor: { name: '大罗法衣', desc: '玄黄精 ×5 + 仙金 ×4', duration: 245, output: { items: [{ id: 'daluoarmor', qty: 1 }], skill: 'forging', exp: 7200 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 5, xianjin: 4 }, unlocked: false },
+                        daluo_pendant: { name: '大罗佩', desc: '玄黄精 ×3 + 灵晶 ×7', duration: 235, output: { items: [{ id: 'daluopendant', qty: 1 }], skill: 'forging', exp: 7400 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 3, spiritcrystal: 7 }, unlocked: false },
                     },
                     actions: {}
                 },
@@ -746,6 +823,7 @@
                         xianlingjing: { name: '采仙灵晶', desc: '产出仙灵晶（真仙装备与仙灵玉露的材料）', duration: 110, output: { items: [{ id: 'xianlingjing', qty: 1 }], skill: 'mining', exp: 1800 }, requiredLevel: 80, requiredRealmIndex: 42, unlocked: false },
                         xianjin: { name: '采仙金', desc: '产出仙金（金仙装备、金髓仙浆、玉身转化的材料）', duration: 140, output: { items: [{ id: 'xianjin', qty: 1 }], skill: 'mining', exp: 2300 }, requiredLevel: 80, requiredRealmIndex: 44, unlocked: false },
                         yupo: { name: '采玉魄', desc: '产出玉魄（太乙装备、玉魄琼脂、推演小世界的材料）', duration: 170, output: { items: [{ id: 'yupo', qty: 1 }], skill: 'mining', exp: 2800 }, requiredLevel: 80, requiredRealmIndex: 46, unlocked: false },
+                        xuanhuang: { name: '采玄黄精', desc: '产出玄黄精（大罗装备、玄黄玉液、凝结法则本源的材料）', duration: 200, output: { items: [{ id: 'xuanhuang', qty: 1 }], skill: 'mining', exp: 3400 }, requiredLevel: 80, requiredRealmIndex: 48, unlocked: false },
                     },
                     actions: {}
                 },
@@ -920,6 +998,11 @@
                 taiyipendant: { name: '太乙佩', icon: '📿', type: 'jewelry', sellPrice: 24500, stats: { spd: 88, hp: 765 } },
                 jinsui_nectar: { name: '金髓仙浆', icon: '🍶', type: 'food', sellPrice: 12500 },
                 yupo_jelly: { name: '玉魄琼脂', icon: '🍶', type: 'food', sellPrice: 17000 },
+                xuanhuang: { name: '玄黄精', icon: '🟫', type: 'ore', sellPrice: 16500 },
+                daluosword: { name: '大罗剑', icon: '🗡️', type: 'weapon', sellPrice: 47000, stats: { atk: 1057 } },
+                daluoarmor: { name: '大罗法衣', icon: '🥼', type: 'armor', sellPrice: 52000, stats: { def: 582, hp: 1600 } },
+                daluopendant: { name: '大罗佩', icon: '📿', type: 'jewelry', sellPrice: 33000, stats: { spd: 119, hp: 1033 } },
+                xuanhuang_dew: { name: '玄黄玉液', icon: '🍶', type: 'food', sellPrice: 23000 },
                 nascentsoul_essence: { name: '元婴精魄', icon: '👁️', type: 'material', sellPrice: 2000 },
 
                 // P6/P7 新作物
@@ -1125,6 +1208,15 @@
                     cooldown: 3.0,
                     minRealm: 46,
                     description: '以玉魄凝成的琼脂，太乙修士的战斗补给'
+                },
+                xuanhuang_dew: {
+                    id: 'xuanhuang_dew',
+                    name: '玄黄玉液',
+                    icon: '🍶',
+                    hpRestore: 24000,         // 恢复HP（v7.24 大罗期）
+                    cooldown: 3.0,
+                    minRealm: 48,
+                    description: '以玄黄精化开的玉液，大罗修士的战斗补给'
                 }
             },
             // 默认食物配置
@@ -1259,6 +1351,11 @@
                 taiyipendant: svg(pendant('#6fb89c', '#eefaf4', `${sparkle(25, 22, 2.6, '#ffffff')}<circle cx="16" cy="20" r="8" stroke="#bfe8d6" stroke-width=".9" opacity=".85"/>`)),
                 jinsui_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#9a6a14"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#f3d36a"/><path d="M10 18Q16 21 22 18" stroke="#fff4c4" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2, '#fff4c4')}`),
                 yupo_jelly: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#4f8f7a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#bfe8d6"/><path d="M10 18Q16 21 22 18" stroke="#ffffff" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2, '#ffffff')}${sparkle(9, 9, 1.8, '#ffffff')}`),
+                xuanhuang: svg(rock('#c9a86a', '#5a4220', `<path d="M10 13L16 10L22 14M12 20L20 18" stroke="#f3e2b8" stroke-width="1" opacity=".85"/>${sparkle(23, 8, 2.4, '#f3e2b8')}${sparkle(9, 21, 1.8, '#f3e2b8')}`)),
+                daluosword: svg(sword('#f8f0ff', '#fff', '#8a6ad0', '<circle cx="16" cy="16" r="15" stroke="#c9a86a" stroke-width="1.4" opacity=".9"/>')),
+                daluoarmor: svg(robe('#f3ead6', '#5a4220', '<path d="M12 24Q14 22 16 24Q18 22 20 24" stroke="#c9a86a" stroke-width="1"/>')),
+                daluopendant: svg(pendant('#8a6ad0', '#f3ead6', `${sparkle(25, 22, 2.6, '#f3e2b8')}<circle cx="16" cy="20" r="8" stroke="#c9a86a" stroke-width=".9" opacity=".85"/>`)),
+                xuanhuang_dew: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#5a4220"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#c9a86a"/><path d="M10 18Q16 21 22 18" stroke="#f3e2b8" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2, '#f3e2b8')}${sparkle(9, 9, 1.8, '#f3e2b8')}`),
                 taiyi_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#8a6a1a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#f3d36a"/><path d="M10 18Q16 21 22 18" stroke="#fff8dc" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2)}${sparkle(9, 9, 1.8)}`),
                 nascentsoul_essence: svg(`<circle cx="16" cy="16" r="11" fill="#e6e0f8" opacity=".85"/><circle cx="16" cy="16" r="7" fill="#b39ddb"/><circle cx="16" cy="16" r="3" fill="#3a1a6a" stroke="none"/><circle cx="14" cy="14" r="1.2" fill="#fff" stroke="none"/>${sparkle(25, 8, 2.2)}${sparkle(7, 24, 2)}`)
             };
@@ -1310,6 +1407,10 @@
             if (typeof P.jadeBody !== 'number') P.jadeBody = 0;             // v7.23 太乙：玉身转化（0–9）
             if (typeof P.smallWorld !== 'number') P.smallWorld = 0;         // v7.23 太乙：小世界推演次数（每 3 次一级）
             if (P.activeDomain2 === undefined) P.activeDomain2 = null;      // v7.23 太乙叠域：第二个灵域
+            if (typeof P.soulTemper !== 'number') P.soulTemper = 0;         // v7.24 大罗：淬炼神魂（0–9）
+            if (typeof P.lawOrigin !== 'number') P.lawOrigin = 0;           // v7.24 大罗：法则本源（道数）
+            if (typeof P.erosion !== 'number') P.erosion = 0;               // v7.24 道祖：天道侵蚀（0–100）
+            if (P.provenLaw === undefined) P.provenLaw = null;              // v7.24 道祖：证道的法则
             if (typeof P.marrowCleansed !== 'boolean') P.marrowCleansed = false;
             if (!ROOT_GRADES[P.rootGrade]) P.rootGrade = DEFAULT_ROOT_GRADE;
             if (typeof P.coreQuality !== 'number') P.coreQuality = P.realmIndex >= 18 ? 35 : 0;   // 已结丹的老存档按中品下限补一颗金丹
@@ -1335,7 +1436,7 @@
         function isShenshiUnlocked() { return gameState.player.realmIndex >= 22; }   // 原索引13 → +9
         // v6.89：练气13层后，「大境界圆满→下一大境界初期」的突破点不再是均匀的 %4===0，
         // 改成显式列表（原索引 4,8,12,16,20,24,28,32 → 13,17,21,25,29,33,37,41）
-        const MAJOR_BREAKTHROUGH_INDICES = new Set([13, 17, 21, 25, 29, 33, 37, 41, 43, 45]);
+        const MAJOR_BREAKTHROUGH_INDICES = new Set([13, 17, 21, 25, 29, 33, 37, 41, 43, 45, 47, 49]);
 
         // 灵根特效经强化后的实际数值（getMod 和界面都用它）
         function getRootEffectsScaled() {
@@ -1462,7 +1563,8 @@
             lingjieAbyss:      { danhuo: [24, 34], shenshi: [20, 30], daoguo: [7, 11] },
             xianbattle:        { danhuo: [30, 42], shenshi: [26, 38], daoguo: [10, 15] },
             jinxianbattle:     { danhuo: [38, 52], shenshi: [33, 47], daoguo: [13, 19] },
-            taiyibattle:       { danhuo: [48, 66], shenshi: [42, 60], daoguo: [17, 24] }
+            taiyibattle:       { danhuo: [48, 66], shenshi: [42, 60], daoguo: [17, 24] },
+            daluobattle:       { danhuo: [60, 84], shenshi: [53, 76], daoguo: [22, 31] }
         };
         function rollAreaCurrency(areaKey, bonus) {
             const cfg = BATTLE_CURRENCY[areaKey] || {};
@@ -1663,7 +1765,7 @@
         const ENDLESS_REFINES = {
             qiling:  { cur: 'danhuo',  icon: '🔥', name: '器灵温养', title: '以丹火温养法宝器灵', unit: '全部装备属性', per: 0.01, base: 2000, realm: 38 },
             shenhun: { cur: 'shenshi', icon: '👁️', name: '神魂参悟', title: '以神识推演法则', unit: '悟道参悟经验', per: 0.03, base: 2000, realm: 38 },
-            benyuan: { cur: 'daoguo',  icon: '🍎', name: '本源温养', title: '以道果温养本源', unit: '生命 / 防御', per: 0.01, base: 600, realm: 38 }
+            benyuan: { cur: 'daoguo',  icon: '🍎', name: '道体温养', title: '以道果温养道体', unit: '生命 / 防御', per: 0.01, base: 600, realm: 38 }
         };
         const ENDLESS_GROWTH = 1.15;
         function getEndless(k) { return ((gameState.player.endless || {})[k]) || 0; }
@@ -2008,10 +2110,10 @@
             if (shuai) {
                 const d = GAME_CONFIG.dungeons[shuai.id];
                 box.style.display = 'block';
-                box.innerHTML = `<div class="bt-guide-title">${d.icon} ${d.name}已降临（${shuai.effect}）</div>
-                    <div class="bt-guide-line">${d.desc}。渡过即消；本境界的衰相都渡过才能突破${(GAME_CONFIG.realms[realmIndex + 1] || {}).name || '下一境界'}</div>
+                box.innerHTML = `<div class="bt-guide-title">${d.icon} ${d.name}${shuai.kind === 'corpse' ? '附身' : '已降临'}（${shuai.effect}）</div>
+                    <div class="bt-guide-line">${d.desc}。${shuai.kind === 'corpse' ? '斩出即分离为化身' : '渡过即消'}；本境界的${trialWords().group}都${trialWords().verb}过才能突破${(GAME_CONFIG.realms[realmIndex + 1] || {}).name || '下一境界'}</div>
                     <div class="bt-guide-line" style="color:var(--text-l4)">${tribulationHint(d)}</div>
-                    <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); maybeSelectDomainThenEnter(() => enterDungeon('${shuai.id}'));">${d.icon} 渡${d.name}</button>`;
+                    <button type="button" class="btn" style="width:100%;margin-top:8px;" onclick="closeBreakthroughModal(); maybeSelectDomainThenEnter(() => enterDungeon('${shuai.id}'));">${d.icon} ${shuai.kind === 'corpse' ? '斩' : '渡'}${d.name}</button>`;
                 return;
             }
             if (!BREAKTHROUGH_GATE_REALMS.includes(realmIndex) || hasSurvivedTribulation(realmIndex)) { box.style.display = 'none'; return; }
@@ -2036,8 +2138,14 @@
             gameState.currentActionProgress = 0;
 
             const rewards = dungeon.rewards;
-            let rewardMsg = dungeon.isShuai
-                ? `${dungeon.icon} 渡过${dungeon.name}！衰退已消除（${(XIAN_SHUAI.find(sh => sh.id === dungeonId) || {}).effect}）${getPendingShuai().length ? `（衰相还剩 ${getPendingShuai().length}）` : '——衰相已渡尽'}
+            const trialCfg = XIAN_SHUAI.find(sh => sh.id === dungeonId) || {};
+            if (dungeonId === 'zhengdao' && gameState.player.provingLaw) gameState.player.provenLaw = gameState.player.provingLaw;
+            let rewardMsg = dungeonId === 'zhengdao'
+                ? `⚖️ 证道成功！以${LAW_EFFECTS[gameState.player.provenLaw].name}证道——可以突破道祖了\n`
+                : trialCfg.kind === 'corpse'
+                ? `${dungeon.icon} 斩出${dungeon.name}！三尸不可灭，已分离为化身：${trialCfg.boon}${getPendingShuai().length ? `（三尸还剩 ${getPendingShuai().length}）` : '——三尸斩尽，可以证道了'}\n`
+                : dungeon.isShuai
+                ? `${dungeon.icon} 渡过${dungeon.name}！衰退已消除（${trialCfg.effect}）${getPendingShuai().length ? `（衰相还剩 ${getPendingShuai().length}）` : '——衰相已渡尽'}
 `
                 : dungeon.isHeartDemon
                 ? `👹 心魔已灭，道心通明——可以冲击元婴了\n`
@@ -2144,8 +2252,20 @@
             { id: 'shuaiQiao', realm: 42, at: 18, effect: '最近打通的 3 个仙穴黯淡、不算道体加成', dimOrifices: 3 },
             { id: 'shuaiShen', realm: 42, at: 21, effect: '生命 / 攻击 / 防御 −15%', bodyPenalty: 0.15 },
             { id: 'shuaiHun', realm: 44, at: 42, effect: '元神黯淡：元婴离体与法则之击停摆', strikeBlock: true },
-            { id: 'shuaiSha', realm: 44, at: 51, effect: '戾气反噬：战斗中每秒流失 1% 最大生命；渡衰失败还会折损一个仙穴', bleed: 0.01, failLoseOrifice: 1 }
+            { id: 'shuaiSha', realm: 44, at: 51, effect: '戾气反噬：战斗中每秒流失 1% 最大生命；渡衰失败还会折损一个仙穴', bleed: 0.01, failLoseOrifice: 1 },
+            // 大罗后期的三尸（v7.24）：一进大罗后期就附身、各带一种牵制，都想夺舍本体。斩尸 = 打赢一场镜像单挑，
+            // 三尸不能灭（灭之修为大降），只能分离——分离出来的三尸化作身外化身，各留一项永久加成（boon）；斩尸失败被夺舍，折损一道法则本源
+            { id: 'corpseShan', realm: 49, at: 0, kind: 'corpse', effect: '善尸牵绊：生活技能耗时 ×1.3', workTime: 1.3, boon: '善尸化身：生活技能耗时 ×0.85', boonWorkTime: 0.85, failLoseOrigin: 1 },
+            { id: 'corpseE', realm: 49, at: 0, kind: 'corpse', effect: '恶尸噬心：敌人攻击 +20%', foeAtk: 0.2, boon: '恶尸化身：战斗中每 4 秒出手一次（攻击 ×2，无视防御）', failLoseOrigin: 1 },
+            { id: 'corpseWo', realm: 49, at: 0, kind: 'corpse', effect: '自我尸夺念：修炼速度 −33%', cultSpeed: -0.33, boon: '自我尸化身：修炼速度 +20%', boonCultSpeed: 0.2, failLoseOrigin: 1 }
         ];
+        // 衰相与三尸共用一套框架，界面文字按种类区分
+        function trialWords(realm = gameState.player.realmIndex) {
+            return getRealmShuai(realm).some(sh => sh.kind === 'corpse')
+                ? { group: '三尸', verb: '斩', done: '已斩出', pending: '三尸未斩尽' }
+                : { group: '衰相', verb: '渡', done: '已渡过', pending: '衰相未渡尽' };
+        }
+        function isCorpseSevered(id) { const sh = XIAN_SHUAI.find(x => x.id === id); return !!(sh && isShuaiDone(sh)); }
         function getXianqiao() { return Math.min(XIAN_ORIFICE_MAX, gameState.player.xianqiao || 0); }
         // 当前境界最多能打通到几穴：大乘圆满未渡飞升天劫为 0（不渡劫灵气无从转化），渡劫后 12；真仙初期 24；
         // 真仙后期 36（为金仙做准备）；金仙起 60
@@ -2188,7 +2308,101 @@
             if (key === 'hpPct' || key === 'defPct') v += DAO_BODY_PER_ORIFICE * getBrightOrifices();
             if (key === 'hpPct' || key === 'atkPct' || key === 'defPct') v -= getActiveShuai().reduce((n, sh) => n + (sh.bodyPenalty || 0), 0);
             if ((key === 'hpPct' || key === 'defPct') && gameState.player.realmIndex >= TAIYI_REALM) v += JADE_BODY.bonus;   // 太乙玉身
+            if (key === 'hpPct' || key === 'atkPct' || key === 'defPct') {
+                v += LAW_ORIGIN.per * getLawOrigin();                 // 大罗：法则本源，本源愈多实力愈强
+                if (gameState.player.daoHeart) v += DAO_HEART_BONUS;  // 道心（自降修为留下的）
+            }
+            if (key === 'cultSpeed') {
+                v += getActiveShuai().reduce((n, sh) => n + (sh.cultSpeed || 0), 0);                                        // 自我尸夺念
+                v += XIAN_SHUAI.filter(sh => sh.boonCultSpeed && isShuaiDone(sh)).reduce((n, sh) => n + sh.boonCultSpeed, 0);  // 自我尸化身
+            }
             return v;
+        }
+        // 生活技能耗时：善尸牵绊 ×1.3、善尸化身 ×0.85
+        function getCorpseWorkMult() {
+            let m = getActiveShuai().reduce((x, sh) => x * (sh.workTime || 1), 1);
+            XIAN_SHUAI.filter(sh => sh.boonWorkTime && isShuaiDone(sh)).forEach(sh => { m *= sh.boonWorkTime; });
+            return m;
+        }
+        function getCorpseFoeAtk() { return getActiveShuai().reduce((n, sh) => n + (sh.foeAtk || 0), 0); }   // 恶尸噬心
+
+        // ---- 大罗（v7.24） ----
+        // 淬炼神魂：太乙后期修炼「淬炼神魂」，九重功成即神魂大成、进阶大罗（身是玉身、法是道丝、意是神魂，三合为一）
+        const DALUO_REALM = 48, DAOZU_REALM = 50;
+        const SOUL_TEMPER = { max: 9 };
+        function getSoulTemper() { return Math.min(SOUL_TEMPER.max, gameState.player.soulTemper || 0); }
+        // 法则本源：大罗起修炼「凝结法则本源」，每道本源攻击 / 生命 / 防御 +per，不设上限；10 道为大罗后期的突破条件
+        const LAW_ORIGIN = { per: 0.03 };
+        function getLawOrigin() { return Math.max(0, gameState.player.lawOrigin || 0); }
+        // 极难被彻底灭杀：大罗起秘境夺舍重生次数与复活生命提高
+        const DALUO_REVIVES = 6, DALUO_REVIVE_HP = 0.7;
+        function getReviveHp() { return gameState.player.realmIndex >= DALUO_REALM ? DALUO_REVIVE_HP : NASCENT_REVIVE_HP; }
+
+        // ---- 道祖（v7.24，最终境界） ----
+        // 证道：斩尽三尸后，选一条练到 50 级的法则，打赢「证道之战」（灭杀这条法则的现任道祖）即成道祖。
+        // 成道祖后：证道法则的效果 ×2；法则之击每秒一击、威力 ×3（挥手可灭大罗）。
+        // 代价是天道侵蚀：每用一次法则之力（法则之击、展开灵域）侵蚀上涨，平时缓慢消退；满 100 被天道同化——法则效果、道丝、法则之击、灵域全部失效，
+        // 侵蚀退到 50 以下才恢复。可以「收敛法则」不用法则之力（不涨侵蚀，也没有这些力量），也可以「自降修为」退回大罗后期：侵蚀清零，
+        // 首次自降永久得到「道心」（攻击 / 生命 / 防御 +10%），之后要再证道须重新打一场证道之战
+        const DAOZU = { strikeInterval: 1, strikeMult: 3, provenMult: 2 };
+        const EROSION = { perStrike: 0.05, perDomain: 2, decayPerHour: 4, assimilateAt: 100, recoverAt: 50 };
+        const DAO_HEART_BONUS = 0.1;
+        const PROVE_LAW_LEVEL = 50;
+        function isDaozu() { return gameState.player.realmIndex >= DAOZU_REALM; }
+        function getErosion() { return Math.max(0, Math.min(EROSION.assimilateAt, gameState.player.erosion || 0)); }
+        function isAssimilated() { return isDaozu() && !!gameState.player.assimilated; }
+        function isLawRestrained() { return isDaozu() && !!gameState.player.lawRestraint; }
+        function addErosion(n) {
+            if (!isDaozu() || n <= 0) return;
+            const P = gameState.player;
+            P.erosion = Math.min(EROSION.assimilateAt, Math.round((getErosion() + n) * 1e6) / 1e6);   // 取整到 1e-6，免得累加误差卡在 99.99999…
+            if (!P.assimilated && P.erosion >= EROSION.assimilateAt) {
+                P.assimilated = true;
+                invalidateLawTotals(); calculateStats();
+                showNotification(`🌀 天道侵蚀已满：法则之力被天道收走——法则效果、道丝、法则之击、灵域全部失效，侵蚀退到 ${EROSION.recoverAt} 以下才会恢复（也可以自降修为）`, '#c4483a', 'danger');
+            }
+        }
+        // 侵蚀消退：在线每 0.1 秒、离线按时长
+        function decayErosion(seconds) {
+            const P = gameState.player;
+            if (!isDaozu() || !(P.erosion > 0)) return;
+            P.erosion = Math.max(0, P.erosion - EROSION.decayPerHour * seconds / 3600);
+            if (P.assimilated && P.erosion < EROSION.recoverAt) {
+                P.assimilated = false;
+                invalidateLawTotals(); calculateStats();
+                showNotification(`☯️ 天道侵蚀退到 ${Math.floor(P.erosion)}：法则之力重新归你所用`, '#6f9c8a', 'success');
+            }
+        }
+        function toggleLawRestraint() {
+            const P = gameState.player;
+            P.lawRestraint = !P.lawRestraint;
+            showNotification(P.lawRestraint ? '🧘 收敛法则：不再动用法则之力（法则之击、灵域），天道侵蚀不再上涨' : '☯️ 放开法则之力：法则之击、灵域恢复，每次动用都会加深天道侵蚀', '#b39ddb');
+            renderRealmLore();
+        }
+        function selfDemote() {
+            if (!isDaozu()) return;
+            const first = !gameState.player.daoHeart;
+            if (!confirm(`自降修为，退回大罗后期？\n\n· 天道侵蚀清零，不再有被同化之虞\n· ${first ? `首次自降：永久得到「道心」，攻击 / 生命 / 防御 +${DAO_HEART_BONUS * 100}%` : '道心已有，不再重复获得'}\n· 证道法则的加成与道祖之力失去；想再成道祖，须重新打一场证道之战\n· 三尸已斩、法则本源、其他进度都保留`)) return;
+            const P = gameState.player;
+            P.realmIndex = DAOZU_REALM - 1;
+            P.erosion = 0; P.assimilated = false; P.lawRestraint = false;
+            P.provenLaw = null;
+            if (gameState.dungeons.zhengdao) gameState.dungeons.zhengdao.completed = false;
+            if (first) P.daoHeart = true;
+            invalidateLawTotals(); calculateStats(); updateUI();
+            checkAchievements(false);
+            showNotification(`🧘 自降修为，退回${getRealmName(P.realmIndex)}：不被天道吞噬，仍是自己${first ? `——道心自守，攻击 / 生命 / 防御 +${DAO_HEART_BONUS * 100}%` : ''}`, '#c2a25f', 'rare');
+            saveGame();
+        }
+        // 证道：选一条 50 级法则，进入证道之战（Boss 名按法则改）
+        function getProvableLaws() { return LAW_IDS.filter(id => getLawInfo(id).level >= PROVE_LAW_LEVEL); }
+        function startProveBattle(lawId) {
+            if (!getProvableLaws().includes(lawId)) return;
+            if (getPendingShuai().length) { showNotification('三尸未斩尽，不能证道', '#c98a3e', 'warning'); return; }
+            gameState.player.provingLaw = lawId;
+            const d = GAME_CONFIG.dungeons.zhengdao;
+            d.monsters[0].name = `${LAW_EFFECTS[lawId].name.replace('之法则', '')}之道祖`;
+            maybeSelectDomainThenEnter(() => enterDungeon('zhengdao'));
         }
 
         // ---- 金仙：淬炼元婴（v7.23） ----
@@ -2261,7 +2475,7 @@
         // ---- 仙界境界的突破条件（v7.23 统一） ----
         // 大乘圆满起突破不看修为，而看下一境界配置里的条件：xianqiaoReq 仙穴 / temperReq 淬炼元婴 / jadeReq 玉身 / worldReq 小世界等级。
         // 进度条、「可突破」、突破弹窗、境界感悟、突破判定都读这一份，另外还要渡尽本境界的衰相（getPendingShuai）
-        function isGateRealm(cfg) { return !!(cfg && (cfg.xianqiaoReq || cfg.temperReq || cfg.jadeReq || cfg.worldReq)); }
+        function isGateRealm(cfg) { return !!(cfg && (cfg.xianqiaoReq || cfg.temperReq || cfg.jadeReq || cfg.worldReq || cfg.soulReq || cfg.originReq || cfg.proveReq)); }
         function getRealmGates(nextIdx = gameState.player.realmIndex + 1) {
             const cfg = GAME_CONFIG.realms[nextIdx];
             if (!isGateRealm(cfg)) return [];
@@ -2271,6 +2485,9 @@
             if (cfg.temperReq) gates.push({ key: 'temper', icon: '🔥', label: '淬炼元婴', have: getNascentTemper(), need: cfg.temperReq, base: 0, how: `修炼页「淬炼元婴」（每次成功率 ${Math.round(getNascentTemperRate() * 100)}%）` });
             if (cfg.jadeReq) gates.push({ key: 'jade', icon: '💠', label: '玉身', have: getJadeBody(), need: cfg.jadeReq, base: 0, how: '修炼页「玉身转化」' });
             if (cfg.worldReq) gates.push({ key: 'world', icon: '🌐', label: '小世界', have: getWorldLevel(), need: cfg.worldReq, base: 0, how: '修炼页「推演小世界」' });
+            if (cfg.soulReq) gates.push({ key: 'soul', icon: '👁️', label: '神魂', have: getSoulTemper(), need: cfg.soulReq, base: 0, how: '修炼页「淬炼神魂」' });
+            if (cfg.originReq) gates.push({ key: 'origin', icon: '🔮', label: '法则本源', have: Math.min(getLawOrigin(), cfg.originReq), need: cfg.originReq, base: 0, how: '修炼页「凝结法则本源」' });
+            if (cfg.proveReq) gates.push({ key: 'prove', icon: '⚖️', label: '证道', have: gameState.player.provenLaw ? 1 : 0, need: 1, base: 0, how: `斩尽三尸、任一法则练到 ${PROVE_LAW_LEVEL} 级后，在境界感悟面板打「证道之战」` });
             return gates;
         }
         function gatesProgress(gates) {
@@ -2358,7 +2575,9 @@
             xianbattle: { hp: 0.025, atk: 0.204 },
             // v7.23 金仙 / 太乙：同一口径相对九霄战场标定——标准玩家（入口境界、当前境界三件套、真灵根，金仙起淬炼元婴九次、
             // 太乙起玉身）穿装备 80 场全胜、敌人约 6 击打死玩家、每场约 3 秒；不穿装备胜率 22% / 8%（九霄战场 32%）
-            jinxianbattle: { hp: 0.046, atk: 0.263 }, taiyibattle: { hp: 0.064, atk: 0.355 }
+            jinxianbattle: { hp: 0.046, atk: 0.263 }, taiyibattle: { hp: 0.064, atk: 0.355 },
+            // v7.24 大罗：同口径相对玉虚战场——100 场穿装备全胜、约 6 击打死玩家、每场约 3 秒；不穿装备胜率 3%
+            daluobattle: { hp: 0.09, atk: 0.39 }
         };
         // v7.18 装备门槛：用户反馈"同境界不穿装备、食物管够也能慢慢磨过去"。在上面的标定之上再乘一层敌人攻击，
         // 标定口径：刚能进入该区域的境界、真灵根、无淬炼，模拟 40 场——
@@ -2369,7 +2588,7 @@
         const GEAR_CHECK_ATK = {
             goldenPlains: 1.75, tribulationGround: 2.5, voidSea: 1.5, abyssRuins: 2, chaosWastes: 1.5, nineNether: 1.5,
             voidAbyss: 1.5, huashiRealm: 1.5, daoWastes: 1.5, fusionVoid: 1.5, taiyiField: 1.75, lingjieAbyss: 1.75, xianbattle: 1.5,
-            jinxianbattle: 1.5, taiyibattle: 1.5
+            jinxianbattle: 1.5, taiyibattle: 1.5, daluobattle: 1.5
         };
         Object.entries(GEAR_CHECK_ATK).forEach(([k, m]) => { if (P4_AREA_SCALE[k]) P4_AREA_SCALE[k].atk *= m; });
 
@@ -2657,7 +2876,7 @@
         function getMaxDungeonRevives(dungeon) {
             const r = gameState.player.realmIndex;
             if (r < NASCENT_SAFE_REALM) return 0;
-            return dungeon && dungeon.isTribulation ? 1 : (r >= VOID_UNDYING_REALM ? VOID_DUNGEON_REVIVES : 1);
+            return dungeon && dungeon.isTribulation ? 1 : (r >= DALUO_REALM ? DALUO_REVIVES : r >= VOID_UNDYING_REALM ? VOID_DUNGEON_REVIVES : 1);
         }
         // 结婴心魔（原著"需要充分准备应对结婴心魔"）：结丹圆满冲击元婴前必须先斩心魔——一场镜像战（tribulation21，见 buildMirrorBoss），
         // 复用天劫的「突破前必须通关」机制。"充分准备"就是备好食物、满血再进
@@ -2769,7 +2988,7 @@
         // 有入门法则时每 LAW_STRIKE_INTERVAL 秒一记法则之击，伤害 = 攻击 × (1 + 入门条数)
         const LAW_MASTER_LEVEL = 30, LAW_MASTER_SUPPRESS = 0.05, LAW_STRIKE_INTERVAL = 10;
         const LAW_STRIKE_INTERVAL_XIAN = 5;   // 真仙「可以运用法则之力」：法则之击间隔减半
-        function getLawStrikeInterval() { return gameState.player.realmIndex >= 42 ? LAW_STRIKE_INTERVAL_XIAN : LAW_STRIKE_INTERVAL; }
+        function getLawStrikeInterval() { return gameState.player.realmIndex >= DAOZU_REALM ? DAOZU.strikeInterval : gameState.player.realmIndex >= 42 ? LAW_STRIKE_INTERVAL_XIAN : LAW_STRIKE_INTERVAL; }
         function getMasteredLaws() {
             if (gameState.player.realmIndex < DACHENG_REALM) return [];
             return LAW_IDS.filter(id => getLawInfo(id).level >= LAW_MASTER_LEVEL);
@@ -2781,13 +3000,13 @@
         }
         function getLawStrikeMult() {
             const n = getMasteredLaws().length;
-            if (!n || isStrikeBlockedByShuai()) return 0;   // 神衰：法则之击停摆
-            return (1 + n) * (1 + DAO_SI_STRIKE * getDaoSi());
+            if (!n || isStrikeBlockedByShuai() || isAssimilated() || isLawRestrained()) return 0;   // 神衰停摆 / 天道同化 / 收敛法则
+            return (1 + n) * (1 + DAO_SI_STRIKE * getDaoSi()) * (isDaozu() ? DAOZU.strikeMult : 1);
         }
         // 道丝（v7.23）：金仙起法则可练过 30 级，每条法则超出 30 的每一级凝成一缕道丝，每缕道丝让法则之击伤害 +DAO_SI_STRIKE
         const DAO_SI_STRIKE = 0.02;
         function getDaoSi() {
-            if (gameState.player.realmIndex < JINXIAN_REALM) return 0;
+            if (gameState.player.realmIndex < JINXIAN_REALM || isAssimilated()) return 0;
             return LAW_IDS.reduce((n, id) => n + Math.max(0, getLawInfo(id).level - LAW_MASTER_LEVEL), 0);
         }
 
@@ -2795,7 +3014,8 @@
         const PERIODIC_STRIKES = [
             { key: 'qiForm', label: '🌀 元气化形', interval: QI_FORM.interval, mult: () => getQiFormMult() },
             { key: 'nascent', label: '👶 元婴离体', interval: NASCENT_STRIKE.interval, mult: () => getNascentStrikeMult() },
-            { key: 'lawStrike', label: '☯️ 法则之击', interval: () => getLawStrikeInterval(), mult: () => getLawStrikeMult() }
+            { key: 'lawStrike', label: '☯️ 法则之击', interval: () => getLawStrikeInterval(), mult: () => getLawStrikeMult(), erosion: true },
+            { key: 'corpseE', label: '👹 恶尸化身', interval: 4, mult: () => isCorpseSevered('corpseE') ? 2 : 0 }
         ];
         const areaStrikeClock = {};   // 普通战斗区域的计时（一场只有两三秒，跨场累积）
         function resetStrikeClock(holder) { PERIODIC_STRIKES.forEach(s => { holder[s.key + 'Timer'] = 0; }); }
@@ -2811,6 +3031,7 @@
                 if (holder[k] < interval) return;
                 holder[k] -= interval;
                 hits.push({ key: s.key, label: s.label, dmg: Math.max(1, Math.floor(gameState.player.stats.atk * mult * getBattleSkillDmgMult())) });
+                if (s.erosion) addErosion(EROSION.perStrike);   // 道祖：每动用一次法则之力，天道侵蚀加深
             });
             return hits;
         }
@@ -2938,7 +3159,10 @@
             { from: 44, to: 44, title: '金仙初期·法则成丝', tip: '完全掌握法则之力：法则可练到 40 级，超出 30 级的每一级凝成一缕道丝，强化法则之击；灵域只对敌。仙穴开到 42 / 51 穴时神衰、戾衰依次降临，五衰中最凶险，渡尽且开满 60 穴才能突破金仙后期' },
             { from: 45, to: 45, title: '金仙后期·玉身转化', tip: '六十穴尽开、五衰已渡。修炼页「玉身转化」九转功成，肉身化为玉身，即为太乙' },
             { from: 46, to: 46, title: '太乙初期·推演小世界', tip: '玉身更为纯粹：生命 / 防御 +20%，法则可练到 50 级，灵域可两域叠加。太乙不再有天劫与衰相。修炼页「推演小世界」，小世界持续产出资源，推演到 Lv.10 即为太乙后期' },
-            { from: 47, to: 47, title: '太乙后期', tip: '小世界初成，寿元无穷——当前实现的至高境界。小世界还能继续推演到 Lv.30，产出随之增长' }
+            { from: 47, to: 47, title: '太乙后期·淬炼神魂', tip: '小世界初成，寿元无穷。身已化玉、法已成丝，再把神魂淬炼九重（修炼页「淬炼神魂」），身法意三合为一即可进阶大罗' },
+            { from: 48, to: 48, title: '大罗初期·法则本源', tip: '与界面共存，体内凝结法则本源：本源愈多实力愈强、不设上限；极难被灭杀，秘境夺舍重生次数增多。凝结 10 道本源即为大罗后期' },
+            { from: 49, to: 49, title: '大罗后期·斩三尸', tip: '善尸、恶尸、自我尸一齐附身，皆欲夺舍本体。三尸不可灭，只能逐一斩出、分离为化身；斩尽三尸，再以一条 50 级法则灭杀它的现任道祖，方可证道' },
+            { from: 50, to: 50, title: '道祖', tip: '在证道的法则之下无敌。然而每动用一次法则之力，天道侵蚀便加深一分，侵蚀满则被天道同化。可以收敛法则，也可以自降修为，守住自己——这是最终境界' }
         ];
         function getRealmLore(idx) { return REALM_LORE.find(l => idx >= l.from && idx <= l.to) || null; }
 
@@ -2993,7 +3217,18 @@
                 `🌐 推演小世界：修炼页新配方，每 ${SMALL_WORLD.perLevel} 次小世界升一级。小世界每小时产出 灵石（等级 × 最好战斗区域 ${SMALL_WORLD.coinWins} 场的收入）、道果 ${SMALL_WORLD.perHour.daoguo} × 等级、丹火 / 神识各 ${SMALL_WORLD.perHour.danhuo} × 等级，离线照算；Lv.10 即可突破太乙后期`,
                 '⚔️ 玉虚战场战斗区域开放', '🌐 玉清仙域秘境开放',
                 '💎 玉魄：玉虚战场 / 玉清仙域掉落，采矿页「采玉魄」也能采；炼器页可炼太乙剑 / 太乙法衣 / 太乙佩，炼丹页可炼玉魄琼脂（恢复 18000 生命）'],
-            47: [`🏁 太乙后期：小世界初成——当前实现的至高境界，暂无下一境界；小世界还能继续推演到 Lv.${SMALL_WORLD.max}`],
+            47: [`🌐 太乙后期：小世界初成，还能继续推演到 Lv.${SMALL_WORLD.max}`,
+                '👁️ 淬炼神魂：修炼页新配方，每重耗玉魄 ×3 + 元婴精魄 ×3，九重神魂大成即可进阶大罗'],
+            48: [`🌟 成就大罗，与界面共存：修炼页「凝结法则本源」，每道本源攻击 / 生命 / 防御 +${LAW_ORIGIN.per * 100}%，不设上限；凝结 10 道即可突破大罗后期`,
+                `🛡️ 极难灭杀：秘境夺舍重生 ${VOID_DUNGEON_REVIVES} → ${DALUO_REVIVES} 次，每次恢复 ${DALUO_REVIVE_HP * 100}% 生命（天劫类仍只有一次）`,
+                '⚔️ 罗天战场战斗区域开放', '🌠 罗天仙域秘境开放',
+                '🟫 玄黄精：罗天战场 / 罗天仙域掉落，采矿页「采玄黄精」也能采；炼器页可炼大罗剑 / 大罗法衣 / 大罗佩（约为太乙装备的 1.35 倍），炼丹页可炼玄黄玉液（恢复 24000 生命）'],
+            49: [`👥 三尸附身：善尸（${XIAN_SHUAI.find(sh => sh.id === 'corpseShan').effect}）、恶尸（${XIAN_SHUAI.find(sh => sh.id === 'corpseE').effect}）、自我尸（${XIAN_SHUAI.find(sh => sh.id === 'corpseWo').effect}），皆欲夺舍本体。境界感悟面板逐一「斩尸」：三尸不可灭，赢了即分离为化身，各留一项永久加成；输了被夺舍，折损一道法则本源`,
+                `⚖️ 证道：斩尽三尸后，选一条练到 ${PROVE_LAW_LEVEL} 级的法则，打赢「证道之战」灭杀它的现任道祖，即可突破道祖`],
+            50: [`🌟 成就道祖：证道法则的效果 ×${DAOZU.provenMult}，法则之击每 ${DAOZU.strikeInterval} 秒一击、威力 ×${DAOZU.strikeMult}——在这条法则之下无敌`,
+                `🌀 天道侵蚀：每次法则之击 +${EROSION.perStrike}、展开灵域 +${EROSION.perDomain}，每小时消退 ${EROSION.decayPerHour}；满 ${EROSION.assimilateAt} 被天道同化，法则效果、道丝、法则之击、灵域全部失效，退到 ${EROSION.recoverAt} 以下恢复`,
+                `🧘 境界感悟面板可「收敛法则」（不动用法则之力，侵蚀不涨），或「自降修为」退回大罗后期（侵蚀清零，首次获得道心：攻击 / 生命 / 防御 +${DAO_HEART_BONUS * 100}%，再证道须重打证道之战）`,
+                '🏁 道祖是最终境界'],
         };
         LIFE_REFINE_TIERS.slice(1).forEach((t, i) => {
             const limit = [null, null, null, '下品金丹的上限', '须中品以上金丹', '须上品以上金丹'][i + 1];
@@ -3051,7 +3286,7 @@
             document.getElementById('realmUnlockContent').innerHTML = `
                 <div class="tutorial-title">🌄 试玩到此为止</div>
                 <div class="tutorial-body">试玩版的内容到<b>${getRealmName(DEMO_REALM_CAP)}</b>为止。<br/><br/>
-                    完整版还有化神、炼虚、合体、大乘、真仙、金仙直到太乙的全部境界，以及天劫、悟道法则、道则、合道、元婴离体、仙穴与衰相等后期玩法。<br/><br/>
+                    完整版还有化神、炼虚、合体、大乘、真仙、金仙、太乙、大罗直到道祖的全部境界，以及天劫、悟道法则、道则、合道、元婴离体、仙穴与衰相等后期玩法。<br/><br/>
                     <b>存档与完整版通用</b>：购买完整版后打开游戏，选择同一个存档即可接着修炼，试玩期间达成的成就也会一并记入。</div>
                 <div class="tutorial-actions">
                     ${canOpenStore ? '<button class="btn" onclick="DESKTOP.openStore()">前往商店页</button>' : ''}
@@ -3063,7 +3298,7 @@
         // 成就：条件全部按存档里的现有状态判断（每 5 秒、突破后、读档后各查一次），解锁记在 gameState.achievements[id] = 时间戳。
         // 网页版在「设置 → 成就」查看；桌面版同时同步到 Steam（id 即 Steamworks 后台的成就 API 名称，两边必须一致，
         // 清单见 desktop/STEAM上架指南.md）。读档时把以前解锁过的全部重新同步一遍，所以试玩版 / 离线期间达成的成就也不会丢。
-        const NORMAL_DUNGEON_IDS = ['mysteryTower', 'mysteriousForest', 'ancientRuin', 'tribulationGround', 'huashenRealm', 'taixuDream', 'voidRealm', 'tiandaoRealm', 'taiyiRealm', 'taiqingRealm', 'shangqingRealm', 'yuqingRealm'];
+        const NORMAL_DUNGEON_IDS = ['mysteryTower', 'mysteriousForest', 'ancientRuin', 'tribulationGround', 'huashenRealm', 'taixuDream', 'voidRealm', 'tiandaoRealm', 'taiyiRealm', 'taiqingRealm', 'shangqingRealm', 'yuqingRealm', 'luotianRealm'];
         const isDungeonDone = id => !!(gameState.dungeons && gameState.dungeons[id] && gameState.dungeons[id].completed);
         const anyWorkSkillAt = lv => WORK_SKILLS.some(k => gameState.skills[k] && gameState.skills[k].level >= lv);
         function anyRecipeMastered() {
@@ -3110,7 +3345,14 @@
             { id: 'ACH_LAST_SHUAI',  glyph: '尽', name: '五衰尽渡',   desc: '渡过最凶险的神衰与戾衰',                   check: () => XIAN_SHUAI.filter(sh => sh.realm === JINXIAN_REALM).every(isShuaiDone) },
             { id: 'ACH_JINXIAN_LATE', glyph: '甲', name: '六十穴尽开', desc: '仙穴开满 60 穴，突破到金仙后期',          check: () => gameState.player.realmIndex >= JINXIAN_REALM + 1 },
             { id: 'ACH_TAIYI',       glyph: '玉', name: '太乙',       desc: '肉身化为玉身，突破到太乙初期',             check: () => gameState.player.realmIndex >= TAIYI_REALM },
-            { id: 'ACH_TAIYI_LATE',  glyph: '界', name: '小世界初成', desc: '推演小世界到 Lv.10，突破到太乙后期',       check: () => gameState.player.realmIndex >= TAIYI_REALM + 1 }
+            { id: 'ACH_TAIYI_LATE',  glyph: '界', name: '小世界初成', desc: '推演小世界到 Lv.10，突破到太乙后期',       check: () => gameState.player.realmIndex >= TAIYI_REALM + 1 },
+            // v7.24 大罗 / 道祖
+            { id: 'ACH_SOUL',        glyph: '魂', name: '神魂大成',   desc: '淬炼神魂九重',                             check: () => getSoulTemper() >= SOUL_TEMPER.max },
+            { id: 'ACH_DALUO',       glyph: '罗', name: '大罗',       desc: '突破到大罗初期',                         check: () => gameState.player.realmIndex >= DALUO_REALM },
+            { id: 'ACH_ORIGIN',      glyph: '源', name: '本源三十',   desc: '凝结 30 道法则本源',                       check: () => getLawOrigin() >= 30 },
+            { id: 'ACH_CORPSE',      glyph: '尸', name: '斩尽三尸',   desc: '斩出善尸、恶尸、自我尸',                   check: () => XIAN_SHUAI.filter(sh => sh.kind === 'corpse').every(isShuaiDone) },
+            { id: 'ACH_DAOZU',       glyph: '祖', name: '道祖',       desc: '证道，成就道祖',                           check: () => gameState.player.realmIndex >= DAOZU_REALM },
+            { id: 'ACH_DAO_HEART',   glyph: '心', name: '道心自守',   desc: '身为道祖而自降修为，不被天道吞噬',           check: () => !!gameState.player.daoHeart }
         ];
         function getAchievementStore() {
             if (!gameState.achievements || typeof gameState.achievements !== 'object') gameState.achievements = {};
@@ -3769,6 +4011,7 @@
                 tickFarmPlot();
                 tickClone();
                 tickSmallWorld();
+                decayErosion(0.1);
                 if (!gameState.currentAction) return;
 
                 // 秘境战斗特殊处理
@@ -4050,7 +4293,12 @@
                 rec.fails = (rec.fails || 0) + 1;
             }
             const shuaiCfg = XIAN_SHUAI.find(sh => sh.id === dungeonId);
-            let orificeLost = 0;
+            let orificeLost = 0, originLost = 0;
+            if (shuaiCfg && shuaiCfg.failLoseOrigin && getLawOrigin() > 0) {
+                originLost = Math.min(getLawOrigin(), shuaiCfg.failLoseOrigin);
+                gameState.player.lawOrigin = getLawOrigin() - originLost;
+                calculateStats();
+            }
             if (shuaiCfg && shuaiCfg.failLoseOrifice) {
                 const floor = (GAME_CONFIG.realms[gameState.player.realmIndex] || {}).xianqiaoReq || 0;
                 const before = getXianqiao();
@@ -4089,6 +4337,7 @@
                                     (nascentSafe ? `${dungeon.isHeartDemon ? '心魔未除' : '元婴不灭'}：修为无损\n` : `丢失修为: ${lostCultivation} (10%)\n`) +
                                     `丢失食物: ${foodLost}份 (${Math.round(foodLossRate * 100)}%)\n` +
                                     (orificeLost ? `戾气反噬：折损 ${orificeLost} 个仙穴（现 ${getXianqiao()} 穴）\n` : '') +
+                                    (originLost ? `${GAME_CONFIG.dungeons[dungeonId].name}夺舍未遂：折损 ${originLost} 道法则本源（现 ${getLawOrigin()} 道）\n` : '') +
                                     (dungeon.isTribulation ? `下次再渡：劫力减弱至 ${Math.round(getTribPityMult(dungeonId) * 100)}%（失败 ${getTribFails(dungeonId)}/${TRIB_PITY.maxFails} 次封顶）\n` : '') +
                                     `血量: ${gameState.player.stats.hp.current}/${gameState.player.stats.hp.max} (+50%)`;
             showNotification(notificationText, '#c4483a', 'danger');
@@ -4680,7 +4929,8 @@
             taiqingRealm:      [72.9, 84.3, 75.9, 94.2, 179.7],
             // v7.23：上清 / 玉清按太清的口径换算——同一标准玩家（入口境界、当前境界三件套）实测击杀用时 × 太清「表值 / 实测」的比例
             shangqingRealm:    [66.8, 77.2, 71.1, 87.0, 162.2],
-            yuqingRealm:       [70.2, 84.8, 79.1, 91.0, 174.5]
+            yuqingRealm:       [70.2, 84.8, 79.1, 91.0, 174.5],
+            luotianRealm:      [74.5, 87.3, 81.2, 99.1, 183.6]   // v7.24：同口径，8 灵根穿装备全过且不触发狂暴、不穿装备全倒在第一只
         };
         function getDungeonEnrageLimit(dungeonId, idx) {
             const t = (DUNGEON_ENRAGE_TIMES[dungeonId] || [])[idx];
@@ -4781,10 +5031,10 @@
                 if (used < maxRevives) {
                     gameState.dungeons.nascentRevives = used + 1;
                     gameState.dungeons.nascentRevived = true;
-                    gameState.player.stats.hp.current = Math.floor(gameState.player.stats.hp.max * NASCENT_REVIVE_HP);
+                    gameState.player.stats.hp.current = Math.floor(gameState.player.stats.hp.max * getReviveHp());
                     const left = maxRevives - used - 1;
-                    addBattleLog(`🛡️ 肉身被毁，元婴夺舍重生！生命恢复到 ${Math.round(NASCENT_REVIVE_HP * 100)}%`, 'victory');
-                    showNotification(`🛡️ ${gameState.player.realmIndex >= VOID_UNDYING_REALM && !dungeon.isTribulation ? '身融天地' : '元婴不灭'}：夺舍重生，以 ${Math.round(NASCENT_REVIVE_HP * 100)}% 生命继续战斗（本次${dungeon.isTribulation ? '天劫' : '秘境'}还剩 ${left} 次）`, '#b39ddb');
+                    addBattleLog(`🛡️ 肉身被毁，元婴夺舍重生！生命恢复到 ${Math.round(getReviveHp() * 100)}%`, 'victory');
+                    showNotification(`🛡️ ${gameState.player.realmIndex >= VOID_UNDYING_REALM && !dungeon.isTribulation ? '身融天地' : '元婴不灭'}：夺舍重生，以 ${Math.round(getReviveHp() * 100)}% 生命继续战斗（本次${dungeon.isTribulation ? '天劫' : '秘境'}还剩 ${left} 次）`, '#b39ddb');
                 } else {
                     handlePlayerDeath();
                     updateProgressBars();
@@ -5090,7 +5340,8 @@
             // 太乙精华概率比上一档更高：这是「开辟仙窍」的唯一材料，真仙境的战斗本身就是仙窍材料的主要来源
             xianbattle:        [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'xianlingjing', p: 0.15, qty: 1 }, { id: 'daofruit', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.04, qty: 1 }],
             jinxianbattle:     [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'xianjin', p: 0.15, qty: 1 }, { id: 'xianlingjing', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.05, qty: 1 }],
-            taiyibattle:       [{ id: 'taiyiessence', p: 0.32, qty: [1, 3] }, { id: 'yupo', p: 0.15, qty: 1 }, { id: 'xianjin', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.05, qty: 1 }]
+            taiyibattle:       [{ id: 'taiyiessence', p: 0.32, qty: [1, 3] }, { id: 'yupo', p: 0.15, qty: 1 }, { id: 'xianjin', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.05, qty: 1 }],
+            daluobattle:       [{ id: 'taiyiessence', p: 0.34, qty: [1, 3] }, { id: 'xuanhuang', p: 0.15, qty: 1 }, { id: 'yupo', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.06, qty: 1 }]
         };
 
         // 掉落数量文字（如 1–2 / 1）
@@ -5650,7 +5901,7 @@
         const DOMAIN_SHENSHI_COST = 15;   // 每次进入战斗激活一次：化神期神识产出约 0.3/秒，15 点约合半分钟产出，有真实成本但不至于用不起
         const MIN_ATTACK_INTERVAL = 0.3;   // 攻击间隔下限，防止冰域 / 装备叠加把间隔压到 0 或负数
 
-        function isDomainUnlocked() { return gameState.player.realmIndex >= 26; }   // v6.89：原索引17 → +9
+        function isDomainUnlocked() { return gameState.player.realmIndex >= 26 && !isAssimilated() && !isLawRestrained(); }   // v6.89：原索引17 → +9；道祖同化 / 收敛时不能展开
         // 灵域的三个阶段（v7.23）：化神～真仙借天地之势布域，敌我同受；金仙以法则凝成自己的灵域，「只对敌」——
         // 自己只吃到灵域的好处、敌人只吃到坏处；太乙「叠域」，可以同时展开两个灵域（各自只对敌）
         function isDomainOneSided() { return gameState.player.realmIndex >= JINXIAN_REALM; }
@@ -5695,8 +5946,8 @@
         function getMonsterEffectiveStats(monster) {
             const hasDomain = getActiveDomains().length > 0;
             const suppress = 1 - getLawSuppression();   // 大乘：入门的法则压制群敌
-            if (!hasDomain && suppress === 1) return { atk: monster.atk, def: monster.def, spd: monster.spd };
-            const atkMod = (1 + domainSideEffect('foe', 'atkPct')) * suppress;
+            if (!hasDomain && suppress === 1 && !getCorpseFoeAtk()) return { atk: monster.atk, def: monster.def, spd: monster.spd };
+            const atkMod = (1 + domainSideEffect('foe', 'atkPct') + getCorpseFoeAtk()) * suppress;   // 恶尸噬心：敌人攻击 +20%
             const defMod = (1 + domainSideEffect('foe', 'defPct')) * suppress;
             const spdMod = 1 + domainSideEffect('foe', 'spdPct');
             return {
@@ -5725,6 +5976,7 @@
             const cost = DOMAIN_SHENSHI_COST * keys.length;
             if (P.shenshi < cost) { spendNotify('shenshi', cost); return false; }
             P.shenshi -= cost;
+            addErosion(EROSION.perDomain * keys.length);   // 道祖：展开灵域也是动用法则之力
             P.activeDomain = keys[0];
             P.activeDomain2 = keys[1] || null;
             if (!P.domainStats) P.domainStats = {};
@@ -5908,6 +6160,13 @@
                 });
                 const lawScale = 1 + DAO_LAW_PER_LEVEL * getDaoLaw();   // 道果悟法：全部法则效果放大
                 if (lawScale !== 1) Object.keys(lawTotalsCache).forEach(k => { lawTotalsCache[k] *= lawScale; });
+                // 道祖：证道法则的效果 ×2；被天道同化时法则效果全部失效
+                if (isDaozu() && gameState.player.provenLaw && !isAssimilated()) {
+                    Object.entries(getLawEffectsAt(gameState.player.provenLaw, getLawInfo(gameState.player.provenLaw).level)).forEach(([k, v]) => {
+                        lawTotalsCache[k] = (lawTotalsCache[k] || 0) + v * lawScale * (DAOZU.provenMult - 1);
+                    });
+                }
+                if (isAssimilated()) lawTotalsCache = {};
             }
             return lawTotalsCache;
         }
@@ -6315,7 +6574,7 @@
                 const ws = GAME_CONFIG.items[id]?.effect?.workSpeed;
                 if (ws) mult *= ws;
             });
-            return mult * (1 - 0.015 * getShenLevel('focus')) * (isFused() ? FUSION_BONUS.workSpeed : 1);   // 神识「专注」：耗时 -1.5%/级；合道：耗时 ×0.5
+            return mult * (1 - 0.015 * getShenLevel('focus')) * (isFused() ? FUSION_BONUS.workSpeed : 1) * getCorpseWorkMult();   // 善尸牵绊 / 善尸化身   // 神识「专注」：耗时 -1.5%/级；合道：耗时 ×0.5
         }
 
         // 其他技能：仅受工作速度倍率 = duration × getWorkSpeedMultiplier()
@@ -6759,6 +7018,16 @@
                 gameState.player.jadeBody = Math.min(JADE_BODY.max, getJadeBody() + finalOutput.jadeBody);
                 showNotification(`💠 玉身转化 ${getJadeBody()}/${JADE_BODY.max}${getJadeBody() >= JADE_BODY.max ? '——肉身尽化玉身，可以突破太乙' : ''}`, '#c2a25f', getJadeBody() >= JADE_BODY.max ? 'rare' : 'info');
                 if (getJadeBody() >= JADE_BODY.max) { gameState.currentAction = null; gameState.currentActionProgress = 0; }
+            }
+            if (finalOutput.soulTemper) {
+                gameState.player.soulTemper = Math.min(SOUL_TEMPER.max, getSoulTemper() + finalOutput.soulTemper);
+                showNotification(`👁️ 淬炼神魂 ${getSoulTemper()}/${SOUL_TEMPER.max}${getSoulTemper() >= SOUL_TEMPER.max ? '——神魂大成，身法意三合为一，可以进阶大罗' : ''}`, '#c2a25f', getSoulTemper() >= SOUL_TEMPER.max ? 'rare' : 'info');
+                if (getSoulTemper() >= SOUL_TEMPER.max) { gameState.currentAction = null; gameState.currentActionProgress = 0; }
+            }
+            if (finalOutput.lawOrigin) {
+                gameState.player.lawOrigin = getLawOrigin() + finalOutput.lawOrigin;
+                calculateStats();
+                showNotification(`🔮 凝结法则本源：${getLawOrigin()} 道（攻击 / 生命 / 防御 +${Math.round(getLawOrigin() * LAW_ORIGIN.per * 100)}%）`, '#c2a25f', getLawOrigin() === 10 ? 'rare' : 'info');
             }
             if (finalOutput.worldDeduce) {
                 const before = getWorldLevel();
@@ -7523,6 +7792,7 @@
             if (o.nascentTemper) return getNascentTemper() >= NASCENT_TEMPER.max;
             if (o.jadeBody) return getJadeBody() >= JADE_BODY.max;
             if (o.worldDeduce) return getWorldLevel() >= SMALL_WORLD.max;
+            if (o.soulTemper) return getSoulTemper() >= SOUL_TEMPER.max;
             return false;
         }
 
@@ -8386,7 +8656,8 @@
                 // 真仙境新增（v6.88）：延续大乘期每级约 2x 的奖励增速，未做真实引擎胜率标定，先按曲线外推，后续可再调
                 xianbattle: { name: '九霄战场', desc: '真仙修士交锋的九霄之上', minLevel: 42, maxLevel: 43, enemies: ['xian-beast', 'void-immortal'], coins: 1040000, exp: 409600 },
                 jinxianbattle: { name: '金阙战场', desc: '金仙以法则交锋之地', minLevel: 44, maxLevel: 45, enemies: ['jinxian-guard', 'daosi-soldier'], coins: 2080000, exp: 819200 },
-                taiyibattle: { name: '玉虚战场', desc: '太乙修士推演天地的战场', minLevel: 46, maxLevel: 47, enemies: ['yuxu-immortal', 'world-spirit'], coins: 4160000, exp: 1638400 }
+                taiyibattle: { name: '玉虚战场', desc: '太乙修士推演天地的战场', minLevel: 46, maxLevel: 47, enemies: ['yuxu-immortal', 'world-spirit'], coins: 4160000, exp: 1638400 },
+                daluobattle: { name: '罗天战场', desc: '大罗修士与界面共存之地，法则本源相激', minLevel: 48, maxLevel: 50, enemies: ['luotian-envoy', 'origin-puppet'], coins: 8320000, exp: 3276800 }
             };
 
             const actions = {};
@@ -8588,6 +8859,10 @@
                 taiyibattle: [
                     { name: '玉虚游仙', hp: 100000, atk: 4000, def: 660, spd: 130, icon: '🧚' },
                     { name: '小世界守灵', hp: 106000, atk: 4260, def: 620, spd: 140, icon: '🌐' }
+                ],
+                daluobattle: [
+                    { name: '罗天巡使', hp: 100000, atk: 4000, def: 680, spd: 135, icon: '👤' },
+                    { name: '本源灵傀', hp: 106000, atk: 4260, def: 640, spd: 145, icon: '🤖' }
                 ]
             };
 
@@ -9046,7 +9321,7 @@
             const realm = GAME_CONFIG.realms[gameState.player.realmIndex];
             document.getElementById('realmDisplay').textContent = realm.name;
             const nextCfg = GAME_CONFIG.realms[gameState.player.realmIndex + 1];
-            document.getElementById('nextBreakthrough').textContent = isGateRealm(nextCfg) ? getRealmGates().map(g => `${g.label} ${g.need}`).join(' · ') : fmtXP(realm.nextReq);
+            document.getElementById('nextBreakthrough').textContent = isDaozu() ? '大道尽头' : isGateRealm(nextCfg) ? getRealmGates().map(g => `${g.label} ${g.need}`).join(' · ') : fmtXP(realm.nextReq);
             renderRealmLore();
         }
 
@@ -9127,7 +9402,31 @@
             } else if (idx === JINXIAN_REALM + 1 && getJadeBody() < JADE_BODY.max) {
                 now.push(`<div>💠 玉身转化 ${getJadeBody()}/${JADE_BODY.max}：修炼页「玉身转化」</div>`);
             }
-            if (idx >= VOID_UNDYING_REALM) more.push(`<div>🌌 身融天地：战斗区域被击败不退出，秘境可夺舍重生 ${VOID_DUNGEON_REVIVES} 次（${NASCENT_REVIVE_HP * 100}% 生命；天劫仍只有一次）</div>`);
+            if (idx === TAIYI_REALM + 1 && getSoulTemper() < SOUL_TEMPER.max) now.push(`<div>👁️ 淬炼神魂 ${getSoulTemper()}/${SOUL_TEMPER.max}：修炼页「淬炼神魂」，神魂大成即进阶大罗</div>`);
+            if (idx >= DALUO_REALM) {
+                now.push(`<div>🔮 法则本源 ${getLawOrigin()} 道：攻击 / 生命 / 防御 +${Math.round(getLawOrigin() * LAW_ORIGIN.per * 100)}%（修炼页「凝结法则本源」，不设上限）</div>`);
+                more.push(`<div>🛡️ 极难灭杀：战斗区域被击败不退出；秘境可夺舍重生 ${DALUO_REVIVES} 次，每次恢复 ${DALUO_REVIVE_HP * 100}% 生命（天劫类仍只有一次）</div>`);
+            }
+            if (idx === DAOZU_REALM - 1) {
+                const tw = trialWords(idx);
+                if (!getPendingShuai().length && !gameState.player.provenLaw) {
+                    const laws = getProvableLaws();
+                    now.push(laws.length
+                        ? `<div>⚖️ 证道：一条法则只能有一位道祖，选一条 ${PROVE_LAW_LEVEL} 级法则，灭杀它的现任道祖${laws.map(id => `<button type="button" class="btn btn-secondary lore-todo" style="padding:2px 8px;font-size:0.9em;margin:2px 0 0 4px;" onclick="startProveBattle('${id}')">以${LAW_EFFECTS[id].name.replace('之法则', '')}证道</button>`).join('')}</div>`
+                        : `<div>⚖️ 证道：须有一条法则练到 ${PROVE_LAW_LEVEL} 级（悟道页），才能挑战它的现任道祖</div>`);
+                } else if (getPendingShuai().length) {
+                    now.push(`<div>⚖️ 证道：先${tw.verb}尽三尸（还剩 ${getPendingShuai().length}）</div>`);
+                }
+            }
+            if (idx >= DAOZU_REALM) {
+                const P = gameState.player, law = P.provenLaw && LAW_EFFECTS[P.provenLaw];
+                now.push(`<div>⚖️ 证道法则：${law ? law.name : '—'}（效果 ×${DAOZU.provenMult}）；法则之击每 ${DAOZU.strikeInterval} 秒一击、威力 ×${DAOZU.strikeMult}</div>`);
+                now.push(`<div style="color:${isAssimilated() ? 'var(--color-danger)' : getErosion() >= 70 ? 'var(--color-warning)' : 'inherit'}">🌀 天道侵蚀 ${getErosion().toFixed(1)}/${EROSION.assimilateAt}${isAssimilated() ? `：已被同化，法则之力失效，退到 ${EROSION.recoverAt} 以下恢复` : `：每次法则之击 +${EROSION.perStrike}、展开灵域 +${EROSION.perDomain}，每小时消退 ${EROSION.decayPerHour}`}
+                    <button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="toggleLawRestraint()">${isLawRestrained() ? '放开法则之力' : '收敛法则'}</button>
+                    <button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="selfDemote()">自降修为</button></div>`);
+            }
+            if (gameState.player.daoHeart) more.push(`<div>🧘 道心：攻击 / 生命 / 防御 +${DAO_HEART_BONUS * 100}%（自降修为所得）</div>`);
+            if (idx >= VOID_UNDYING_REALM && idx < DALUO_REALM) more.push(`<div>🌌 身融天地：战斗区域被击败不退出，秘境可夺舍重生 ${VOID_DUNGEON_REVIVES} 次（${NASCENT_REVIVE_HP * 100}% 生命；天劫仍只有一次）</div>`);
             const tribBonus = getTribulationMod('hpPct');
             if (tribBonus > 0) more.push(`<div>⚡ 已渡天劫 ${TRIBULATION_REALMS.filter(r => hasSurvivedTribulation(r)).length} 次：生命 / 防御 +${Math.round(tribBonus * 100)}%</div>`);
             if (TRIBULATION_REALMS.includes(idx)) {
@@ -9141,6 +9440,7 @@
             const nextRealm = GAME_CONFIG.realms[idx + 1];
             if (isGateRealm(nextRealm)) {
                 getRealmGates(idx + 1).forEach(g => {
+                    if (g.key === 'prove') return;   // 证道另有一行（带「以某法则证道」按钮），不重复
                     if (idx === 41 && g.key === 'xianqiao') {
                         now.push(`<div>☯️ 仙元转化 ${g.have}/${g.need} 穴：${hasSurvivedTribulation(41) ? '修炼页「开辟仙穴」，全部转化即飞升真仙初期' : '渡过飞升天劫后开始'}</div>`);
                         return;
@@ -9155,10 +9455,10 @@
             if (getRealmShuai(idx).length) {
                 getRealmShuai(idx).forEach(sh => {
                     const d = GAME_CONFIG.dungeons[sh.id];
-                    if (isShuaiDone(sh)) { more.push(`<div>${d.icon} ${d.name}：已渡过 ✅</div>`); return; }
+                    if (isShuaiDone(sh)) { more.push(sh.kind === 'corpse' ? `<div>${d.icon} ${d.name}：已分离 ✅ ${sh.boon}</div>` : `<div>${d.icon} ${d.name}：已渡过 ✅</div>`); return; }
                     if (getXianqiao() < sh.at) { now.push(`<div style="color:var(--text-l4)">${d.icon} ${d.name}：仙穴 ${sh.at} 穴时降临（${sh.effect}）</div>`); return; }
-                    now.push(`<div style="color:var(--color-danger)">${d.icon} ${d.name}生效中：${sh.effect}
-                        <button type="button" class="btn btn-secondary lore-todo" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${sh.id}'))">渡${d.name}</button><br><small style="color:var(--text-l4)">${tribulationHint(d)}</small></div>`);
+                    now.push(`<div style="color:var(--color-danger)">${d.icon} ${d.name}${sh.kind === 'corpse' ? '附身' : '生效中'}：${sh.effect}
+                        <button type="button" class="btn btn-secondary lore-todo" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${sh.id}'))">${sh.kind === 'corpse' ? '斩' : '渡'}${d.name}</button><br><small style="color:var(--text-l4)">${tribulationHint(d)}</small></div>`);
                 });
             }
             const next = [13, 17, 21, 25].find(i => i >= idx);
@@ -9187,8 +9487,9 @@
             // 大乘圆满 / 真仙初期的突破只看仙窍：进度条、是否可突破都按仙窍算（原来按钮要等修为满才出现，等于暗中还要攒满修为）
             const nextRealmCfg = GAME_CONFIG.realms[gameState.player.realmIndex + 1];
             const gates = isGateRealm(nextRealmCfg) ? getRealmGates() : null;   // 仙界：按突破条件算（仙穴 / 淬炼元婴 / 玉身 / 小世界）
-            const percentage = gates
-                ? Math.min(100, Math.max(0, gatesProgress(gates) * 100))
+            const daozu = isDaozu();   // 道祖是最终境界：这根条改显示天道侵蚀
+            const percentage = daozu ? getErosion()
+                : gates ? Math.min(100, Math.max(0, gatesProgress(gates) * 100))
                 : Math.min((gameState.player.cultivationXP / realm.nextReq) * 100, 100);
             document.getElementById('cultivationBar').style.width = percentage + '%';
             const cultBar = document.getElementById('cultivationProgress');
@@ -9197,12 +9498,13 @@
             cultBar.classList.toggle('flowing', !!(gameState.currentAction && gameState.currentAction.skill === 'cultivation'));   // 正在修炼：一道流光缓缓扫过
             document.getElementById('progressText').textContent = Math.round(percentage) + '%';
             // 修为显示：达到上限时提示可突破；大境界缺丹药时明确写出缺什么
-            const full = gates ? gatesMet(gates) : gameState.player.cultivationXP >= realm.nextReq;
+            const full = daozu ? false : gates ? gatesMet(gates) : gameState.player.cultivationXP >= realm.nextReq;
             const isMajor = MAJOR_BREAKTHROUGH_INDICES.has(gameState.player.realmIndex) && !!GAME_CONFIG.realms[gameState.player.realmIndex + 1];
             const req = isMajor ? MAJOR_BREAKTHROUGH_PILLS[gameState.player.realmIndex] : null;
             const pillQty = req ? ((gameState.player.inventory.find(item => item.id === req.pillId) || {}).qty || 0) : 0;
             const lackPill = full && !!req && pillQty < req.qty;
-            let cultivationDisplay = gates ? gatesText(gates, ' · ') : `${fmtXP(gameState.player.cultivationXP)}/${fmtXP(realm.nextReq)}`;
+            let cultivationDisplay = daozu ? `天道侵蚀 ${getErosion().toFixed(1)}/${EROSION.assimilateAt}${isAssimilated() ? '（已同化）' : isLawRestrained() ? '（收敛中）' : ''}`
+                : gates ? gatesText(gates, ' · ') : `${fmtXP(gameState.player.cultivationXP)}/${fmtXP(realm.nextReq)}`;
             if (full) cultivationDisplay += lackPill ? ` ⚠ 缺${req.pillName}` : ` ✨ 可突破`;
             document.getElementById('cultivationXP').textContent = cultivationDisplay;
 
@@ -9929,12 +10231,13 @@
                 document.getElementById('btModalTitle').textContent = `✨ 突破${nextRealm.name} ✨`;
                 const gates = getRealmGates();
                 const pending = getPendingShuai(), realmShuai = getRealmShuai();
+                const tw = trialWords();
                 document.getElementById('btBreakthroughType').textContent = realmIndex === 41
                     ? `渡飞升天劫后灵气化为仙元：已转化 ${gates[0].have}/${gates[0].need} 穴`
-                    : `${gatesText(gates)}${realmShuai.length ? `｜衰相 ${realmShuai.length - pending.length}/${realmShuai.length} 已渡` : ''}`;
+                    : `${gatesText(gates)}${realmShuai.length ? `｜${tw.group} ${realmShuai.length - pending.length}/${realmShuai.length} ${tw.done}` : ''}`;
                 const button = document.getElementById('btButton');
                 const lack = gates.find(g => g.have < g.need);
-                button.textContent = lack ? `${lack.label}不足（${lack.have}/${lack.need}）` : pending.length ? `衰相未渡尽（${pending.length}）` : '🌟 飞升突破 🌟';
+                button.textContent = pending.length ? `${tw.pending}（${pending.length}）` : lack ? `${lack.label}不足（${lack.have}/${lack.need}）` : '🌟 飞升突破 🌟';
             } else if (isMajorBreakthrough && nextRealm) {
                 // 大境界突破
                 document.getElementById('btModalTitle').textContent = realmIndex === ASCEND_REALM ? `✨ 飞升上界（${nextRealm.name}）✨` : `✨ 突破${nextRealm ? nextRealm.name : '大道尽头'} ✨`;
@@ -10027,13 +10330,13 @@
             // 真仙境两次突破（大乘圆满→真仙初期需12窍，真仙初期→真仙后期需24窍）改用仙窍数量判定，
             // 不再看修为——nextRealm.xianqiaoReq 有值就说明这次突破走仙窍这条线
             if (isGateRealm(nextRealm)) {
-                const lack = getRealmGates().find(g => g.have < g.need);
+                const lack = getPendingShuai().length && nextRealm.proveReq ? null : getRealmGates().find(g => g.have < g.need);
                 if (lack) {
                     showNotification(`${lack.label}不足：${lack.have}/${lack.need}，去${lack.how}`, '#c98a3e', 'warning');
                     return;
                 }
                 if (getPendingShuai().length) {
-                    showNotification(`衰相未渡尽（还剩 ${getPendingShuai().map(sh => GAME_CONFIG.dungeons[sh.id].name).join('、')}），不能突破${nextRealm.name}`, '#c98a3e', 'warning');
+                    showNotification(`${trialWords().pending}（还剩 ${getPendingShuai().map(sh => GAME_CONFIG.dungeons[sh.id].name).join('、')}），不能突破${nextRealm.name}`, '#c98a3e', 'warning');
                     showBreakthroughModal();
                     return;
                 }
@@ -10117,7 +10420,9 @@
             38: { name: '大乘', line: '元婴离体，法则随心', kind: 'dacheng', dur: 5.4 },
             42: { name: '飞升', line: '仙穴打通，肉身化道', kind: 'dacheng', dur: 5.6 },
             44: { name: '金仙', line: '元婴九炼，法则成丝', kind: 'law', dur: 5.6 },
-            46: { name: '太乙', line: '玉身无垢，推演乾坤', kind: 'dacheng', dur: 6.0 }
+            46: { name: '太乙', line: '玉身无垢，推演乾坤', kind: 'dacheng', dur: 6.0 },
+            48: { name: '大罗', line: '神魂大成，本源自凝', kind: 'law', dur: 6.0 },
+            50: { name: '道祖', line: '一法证道，万法皆下', kind: 'dacheng', dur: 6.6 }
         };
         // 灵根对应的颜色（灵气入体特效用你自己的灵根色）
         const ROOT_FX_COLORS = { metal: '#d8c078', wood: '#7fae9a', water: '#7d9bb5', fire: '#d9614f', earth: '#b08d5a', wind: '#b7c9c2', thunder: '#b39ddb', ice: '#a8d8e8' };
@@ -11235,6 +11540,7 @@
             settleCloneOffline(offlineSeconds);
             settleFarmPlotOffline(offlineSeconds);
             settleSmallWorldOffline(offlineSeconds);
+            decayErosion(offlineSeconds);
 
             // 战斗/秘境无法在离线时进行，重新打开页面时战斗界面已丢失，直接中断
             const savedAction = gameState.currentAction;
@@ -11482,6 +11788,16 @@
                 gameState.player.jadeBody = Math.min(JADE_BODY.max, getJadeBody() + completions);
                 showNotification(`💠 离线玉身转化：${getJadeBody()}/${JADE_BODY.max}`, '#c2a25f');
                 if (getJadeBody() >= JADE_BODY.max) gameState.currentAction = null;
+            }
+            if (completions > 0 && perAction.soulTemper) {
+                gameState.player.soulTemper = Math.min(SOUL_TEMPER.max, getSoulTemper() + completions);
+                showNotification(`👁️ 离线淬炼神魂：${getSoulTemper()}/${SOUL_TEMPER.max}`, '#c2a25f');
+                if (getSoulTemper() >= SOUL_TEMPER.max) gameState.currentAction = null;
+            }
+            if (completions > 0 && perAction.lawOrigin) {
+                gameState.player.lawOrigin = getLawOrigin() + completions;
+                calculateStats();
+                showNotification(`🔮 离线凝结法则本源 ${completions} 道：共 ${getLawOrigin()} 道`, '#c2a25f');
             }
             if (completions > 0 && perAction.worldDeduce) {
                 const before = getWorldLevel();
@@ -12043,6 +12359,7 @@
                 settleCloneOffline(awaySecs);   // 主角在战斗时，分身与第二块田仍按离线结算
                 settleFarmPlotOffline(awaySecs);
                 settleSmallWorldOffline(awaySecs);
+                decayErosion(awaySecs);
                 gameState.lastActiveTime = Date.now();
             } else {
                 handleOfflineTime(60);
