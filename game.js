@@ -1232,7 +1232,8 @@
         // 每种物品单独一枚 SVG（32×32），不依赖外部图片。加载时写回 GAME_CONFIG.items / 商店 / 食物配置的 icon 字段；
         // 没有对应图标的物品保持原来的 emoji。图标是 HTML 字符串，所以显示图标的地方一律用 innerHTML。
         // 图标共用的小工具：外壳（墨色描边）、四角星光、叶片
-        const icoSvg = inner => `<svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><g stroke="#2b2016" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" fill="none">${inner}</g></svg>`;
+        // v7.26 漫画风：墨线加粗加黑，并套用页面里的 #icoInk 滤镜（外描边 + 右下硬阴影），所有物品图标一起变
+        const icoSvg = inner => `<svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><g filter="url(#icoInk)"><g stroke="#130f0a" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round" fill="none">${inner}</g></g></svg>`;
         const icoSparkle = (x, y, s = 2.4, c = '#fff4c4') => `<path d="M${x} ${y - s}L${x + s * 0.35} ${y - s * 0.35}L${x + s} ${y}L${x + s * 0.35} ${y + s * 0.35}L${x} ${y + s}L${x - s * 0.35} ${y + s * 0.35}L${x - s} ${y}L${x - s * 0.35} ${y - s * 0.35}Z" fill="${c}" stroke="none"/>`;
         const icoLeaf = (x, y, rot, len, c) => `<path d="M0 0Q${len / 2} ${-len * 0.42} ${len} 0Q${len / 2} ${len * 0.42} 0 0Z" transform="translate(${x} ${y}) rotate(${rot})" fill="${c}"/>`;
 
@@ -7696,6 +7697,20 @@
          * 渲染单个配方卡片（新系统）
          */
         // 配方卡片正中的大图：产出物品的图标；产出灵石 / 修为时用通用符号
+        // v7.26 修炼配方没有物品产出，原来都画同一个「气」图标；改成每个配方一个书法字（毛笔字配技能色光盘）
+        const CULT_GLYPH = {
+            basic: '纳', small: '周', big: '天', breath: '息', marrow_cleansing: '髓', bulinggen: '五', danding: '鼎', epiphany: '悟',
+            golden_temper: '淬', fire_body: '火', golden_perfect: '圆', yuanying_nurture: '养', soul_travel: '游', yuanying_dao: '合',
+            huashen_ning: '凝', yuanshen_huaxu: '虚', tiandi_gongming: '鸣', heti_unity: '一', dao_body: '体', dao_perfect: '道',
+            lianxu_main: '元', huaxu_unity: '真', taixu_manifest: '显', dacheng_convergence: '归', nascent_infuse: '注', yuanying_growth: '蕴',
+            fadao_suppress: '镇', open_orifice: '穴', nascent_temper: '婴', jade_body: '玉', world_deduce: '界', soul_temper: '魂', law_origin: '源'
+        };
+        // 卡片上的产出大图：一枚按技能着色的光盘，里面是物品图标或书法字；未解锁盖一枚朱红「封」印
+        function recipeArtHtml(skillName, recipeKey, recipe, unlocked) {
+            if (!unlocked) return '<div class="rc-medal"><span class="rc-seal">封</span></div>';
+            const glyph = skillName === 'cultivation' ? (CULT_GLYPH[recipeKey] || (recipe.name || '修')[0]) : null;
+            return `<div class="rc-medal">${glyph ? `<span class="rc-glyph">${glyph}</span>` : recipeArtIcon(recipe)}</div>`;
+        }
         function recipeArtIcon(recipe) {
             const out = recipe.output || {};
             const first = (out.items || []).map(i => GAME_CONFIG.items[i.id]).find(Boolean);
@@ -7736,7 +7751,7 @@
             const materials = checkMaterialAvailability(recipe);
 
             // 4. 判断类名
-            let className = 'action-item recipe-card';
+            let className = 'action-item recipe-card rc-skill-' + skillName;   // v7.26：按技能换卡片的点缀色
             if (isActive) className += ' active';
             if (!unlockState.unlocked) className += ' disabled';
             if (isQuestTarget(skillName, recipeKey)) className += ' quest-target';
@@ -7816,7 +7831,7 @@
                 ${sessionCountHtml}
                 <div class="recipe-name rc-name">${recipe.name}</div>
                 <div class="recipe-time rc-meta">⏱ ${timeText}</div>
-                <div class="rc-art${unlockState.unlocked ? '' : ' locked'}">${unlockState.unlocked ? recipeArtIcon(recipe) : '🔒'}</div>
+                <div class="rc-art${unlockState.unlocked ? '' : ' locked'}">${recipeArtHtml(skillName, recipeKey, recipe, unlockState.unlocked)}</div>
                 <div class="recipe-output">${outputStr}</div>
                 ${equipStatsHtml}
                 ${materialsHtml}

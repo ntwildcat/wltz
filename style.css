@@ -2310,3 +2310,52 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .fx-major .fx-title { font-family: var(--font-brush); letter-spacing: 0.12em; text-indent: 0.12em; font-size: clamp(3.6rem, 19vw, 8rem); line-height: 1.05; color: #fff3cf; -webkit-text-stroke: 3px #0e0c09; paint-order: stroke fill; }
 .fx-major .fx-sub { font-family: var(--font-brush); font-size: clamp(1.2rem, 4.4vw, 1.9rem); color: #f3e2b8; -webkit-text-stroke: 1px #0e0c09; paint-order: stroke fill; }
 @media (prefers-reduced-motion: reduce) { .fx-manga { display: none; } }
+
+/* ==========================================================================
+   v7.26 配方卡片漫画风：毛笔字配方名 + 毛笔笔触下划线；产出大图放进技能色光盘（圆相笔触环，进行中时旋转发光）；
+   修炼配方是书法字；未解锁盖朱红「封」印；进度条是笔刷收尾。点缀色 --rc-c 按技能，四套配色主题都适用
+   ========================================================================== */
+.recipe-card { --rc-c: var(--jade); }
+.rc-skill-cultivation { --rc-c: #5aa8ef; }
+.rc-skill-alchemy { --rc-c: #36b383; }
+.rc-skill-forging { --rc-c: #d99a3a; }
+.rc-skill-farming { --rc-c: #79b84e; }
+.rc-skill-mining { --rc-c: #8aa0b8; }
+.rc-skill-danhuo { --rc-c: #f0703f; }
+.rc-skill-shenshi { --rc-c: #a283f0; }
+.rc-skill-wudao { --rc-c: #d8b445; }
+.rc-skill-daoguo { --rc-c: #d877b6; }
+.recipe-card .rc-name { font-family: var(--font-brush); font-size: 1.42em; letter-spacing: 0.06em; line-height: 1.15; color: var(--text-l1); }
+.recipe-card .rc-name::after { content: ''; display: block; width: 72%; height: 6px; margin: 2px auto 0; background: var(--rc-c); opacity: 0.6;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+.recipe-card .rc-art { height: 72px; margin: 4px 0 2px; }
+.rc-medal { position: relative; width: 66px; height: 66px; display: flex; align-items: center; justify-content: center; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--rc-c) 36%, transparent) 0%, color-mix(in srgb, var(--rc-c) 12%, transparent) 52%, transparent 70%); }
+.rc-medal::before { content: ''; position: absolute; inset: 1px; background: var(--rc-c); opacity: 0.7;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M52 6 C79 6 95 27 93 52 C91 77 70 95 47 94 C25 93 6 75 7 50 C8 32 19 16 34 10 L36 15 C23 21 13 34 13 50 C13 71 29 87 48 88 C68 89 85 73 87 52 C89 31 74 12 52 12 Z'/><circle cx='35' cy='12' r='3.2'/></svg>") center / contain no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M52 6 C79 6 95 27 93 52 C91 77 70 95 47 94 C25 93 6 75 7 50 C8 32 19 16 34 10 L36 15 C23 21 13 34 13 50 C13 71 29 87 48 88 C68 89 85 73 87 52 C89 31 74 12 52 12 Z'/><circle cx='35' cy='12' r='3.2'/></svg>") center / contain no-repeat; }
+.recipe-card.active .rc-medal::before { opacity: 1; animation: rcSpin 6s linear infinite; filter: drop-shadow(0 0 5px var(--rc-c)); }
+.recipe-card.active .rc-medal { background: radial-gradient(circle, color-mix(in srgb, var(--rc-c) 55%, transparent) 0%, color-mix(in srgb, var(--rc-c) 18%, transparent) 55%, transparent 72%); }
+@keyframes rcSpin { to { transform: rotate(360deg); } }
+.rc-medal .ico { position: relative; width: 40px; height: 40px; }
+.rc-art .rc-medal .ico { filter: none; }
+.rc-glyph { position: relative; font-family: var(--font-brush); font-size: 38px; line-height: 1; color: var(--rc-c); -webkit-text-stroke: 1.6px #120e09; paint-order: stroke fill;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45), 0 0 12px color-mix(in srgb, var(--rc-c) 55%, transparent); }
+.rc-art.locked { opacity: 1; filter: none; }
+.rc-art.locked .rc-medal { --rc-c: #8a8478; opacity: 0.85; }
+.rc-seal { position: relative; font-family: var(--font-brush); font-size: 26px; line-height: 1; color: #fff2e4; background: #a8322a; padding: 4px 6px 3px; border-radius: 3px; transform: rotate(-8deg);
+    box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.35), 2px 2px 0 rgba(0, 0, 0, 0.35); }
+.action-item.disabled .rc-art.locked { height: 56px; font-size: inherit; margin: 2px 0; }
+.recipe-card .action-progress-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--rc-c) 45%, #120e09), var(--rc-c)); box-shadow: 0 0 6px color-mix(in srgb, var(--rc-c) 50%, transparent);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 0 L94 0 Q97 1 96 3 Q99 4 97 6 Q100 8 95 10 L0 10 Z'/></svg>") right / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 0 L94 0 Q97 1 96 3 Q99 4 97 6 Q100 8 95 10 L0 10 Z'/></svg>") right / 100% 100% no-repeat; }
+.recipe-card.active { box-shadow: 0 0 0 1px var(--rc-c), 0 0 14px color-mix(in srgb, var(--rc-c) 35%, transparent); }
+@media (max-width: 768px) {
+    .recipe-card .rc-name::after { margin-left: 0; width: 60%; }
+    .recipe-card .rc-art { height: 48px; width: 48px; }
+    .action-item.disabled .rc-art.locked { height: 48px; }
+    .recipe-card .rc-medal { width: 48px; height: 48px; }
+    .recipe-card .rc-medal .ico { width: 30px; height: 30px; }
+    .recipe-card .rc-glyph { font-size: 28px; }
+    .recipe-card .rc-seal { font-size: 20px; padding: 3px 4px 2px; }
+    .action-item.recipe-card { grid-template-columns: 48px 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .recipe-card.active .rc-medal::before { animation: none; } }
