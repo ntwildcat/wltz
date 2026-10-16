@@ -2204,3 +2204,109 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 
 /* v7.23 太乙叠域：已选的第一个灵域 */
 .domain-card.selected { border-color: var(--bronze); background: var(--bg-l3); box-shadow: inset 0 0 0 1px var(--bronze); }
+
+/* ==========================================================================
+   v7.25 战斗舞台（国漫风）：水墨山水背景 + 左右两张立绘 + 漫画式出手特效。美术在 art.js（BattleArt）
+   ========================================================================== */
+@font-face { font-family: 'ZhiMangXing'; src: url('fonts/zhimangxing-subset.woff') format('woff'); font-display: swap; }
+:root { --font-brush: 'ZhiMangXing', 'STXingkai', 'KaiTi', 'STKaiti', serif; }
+.battle-scene.bs-stage { position: relative; height: 250px; overflow: hidden; padding: 0; border: 1px solid #000; background: #0c0b09; border-radius: 4px; isolation: isolate; }
+.bs-stage .bs-bg { position: absolute; inset: 0; z-index: 0; }
+.bs-stage .bs-bg-svg { width: 100%; height: 100%; display: block; }
+.bs-vignette { position: absolute; inset: 0; z-index: 4; pointer-events: none; box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.75); }
+.battle-scene.bs-stage:has(.monster-sprite.hit-crit)::after { display: none; }   /* 旧版暴击剑光，新舞台用 BattleArt.slash */
+.bs-fighter { position: absolute; bottom: 4px; z-index: 2; width: min(40%, 170px); line-height: 0; }
+.bs-fighter .bs-art { width: 100%; height: auto; overflow: visible; }
+.bs-player { left: 3%; }
+.bs-stage .monster-sprite { position: absolute; right: 3%; left: auto; top: auto; bottom: 4px; transform: none; font-size: 0; width: min(40%, 170px); line-height: 0; z-index: 2; animation: none; }
+.bs-stage .monster-sprite .bs-art { animation: bsIdle 3.4s ease-in-out infinite; transform-origin: 50% 90%; }
+.bs-stage .monster-sprite .bs-boss { transform: scale(1.12); }
+.bs-player .bs-art { animation: bsBreathe 4s ease-in-out infinite; transform-origin: 40% 95%; }
+.bs-art.bs-mirror { transform: scaleX(-1); }
+.bs-stage .monster-sprite .bs-art.bs-mirror { animation: none; }
+.bs-fx-layer { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.bs-stage .damage-float-layer { z-index: 6; }
+
+@keyframes bsBreathe { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-1px) scaleY(1.012); } }
+@keyframes bsIdle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.bs-art .bs-flame { transform-box: fill-box; transform-origin: 50% 100%; animation: bsFlame 1.6s ease-in-out infinite; }
+.bs-art .bs-flame.f2 { animation-duration: 2.1s; animation-delay: -0.7s; }
+@keyframes bsFlame { 0%, 100% { transform: scale(1, 1); opacity: 0.85; } 50% { transform: scale(1.06, 1.14); opacity: 1; } }
+.bs-art .bs-ribbon, .bs-art .bs-hair { transform-box: fill-box; transform-origin: 100% 30%; animation: bsWave 2.6s ease-in-out infinite; }
+@keyframes bsWave { 0%, 100% { transform: rotate(0deg) skewY(0deg); } 50% { transform: rotate(-4deg) skewY(3deg); } }
+.bs-art .bs-float { animation: bsIdle 3s ease-in-out infinite; }
+.bs-art .bs-halo { transform-box: fill-box; transform-origin: center; animation: bsHalo 8s linear infinite; }
+@keyframes bsHalo { to { transform: rotate(360deg); } }
+.bs-art .bs-eye { animation: bsEye 2.4s ease-in-out infinite; }
+@keyframes bsEye { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+.bs-art .bs-sword { animation: bsSword 2.8s ease-in-out infinite; }
+@keyframes bsSword { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.5); } }
+.bs-art .bs-crackle { animation: bsCrackle 0.18s steps(2) infinite; }
+@keyframes bsCrackle { 50% { opacity: 0.75; } }
+.bs-art .bs-wings { transform-box: fill-box; transform-origin: center; animation: bsFlap 0.9s ease-in-out infinite; }
+@keyframes bsFlap { 50% { transform: scaleX(0.86); } }
+.bs-bg-svg .bs-mist { animation: bsDrift 14s ease-in-out infinite alternate; }
+.bs-bg-svg .bs-mist2 { animation-duration: 19s; animation-direction: alternate-reverse; }
+@keyframes bsDrift { to { transform: translateX(-36px); } }
+.bs-bg-svg .bs-storm { animation: bsStorm 4s ease-in-out infinite; }
+@keyframes bsStorm { 50% { opacity: 0.8; } }
+
+.bs-stage .monster-sprite.hit .bs-art { animation: bsHit 0.3s ease-out, bsIdle 3.4s ease-in-out 0.3s infinite; }
+.bs-stage .monster-sprite.hit-crit .bs-art { animation: bsHitCrit 0.45s ease-out, bsIdle 3.4s ease-in-out 0.45s infinite; }
+@keyframes bsHit { 0% { transform: translateX(0); filter: brightness(1); } 25% { transform: translateX(8px); filter: brightness(2.4); } 100% { transform: translateX(0); filter: brightness(1); } }
+@keyframes bsHitCrit { 0% { transform: translateX(0) scale(1); filter: brightness(1); } 20% { transform: translateX(14px) scale(0.94); filter: brightness(3) contrast(1.4); } 100% { transform: none; filter: none; } }
+.bs-stage .monster-sprite.spawn .bs-art { animation: bsSpawn 0.6s cubic-bezier(.2, .8, .2, 1.2), bsIdle 3.4s ease-in-out 0.6s infinite; }
+@keyframes bsSpawn { from { transform: translateY(30px) scale(0.9); opacity: 0; filter: blur(4px); } to { transform: none; opacity: 1; filter: none; } }
+.bs-stage .monster-sprite.dying .bs-art { animation: bsDie 0.6s ease-in forwards; }
+@keyframes bsDie { to { transform: translateY(10px) scale(1.06); opacity: 0; filter: blur(6px) brightness(0.3); } }
+.bs-player.hurt .bs-art { animation: bsHurt 0.32s ease-out; }
+@keyframes bsHurt { 25% { transform: translateX(-8px); filter: brightness(1.6) sepia(1) hue-rotate(-30deg) saturate(4); } }
+.bs-stage.bs-shake { animation: bsShake 0.35s ease-out; }
+@keyframes bsShake { 20% { transform: translate(-5px, 3px); } 40% { transform: translate(5px, -3px); } 60% { transform: translate(-3px, 2px); } 80% { transform: translate(2px, -1px); } }
+.bs-stage .monster-sprite.enraged .bs-art { filter: drop-shadow(0 0 12px rgba(255, 60, 40, 0.95)) saturate(1.6); }
+
+.bs-fx-slash { position: absolute; width: 46%; max-width: 210px; transform: translate(-50%, -50%); overflow: visible; }
+.bs-fx-slash.crit { width: 58%; max-width: 260px; }
+.bs-slash-stroke { animation: bsSlash 0.42s ease-out forwards; }
+@keyframes bsSlash { 0% { clip-path: inset(0 100% 0 0); opacity: 1; } 45% { clip-path: inset(0 0 0 0); opacity: 1; } 100% { clip-path: inset(0 0 0 0); opacity: 0; } }
+.bs-fx-lines { position: absolute; left: -10%; top: -10%; width: 120%; height: 120%; animation: bsLines 0.4s steps(3) forwards; }
+@keyframes bsLines { 0% { opacity: 0.95; } 100% { opacity: 0; } }
+.bs-stamp { position: absolute; transform: translate(-50%, -50%) rotate(var(--rot)); animation: bsStamp 0.9s cubic-bezier(.2, 1.4, .3, 1) forwards; white-space: nowrap; }
+.bs-stamp-ink { position: absolute; left: 50%; top: 50%; width: 170%; height: 150%; transform: translate(-50%, -50%); opacity: 0.88; }
+.bs-stamp span { position: relative; font-family: var(--font-brush); font-size: 46px; line-height: 1; color: var(--c); -webkit-text-stroke: 2px #0e0c09; paint-order: stroke fill; text-shadow: 0 0 10px var(--c), 3px 3px 0 #0e0c09; }
+.bs-stamp.big span { font-size: 84px; }
+@keyframes bsStamp { 0% { transform: translate(-50%, -50%) rotate(var(--rot)) scale(2.4); opacity: 0; } 18% { transform: translate(-50%, -50%) rotate(var(--rot)) scale(0.92); opacity: 1; } 30% { transform: translate(-50%, -50%) rotate(var(--rot)) scale(1); } 78% { opacity: 1; } 100% { transform: translate(-50%, -60%) rotate(var(--rot)) scale(1.04); opacity: 0; } }
+.bs-fx-claw { position: absolute; width: 22%; max-width: 100px; animation: bsClaw 0.45s ease-out forwards; }
+@keyframes bsClaw { 0% { clip-path: inset(0 0 100% 0); opacity: 1; } 40% { clip-path: inset(0 0 0 0); } 100% { opacity: 0; } }
+.bs-fx-bolt { position: absolute; top: 0; width: 28%; height: 78%; animation: bsBolt 0.5s steps(4) forwards; }
+@keyframes bsBolt { 0%, 50% { opacity: 1; } 25%, 75% { opacity: 0.3; } 100% { opacity: 0; } }
+.bs-fx-nascent { position: absolute; left: 18%; top: 42%; width: 36px; animation: bsNascent 0.65s cubic-bezier(.5, 0, .7, 1) forwards; }
+@keyframes bsNascent { 0% { transform: translate(0, 0) scale(0.6); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(min(46vw, 230px), -10px) scale(1.2); opacity: 0.2; } }
+.bs-fx-ink { position: absolute; width: 34%; max-width: 160px; transform: translate(-50%, -50%); overflow: visible; }
+.bs-ink-dot { animation: bsInk 0.75s ease-out forwards; }
+@keyframes bsInk { to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+.bs-ink-ring { transform-box: fill-box; transform-origin: center; animation: bsRing 0.6s ease-out forwards; }
+@keyframes bsRing { from { transform: scale(0.3); opacity: 1; } to { transform: scale(2); opacity: 0; } }
+
+.bs-stage .damage-float { font-family: var(--font-brush); font-size: 30px; font-weight: normal; -webkit-text-stroke: 1.5px #0e0c09; paint-order: stroke fill; text-shadow: 2px 2px 0 #0e0c09, 0 0 8px rgba(0, 0, 0, 0.6); letter-spacing: 0.02em; }
+.bs-stage .damage-float.crit { font-size: 44px; color: #ffd86b !important; text-shadow: 3px 3px 0 #7a1a10, 0 0 14px rgba(255, 120, 40, 0.9); }
+.bs-stage .damage-float.strike { font-size: 32px; }
+.bs-stage .damage-float.strike small { font-size: 18px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .bs-art *, .bs-art, .bs-bg-svg * { animation: none !important; }
+    .bs-fx-layer { display: none; }
+}
+@media (max-width: 480px) { .battle-scene.bs-stage { height: 220px; } .bs-stamp span { font-size: 38px; } .bs-stamp.big span { font-size: 64px; } }
+
+/* v7.25 突破特效的漫画层：集中线在高潮时射出，打坐修士从下方升起；境界名换毛笔字、粗描边 */
+.fx-manga { position: absolute; inset: 0; pointer-events: none; }
+.fx-burst-lines { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; animation: fxBurstLines 0.9s steps(4) var(--fx-peak, 1.5s) both; }
+@keyframes fxBurstLines { 0% { opacity: 0; transform: scale(1.25); } 15% { opacity: 0.7; transform: scale(1); } 100% { opacity: 0; transform: scale(0.96); } }
+.fx-figure { position: absolute; left: 50%; bottom: 6%; width: min(40vw, 220px); transform: translateX(-50%); opacity: 0; animation: fxFigureRise 1.4s cubic-bezier(.2, .8, .2, 1) 0.2s both, fxFadeOut 0.6s ease-in calc(var(--fx-dur, 4s) - 0.6s) forwards; }
+.fx-figure .bs-art { width: 100%; height: auto; overflow: visible; }
+.fx-figure .bs-flame { animation-duration: 1s; }
+@keyframes fxFigureRise { from { opacity: 0; transform: translate(-50%, 40px); filter: brightness(0.3) blur(3px); } to { opacity: 1; transform: translate(-50%, 0); filter: none; } }
+.fx-major .fx-title { font-family: var(--font-brush); letter-spacing: 0.12em; text-indent: 0.12em; font-size: clamp(3.6rem, 19vw, 8rem); line-height: 1.05; color: #fff3cf; -webkit-text-stroke: 3px #0e0c09; paint-order: stroke fill; }
+.fx-major .fx-sub { font-family: var(--font-brush); font-size: clamp(1.2rem, 4.4vw, 1.9rem); color: #f3e2b8; -webkit-text-stroke: 1px #0e0c09; paint-order: stroke fill; }
+@media (prefers-reduced-motion: reduce) { .fx-manga { display: none; } }

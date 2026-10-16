@@ -4590,44 +4590,108 @@
             void el.offsetWidth;
             el.classList.add(cls);
         }
-        // 敌人头像：换了一只敌人时从下方浮现
+        // ---- 战斗舞台（v7.25，美术见 art.js 的 BattleArt）----
+        // 当前这场战斗的背景档位与镜像类型：心魔 / 衰相 / 三尸 / 证道是照着玩家画的镜像，天劫类都用天劫背景
+        function battleStageContext() {
+            const d = gameState.dungeons && gameState.dungeons.currentDungeon && GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon];
+            let realm = gameState.player.realmIndex, mirror = null, special = false;
+            if (d) {
+                realm = d.baseRealmIndex || realm;
+                special = !!d.isTribulation;
+                if (d.isHeartDemon) mirror = 'demon';
+                else if (d.id === 'zhengdao') mirror = 'dao';
+                else if (d.isShuai) mirror = (XIAN_SHUAI.find(sh => sh.id === d.id) || {}).kind === 'corpse' ? 'corpse' : 'shuai';
+            } else if (gameState.battles && gameState.battles.currentArea) {
+                const a = getAction('battle', gameState.battles.currentArea);
+                if (a && a.areaData) realm = a.areaData.minLevel;
+            }
+            return { tier: BattleArt.tierOf(realm, special), mirror, root: gameState.player.spiritRoot };
+        }
+        let lastStageKey = '';
+        function refreshBattleStage(force = false) {
+            if (typeof BattleArt === 'undefined') return;
+            const ctx = battleStageContext();
+            const key = ctx.tier + '|' + ctx.root;
+            if (!force && key === lastStageKey) return;
+            lastStageKey = key;
+            const bg = document.getElementById('battleBg'), pl = document.getElementById('playerSprite');
+            if (bg) bg.innerHTML = BattleArt.scene(ctx.tier);
+            if (pl) pl.innerHTML = BattleArt.player(ctx.root);
+        }
+        function battleFx() { return fxReduced() || typeof BattleArt === 'undefined' ? null : document.getElementById('battleFxLayer'); }
+        function shakeStage() { pulseClass(document.getElementById('battleStage'), 'bs-shake'); }
+        // 敌人立绘：换了一只敌人时从下方浮现
         let lastSpriteEnemy = null;
         function setMonsterSprite(icon, enemyRef) {
             const el = document.getElementById('monsterSprite');
             if (!el) return;
             if (enemyRef === lastSpriteEnemy) return;
             lastSpriteEnemy = enemyRef;
-            el.innerHTML = icon || '👾';
+            refreshBattleStage();
+            if (typeof BattleArt !== 'undefined') {
+                const ctx = battleStageContext();
+                el.innerHTML = BattleArt.enemy(enemyRef, { mirror: ctx.mirror, root: ctx.root });
+            } else el.innerHTML = icon || '👾';
+            el.classList.remove('dying');
             spriteAnim('spawn');
         }
-        // 击杀：敌人位置迸开一团墨色光尘（独立元素，不会被下一只敌人的出场动画打断）
+        // 击杀：敌人化作一团墨迹散开
         function showDefeatBurst() {
-            const scene = document.querySelector('.battle-scene');
-            if (!scene || fxReduced()) return;
-            const b = document.createElement('div');
-            b.className = 'defeat-burst';
-            scene.appendChild(b);
-            setTimeout(() => b.remove(), 900);
+            const fx = battleFx();
+            if (!fx) return;
+            BattleArt.inkBurst(fx, { x: 76, y: 60 });
+            pulseClass(document.getElementById('monsterSprite'), 'dying');
         }
-        // 天劫 / 心魔 / 三衰出手时整块战斗画面闪一下
+        // 天劫 / 心魔 / 衰相 / 三尸出手：天劫劈一道雷，心魔血色、衰相灰败、三尸紫色的爪痕
         function showTribulationFlash(dungeon) {
-            const scene = document.querySelector('.battle-scene');
-            if (!scene || fxReduced()) return;
-            const f = document.createElement('div');
-            f.className = 'trib-flash ' + (dungeon.isHeartDemon ? 'trib-demon' : dungeon.isShuai ? 'trib-shuai' : 'trib-thunder');
-            scene.appendChild(f);
-            setTimeout(() => f.remove(), 700);
+            const fx = battleFx();
+            if (!fx) return;
+            if (dungeon.isHeartDemon || dungeon.isShuai || dungeon.id === 'zhengdao') {
+                const c = dungeon.isHeartDemon ? '#ff3b3b' : dungeon.id === 'zhengdao' ? '#ffe08a' : (XIAN_SHUAI.find(sh => sh.id === dungeon.id) || {}).kind === 'corpse' ? '#c070ff' : '#a9a294';
+                BattleArt.claw(fx, { color: c, x: 12, y: 30 });
+            } else {
+                BattleArt.lightning(fx, { x: 22 });
+            }
+            shakeStage();
         }
-        // 元气化形 / 元婴离体 / 法则之击：带名字的飘字，各自一种颜色
+        // 元气化形 / 元婴离体 / 法则之击 / 恶尸化身：各自一种漫画特效 + 带名字的飘字
+        const LAW_GLYPH = { metal: '金', wood: '木', water: '水', fire: '火', earth: '土', wind: '风', thunder: '雷', ice: '冰' };
+        function showStrikeArt(h) {
+            const fx = battleFx();
+            if (!fx) return;
+            const rootColor = BattleArt.colorOf(gameState.player.spiritRoot);
+            if (h.key === 'lawStrike') {
+                const laws = gameState.player.provenLaw ? [gameState.player.provenLaw] : getMasteredLaws();
+                const id = laws[Math.floor(Math.random() * laws.length)] || gameState.player.spiritRoot;
+                const c = BattleArt.colorOf(id);
+                BattleArt.speedLines(fx, { color: c });
+                BattleArt.stamp(fx, LAW_GLYPH[id] || '道', { big: true, x: 72, y: 42, color: c, rot: -6, life: 1000 });
+                shakeStage();
+            } else if (h.key === 'nascent') {
+                BattleArt.nascent(fx, {});
+            } else if (h.key === 'qiForm') {
+                BattleArt.slash(fx, { color: '#9ff0d8', x: 70, y: 46 });
+            } else if (h.key === 'corpseE') {
+                BattleArt.claw(fx, { color: '#c070ff', x: 66, y: 32 });
+            } else {
+                BattleArt.slash(fx, { color: rootColor, x: 70, y: 46 });
+            }
+        }
         function showStrikeFloat(h) {
+            showStrikeArt(h);
             const floatLayer = document.getElementById('damageFloatLayer');
             if (!floatLayer || fxReduced()) return;
             const d = document.createElement('div');
             d.className = 'damage-float strike strike-' + (h.key || 'qiForm');
             d.innerHTML = `<small>${h.label.replace(/^\S+\s/, '')}</small>-${h.dmg}`;
-            const side = Math.random() < 0.5 ? 6 : 62;   // 落在敌人头像左右两侧，不挡头像（left 是飘字左边缘）
-            d.style.left = (side + Math.random() * 10) + '%';
-            d.style.top = '60px';
+            if (document.getElementById('battleStage')) {   // 新舞台：定时攻击的飘字放在上方中间，不和普通伤害数字叠
+                d.style.left = (34 + Math.random() * 14) + '%';
+                d.style.top = (8 + Math.random() * 16) + 'px';
+            } else {
+                const side = Math.random() < 0.5 ? 6 : 62;   // 落在敌人头像左右两侧，不挡头像（left 是飘字左边缘）
+                d.style.left = (side + Math.random() * 10) + '%';
+                d.style.top = '60px';
+            }
             floatLayer.appendChild(d);
             spriteAnim('hit');
             setTimeout(() => d.remove(), 1600);
@@ -4643,27 +4707,51 @@
             floatDiv.className = 'damage-float' + (isCrit ? ' crit' : '');
 
             if (damage < 0) {
-                floatDiv.textContent = (isCrit ? '暴击 ' : '') + damage;
+                floatDiv.textContent = (isCrit && typeof BattleArt === 'undefined' ? '暴击 ' : '') + damage;   // 新舞台上「暴击」已有书法大字，不重复
                 floatDiv.style.color = isCrit ? '' : 'var(--color-danger)';
             } else {
                 floatDiv.textContent = '+' + damage;
                 floatDiv.style.color = 'var(--jade)';
             }
 
-            // 随机X偏移
-            const xOffset = Math.random() * 100 - 50;
-            const yOffset = isPlayer ? 30 : 90;
-            floatDiv.style.left = (50 + xOffset) + '%';
-            floatDiv.style.top = yOffset + 'px';
+            // 落点：新舞台上按受击方分区（敌人在右、自己在左），免得几种飘字叠在一起；旧版仍随机
+            if (document.getElementById('battleStage')) {
+                const toPlayer = isPlayer;
+                floatDiv.style.left = (toPlayer ? 6 + Math.random() * 20 : 54 + Math.random() * 18) + '%';
+                floatDiv.style.top = (toPlayer ? 70 + Math.random() * 40 : 96 + Math.random() * 46) + 'px';
+            } else {
+                const xOffset = Math.random() * 100 - 50;
+                floatDiv.style.left = (50 + xOffset) + '%';
+                floatDiv.style.top = (isPlayer ? 30 : 90) + 'px';
+            }
 
             floatLayer.appendChild(floatDiv);
 
             // 1.5秒后移除
             setTimeout(() => floatDiv.remove(), 1500);
-            // 受击动作：敌人挨打时抖一下、发白（暴击更猛并带一道剑光）；自己挨打时状态栏泛红
+            // 受击动作：敌人挨打时抖一下、发白，配毛笔剑痕（暴击：交叉金色剑痕 + 集中线 + 「暴击」大字 + 画面震动）；
+            // 自己挨打时状态栏泛红、立绘一缩，玩家一侧落下三道爪痕（天劫类由 showTribulationFlash 画雷 / 镜像爪痕）
             if (damage < 0) {
-                if (isPlayer) pulseClass(document.querySelector('.combatant.player'), 'hurt');
-                else spriteAnim(isCrit ? 'hit-crit' : 'hit');
+                const fx = battleFx();
+                if (isPlayer) {
+                    pulseClass(document.querySelector('.combatant.player'), 'hurt');
+                    pulseClass(document.getElementById('playerSprite'), 'hurt');
+                    const d = gameState.dungeons && gameState.dungeons.currentDungeon && GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon];
+                    if (fx && !(d && d.isTribulation)) BattleArt.claw(fx, {});
+                } else {
+                    spriteAnim(isCrit ? 'hit-crit' : 'hit');
+                    if (fx) {
+                        const c = BattleArt.colorOf(gameState.player.spiritRoot);
+                        if (isCrit) {
+                            BattleArt.speedLines(fx, {});
+                            BattleArt.slash(fx, { crit: true, color: '#ffd86b', x: 72, y: 44 });
+                            BattleArt.stamp(fx, '暴击', { x: 70, y: 22, color: '#ffd86b' });
+                            shakeStage();
+                        } else {
+                            BattleArt.slash(fx, { color: c, x: 72, y: 46 });
+                        }
+                    }
+                }
             }
         }
 
@@ -11034,7 +11122,10 @@
             el.style.setProperty('--fx-dur', dur + 's');
             el.style.setProperty('--fx-peak', Math.max(0, peak - 0.15) + 's');
             el.setAttribute('aria-hidden', 'true');
-            el.innerHTML = (reduce ? '' : '<canvas class="fx-canvas"></canvas>') + (major
+            // v7.25 国漫风：大境界突破加一层集中线（高潮时射出）+ 盘膝打坐的修士剪影（随特效升起），境界名换毛笔字
+            const manga = major && typeof BattleArt !== 'undefined' && !reduce
+                ? `<div class="fx-manga">${BattleArt.burstLines()}<div class="fx-figure">${BattleArt.meditator(gameState.player.spiritRoot)}</div></div>` : '';
+            el.innerHTML = (reduce ? '' : '<canvas class="fx-canvas"></canvas>') + manga + (major
                 ? `<div class="fx-text"><div class="fx-title">${cfg.name.split('').join(' ')}</div><div class="fx-sub">${realmName} · ${cfg.line}</div><div class="fx-skip">点击任意处跳过</div></div>`
                 : `<div class="fx-text"><div class="fx-title">突 破</div><div class="fx-sub">${realmName}</div><div class="fx-seal">破</div></div>`);
             document.body.appendChild(el);
