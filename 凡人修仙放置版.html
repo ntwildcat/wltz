@@ -16,10 +16,20 @@
             var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', THEMES[t]);
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=13.67">
+    <link rel="stylesheet" href="style.css?v=13.72">
 
 </head>
 <body data-panel="cultivation">
+    <!-- v7.26 漫画风图标墨线：加粗外描边 + 右下硬阴影（物品图标的 icoSvg 统一引用 #icoInk） -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+        <filter id="icoInk" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+            <feMorphology in="SourceAlpha" operator="dilate" radius="0.75" result="thick"/>
+            <feFlood flood-color="#120e09"/><feComposite in2="thick" operator="in" result="outline"/>
+            <feOffset in="outline" dx="0.9" dy="1.1" result="drop"/>
+            <feFlood flood-color="#000" flood-opacity="0.5"/><feComposite in2="drop" operator="in" result="shadow"/>
+            <feMerge><feMergeNode in="shadow"/><feMergeNode in="outline"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+    </defs></svg>
     <a class="skip-link" href="#main">跳到主要内容</a>
     <h1 class="sr-only">散修长生录</h1>
     <div id="notificationLive" class="sr-only" role="status" aria-live="polite"></div>
@@ -41,6 +51,7 @@
             <!-- 游戏开始前的创建屏幕 -->
             <div id="startScreen" class="modal show">
                 <div class="modal-content" role="dialog" aria-modal="true">
+                    <div id="startHero"></div>
                     <div class="modal-title">⚡ 散修长生录 ⚡</div>
                     <!-- 存档选择：最多 3 个存档 -->
                     <p id="slotHint" style="color: var(--text-l4); margin-bottom: 20px;">选择一个存档，或新建角色（最多 3 个存档）</p>
@@ -778,8 +789,8 @@
 
     <!-- 离线结算模态框 -->
     <div id="offlineModal" class="modal">
-        <div class="modal-content" role="dialog" aria-modal="true">
-            <div class="modal-title">🌙 闭关归来 🌙</div>
+        <div class="modal-content scroll-modal" role="dialog" aria-modal="true">
+            <div class="modal-title">闭关归来</div>
             <div id="offlineContent"></div>
             <button class="btn" onclick="closeOfflineModal()" style="width: 100%; margin-top: 20px;">
                 继续修行
@@ -853,8 +864,8 @@
         </div>
     </div>
 
-    <script src="art.js?v=1.2"></script>
-    <script src="game.js?v=14.32"></script>
+    <script src="art.js?v=1.4"></script>
+    <script src="game.js?v=14.35"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

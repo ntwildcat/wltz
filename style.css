@@ -2310,3 +2310,204 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .fx-major .fx-title { font-family: var(--font-brush); letter-spacing: 0.12em; text-indent: 0.12em; font-size: clamp(3.6rem, 19vw, 8rem); line-height: 1.05; color: #fff3cf; -webkit-text-stroke: 3px #0e0c09; paint-order: stroke fill; }
 .fx-major .fx-sub { font-family: var(--font-brush); font-size: clamp(1.2rem, 4.4vw, 1.9rem); color: #f3e2b8; -webkit-text-stroke: 1px #0e0c09; paint-order: stroke fill; }
 @media (prefers-reduced-motion: reduce) { .fx-manga { display: none; } }
+
+/* ==========================================================================
+   v7.26 配方卡片漫画风：毛笔字配方名 + 毛笔笔触下划线；产出大图放进技能色光盘（圆相笔触环，进行中时旋转发光）；
+   修炼配方是书法字；未解锁盖朱红「封」印；进度条是笔刷收尾。点缀色 --rc-c 按技能，四套配色主题都适用
+   ========================================================================== */
+.recipe-card { --rc-c: var(--jade); }
+.rc-skill-cultivation { --rc-c: #5aa8ef; }
+.rc-skill-alchemy { --rc-c: #36b383; }
+.rc-skill-forging { --rc-c: #d99a3a; }
+.rc-skill-farming { --rc-c: #79b84e; }
+.rc-skill-mining { --rc-c: #8aa0b8; }
+.rc-skill-danhuo { --rc-c: #f0703f; }
+.rc-skill-shenshi { --rc-c: #a283f0; }
+.rc-skill-wudao { --rc-c: #d8b445; }
+.rc-skill-daoguo { --rc-c: #d877b6; }
+.recipe-card .rc-name { font-family: var(--font-brush); font-size: 1.42em; letter-spacing: 0.06em; line-height: 1.15; color: var(--text-l1); }
+.recipe-card .rc-name::after { content: ''; display: block; width: 72%; height: 6px; margin: 2px auto 0; background: var(--rc-c); opacity: 0.6;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+.recipe-card .rc-art { height: 72px; margin: 4px 0 2px; }
+.rc-medal { position: relative; width: 66px; height: 66px; display: flex; align-items: center; justify-content: center; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--rc-c) 36%, transparent) 0%, color-mix(in srgb, var(--rc-c) 12%, transparent) 52%, transparent 70%); }
+.rc-medal::before { content: ''; position: absolute; inset: 1px; background: var(--rc-c); opacity: 0.7;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M52 6 C79 6 95 27 93 52 C91 77 70 95 47 94 C25 93 6 75 7 50 C8 32 19 16 34 10 L36 15 C23 21 13 34 13 50 C13 71 29 87 48 88 C68 89 85 73 87 52 C89 31 74 12 52 12 Z'/><circle cx='35' cy='12' r='3.2'/></svg>") center / contain no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M52 6 C79 6 95 27 93 52 C91 77 70 95 47 94 C25 93 6 75 7 50 C8 32 19 16 34 10 L36 15 C23 21 13 34 13 50 C13 71 29 87 48 88 C68 89 85 73 87 52 C89 31 74 12 52 12 Z'/><circle cx='35' cy='12' r='3.2'/></svg>") center / contain no-repeat; }
+.recipe-card.active .rc-medal::before { opacity: 1; animation: rcSpin 6s linear infinite; filter: drop-shadow(0 0 5px var(--rc-c)); }
+.recipe-card.active .rc-medal { background: radial-gradient(circle, color-mix(in srgb, var(--rc-c) 55%, transparent) 0%, color-mix(in srgb, var(--rc-c) 18%, transparent) 55%, transparent 72%); }
+@keyframes rcSpin { to { transform: rotate(360deg); } }
+.rc-medal .ico { position: relative; width: 40px; height: 40px; }
+.rc-art .rc-medal .ico { filter: none; }
+.rc-glyph { position: relative; font-family: var(--font-brush); font-size: 38px; line-height: 1; color: var(--rc-c); -webkit-text-stroke: 1.6px #120e09; paint-order: stroke fill;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45), 0 0 12px color-mix(in srgb, var(--rc-c) 55%, transparent); }
+.rc-art.locked { opacity: 1; filter: none; }
+.rc-art.locked .rc-medal { --rc-c: #8a8478; opacity: 0.85; }
+.rc-seal { position: relative; font-family: var(--font-brush); font-size: 26px; line-height: 1; color: #fff2e4; background: #a8322a; padding: 4px 6px 3px; border-radius: 3px; transform: rotate(-8deg);
+    box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.35), 2px 2px 0 rgba(0, 0, 0, 0.35); }
+.action-item.disabled .rc-art.locked { height: 56px; font-size: inherit; margin: 2px 0; }
+.recipe-card .action-progress-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--rc-c) 45%, #120e09), var(--rc-c)); box-shadow: 0 0 6px color-mix(in srgb, var(--rc-c) 50%, transparent);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 0 L94 0 Q97 1 96 3 Q99 4 97 6 Q100 8 95 10 L0 10 Z'/></svg>") right / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 0 L94 0 Q97 1 96 3 Q99 4 97 6 Q100 8 95 10 L0 10 Z'/></svg>") right / 100% 100% no-repeat; }
+.recipe-card.active { box-shadow: 0 0 0 1px var(--rc-c), 0 0 14px color-mix(in srgb, var(--rc-c) 35%, transparent); }
+@media (max-width: 768px) {
+    .recipe-card .rc-name::after { margin-left: 0; width: 60%; }
+    .recipe-card .rc-art { height: 48px; width: 48px; }
+    .action-item.disabled .rc-art.locked { height: 48px; }
+    .recipe-card .rc-medal { width: 48px; height: 48px; }
+    .recipe-card .rc-medal .ico { width: 30px; height: 30px; }
+    .recipe-card .rc-glyph { font-size: 28px; }
+    .recipe-card .rc-seal { font-size: 20px; padding: 3px 4px 2px; }
+    .action-item.recipe-card { grid-template-columns: 48px 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .recipe-card.active .rc-medal::before { animation: none; } }
+
+/* ==========================================================================
+   v7.27 漫画风：开始界面主视觉 / 玉简存档卡 / Boss 登场分镜 / 成就印章 / 悟道法则光盘 / 灵域属性纹样
+   ========================================================================== */
+/* 开始界面 */
+#startScreen.has-hero .modal-title { display: none; }
+.start-hero { position: relative; height: 210px; margin: 0 0 14px; border-radius: 6px; overflow: hidden; border: 1px solid #000; isolation: isolate; }
+.start-hero .sh-bg, .start-hero .sh-bg .bs-bg-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.start-hero::after { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; box-shadow: inset 0 0 36px rgba(0, 0, 0, 0.7); }
+.sh-figure { position: absolute; left: 6%; bottom: 2px; width: 34%; max-width: 150px; line-height: 0; z-index: 1; }
+.sh-figure .bs-art { width: 100%; height: auto; overflow: visible; animation: bsBreathe 4s ease-in-out infinite; transform-origin: 40% 95%; }
+.sh-text { position: absolute; right: 6%; top: 50%; transform: translateY(-50%); text-align: right; z-index: 2; }
+.sh-title { font-family: var(--font-brush); font-size: clamp(2.3rem, 10.5vw, 3.6rem); line-height: 1.08; color: #fff3cf; -webkit-text-stroke: 2px #0e0c09; paint-order: stroke fill;
+    text-shadow: 3px 3px 0 #0e0c09, 0 0 18px rgba(255, 220, 150, 0.45); animation: shTitle 1.1s cubic-bezier(.2, 1.3, .3, 1) both; }
+.sh-title small { display: block; font-size: 0.42em; color: #ff9478; letter-spacing: 0.2em; }
+.sh-sub { margin-top: 6px; font-family: var(--font-brush); font-size: 1.1rem; letter-spacing: 0.18em; color: #f3e2b8; -webkit-text-stroke: 0.6px #0e0c09; paint-order: stroke fill; animation: shSub 0.8s ease-out 0.5s both; }
+@keyframes shTitle { from { opacity: 0; transform: scale(1.5); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes shSub { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (max-width: 480px) { .start-hero { height: 180px; } }
+
+/* 玉简存档卡 */
+.slot-card { display: flex; gap: 12px; align-items: stretch; --c: var(--bronze); padding-left: 10px; }
+.slot-slip { flex: none; width: 34px; border-radius: 3px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-brush); font-size: 24px; color: var(--c); -webkit-text-stroke: 1px #0e0c09; paint-order: stroke fill;
+    background: repeating-linear-gradient(90deg, transparent 0 10px, rgba(0, 0, 0, 0.14) 10px 11px), linear-gradient(180deg, color-mix(in srgb, var(--c) 30%, var(--bg-l3)), color-mix(in srgb, var(--c) 10%, var(--bg-l2)));
+    border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); }
+.slot-body { flex: 1; min-width: 0; }
+.slot-card .slot-name { font-family: var(--font-brush); font-size: 1.4em; line-height: 1.2; }
+.slot-realm { margin-left: 8px; font-family: var(--font-title); font-size: 0.6em; color: #fff3e6; background: #a8322a; padding: 1px 6px; border-radius: 2px; vertical-align: 0.25em; }
+.slot-new { font-family: var(--font-brush); font-size: 1.3em; color: var(--text-l3); }
+
+/* Boss 登场分镜 */
+#bossIntro { position: fixed; inset: 0; z-index: 2100; cursor: pointer; }
+.vs-overlay { position: absolute; inset: 0; background: rgba(5, 4, 3, 0.8); overflow: hidden; animation: vsOut 0.3s ease-in 1.5s forwards; }
+.vs-panel { position: absolute; top: 0; bottom: 0; width: 62%; overflow: hidden; }
+.vs-left { left: 0; clip-path: polygon(0 0, 100% 0, 78% 100%, 0 100%); background: radial-gradient(ellipse at 35% 62%, color-mix(in srgb, var(--c) 42%, #000) 0%, #0b0a08 72%); animation: vsInL 0.35s cubic-bezier(.2, .9, .3, 1) both; }
+.vs-right { right: 0; clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 100%); background: radial-gradient(ellipse at 65% 48%, color-mix(in srgb, var(--c) 42%, #000) 0%, #0b0a08 72%); animation: vsInR 0.35s cubic-bezier(.2, .9, .3, 1) 0.08s both; }
+.vs-art { position: absolute; bottom: 6%; width: min(48vw, 300px); line-height: 0; }
+.vs-left .vs-art { left: 4%; }
+.vs-right .vs-art { right: 4%; }
+.vs-art .bs-art { width: 100%; height: auto; overflow: visible; }
+.vs-name { position: absolute; font-family: var(--font-brush); font-size: clamp(2.2rem, 10vw, 4.4rem); line-height: 1; color: #fff3cf; -webkit-text-stroke: 2px #0e0c09; paint-order: stroke fill; text-shadow: 0 0 16px var(--c), 3px 3px 0 #0e0c09; }
+.vs-left .vs-name { left: 6%; top: 12%; }
+.vs-right .vs-name { right: 6%; top: 9%; text-align: right; }
+.vs-bubble { position: absolute; right: 7%; top: calc(9% + clamp(2.6rem, 11.5vw, 5rem)); max-width: 58%; background: #fffaf0; color: #120e09; font-family: var(--font-brush); font-size: clamp(1rem, 4.2vw, 1.4rem); line-height: 1.35;
+    padding: 8px 12px; border: 2px solid #120e09; border-radius: 14px; box-shadow: 3px 3px 0 #120e09; animation: vsBubble 0.3s ease-out 0.45s both; }
+.vs-bubble::after { content: ''; position: absolute; right: 22%; bottom: -10px; border: 8px solid transparent; border-top-color: #120e09; border-bottom: 0; }
+.vs-slash { position: absolute; left: 50%; top: -10%; width: 6px; height: 120%; background: #fff; transform: translateX(-50%) rotate(13deg); box-shadow: 0 0 20px #fff, 0 0 40px rgba(255, 255, 255, 0.6); animation: vsSlash 0.4s ease-out 0.25s both; }
+.vs-mark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-8deg); font-family: var(--font-brush); font-size: clamp(3.4rem, 16vw, 6.4rem); color: #ffd86b;
+    -webkit-text-stroke: 3px #0e0c09; paint-order: stroke fill; text-shadow: 4px 4px 0 #7a1a10, 0 0 24px rgba(255, 160, 60, 0.8); animation: vsMark 0.45s cubic-bezier(.2, 1.5, .3, 1) 0.3s both; }
+.vs-skip { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); }
+@keyframes vsInL { from { transform: translateX(-100%); } to { transform: none; } }
+@keyframes vsInR { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes vsSlash { 0% { opacity: 0; transform: translateX(-50%) rotate(13deg) scaleY(0); } 40% { opacity: 1; transform: translateX(-50%) rotate(13deg) scaleY(1); } 100% { opacity: 0.85; } }
+@keyframes vsMark { 0% { opacity: 0; transform: translate(-50%, -50%) rotate(-8deg) scale(2.6); } 100% { opacity: 1; transform: translate(-50%, -50%) rotate(-8deg) scale(1); } }
+@keyframes vsBubble { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+@keyframes vsOut { to { opacity: 0; } }
+
+/* 成就印章 */
+.ach-row { display: flex; gap: 10px; align-items: center; }
+.ach-seal { flex: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; background: #a8322a; color: #fff2e4; font-family: var(--font-brush); font-size: 22px; line-height: 1;
+    border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.4), 2px 2px 0 rgba(0, 0, 0, 0.35); transform: rotate(-4deg); }
+.ach-seal.locked { background: #5b564c; color: #a9a294; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.12); }
+
+/* 悟道：法则光盘（外圈按等级画满） */
+.law-card > .recipe-header { align-items: center; }
+.law-medal { --c: var(--gold); --p: 0; position: relative; flex: none; width: 44px; height: 44px; margin-right: 8px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
+    font-family: var(--font-brush); font-size: 26px; line-height: 1; color: var(--c); -webkit-text-stroke: 1.2px #120e09; paint-order: stroke fill;
+    background: radial-gradient(circle, color-mix(in srgb, var(--c) 30%, transparent) 0 52%, transparent 70%); }
+.law-medal::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(var(--c) calc(var(--p) * 1%), color-mix(in srgb, var(--c) 16%, transparent) 0);
+    -webkit-mask: radial-gradient(circle, transparent 61%, #000 63%); mask: radial-gradient(circle, transparent 61%, #000 63%); }
+.law-medal.silk { box-shadow: 0 0 10px color-mix(in srgb, var(--c) 60%, transparent); animation: lawSilk 2.6s ease-in-out infinite; }
+@keyframes lawSilk { 50% { box-shadow: 0 0 18px color-mix(in srgb, var(--c) 80%, transparent); } }
+.law-card .recipe-name { font-family: var(--font-brush); font-size: 1.2em; white-space: nowrap; }
+
+/* 灵域：属性纹样 + 书法字光盘 */
+.domain-card { position: relative; overflow: hidden; --c: var(--gold); }
+.domain-card::before { content: ''; position: absolute; inset: 0; background: var(--c); opacity: 0.11; pointer-events: none; -webkit-mask: var(--pat) 0 0 / 46px 46px repeat; mask: var(--pat) 0 0 / 46px 46px repeat; }
+.domain-card > * { position: relative; }
+.dom-glyph { display: inline-flex; width: 46px; height: 46px; align-items: center; justify-content: center; border-radius: 50%; font-family: var(--font-brush); font-size: 28px; line-height: 1; color: var(--c);
+    -webkit-text-stroke: 1.2px #120e09; paint-order: stroke fill; background: radial-gradient(circle, color-mix(in srgb, var(--c) 32%, transparent) 0 50%, transparent 70%); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c) 60%, transparent); }
+.domain-card .domain-name { font-family: var(--font-brush); font-size: 1.3em; font-weight: normal; }
+.dom-fire { --pat: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M12 42 Q4 30 12 20 Q12 28 18 30 Q14 18 24 6 Q24 20 30 24 Q34 16 32 10 Q42 26 36 42 Z'/></svg>"); }
+.dom-water { --pat: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M0 16 Q12 8 24 16 T48 16 L48 20 Q36 12 24 20 T0 20 Z M0 36 Q12 28 24 36 T48 36 L48 40 Q36 32 24 40 T0 40 Z'/></svg>"); }
+.dom-wood { --pat: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M6 40 Q8 20 26 14 Q24 32 6 40 Z M26 34 Q30 18 44 14 Q42 28 26 34 Z'/></svg>"); }
+.dom-metal { --pat: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M4 44 L40 4 L44 6 L8 46 Z M26 46 L46 24 L47 27 L29 47 Z'/></svg>"); }
+.dom-earth { --pat: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M0 10 L48 10 L48 14 L0 14 Z M0 26 L20 26 L24 22 L48 22 L48 26 L26 26 L22 30 L0 30 Z M0 40 L48 40 L48 43 L0 43 Z'/></svg>"); }
+.dom-thunder { --pat: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M26 2 L14 24 L22 24 L16 46 L34 18 L26 18 L32 2 Z'/></svg>"); }
+.dom-ice { --pat: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M23 4 h2 v40 h-2 Z M4 23 h40 v2 H4 Z M8.5 7 l1.4 -1.4 l32.5 32.5 l-1.4 1.4 Z M7 39.5 l32.5 -32.5 l1.4 1.4 l-32.5 32.5 Z'/></svg>"); }
+.dom-wind { --pat: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M6 18 Q18 6 30 14 Q38 20 30 24 Q24 26 24 20 Q26 16 30 18 Q26 10 16 14 Q10 17 8 20 Z M18 38 Q30 28 42 36 L40 38 Q30 32 20 40 Z'/></svg>"); }
+@media (prefers-reduced-motion: reduce) { .vs-overlay *, .sh-title, .sh-sub, .law-medal.silk { animation: none !important; } }
+
+/* ==========================================================================
+   v7.28 漫画风续：功法卷轴 / 境界印章 / 装备页立绘 / 离线收益卷轴
+   卷轴纸面固定用宣纸色，内部换成宣纸主题的文字颜色，四套主题下都看得清
+   ========================================================================== */
+/* 功法卡：横卷轴，左右两根木轴 */
+.art-card { position: relative; --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; color: var(--text-l1); background: linear-gradient(180deg, #f3e9cf 0%, #e7d8b4 100%); border: none; border-radius: 2px; margin-left: 10px; margin-right: 10px;
+    box-shadow: inset 0 0 18px rgba(120, 90, 40, 0.28), 0 3px 8px rgba(0, 0, 0, 0.35); padding: 10px 16px; }
+.art-card::before, .art-card::after { content: ''; position: absolute; top: -5px; bottom: -5px; width: 9px; border-radius: 5px;
+    background: linear-gradient(90deg, #3a2412, #7a4c26 45%, #3a2412); box-shadow: 0 0 0 1px #1a1008, inset 0 6px 0 -3px #c9a24a, inset 0 -6px 0 -3px #c9a24a; }
+.art-card::before { left: -9px; }
+.art-card::after { right: -9px; }
+.art-card .art-card-label { font-family: var(--font-brush); font-size: 1.05em; color: #8a2a20; }
+.art-card .art-name { font-family: var(--font-brush); font-size: 1.45em; font-weight: normal; color: #1a140c; letter-spacing: 0.08em; }
+.art-card .art-speed { color: #fff3e6; background: #a8322a; padding: 1px 6px; border-radius: 2px; font-size: 0.82em; }
+.art-card .art-icon { display: inline-flex; width: 30px; height: 30px; align-self: center; }
+.art-card .art-icon .ico { width: 30px; height: 30px; }
+.art-card .art-switch { background: transparent; color: #8a2a20; border: 1.5px solid #8a2a20; font-family: var(--font-brush); font-size: 1.05em; }
+.art-card .art-switch:hover { background: rgba(168, 50, 42, 0.1); }
+
+/* 境界印章：毛笔字、双线边、磨损的印边；换境界时重新盖一下 */
+#realmDisplay { font-family: var(--font-brush); font-size: 1.12em; letter-spacing: 0.08em; padding: 2px 10px 1px; background: #a8322a; color: #fff2e4; border-radius: 3px;
+    box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.5), inset 0 0 0 4px #a8322a, inset 0 0 0 5px rgba(255, 236, 214, 0.28);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40' preserveAspectRatio='none'><path d='M2 3 L20 1 L40 2.5 L60 0.8 L80 2 L98 1 L99 18 L100 38 L80 39.2 L60 38 L40 39.5 L20 38.4 L1 39 L0.5 20 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40' preserveAspectRatio='none'><path d='M2 3 L20 1 L40 2.5 L60 0.8 L80 2 L98 1 L99 18 L100 38 L80 39.2 L60 38 L40 39.5 L20 38.4 L1 39 L0.5 20 Z'/></svg>") center / 100% 100% no-repeat; }
+#realmDisplay.stamped { animation: realmStamp 0.55s cubic-bezier(.2, 1.4, .3, 1); }
+@keyframes realmStamp { 0% { transform: rotate(-1.5deg) scale(1.9); opacity: 0; } 55% { transform: rotate(-1.5deg) scale(0.92); opacity: 1; } 100% { transform: rotate(-1.5deg) scale(1); } }
+
+/* 装备页立绘 */
+.equip-hero { margin-bottom: 14px; }
+.pt-stage { position: relative; height: 230px; border-radius: 4px; overflow: hidden; border: 1px solid #000; isolation: isolate; }
+.pt-stage::after { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; box-shadow: inset 0 0 36px rgba(0, 0, 0, 0.7); }
+.pt-bg, .pt-bg .bs-bg-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pt-figure { position: absolute; left: 50%; bottom: 4px; width: 150px; transform: translateX(-50%); line-height: 0; z-index: 2; }
+.pt-figure .bs-art { width: 100%; height: auto; overflow: visible; position: relative; z-index: 1; animation: bsBreathe 4s ease-in-out infinite; transform-origin: 40% 95%; }
+.pt-aura-low .bs-aura { opacity: 0.35; }
+.pt-aura-hi .bs-aura { transform-box: fill-box; transform-origin: 50% 100%; transform: scale(1.15); }
+.pt-core { position: absolute; left: 48%; top: 56%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; z-index: 2; background: radial-gradient(circle, #fff8d6, #ffd86b 55%, rgba(255, 200, 80, 0) 72%);
+    box-shadow: 0 0 10px 3px rgba(255, 210, 100, 0.75); animation: ptCore 2.4s ease-in-out infinite; }
+@keyframes ptCore { 50% { box-shadow: 0 0 16px 6px rgba(255, 210, 100, 0.9); } }
+.pt-nascent { position: absolute; left: 6%; top: 6%; width: 26px; z-index: 2; animation: ptNascent 3.6s ease-in-out infinite; }
+@keyframes ptNascent { 50% { transform: translate(-4px, -6px); } }
+.pt-halo { position: absolute; left: 49%; top: 18%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; z-index: 0;
+    border: 2px solid var(--c); box-shadow: 0 0 12px var(--c), inset 0 0 12px var(--c); opacity: 0.85; animation: bsHalo 9s linear infinite; }
+.pt-laws { position: absolute; left: 50%; bottom: 40px; width: 210px; height: 210px; margin-left: -105px; z-index: 1; animation: bsHalo 24s linear infinite; }
+.pt-laws span { position: absolute; left: 50%; top: 50%; font-family: var(--font-brush); font-size: 18px; line-height: 1; color: var(--c); -webkit-text-stroke: 1px #0e0c09; paint-order: stroke fill;
+    text-shadow: 0 0 8px var(--c); transform: rotate(calc(var(--i) * 45deg)) translateY(-100px) rotate(calc(var(--i) * -45deg)); margin: -9px 0 0 -9px; }
+.pt-caption { position: absolute; left: 0; right: 0; top: 10px; z-index: 6; text-align: center; font-family: var(--font-brush); font-size: 1.5em; color: #fff3cf;
+    -webkit-text-stroke: 1.2px #0e0c09; paint-order: stroke fill; text-shadow: 2px 2px 0 #0e0c09, 0 0 12px rgba(255, 220, 150, 0.4); }
+
+/* 离线收益：竖卷轴，上下两根木轴，打开时从中间展开 */
+.modal-content.scroll-modal { position: relative; --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; color: var(--text-l1); background: linear-gradient(90deg, #e9dcba, #f5ecd4 18%, #f5ecd4 82%, #e9dcba); border: none; border-radius: 2px;
+    box-shadow: inset 0 0 26px rgba(120, 90, 40, 0.3), 0 10px 30px rgba(0, 0, 0, 0.55); margin-top: 18px; margin-bottom: 18px; overflow: visible; }
+.modal-content.scroll-modal::before, .modal-content.scroll-modal::after { content: ''; position: absolute; left: -14px; right: -14px; height: 14px; border-radius: 7px;
+    background: linear-gradient(180deg, #3a2412, #7a4c26 45%, #3a2412); box-shadow: 0 0 0 1px #1a1008, inset 8px 0 0 -4px #c9a24a, inset -8px 0 0 -4px #c9a24a; }
+.modal-content.scroll-modal::before { top: -12px; }
+.modal-content.scroll-modal::after { bottom: -12px; }
+.modal.show .modal-content.scroll-modal { animation: scrollUnroll 0.6s cubic-bezier(.3, .9, .3, 1) both; }
+@keyframes scrollUnroll { from { clip-path: inset(46% -20px 46% -20px); } to { clip-path: inset(-20px -20px -20px -20px); } }
+.scroll-modal .modal-title { font-family: var(--font-brush); font-size: 2em; color: #1a140c; letter-spacing: 0.2em; text-shadow: none; }
+.scroll-modal .btn { background: #a8322a; color: #fff3e6; border-color: #7a1f18; font-family: var(--font-brush); font-size: 1.15em; }
+@media (prefers-reduced-motion: reduce) { .modal.show .modal-content.scroll-modal, #realmDisplay.stamped, .pt-laws, .pt-halo, .pt-core, .pt-nascent { animation: none !important; } }

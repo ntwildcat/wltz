@@ -1232,7 +1232,8 @@
         // 每种物品单独一枚 SVG（32×32），不依赖外部图片。加载时写回 GAME_CONFIG.items / 商店 / 食物配置的 icon 字段；
         // 没有对应图标的物品保持原来的 emoji。图标是 HTML 字符串，所以显示图标的地方一律用 innerHTML。
         // 图标共用的小工具：外壳（墨色描边）、四角星光、叶片
-        const icoSvg = inner => `<svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><g stroke="#2b2016" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" fill="none">${inner}</g></svg>`;
+        // v7.26 漫画风：墨线加粗加黑，并套用页面里的 #icoInk 滤镜（外描边 + 右下硬阴影），所有物品图标一起变
+        const icoSvg = inner => `<svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><g filter="url(#icoInk)"><g stroke="#130f0a" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round" fill="none">${inner}</g></g></svg>`;
         const icoSparkle = (x, y, s = 2.4, c = '#fff4c4') => `<path d="M${x} ${y - s}L${x + s * 0.35} ${y - s * 0.35}L${x + s} ${y}L${x + s * 0.35} ${y + s * 0.35}L${x} ${y + s}L${x - s * 0.35} ${y + s * 0.35}L${x - s} ${y}L${x - s * 0.35} ${y - s * 0.35}Z" fill="${c}" stroke="none"/>`;
         const icoLeaf = (x, y, rot, len, c) => `<path d="M0 0Q${len / 2} ${-len * 0.42} ${len} 0Q${len / 2} ${len * 0.42} 0 0Z" transform="translate(${x} ${y}) rotate(${rot})" fill="${c}"/>`;
 
@@ -3392,8 +3393,9 @@
             const got = ACHIEVEMENTS.filter(a => store[a.id]).length;
             const rows = ACHIEVEMENTS.map(a => {
                 const t = store[a.id];
-                return `<div class="use-row"${t ? '' : ' style="opacity:0.55;"'}>
-                    <div class="use-main"><b>${t ? '🏆' : '🔒'} ${a.name}</b>
+                return `<div class="use-row ach-row"${t ? '' : ' style="opacity:0.6;"'}>
+                    <span class="ach-seal${t ? '' : ' locked'}">${a.glyph}</span>
+                    <div class="use-main"><b>${a.name}</b>
                     <div class="use-effect">${a.desc}${t ? `<span style="color:var(--text-l4);">　· ${new Date(t).toLocaleDateString()}</span>` : ''}</div></div>
                 </div>`;
             }).join('');
@@ -5053,7 +5055,54 @@
         }
 
         // P0-4 双向战斗系统重写
+        // Boss 登场画面（v7.27）：天劫 / 心魔 / 衰相 / 三尸 / 证道之战开打前，弹一格漫画分镜对峙约 1.8 秒（可点掉）。
+        // 播放期间战斗暂停计时，免得开场白挨打；页面在后台或设置了减少动态效果时不播
+        const BOSS_INTRO = {
+            heart: { line: '你就是我，我就是你——你斩得了自己吗？' },
+            small: { line: '天道不容，雷劫降世！' },
+            big: { line: '大劫临身，一劫重过一劫！' },
+            fly: { line: '飞升之劫，九死一生！' },
+            shuai: { line: '仙亦有衰，衰则道消。' },
+            corpseShan: { line: '我才是真正的你。' },
+            corpseE: { line: '把这具身体交给我吧。' },
+            corpseWo: { line: '你我本是一人，何必分离？' },
+            zhengdao: { line: '一法只容一祖——你也配证道？' }
+        };
+        let bossIntroUntil = 0;
+        function bossIntroKey(d) {
+            if (d.isHeartDemon) return 'heart';
+            if (BOSS_INTRO[d.id]) return d.id;
+            if (d.isShuai) return 'shuai';
+            if (d.tribulationRealm === 41) return 'fly';
+            return d.kind === 'big' ? 'big' : 'small';
+        }
+        function closeBossIntro() {
+            bossIntroUntil = 0;
+            const el = document.getElementById('bossIntro');
+            if (el) el.remove();
+        }
+        function showBossIntro(d) {
+            if (fxReduced() || typeof BattleArt === 'undefined') return;
+            closeBossIntro();
+            const ctx = battleStageContext();
+            const monster = d.monsters[0];
+            const P = gameState.player;
+            const enemyColor = ctx.mirror ? ({ demon: '#ff3b3b', shuai: '#a9a294', corpse: '#c070ff', dao: '#ffe08a' })[ctx.mirror] : BattleArt.colorOf(monster.type);
+            const wrap = document.createElement('div');
+            wrap.id = 'bossIntro';
+            wrap.innerHTML = BattleArt.versus({
+                playerArt: BattleArt.player(P.spiritRoot), playerColor: BattleArt.colorOf(P.spiritRoot), leftName: P.name || '散修',
+                enemyArt: BattleArt.enemy(monster, { mirror: ctx.mirror, root: P.spiritRoot }), enemyColor,
+                rightName: d.id === 'zhengdao' ? monster.name : d.name, line: BOSS_INTRO[bossIntroKey(d)].line
+            });
+            wrap.addEventListener('click', closeBossIntro);
+            document.body.appendChild(wrap);
+            bossIntroUntil = performance.now() + 1800;
+            setTimeout(() => { if (performance.now() >= bossIntroUntil - 30) closeBossIntro(); }, 1850);
+        }
+
         function processDungeonTick() {
+            if (bossIntroUntil && performance.now() < bossIntroUntil) return;   // 登场画面播放中：战斗暂停
             const dungeonId = gameState.dungeons.currentDungeon;
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
             const monster = dungeon.monsters[gameState.dungeons.currentMonsterIndex];
@@ -6147,8 +6196,9 @@
                 const statsHtml = s.used > 0
                     ? `<div class="domain-stats">你选过 ${s.used} 次，存活 ${Math.round(s.survived / s.used * 100)}%</div>`
                     : `<div class="domain-stats domain-stats-new">还没选过</div>`;
-                return `<div class="domain-card${affordable ? '' : ' unaffordable'}${key === first ? ' selected' : ''}" onclick="confirmDomainChoice('${key === first ? '__one__' : key}')">
-                    <div class="domain-icon">${d.icon}</div>
+                const c = typeof BattleArt !== 'undefined' ? BattleArt.colorOf(key) : 'var(--gold)';
+                return `<div class="domain-card dom-${key}${affordable ? '' : ' unaffordable'}${key === first ? ' selected' : ''}" style="--c:${c}" onclick="confirmDomainChoice('${key === first ? '__one__' : key}')">
+                    <div class="domain-icon"><span class="dom-glyph">${d.name[0]}</span></div>
                     <div class="domain-name">${d.name}</div>
                     ${statsHtml}
                     <div class="domain-desc">${d.desc}</div>
@@ -6309,7 +6359,7 @@
                 card.className = 'action-item law-card' + (active ? ' active' : '') + (atCap ? ' law-capped' : '');
                 card.id = 'action-wudao-' + id;
                 card.innerHTML = `
-                    <div class="recipe-header"><span class="recipe-icon">${def.icon}</span><span class="recipe-name">${def.name}</span>${isLawResonant(id) ? '<span class="law-resonant" title="与你的灵根相合：参悟速度 +50%">✦ 灵根相合</span>' : ''}</div>
+                    <div class="recipe-header"><span class="law-medal${info.level > LAW_MASTER_LEVEL ? ' silk' : ''}" style="--c:${typeof BattleArt !== 'undefined' ? BattleArt.colorOf(id) : 'var(--gold)'};--p:${Math.round(info.level / LAW_MAX_LEVEL * 100)}" title="外圈：${info.level}/${LAW_MAX_LEVEL} 级">${LAW_GLYPH[id]}</span><span class="recipe-name">${def.name}</span>${isLawResonant(id) ? '<span class="law-resonant" title="与你的灵根相合：参悟速度 +50%">✦ 灵根相合</span>' : ''}</div>
                     <div class="law-level">Lv.${info.level} <small>/ ${cap}</small></div>
                     <div class="mastery-track"><div class="mastery-fill" style="width: ${info.percent}%"></div></div>
                     <div class="law-exp">${atCap ? '已至当前境界上限，突破后可继续领悟' : `${info.exp} / ${info.need}`}</div>
@@ -7696,6 +7746,20 @@
          * 渲染单个配方卡片（新系统）
          */
         // 配方卡片正中的大图：产出物品的图标；产出灵石 / 修为时用通用符号
+        // v7.26 修炼配方没有物品产出，原来都画同一个「气」图标；改成每个配方一个书法字（毛笔字配技能色光盘）
+        const CULT_GLYPH = {
+            basic: '纳', small: '周', big: '天', breath: '息', marrow_cleansing: '髓', bulinggen: '五', danding: '鼎', epiphany: '悟',
+            golden_temper: '淬', fire_body: '火', golden_perfect: '圆', yuanying_nurture: '养', soul_travel: '游', yuanying_dao: '合',
+            huashen_ning: '凝', yuanshen_huaxu: '虚', tiandi_gongming: '鸣', heti_unity: '一', dao_body: '体', dao_perfect: '道',
+            lianxu_main: '元', huaxu_unity: '真', taixu_manifest: '显', dacheng_convergence: '归', nascent_infuse: '注', yuanying_growth: '蕴',
+            fadao_suppress: '镇', open_orifice: '穴', nascent_temper: '婴', jade_body: '玉', world_deduce: '界', soul_temper: '魂', law_origin: '源'
+        };
+        // 卡片上的产出大图：一枚按技能着色的光盘，里面是物品图标或书法字；未解锁盖一枚朱红「封」印
+        function recipeArtHtml(skillName, recipeKey, recipe, unlocked) {
+            if (!unlocked) return '<div class="rc-medal"><span class="rc-seal">封</span></div>';
+            const glyph = skillName === 'cultivation' ? (CULT_GLYPH[recipeKey] || (recipe.name || '修')[0]) : null;
+            return `<div class="rc-medal">${glyph ? `<span class="rc-glyph">${glyph}</span>` : recipeArtIcon(recipe)}</div>`;
+        }
         function recipeArtIcon(recipe) {
             const out = recipe.output || {};
             const first = (out.items || []).map(i => GAME_CONFIG.items[i.id]).find(Boolean);
@@ -7736,7 +7800,7 @@
             const materials = checkMaterialAvailability(recipe);
 
             // 4. 判断类名
-            let className = 'action-item recipe-card';
+            let className = 'action-item recipe-card rc-skill-' + skillName;   // v7.26：按技能换卡片的点缀色
             if (isActive) className += ' active';
             if (!unlockState.unlocked) className += ' disabled';
             if (isQuestTarget(skillName, recipeKey)) className += ' quest-target';
@@ -7816,7 +7880,7 @@
                 ${sessionCountHtml}
                 <div class="recipe-name rc-name">${recipe.name}</div>
                 <div class="recipe-time rc-meta">⏱ ${timeText}</div>
-                <div class="rc-art${unlockState.unlocked ? '' : ' locked'}">${unlockState.unlocked ? recipeArtIcon(recipe) : '🔒'}</div>
+                <div class="rc-art${unlockState.unlocked ? '' : ' locked'}">${recipeArtHtml(skillName, recipeKey, recipe, unlockState.unlocked)}</div>
                 <div class="recipe-output">${outputStr}</div>
                 ${equipStatsHtml}
                 ${materialsHtml}
@@ -8645,7 +8709,10 @@
                         <button class="btn equip-btn" onclick="equipFromBag('${i.id}')">装备</button></div>`;
                 }).join('');
             });
-            box.innerHTML = `<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（可以在炼器里打造）</div>'}`;
+            // v7.28 顶部立绘：随境界变化（气焰 / 金丹 / 元婴 / 光环 / 法则环），装了武器才持剑
+            const hero = typeof BattleArt !== 'undefined'
+                ? `<div class="equip-hero">${BattleArt.portrait(gameState.player.spiritRoot, gameState.player.realmIndex, { sword: !!eq.weapon, caption: `${gameState.player.name || '散修'} · ${getRealmName(gameState.player.realmIndex)}` })}</div>` : '';
+            box.innerHTML = `${hero}<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（可以在炼器里打造）</div>'}`;
         }
 
         // 旧存档迁移：装备曾同时保留在背包里，现在装备栏与背包分开。每件已装备的物品从背包扣掉 1 件；
@@ -9264,6 +9331,7 @@
 
             // P1-1 初始化战斗UI
             renderBattleUI(auto);
+            if (!auto && dungeon.isTribulation) showBossIntro(dungeon);
         }
 
         // ==================== UI更新 ====================
@@ -9407,7 +9475,13 @@
             nameEl.textContent = gameState.player.name || '-';
             nameEl.title = gameState.player.name || '';   // 名字被截断时可悬停查看全名
             const realm = GAME_CONFIG.realms[gameState.player.realmIndex];
-            document.getElementById('realmDisplay').textContent = realm.name;
+            const realmEl = document.getElementById('realmDisplay');
+            if (realmEl.textContent !== realm.name) {
+                const changed = !!realmEl.textContent && realmEl.dataset.realm !== undefined;
+                realmEl.textContent = realm.name;
+                realmEl.dataset.realm = gameState.player.realmIndex;
+                if (changed) pulseClass(realmEl, 'stamped');   // v7.28：境界变了，印章重新盖一下
+            }
             const nextCfg = GAME_CONFIG.realms[gameState.player.realmIndex + 1];
             document.getElementById('nextBreakthrough').textContent = isDaozu() ? '大道尽头' : isGateRealm(nextCfg) ? getRealmGates().map(g => `${g.label} ${g.need}`).join(' · ') : fmtXP(realm.nextReq);
             renderRealmLore();
@@ -11495,33 +11569,50 @@
             } catch (e) { /* 存储不可用时忽略 */ }
         }
 
-        // 渲染存档选择界面
+        // 开始界面主视觉（v7.27）：山水 + 修士 + 毛笔标题。修士的灵根色取第一个存档，没有存档时随机；背景按存档里最高的境界换档
+        function renderStartHero() {
+            const box = document.getElementById('startHero');
+            if (!box || typeof BattleArt === 'undefined') return;
+            let rootId = null, best = 0;
+            for (let n = 1; n <= SAVE_SLOT_COUNT; n++) {
+                try { const d = JSON.parse(readSlot(n) || 'null'); if (d && d.player) { rootId = rootId || d.player.spiritRoot; best = Math.max(best, d.player.realmIndex || 0); } } catch (e) { /* 坏档跳过 */ }
+            }
+            if (!rootId) rootId = LAW_IDS[Math.floor(Math.random() * LAW_IDS.length)];
+            box.innerHTML = BattleArt.startHero(rootId, { tier: BattleArt.tierOf(best), demo: isDemoEdition() });
+            document.getElementById('startScreen').classList.add('has-hero');
+        }
+        const SLOT_NUMERALS = ['壹', '贰', '叁'];
+
+        // 渲染存档选择界面：每个存档是一枚玉简——左边竖条写序号，名字用毛笔字，境界是一枚小印，点缀色随灵根
         function renderSlotSelect() {
             const box = document.getElementById('slotSelect');
             if (!box) return;
+            renderStartHero();
             let html = '';
             for (let n = 1; n <= SAVE_SLOT_COUNT; n++) {
                 const raw = readSlot(n);
+                const slip = `<div class="slot-slip">${SLOT_NUMERALS[n - 1] || n}</div>`;
                 if (!raw) {
-                    html += `<div class="slot-card empty" onclick="openSlot(${n})">
-                        <div class="slot-title">存档 ${n}</div>
-                        <div class="slot-info">＋ 新建角色</div>
+                    html += `<div class="slot-card empty" onclick="openSlot(${n})">${slip}
+                        <div class="slot-body"><div class="slot-title">存档 ${n}</div>
+                        <div class="slot-info slot-new">＋ 新建角色</div></div>
                     </div>`;
                     continue;
                 }
-                let info;
+                let info, accent = '';
                 try {
                     const d = JSON.parse(raw);
                     const realm = GAME_CONFIG.realms[d.player.realmIndex] ? getRealmName(d.player.realmIndex) : '未知境界';
                     const when = d.lastSaveTime ? new Date(d.lastSaveTime).toLocaleString() : '—';
-                    info = `<div class="slot-name">${d.player.name || '无名'} · ${realm}</div>
+                    if (typeof BattleArt !== 'undefined') accent = ` style="--c:${BattleArt.colorOf(d.player.spiritRoot)}"`;
+                    info = `<div class="slot-name">${d.player.name || '无名'}<span class="slot-realm">${realm}</span></div>
                         <div class="slot-info">灵石 ${d.player.coins} · 最后保存 ${when}</div>`;
                 } catch (e) {
                     info = '<div class="slot-name">⚠️ 存档已损坏</div><div class="slot-info">可以删除后重新创建</div>';
                 }
-                html += `<div class="slot-card" onclick="openSlot(${n})">
-                    <div class="slot-title">存档 ${n}</div>
-                    ${info}
+                html += `<div class="slot-card"${accent} onclick="openSlot(${n})">${slip}
+                    <div class="slot-body"><div class="slot-title">存档 ${n}</div>
+                    ${info}</div>
                     <button class="slot-delete" onclick="event.stopPropagation(); deleteSlot(${n})" title="删除此存档" aria-label="删除此存档">🗑</button>
                 </div>`;
             }
@@ -12156,7 +12247,7 @@
                 // 更新当前功法显示
                 const artDisplayDiv = document.querySelector('#currentArtDisplay');
                 if (artDisplayDiv) {
-                    artDisplayDiv.innerHTML = `<b class="art-name">${currentArt.name}</b><span class="art-speed">修炼速度 ×${currentArt.speedMultiplier.toFixed(1)}</span>`;
+                    artDisplayDiv.innerHTML = `${currentArt.icon && String(currentArt.icon).startsWith('<svg') ? `<span class="art-icon">${currentArt.icon}</span>` : ''}<b class="art-name">${currentArt.name}</b><span class="art-speed">修炼速度 ×${currentArt.speedMultiplier.toFixed(1)}</span>`;
                 }
                 // 更新功法速度显示
                 const artSpeedDisplay = document.getElementById('artSpeedDisplay');

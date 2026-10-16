@@ -58,11 +58,11 @@ const BattleArt = (() => {
             <path d="M47 85 Q60 89 75 85" stroke="${c}" stroke-width="2.4" fill="none" opacity=".9"/>
             <path d="M49 13 L71 9" stroke="${c}" stroke-width="1.6" stroke-linecap="round"/>
             ${eyes(u, eyeC, 'M66 28.5 L70.5 27.8')}
-            <g class="bs-sword">
-                <path d="M92 79 L96 81 L121 147 L118 148 Z" fill="${c}" opacity=".45" filter="url(#glow${u})"/>
+            ${opts.sword === false ? '' : `<g class="bs-sword">
+                <path d="M92 79 L96 81 L121 147 L118 148 Z" fill="${opts.swordColor || c}" opacity=".45" filter="url(#glow${u})"/>
                 <path d="M92.6 79.4 L95.4 80.8 L120 146.6 L118.4 147.2 Z" fill="#f4faff"/>
                 <path d="M87 77 L99 85" stroke="${INK}" stroke-width="3.4" stroke-linecap="round"/>
-            </g>`;
+            </g>`}`;
         return svg('0 0 124 160', body, 'bs-player-art' + (opts.mirror ? ' bs-mirror' : ''));
     }
 
@@ -325,5 +325,41 @@ const BattleArt = (() => {
         }
         return `<svg class="fx-burst-lines" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><g stroke="${color}">${lines}</g></svg>`;
     }
-    return { player, enemy, scene, tierOf, meditator, burstLines, archetypeOf, colorOf, slash, speedLines, stamp, claw, lightning, nascent, inkBurst, ELEMENT, ROOT };
+    // ---------------- 开始界面主视觉：山水 + 立于崖上的修士 + 毛笔大字标题 ----------------
+    function startHero(root = 'wood', opts = {}) {
+        return `<div class="start-hero">
+            <div class="sh-bg">${scene(opts.tier || 'cultist')}</div>
+            <div class="sh-figure">${player(root)}</div>
+            <div class="sh-text"><div class="sh-title">散修长生录${opts.demo ? '<small>试玩版</small>' : ''}</div><div class="sh-sub">一介散修　问道长生</div></div>
+        </div>`;
+    }
+    // ---------------- Boss 登场：左右斜切的两格分镜对峙，中间 VS，Boss 一侧配名字与一句台词 ----------------
+    function versus(o) {
+        return `<div class="vs-overlay">
+            <div class="vs-panel vs-left" style="--c:${o.playerColor}"><div class="vs-art">${o.playerArt}</div><div class="vs-name">${o.leftName}</div></div>
+            <div class="vs-panel vs-right" style="--c:${o.enemyColor}"><div class="vs-art">${o.enemyArt}</div><div class="vs-name">${o.rightName}</div><div class="vs-bubble">${o.line}</div></div>
+            <div class="vs-slash"></div>
+            <div class="vs-mark">VS</div>
+            <div class="vs-skip">点击跳过</div>
+        </div>`;
+    }
+    // ---------------- 装备页立绘：随境界变化的修士 ----------------
+    // 筑基前气焰淡、筑基起旺；结丹起丹田一颗金丹；元婴起肩头飘着金色元婴；真仙起脑后光环；道祖身边环绕八个法则字
+    function portrait(root = 'wood', realm = 0, opts = {}) {
+        const c = colorOf(root);
+        const aura = realm >= 30 ? 'hi' : realm >= 14 ? 'mid' : 'low';
+        const laws = '金木水火土风雷冰'.split('');
+        return `<div class="pt-stage">
+            <div class="pt-bg">${scene(tierOf(realm))}</div>
+            ${realm >= 50 ? `<div class="pt-laws" style="--c:${c}">${laws.map((g, i) => `<span style="--i:${i}">${g}</span>`).join('')}</div>` : ''}
+            <div class="pt-figure pt-aura-${aura}" style="--c:${c}">
+                ${realm >= 42 ? '<div class="pt-halo"></div>' : ''}
+                ${player(root, { sword: opts.sword !== false })}
+                ${realm >= 18 ? '<div class="pt-core"></div>' : ''}
+                ${realm >= 22 ? `<svg class="pt-nascent" viewBox="0 0 40 40"><g fill="#ffd86b" filter="drop-shadow(0 0 4px #ffd86b)"><circle cx="20" cy="11" r="6"/><path d="M12 18 Q20 15 28 18 L30 32 Q20 36 10 32 Z"/></g></svg>` : ''}
+            </div>
+            ${opts.caption ? `<div class="pt-caption">${opts.caption}</div>` : ''}
+        </div>`;
+    }
+    return { player, enemy, scene, tierOf, meditator, burstLines, startHero, versus, portrait, archetypeOf, colorOf, slash, speedLines, stamp, claw, lightning, nascent, inkBurst, ELEMENT, ROOT };
 })();
