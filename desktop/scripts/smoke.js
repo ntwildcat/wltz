@@ -1,4 +1,4 @@
-// 桌面版冒烟测试：npm run smoke（跑源码）/ npm run smoke:packed（跑 build.js 生成的 app/）
+// 桌面版冒烟测试：npm run smoke（跑源码）/ npm run smoke:packed（跑 build.js 生成的 app/）/ npm run smoke:demo（试玩版产物）
 // 在临时目录里真实启动游戏窗口，走一遍 建角色 → 存档落盘 → 重新载入 → 主文件损坏退回 .bak → 关窗口时存档 → 删除存档，
 // 全部通过退出码 0，否则 1。不碰 %APPDATA% 里的真实存档。
 const os = require('os');
@@ -7,8 +7,17 @@ const fs = require('fs');
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sanxiu-smoke-'));
 process.env.SANXIU_USER_DATA = tmp;
-const { app, BrowserWindow } = require('electron');
+const { app, ipcMain } = require('electron');
 require('../main.js');
+
+// 预期的版本：跑打包产物时看 app/build-info.json，跑源码时看 SANXIU_EDITION（默认完整版）
+const PACKED = process.argv.includes('--packed-preview');
+let EXPECT_EDITION = process.env.SANXIU_EDITION || 'full';
+if (PACKED) { try { EXPECT_EDITION = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'app', 'build-info.json'), 'utf8')).edition; } catch (e) { /* 留默认 */ } }
+const EXPECT_TITLE = EXPECT_EDITION === 'demo' ? '散修长生录 试玩版' : '散修长生录';
+// 记下游戏发给外壳的 Steam 成就（没连 Steam 时外壳什么也不做，但请求要发出来）
+const achieveSent = [];
+ipcMain.on('steam:achieve', (e, id) => achieveSent.push(id));
 
 const saveDir = path.join(tmp, 'saves');
 const slotFile = path.join(saveDir, 'xiuxianIdleGame_slot1.json');
@@ -34,11 +43,10 @@ app.on('browser-window-created', (_, win) => {
         await loaded(wc);
         await sleep(800);
         const page = decodeURIComponent(await js('location.pathname'));
-        const wantBuilt = process.argv.includes('--packed-preview');
-        check('加载的页面', wantBuilt ? page.endsWith('/desktop/app/index.html') : page.endsWith('/凡人修仙放置版.html'), page);
-        check('页面标题', (await js('document.title')) === '散修长生录', await js('document.title'));
+        check('加载的页面', PACKED ? page.endsWith('/desktop/app/index.html') : page.endsWith('/凡人修仙放置版.html'), page);
+        check('页面标题', (await js('document.title')) === EXPECT_TITLE, await js('document.title'));
         check('存档接口已注入', await js('!!window.desktopSaves && saveStore === window.desktopSaves'));
-        check('版本信息', await js('window.desktopApp && window.desktopApp.edition === "steam"'), JSON.stringify(await js('window.desktopApp')));
+        check('版本信息', await js(`window.desktopApp && window.desktopApp.edition === '${EXPECT_EDITION}' && GAME_EDITION === '${EXPECT_EDITION}'`), await js('JSON.stringify(window.desktopApp)'));
 
         // 建角色并存档
         await js(`openSlot(1)`); await sleep(300);
@@ -63,6 +71,21 @@ app.on('browser-window-created', (_, win) => {
         check('重新载入后存档列表显示角色', (await js(`document.getElementById('slotSelect').innerText`)).includes('冒烟测试'));
         await js('openSlot(1)'); await sleep(800);
         check('进入存档后数据正确', await js(`gameState.player.name === '冒烟测试' && gameState.player.coins >= 12345`), String(await js('gameState.player.coins')));
+
+        // 成就：达成后发给外壳（再由外壳同步 Steam）
+        await js(`gameState.player.realmIndex = 14; checkAchievements()`); await sleep(300);
+        check('成就解锁并发给外壳', ['ACH_QI', 'ACH_ZHUJI'].every(id => achieveSent.includes(id)), achieveSent.join(','));
+
+        // 试玩版上限：元婴大圆满处拦下突破；完整版不拦
+        await js(`gameState.player.realmIndex = ${25}; gameState.player.cultivationXP = GAME_CONFIG.realms[25].nextReq; attemptBreakthrough();`); await sleep(400);
+        if (EXPECT_EDITION === 'demo') {
+            const blocked = await js(`gameState.player.realmIndex === 25 && document.getElementById('realmUnlockModal').classList.contains('show') && document.getElementById('realmUnlockContent').innerText.includes('试玩到此为止')`);
+            check('试玩版在化神突破处拦下', blocked);
+            check('试玩版不会自动越过上限', await js(`gameState.player.realmIndex = 25; canAutoBreakthrough() === false`));
+        } else {
+            check('完整版没有试玩上限', await js(`isDemoCapped(25) === false && !document.getElementById('realmUnlockContent').innerText.includes('试玩到此为止')`));
+        }
+        await js(`try { closeRealmUnlockModal(); closeBreakthroughModal(); } catch (e) {}`);
 
         // 主文件损坏 → 退回 .bak
         await js('gameRunning = false; clearInterval(tickInterval)');   // 先停自动存档，免得把坏文件又写回去

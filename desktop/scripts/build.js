@@ -1,7 +1,7 @@
 // 把仓库根目录的网页版游戏复制到 desktop/app/ 供打包：
 // 1. HTML 改名 index.html；game.js 用 terser 去注释（不改名、不压缩逻辑，出错时堆栈仍可读）；CSS / HTML 去注释
 // 2. 检查产物里没有原著专有名词（注释里的原著出处说明只该留在源码里，不能随游戏发出去）
-// 3. 写入版本号，供游戏内显示
+// 3. 写 build-info.json：版本号与 edition（node scripts/build.js --demo 打试玩版，否则完整版）
 const fs = require('fs');
 const path = require('path');
 const { minify } = require('terser');
@@ -9,6 +9,7 @@ const { minify } = require('terser');
 const ROOT = path.join(__dirname, '..', '..');
 const OUT = path.join(__dirname, '..', 'app');
 const pkg = require('../package.json');
+const EDITION = process.argv.includes('--demo') ? 'demo' : 'full';
 
 // 与 去IP替换清单.md 保持一致；发现就中止打包
 const BANNED = /凡人修仙传|凡人修仙放置|韩立|掌天瓶|小绿瓶|青竹蜂云|金雷竹|忘语|原著|假婴|飞仙劫|仙窍|仙灵力|窍衰|仙衰|身衰|空间节点|人界|灵界/g;
@@ -76,8 +77,10 @@ async function main() {
         process.exit(1);
     }
 
+    fs.writeFileSync(path.join(OUT, 'build-info.json'), JSON.stringify({ edition: EDITION, version: pkg.version, builtAt: new Date().toISOString() }, null, 2));
+
     const size = f => (fs.statSync(path.join(OUT, f)).size / 1024).toFixed(0) + 'KB';
-    console.log(`✓ app/ 已生成（v${pkg.version}）：index.html ${size('index.html')} · game.js ${size('game.js')} · style.css ${size('style.css')} · fonts/`);
+    console.log(`✓ app/ 已生成（v${pkg.version} · ${EDITION === 'demo' ? '试玩版' : '完整版'}）：index.html ${size('index.html')} · game.js ${size('game.js')} · style.css ${size('style.css')} · fonts/`);
 }
 
 main().catch(e => { console.error(e); process.exit(1); });

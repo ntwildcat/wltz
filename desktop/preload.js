@@ -13,4 +13,9 @@ contextBridge.exposeInMainWorld('desktopSaves', {
     set: (key, value) => { call('saves:set', key, String(value)); },
     remove: key => { call('saves:remove', key); }
 });
-contextBridge.exposeInMainWorld('desktopApp', ipcRenderer.sendSync('app:info'));
+const info = ipcRenderer.sendSync('app:info');
+contextBridge.exposeInMainWorld('desktopApp', {
+    ...info,
+    unlockAchievement: id => ipcRenderer.send('steam:achieve', String(id)),   // 成就同步到 Steam（没连上 Steam 时什么也不做）
+    openStore: info.canOpenStore ? () => ipcRenderer.send('app:openStore') : null
+});

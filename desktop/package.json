@@ -10,9 +10,12 @@
     "start": "electron .",
     "prepare-app": "node scripts/build.js",
     "start:packed": "node scripts/build.js && electron . --packed-preview",
-    "dist": "node scripts/build.js && electron-builder --win dir",
+    "dist": "node scripts/build.js && electron-builder --win dir -c.directories.output=dist/full",
     "smoke": "electron scripts/smoke.js",
-    "smoke:packed": "node scripts/build.js && electron scripts/smoke.js --packed-preview"
+    "smoke:packed": "node scripts/build.js && electron scripts/smoke.js --packed-preview",
+    "dist:demo": "node scripts/build.js --demo && electron-builder --win dir -c.directories.output=dist/demo",
+    "smoke:demo": "node scripts/build.js --demo && electron scripts/smoke.js --packed-preview",
+    "icons": "electron scripts/make-icons.js"
   },
   "build": {
     "appId": "com.wltz.sanxiuchangsheng",
@@ -25,16 +28,24 @@
       "main.js",
       "preload.js",
       "package.json",
+      "steam.json",
       "app/**/*"
     ],
     "asar": true,
     "win": {
-      "target": "dir"
-    }
+      "target": "dir",
+      "icon": "assets/icon.png"
+    },
+    "asarUnpack": [
+      "node_modules/steamworks.js/dist/win64/**"
+    ]
   },
   "devDependencies": {
     "electron": "44.8.0",
     "electron-builder": "26.15.3",
     "terser": "5.51.2"
+  },
+  "dependencies": {
+    "steamworks.js": "0.4.0"
   }
 }

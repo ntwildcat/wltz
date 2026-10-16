@@ -21,6 +21,53 @@ if (!app.requestSingleInstanceLock()) {
     app.quit();
 }
 
+// ---------------- 版本（完整版 / 试玩版） ----------------
+// 打包时 scripts/build.js 写 app/build-info.json（--demo 时 edition = 'demo'）；直接跑源码时默认完整版，可用 SANXIU_EDITION=demo 试试玩版
+const PKG_VERSION = require('./package.json').version;
+function readBuildInfo() {
+    try { return JSON.parse(fs.readFileSync(path.join(GAME_DIR, 'build-info.json'), 'utf8')); } catch (e) { return {}; }
+}
+const BUILD_INFO = readBuildInfo();
+const EDITION = process.env.SANXIU_EDITION || BUILD_INFO.edition || 'full';
+
+// ---------------- Steam ----------------
+// App ID 填在 steam.json（Steamworks 后台建好应用后才有）；没填就不连 Steam，游戏照常运行（成就只记在存档里，以后连上再补同步）。
+// 测试可用 SANXIU_STEAM_APPID=480（Valve 官方测试应用 Spacewar）。
+function readSteamConfig() {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'steam.json'), 'utf8')); } catch (e) { return {}; }
+}
+const STEAM_CONFIG = readSteamConfig();
+const STEAM_APP_ID = Number(process.env.SANXIU_STEAM_APPID) || Number(EDITION === 'demo' ? STEAM_CONFIG.demoAppId : STEAM_CONFIG.fullAppId) || 0;
+const FULL_APP_ID = Number(STEAM_CONFIG.fullAppId) || 0;
+let steam = null;
+let steamError = '';
+if (STEAM_APP_ID) {
+    try {
+        const steamworks = require('steamworks.js');
+        // 正式打包版不是从 Steam 启动的（直接双击 exe）：交给 Steam 重新启动，保证成就、云存档、在线状态正常
+        if (app.isPackaged && !process.env.SANXIU_STEAM_APPID && steamworks.restartAppIfNecessary(STEAM_APP_ID)) {
+            app.exit(0);
+        } else {
+            steam = steamworks.init(STEAM_APP_ID);
+            steamworks.electronEnableSteamOverlay();
+        }
+    } catch (e) {
+        steamError = e.message;   // Steam 没开 / 没拥有这个应用：不连 Steam 继续玩
+        steam = null;
+    }
+}
+function unlockSteamAchievement(id) {
+    if (!steam || !/^ACH_[A-Z0-9_]+$/.test(String(id))) return false;
+    try { return steam.achievement.activate(id); } catch (e) { return false; }
+}
+function openStorePage() {
+    if (!FULL_APP_ID) return;
+    if (steam) {
+        try { steam.overlay.activateToStore(FULL_APP_ID, 0); return; } catch (e) { /* 浮层不可用就开网页 */ }
+    }
+    shell.openExternal(`https://store.steampowered.com/app/${FULL_APP_ID}/`);
+}
+
 // ---------------- 存档文件 ----------------
 // 只接受游戏用到的存档键（旧版单存档 + 3 个槽位），每个键对应 saves/<键>.json
 const SAVE_KEY_RE = /^xiuxianIdleGame(_slot[1-3])?$/;
@@ -56,7 +103,13 @@ function removeSave(key) {
 ipcMain.on('saves:get', (e, key) => { try { e.returnValue = { ok: true, value: readSave(key) }; } catch (err) { e.returnValue = { ok: false, error: err.message }; } });
 ipcMain.on('saves:set', (e, key, text) => { try { writeSave(key, text); e.returnValue = { ok: true }; } catch (err) { e.returnValue = { ok: false, error: err.message }; } });
 ipcMain.on('saves:remove', (e, key) => { try { removeSave(key); e.returnValue = { ok: true }; } catch (err) { e.returnValue = { ok: false, error: err.message }; } });
-ipcMain.on('app:info', e => { e.returnValue = { version: app.getVersion(), edition: 'steam', saveDir: SAVE_DIR }; });
+ipcMain.on('app:info', e => {
+    let steamUser = '';
+    try { steamUser = steam ? steam.localplayer.getName() : ''; } catch (err) { /* 忽略 */ }
+    e.returnValue = { version: PKG_VERSION, edition: EDITION, saveDir: SAVE_DIR, steam: !!steam, steamAppId: STEAM_APP_ID, steamUser, steamError, canOpenStore: !!FULL_APP_ID };
+});
+ipcMain.on('steam:achieve', (e, id) => { unlockSteamAchievement(id); });
+ipcMain.on('app:openStore', () => openStorePage());
 
 // ---------------- 窗口 ----------------
 let win = null;
@@ -67,7 +120,7 @@ function createWindow() {
         minWidth: 800,
         minHeight: 600,
         backgroundColor: '#15140f',   // 松烟铜器底色，避免启动时白屏一闪
-        title: '散修长生录',
+        title: EDITION === 'demo' ? '散修长生录 试玩版' : '散修长生录',
         show: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),

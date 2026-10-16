@@ -1777,6 +1777,7 @@
             if ((gameState.settings || {}).autoBreakthrough === false) return false;
             if (r === 0 || !next || next.xianqiaoReq) return false;
             if (MAJOR_BREAKTHROUGH_INDICES.has(r)) return false;
+            if (isDemoCapped(r)) return false;
             if (BREAKTHROUGH_GATE_REALMS.includes(r) && !hasSurvivedTribulation(r)) return false;
             if (r >= FUSION_REQUIRED_REALM && !isFused()) return false;
             return true;
@@ -2746,6 +2747,124 @@
             document.getElementById('realmUnlockModal').classList.add('show');
         }
 
+        // ==================== 版本（网页 / Steam 完整版 / Steam 试玩版）与成就（v7.22） ====================
+        // 桌面版外壳（desktop/preload.js）注入 window.desktopApp：edition = 'full' | 'demo'，网页版没有这个对象（= 完整内容）。
+        // 试玩版只到元婴大圆满（DEMO_REALM_CAP），化神突破处弹「试玩到此为止」；存档与完整版通用（同一个存档目录），买了完整版直接接着玩。
+        const DESKTOP = window.desktopApp || null;
+        const GAME_EDITION = DESKTOP ? DESKTOP.edition : 'web';
+        const DEMO_REALM_CAP = 25;   // 元婴大圆满：试玩版能到达的最高境界（改这里即可调整试玩范围）
+        function isDemoEdition() { return GAME_EDITION === 'demo'; }
+        function isDemoCapped(realmIndex = gameState.player.realmIndex) { return isDemoEdition() && realmIndex >= DEMO_REALM_CAP; }
+        function showDemoEndModal() {
+            const canOpenStore = !!(DESKTOP && DESKTOP.openStore);
+            document.getElementById('realmUnlockContent').innerHTML = `
+                <div class="tutorial-title">🌄 试玩到此为止</div>
+                <div class="tutorial-body">试玩版的内容到<b>${getRealmName(DEMO_REALM_CAP)}</b>为止。<br/><br/>
+                    完整版还有化神、炼虚、合体、大乘直到真仙的全部境界，以及天劫、悟道法则、道则、合道、元婴离体、仙穴与衰相等后期玩法。<br/><br/>
+                    <b>存档与完整版通用</b>：购买完整版后打开游戏，选择同一个存档即可接着修炼，试玩期间达成的成就也会一并记入。</div>
+                <div class="tutorial-actions">
+                    ${canOpenStore ? '<button class="btn" onclick="DESKTOP.openStore()">前往商店页</button>' : ''}
+                    <button class="btn" onclick="closeRealmUnlockModal()">知道了</button>
+                </div>`;
+            document.getElementById('realmUnlockModal').classList.add('show');
+        }
+
+        // 成就：条件全部按存档里的现有状态判断（每 5 秒、突破后、读档后各查一次），解锁记在 gameState.achievements[id] = 时间戳。
+        // 网页版在「设置 → 成就」查看；桌面版同时同步到 Steam（id 即 Steamworks 后台的成就 API 名称，两边必须一致，
+        // 清单见 desktop/STEAM上架指南.md）。读档时把以前解锁过的全部重新同步一遍，所以试玩版 / 离线期间达成的成就也不会丢。
+        const NORMAL_DUNGEON_IDS = ['mysteryTower', 'mysteriousForest', 'ancientRuin', 'tribulationGround', 'huashenRealm', 'taixuDream', 'voidRealm', 'tiandaoRealm', 'taiyiRealm', 'taiqingRealm'];
+        const isDungeonDone = id => !!(gameState.dungeons && gameState.dungeons[id] && gameState.dungeons[id].completed);
+        const anyWorkSkillAt = lv => WORK_SKILLS.some(k => gameState.skills[k] && gameState.skills[k].level >= lv);
+        function anyRecipeMastered() {
+            return Object.keys(gameState.skills).some(k => {
+                const st = gameState.skills[k] && gameState.skills[k].mastery;
+                return st && Object.keys(st.recipes || {}).some(key => getMasteryInfo(k, key).level >= MASTERY_MAX_LEVEL);
+            });
+        }
+        // （描述里引用的 MASTERY_MAX_LEVEL / WORK_SKILL_MAX_LEVEL 定义在本文件更后面，所以写成 getter，用到时才取值）
+        const ACHIEVEMENTS = [
+            { id: 'ACH_QI',          glyph: '气', name: '引气入体',   desc: '突破到练气一层',                         check: () => gameState.player.realmIndex >= 1 },
+            { id: 'ACH_NEWBIE',      glyph: '途', name: '初入仙途',   desc: '完成全部新手任务（不跳过）',               check: () => { const q = getQuestState(); return q.done && !q.skipped; } },
+            { id: 'ACH_ZHUJI',       glyph: '基', name: '筑基',       desc: '突破到筑基初期',                         check: () => gameState.player.realmIndex >= 14 },
+            { id: 'ACH_WEI_ZHUJI',   glyph: '逆', name: '逆命筑基',   desc: '以伪灵根突破到筑基初期',                   check: () => gameState.player.rootGrade === 'wei' && gameState.player.realmIndex >= 14 },
+            { id: 'ACH_JIEDAN',      glyph: '丹', name: '结丹',       desc: '突破到结丹初期',                         check: () => gameState.player.realmIndex >= 18 },
+            { id: 'ACH_PERFECT_CORE', glyph: '珠', name: '极品金丹',  desc: '金丹品质达到极品（90）',                   check: () => getCoreQuality() >= 90 },
+            { id: 'ACH_LIFE_SWORD',  glyph: '剑', name: '本命法宝',   desc: '炼成本命法宝青冥剑',                       check: () => ownsLifeTreasure() },
+            { id: 'ACH_FIRST_DUNGEON', glyph: '探', name: '初探秘境', desc: '首次通关任意秘境',                         check: () => NORMAL_DUNGEON_IDS.some(isDungeonDone) },
+            { id: 'ACH_HEART_DEMON', glyph: '魔', name: '斩灭心魔',   desc: '冲击元婴前斩灭心魔',                       check: () => hasSurvivedTribulation(HEART_DEMON_REALM) },
+            { id: 'ACH_YUANYING',    glyph: '婴', name: '元婴',       desc: '突破到元婴初期',                         check: () => gameState.player.realmIndex >= 22 },
+            { id: 'ACH_SMALL_TRIB',  glyph: '雷', name: '初渡天劫',   desc: '渡过第一次小天劫',                         check: () => hasSurvivedTribulation(24) },
+            { id: 'ACH_SKILL_50',    glyph: '艺', name: '一技之长',   desc: '任一生活技能（炼丹 / 炼器 / 灵田 / 采矿）达到 50 级', check: () => anyWorkSkillAt(50) },
+            { id: 'ACH_MASTERY_MAX', glyph: '精', name: '炉火纯青',   get desc() { return `任一配方精通达到 ${MASTERY_MAX_LEVEL} 级`; }, check: anyRecipeMastered },
+            { id: 'ACH_COINS_1M',    glyph: '财', name: '小有积蓄',   desc: '同时持有 100 万灵石',                      check: () => gameState.player.coins >= 1e6 },
+            { id: 'ACH_HUASHEN',     glyph: '神', name: '化神',       desc: '突破到化神初期',                         check: () => gameState.player.realmIndex >= 26 },
+            { id: 'ACH_ASCEND',      glyph: '升', name: '飞升上界',   desc: '穿过界壁裂隙，突破到炼虚初期',             check: () => gameState.player.realmIndex >= 30 },
+            { id: 'ACH_BIG_TRIB',    glyph: '劫', name: '大劫不灭',   desc: '渡过第一次大天劫',                         check: () => hasSurvivedTribulation(33) },
+            { id: 'ACH_HETI',        glyph: '合', name: '合体',       desc: '突破到合体初期',                         check: () => gameState.player.realmIndex >= 34 },
+            { id: 'ACH_FUSION',      glyph: '道', name: '合道',       desc: '元婴分身、身外化身归于本体',               check: () => isFused() },
+            { id: 'ACH_LIFE_SWORD_5', glyph: '冥', name: '五重祭炼',  desc: '把青冥剑祭炼到五重',                       check: () => getLifeRefineTier() >= 5 },
+            { id: 'ACH_DACHENG',     glyph: '乘', name: '大乘',       desc: '突破到大乘初期',                         check: () => gameState.player.realmIndex >= 38 },
+            { id: 'ACH_LAW_MASTER',  glyph: '法', name: '法则入门',   desc: `任一法则练到 ${LAW_MASTER_LEVEL} 级`,      check: () => LAW_IDS.some(id => getLawInfo(id).level >= LAW_MASTER_LEVEL) },
+            { id: 'ACH_ALL_DUNGEONS', glyph: '境', name: '踏遍秘境',  desc: '通关全部 10 个秘境',                       check: () => NORMAL_DUNGEON_IDS.every(isDungeonDone) },
+            { id: 'ACH_SKILL_80',    glyph: '宗', name: '一代宗师',   get desc() { return `任一生活技能达到 ${WORK_SKILL_MAX_LEVEL} 级（满级）`; }, check: () => anyWorkSkillAt(WORK_SKILL_MAX_LEVEL) },
+            { id: 'ACH_COINS_100M',  glyph: '富', name: '富甲一方',   desc: '同时持有 1 亿灵石',                        check: () => gameState.player.coins >= 1e8 },
+            { id: 'ACH_FLY_TRIB',    glyph: '霄', name: '飞升天劫',   desc: '渡过飞升天劫',                             check: () => hasSurvivedTribulation(41) },
+            { id: 'ACH_ZHENXIAN',    glyph: '仙', name: '真仙',       desc: '灵气尽化仙元，突破到真仙初期',             check: () => gameState.player.realmIndex >= XIAN_REALM },
+            { id: 'ACH_SHUAI',       glyph: '衰', name: '衰相尽渡',   desc: '渡过元衰、穴衰、体衰三重衰相',             check: () => XIAN_SHUAI.every(isShuaiDone) },
+            { id: 'ACH_ZHENXIAN_LATE', glyph: '圆', name: '道体圆满', desc: '二十四穴尽开，突破到真仙后期',             check: () => gameState.player.realmIndex >= XIAN_REALM + 1 }
+        ];
+        function getAchievementStore() {
+            if (!gameState.achievements || typeof gameState.achievements !== 'object') gameState.achievements = {};
+            return gameState.achievements;
+        }
+        // quiet：读档时补记老存档早已满足的成就，不逐条弹通知，合并成一条
+        function checkAchievements(quiet = false) {
+            if (!gameRunning || !gameState || !gameState.player) return;
+            const store = getAchievementStore(), fresh = [];
+            for (const a of ACHIEVEMENTS) {
+                if (store[a.id]) continue;
+                let ok = false;
+                try { ok = a.check(); } catch (e) { ok = false; }
+                if (ok) { store[a.id] = Date.now(); fresh.push(a); }
+            }
+            if (!fresh.length) return;
+            if (DESKTOP && DESKTOP.unlockAchievement) fresh.forEach(a => DESKTOP.unlockAchievement(a.id));
+            if (quiet) {
+                showNotification(`🏆 补记成就 ${fresh.length} 个（设置 → 成就 查看）`, '#c2a25f', 'rare');
+            } else {
+                fresh.forEach(a => showNotification(`🏆 成就达成：${a.name}——${a.desc}`, '#c2a25f', 'rare'));
+            }
+        }
+        // 读档后：已解锁的全部重新同步给 Steam（Steam 那边已解锁的会忽略），再补记新满足的
+        function syncAchievementsOnLoad() {
+            const store = getAchievementStore();
+            if (DESKTOP && DESKTOP.unlockAchievement) Object.keys(store).forEach(id => DESKTOP.unlockAchievement(id));
+            checkAchievements(true);
+        }
+        let achievementTimer = null;
+        function startAchievementChecks() {
+            if (achievementTimer) return;
+            achievementTimer = setInterval(() => checkAchievements(false), 5000);
+        }
+        function showAchievementList() {
+            const store = getAchievementStore();
+            const got = ACHIEVEMENTS.filter(a => store[a.id]).length;
+            const rows = ACHIEVEMENTS.map(a => {
+                const t = store[a.id];
+                return `<div class="use-row"${t ? '' : ' style="opacity:0.55;"'}>
+                    <div class="use-main"><b>${t ? '🏆' : '🔒'} ${a.name}</b>
+                    <div class="use-effect">${a.desc}${t ? `<span style="color:var(--text-l4);">　· ${new Date(t).toLocaleDateString()}</span>` : ''}</div></div>
+                </div>`;
+            }).join('');
+            document.getElementById('realmUnlockContent').innerHTML = `
+                <div class="tutorial-title">🏆 成就（${got} / ${ACHIEVEMENTS.length}）</div>
+                <div style="max-height:55vh;overflow-y:auto;margin:12px 0;">${rows}</div>
+                <div class="tutorial-actions">
+                    <button class="btn" onclick="closeRealmUnlockModal()">关闭</button>
+                </div>`;
+            document.getElementById('realmUnlockModal').classList.add('show');
+        }
+
         // ==================== 新手任务 ====================
         // 一串连续的小任务，带新玩家把每个基础玩法（六个基础技能、出售 / 购买、装备、战斗、秘境）都用一遍；每个任务完成后
         // 点「领取奖励」得灵石（个别送物品），全部做完再告诉玩家游戏目标。进度靠 gameState.tally（累计事件计数）和当前状态判断，
@@ -3038,6 +3157,7 @@
         // 自动保存定时器只保留一个（重开新游戏时不会叠加）
         let autoSaveTimer = null;
         function startAutoSave() {
+            startAchievementChecks();
             if (autoSaveTimer) return;
             autoSaveTimer = setInterval(() => {
                 if (gameRunning) saveGame();
@@ -9495,6 +9615,13 @@
                 return;
             }
 
+            // 试玩版到上限
+            if (isDemoCapped(realmIndex)) {
+                closeBreakthroughModal();
+                showDemoEndModal();
+                return;
+            }
+
             // 已是最高境界，没有下一境界可突破
             if (!GAME_CONFIG.realms[realmIndex + 1]) {
                 showNotification('已至当前大道尽头，后续境界敬请期待', '#c98a3e', 'warning');
@@ -10244,6 +10371,7 @@
 
             closeBreakthroughModal();
             updateUI();
+            checkAchievements(false);
             saveGame();
             // 凡人 → 练气也是「入道」大事件；特效结束后再弹境界解锁提示，两个视觉效果不抢注意力
             playBreakthroughEffect(nextRealmIndex, wasMajor || nextRealmIndex === 1, false, () => showRealmUnlockModal(nextRealmIndex));
@@ -10638,6 +10766,7 @@
             applyDisplaySettings();
 
             startAutoSave();
+            syncAchievementsOnLoad();   // 已解锁的成就同步给 Steam，老存档早已满足的补记
 
             // 新角色看引导时刷新了页面：引导还没看完，继续弹出
             if (gameState.tutorialSeen === false) setTimeout(() => showTutorial(0), 300);
@@ -11435,6 +11564,11 @@
 
         // ==================== 页面加载 ====================
         window.addEventListener('load', () => {
+            if (isDemoEdition()) {
+                document.title = '散修长生录 试玩版';
+                const t = document.querySelector('#startScreen .modal-title');
+                if (t) t.textContent = '⚡ 散修长生录 · 试玩版 ⚡';
+            }
             fillIconSlots();
             populateRootOptions();
             loadGame();
