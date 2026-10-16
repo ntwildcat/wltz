@@ -16,7 +16,7 @@
             var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', THEMES[t]);
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=13.63">
+    <link rel="stylesheet" href="style.css?v=13.67">
 
 </head>
 <body data-panel="cultivation">
@@ -395,8 +395,12 @@
                             </div>
 
                             <!-- 战斗场景 -->
-                            <div class="battle-scene">
-                                <div class="monster-sprite" id="monsterSprite">👾</div>
+                            <div class="battle-scene bs-stage" id="battleStage">
+                                <div class="bs-bg" id="battleBg"></div>
+                                <div class="bs-fighter bs-player" id="playerSprite"></div>
+                                <div class="monster-sprite" id="monsterSprite"></div>
+                                <div class="bs-fx-layer" id="battleFxLayer"></div>
+                                <div class="bs-vignette"></div>
                                 <div id="damageFloatLayer" class="damage-float-layer"></div>
                             </div>
 
@@ -849,7 +853,8 @@
         </div>
     </div>
 
-    <script src="game.js?v=14.29"></script>
+    <script src="art.js?v=1.2"></script>
+    <script src="game.js?v=14.32"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

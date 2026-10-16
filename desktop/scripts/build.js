@@ -51,8 +51,9 @@ async function main() {
     fs.rmSync(OUT, { recursive: true, force: true });
     fs.mkdirSync(OUT, { recursive: true });
 
-    const js = await stripJs(fs.readFileSync(path.join(ROOT, 'game.js'), 'utf8'));
-    fs.writeFileSync(path.join(OUT, 'game.js'), js);
+    for (const f of ['game.js', 'art.js']) {
+        fs.writeFileSync(path.join(OUT, f), await stripJs(fs.readFileSync(path.join(ROOT, f), 'utf8')));
+    }
 
     fs.writeFileSync(path.join(OUT, 'style.css'), stripCssComments(fs.readFileSync(path.join(ROOT, 'style.css'), 'utf8')));
 
@@ -67,7 +68,7 @@ async function main() {
 
     // 检查原著专有名词
     const problems = [];
-    for (const f of ['index.html', 'game.js', 'style.css']) {
+    for (const f of ['index.html', 'game.js', 'art.js', 'style.css']) {
         const text = fs.readFileSync(path.join(OUT, f), 'utf8');
         const found = text.match(BANNED);
         if (found) problems.push(`${f}: ${[...new Set(found)].join('、')}`);
