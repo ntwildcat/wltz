@@ -3491,7 +3491,7 @@
             const eff = getMonsterEffectiveStats(monster);
 
             if (Math.random() < hitChance) {
-                const baseDmg = eff.atk || 10;
+                const baseDmg = (eff.atk || 10) * getDungeonEnrageMult();   // 秘境久战狂暴
                 let monsterDmg = baseDmg + Math.random() * baseDmg * 0.3 - baseDmg * 0.15;
 
                 // 玩家防御减伤
@@ -4231,6 +4231,56 @@
             consumeFood(hpObj, logFn);
         }
 
+        // ---- 秘境久战狂暴（v7.19）----
+        // 用户反馈"同境界不穿装备、食物管够也能慢慢磨过关"。战斗区域提高攻击就够了（GEAR_CHECK_ATK），秘境不行：
+        // 秘境是一长串连续战斗、怪物出手慢，每 3 秒吃一口的回血比掉血快，提高攻击只会让不穿装备的人"更慢、更费食物"。
+        // 所以给秘境加时间压力：每只怪的时限 = 标准玩家平均击杀用时 × factor，超时后每秒攻击 +ramp，越拖越凶。
+        // 标准玩家 = 刚能进入该秘境的境界（不是下一境界：天劫之地入口是筑基圆满，玩家手上只有筑基装备）、穿该境界炼器三件套、
+        // 真灵根、无淬炼、带当前最好的食物，每个秘境跑 3 遍取平均；单只怪最慢一次只比平均多约 10%，1.8 倍对正常玩家仍很宽裕。
+        // 最初用 2.25 倍 + 每秒 +10%：天劫之地 / 元婴秘境不穿装备的用时只是穿装备的 2.1–2.35 倍（那时装备弱），仍能通关，所以收紧到 1.8 倍 + 每秒 +15%。
+        // 筑基及以前的秘境不加（装备太弱，同战斗区域的宽松阶段）；天劫 / 心魔 / 三衰不加（镜像关卡另有标定）。
+        const DUNGEON_ENRAGE = { factor: 1.8, ramp: 0.15, warnAt: 10 };
+        const DUNGEON_ENRAGE_TIMES = {   // 每只怪的标准击杀用时（秒），按怪物顺序
+            tribulationGround: [40, 49.6, 45.9, 62.4, 108.3],
+            huashenRealm:      [66, 79, 71, 88, 171.5],
+            taixuDream:        [106.4, 133.9, 117.6, 151.7, 284.2],
+            voidRealm:         [116.6, 101, 135.6, 164.7, 331.5],
+            tiandaoRealm:      [102.8, 120.4, 116.8, 142.4, 282.8],
+            taiyiRealm:        [105.7, 126, 112.7, 140.3, 285.3],
+            taiqingRealm:      [72.9, 84.3, 75.9, 94.2, 179.7]
+        };
+        function getDungeonEnrageLimit(dungeonId, idx) {
+            const t = (DUNGEON_ENRAGE_TIMES[dungeonId] || [])[idx];
+            return t ? Math.round(t * DUNGEON_ENRAGE.factor) : null;
+        }
+        // 当前这只怪的攻击倍率：时限内为 1，超时后每秒 +10%
+        function getDungeonEnrageMult() {
+            const d = gameState.dungeons, lim = getDungeonEnrageLimit(d.currentDungeon, d.currentMonsterIndex);
+            if (!lim) return 1;
+            const over = (d.monsterElapsed || 0) - lim;
+            return over > 0 ? 1 + DUNGEON_ENRAGE.ramp * over : 1;
+        }
+        // 每 tick 推进计时；换了一只怪（含循环挑战回到第一只）就从头计；夺舍重生不重置（不能靠复活硬拖过去）
+        function tickDungeonEnrage(monster, timeDelta) {
+            const d = gameState.dungeons, idx = d.currentMonsterIndex;
+            if (d.enrageIdx !== idx) {
+                d.enrageIdx = idx; d.monsterElapsed = 0; d.enrageWarned = false; d.enraged = false;
+            }
+            const lim = getDungeonEnrageLimit(d.currentDungeon, idx);
+            const sprite = document.getElementById('monsterSprite');
+            if (!lim) { if (sprite) sprite.classList.remove('enraged'); return; }
+            d.monsterElapsed = (d.monsterElapsed || 0) + timeDelta;
+            if (!d.enrageWarned && d.monsterElapsed >= lim - DUNGEON_ENRAGE.warnAt) {
+                d.enrageWarned = true;
+                addBattleLog(`⚠️ ${monster.name}久战不下，再拖 ${DUNGEON_ENRAGE.warnAt} 秒将会狂暴`, 'monster-hit');
+            }
+            if (!d.enraged && d.monsterElapsed >= lim) {
+                d.enraged = true;
+                addBattleLog(`🔥 ${monster.name}狂暴了！之后每拖一秒攻击 +${Math.round(DUNGEON_ENRAGE.ramp * 100)}%——输出不够就撤退，换更好的装备再来`, 'death');
+            }
+            if (sprite) sprite.classList.toggle('enraged', !!d.enraged);
+        }
+
         // P0-4 双向战斗系统重写
         function processDungeonTick() {
             const dungeonId = gameState.dungeons.currentDungeon;
@@ -4247,6 +4297,7 @@
             const speedMultiplier = gameState.battleSpeed || 1;
             const timeDelta = 0.1 * speedMultiplier;
             applyRegen(gameState.player.stats.hp, timeDelta);   // 灵根/功法的战斗回复特效
+            if (!dungeon.isTribulation) tickDungeonEnrage(monster, timeDelta);   // 秘境久战狂暴
 
             // 灵域对双方同时生效：木域回血也要作用在怪物身上，不然「双方」就只剩玩家单方面受益
             const domainRegen = getDomainMod('regen');
@@ -8264,6 +8315,8 @@
             gameState.dungeons.currentDungeon = dungeonId;
             gameState.dungeons.nascentRevived = false;   // 元婴夺舍重生：每次进入秘境重新计数
             gameState.dungeons.nascentRevives = 0;
+            gameState.dungeons.enrageIdx = null;   // 久战狂暴计时从头开始
+            gameState.dungeons.monsterElapsed = 0;
             resetStrikeClock(gameState.dungeons);
             gameState.dungeons.currentMonsterIndex = 0;
             gameState.dungeons.defeatCount = 0;
