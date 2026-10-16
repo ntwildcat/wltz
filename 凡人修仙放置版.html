@@ -16,7 +16,7 @@
             var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', THEMES[t]);
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=13.62">
+    <link rel="stylesheet" href="style.css?v=13.63">
 
 </head>
 <body data-panel="cultivation">
@@ -482,6 +482,10 @@
                                     <span class="stat-label">境界解锁一览:</span>
                                     <button class="btn btn-secondary" onclick="showRealmUnlockList()" style="padding: 6px 16px;">查看</button>
                                 </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">成就:</span>
+                                    <button class="btn btn-secondary" onclick="showAchievementList()" style="padding: 6px 16px;">查看</button>
+                                </div>
                             </div>
 
                             <!-- 通知设置 -->
@@ -758,7 +762,7 @@
             <button type="button" class="modal-close" onclick="confirmDomainChoice(null)" aria-label="不使用灵域">&times;</button>
             <div class="modal-title">🌀 选择灵域 🌀</div>
             <p style="color: var(--text-l4, var(--text-l4)); margin-bottom: 14px; font-size: 0.9em;">
-                灵域对战斗双方同时生效，整场战斗（循环挑战期间）持续、中途不可更换。
+                <span id="domainSelectHint">灵域借天地之势布下，对战斗双方同时生效。</span>整场战斗（循环挑战期间）持续、中途不可更换。
                 激活消耗 <span data-ico="shenshi">👁️</span> 神识 <b id="domainShenshiCost"></b>（现有 <b id="domainShenshiBalance">0</b>）。
             </p>
             <div id="domainSelectList" class="domain-grid"></div>
@@ -845,7 +849,7 @@
         </div>
     </div>
 
-    <script src="game.js?v=14.19"></script>
+    <script src="game.js?v=14.29"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

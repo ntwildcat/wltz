@@ -2201,3 +2201,6 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .progress-fill span, #progressText { color: #fff; text-shadow: 0 0 2px rgba(0, 0, 0, 0.85), 0 1px 2px rgba(0, 0, 0, 0.7); }
 /* 切换配色主题的那一帧不做过渡（setColorTheme 加上、两帧后移除） */
 .theme-switching, .theme-switching *, .theme-switching *::before, .theme-switching *::after { transition: none !important; }
+
+/* v7.23 太乙叠域：已选的第一个灵域 */
+.domain-card.selected { border-color: var(--bronze); background: var(--bg-l3); box-shadow: inset 0 0 0 1px var(--bronze); }
