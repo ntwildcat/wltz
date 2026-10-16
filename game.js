@@ -2098,6 +2098,17 @@
             taiyiField: { hp: 0.0425, atk: 0.567 }, lingjieAbyss: { hp: 0.0328, atk: 0.471 },
             xianbattle: { hp: 0.025, atk: 0.204 }
         };
+        // v7.18 装备门槛：用户反馈"同境界不穿装备、食物管够也能慢慢磨过去"。在上面的标定之上再乘一层敌人攻击，
+        // 标定口径：刚能进入该区域的境界、真灵根、无淬炼，模拟 40 场——
+        //   不穿装备胜率压到 70% 以下（挂机连输 3 场会自动停，长时间挂机基本一定停下），
+        //   穿当前境界炼器三件套胜率仍为 100%，每场食物从约 0.2–0.4 份涨到 0.3–0.8 份。
+        // 筑基期（十万大山核心 / 妖兽沼泽 / 魔窟深渊）不加：这时装备太弱，乘 6 倍时穿装备的也会输，算新手期的宽松阶段。
+        // 合体期两区取 1.5 与前后衔接：合道和法则之力的加成远大于装备，再高也拦不住不穿装备的人（也合原著"合体斗法看天地之力"）。
+        const GEAR_CHECK_ATK = {
+            goldenPlains: 1.75, tribulationGround: 2.5, voidSea: 1.5, abyssRuins: 2, chaosWastes: 1.5, nineNether: 1.5,
+            voidAbyss: 1.5, huashiRealm: 1.5, daoWastes: 1.5, fusionVoid: 1.5, taiyiField: 1.75, lingjieAbyss: 1.75, xianbattle: 1.5
+        };
+        Object.entries(GEAR_CHECK_ATK).forEach(([k, m]) => { if (P4_AREA_SCALE[k]) P4_AREA_SCALE[k].atk *= m; });
 
         const BATTLE_FORMULAS = {
             // 基础命中率（与速度差成反比）
