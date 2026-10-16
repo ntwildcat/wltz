@@ -325,5 +325,23 @@ const BattleArt = (() => {
         }
         return `<svg class="fx-burst-lines" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><g stroke="${color}">${lines}</g></svg>`;
     }
-    return { player, enemy, scene, tierOf, meditator, burstLines, archetypeOf, colorOf, slash, speedLines, stamp, claw, lightning, nascent, inkBurst, ELEMENT, ROOT };
+    // ---------------- 开始界面主视觉：山水 + 立于崖上的修士 + 毛笔大字标题 ----------------
+    function startHero(root = 'wood', opts = {}) {
+        return `<div class="start-hero">
+            <div class="sh-bg">${scene(opts.tier || 'cultist')}</div>
+            <div class="sh-figure">${player(root)}</div>
+            <div class="sh-text"><div class="sh-title">散修长生录${opts.demo ? '<small>试玩版</small>' : ''}</div><div class="sh-sub">一介散修　问道长生</div></div>
+        </div>`;
+    }
+    // ---------------- Boss 登场：左右斜切的两格分镜对峙，中间 VS，Boss 一侧配名字与一句台词 ----------------
+    function versus(o) {
+        return `<div class="vs-overlay">
+            <div class="vs-panel vs-left" style="--c:${o.playerColor}"><div class="vs-art">${o.playerArt}</div><div class="vs-name">${o.leftName}</div></div>
+            <div class="vs-panel vs-right" style="--c:${o.enemyColor}"><div class="vs-art">${o.enemyArt}</div><div class="vs-name">${o.rightName}</div><div class="vs-bubble">${o.line}</div></div>
+            <div class="vs-slash"></div>
+            <div class="vs-mark">VS</div>
+            <div class="vs-skip">点击跳过</div>
+        </div>`;
+    }
+    return { player, enemy, scene, tierOf, meditator, burstLines, startHero, versus, archetypeOf, colorOf, slash, speedLines, stamp, claw, lightning, nascent, inkBurst, ELEMENT, ROOT };
 })();
