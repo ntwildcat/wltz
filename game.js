@@ -8194,11 +8194,11 @@
                 太乙游神: svg(soulFig('#f3d36a')),
                 元婴化影: svg(willEye('#b39ddb', '#f0e8ff')),
                 法则执者: svg(golem('#8a6a1a', '#fff4d8', '<circle cx="16" cy="8.5" r="2" fill="#fff4d8"/><circle cx="16" cy="8.5" r=".8" fill="#4a3a0a" stroke="none"/>')),
-                灵界残将: svg(hood('#4a3a1a', '#f3d36a', '#12100a')),
-                灵界至尊: svg(supremeSage()),
+                上界残将: svg(hood('#4a3a1a', '#f3d36a', '#12100a')),
+                上界至尊: svg(supremeSage()),
                 太乙战修: svg(hood('#5a4a1a', '#fff4d8', '#1a1408')),
-                灵界守卫: svg(golem('#7a6a2a', '#fff4d8', '<circle cx="16" cy="8.5" r="2" fill="#fff4d8"/><circle cx="16" cy="8.5" r=".8" fill="#3a2a0a" stroke="none"/>')),
-                灵界凶兽: svg(ancient()),
+                上界守卫: svg(golem('#7a6a2a', '#fff4d8', '<circle cx="16" cy="8.5" r="2" fill="#fff4d8"/><circle cx="16" cy="8.5" r=".8" fill="#3a2a0a" stroke="none"/>')),
+                上界凶兽: svg(ancient()),
                 道祖之影: svg(demon('#241a30', '#f3d36a', '#fff4d8', true))
             };
         })();
@@ -10331,13 +10331,15 @@
             // （切到后台那一刻的时间由 visibilitychange 显式记录）
             if (!document.hidden) gameState.lastActiveTime = gameState.lastSaveTime;
             try {
-                localStorage.setItem(slotKey(currentSlot), JSON.stringify(gameState));
+                saveStore.set(slotKey(currentSlot), JSON.stringify(gameState));
             } catch (e) {
                 console.error('Failed to save game:', e);
                 if (e.name === 'QuotaExceededError') {
                     showNotification('📦 存储空间已满，无法保存存档', '#c4483a', 'error');
                 } else if (e.name === 'SecurityError') {
                     showNotification('🔒 本地存储被禁用（在data: URL中）- 请下载HTML文件到本地打开', '#ff9800', 'error');
+                } else if (window.desktopSaves) {
+                    showNotification(`💾 存档写入失败：${e.message}`, '#c4483a', 'error');
                 }
             }
         }
@@ -10510,9 +10512,18 @@
 
         function slotKey(n) { return `${LEGACY_SAVE_KEY}_slot${n}`; }
 
+        // 存档读写（v7.22）：网页版存在 localStorage；桌面版（Steam）由外壳 desktop/preload.js 提供 window.desktopSaves，
+        // 每个槽位是用户数据目录 saves/ 下的一个 JSON 文件（写入先写临时文件再替换，并留一份 .bak），Steam 云存档同步这个目录。
+        // 存档相关的读写一律走这里，不要再直接用 localStorage（配色主题这类全局偏好除外）
+        const saveStore = window.desktopSaves || {
+            get: key => localStorage.getItem(key),
+            set: (key, value) => localStorage.setItem(key, value),
+            remove: key => localStorage.removeItem(key)
+        };
+
         function readSlot(n) {
             try {
-                const raw = localStorage.getItem(slotKey(n));
+                const raw = saveStore.get(slotKey(n));
                 return raw ? raw : null;
             } catch (e) {
                 return null;
@@ -10522,11 +10533,11 @@
         // 旧版单存档迁移：只在三个槽位都为空、且存在旧存档时执行一次
         function migrateLegacySave() {
             try {
-                const legacy = localStorage.getItem(LEGACY_SAVE_KEY);
+                const legacy = saveStore.get(LEGACY_SAVE_KEY);
                 if (!legacy) return;
-                const anySlot = [1, 2, 3].some(n => localStorage.getItem(slotKey(n)));
-                if (!anySlot) localStorage.setItem(slotKey(1), legacy);
-                localStorage.removeItem(LEGACY_SAVE_KEY);
+                const anySlot = [1, 2, 3].some(n => saveStore.get(slotKey(n)));
+                if (!anySlot) saveStore.set(slotKey(1), legacy);
+                saveStore.remove(LEGACY_SAVE_KEY);
             } catch (e) { /* 存储不可用时忽略 */ }
         }
 
@@ -10572,7 +10583,7 @@
 
         function deleteSlot(n) {
             if (!confirm(`确定要删除存档 ${n} 吗？此存档的所有进度将永久丢失！`)) return;
-            try { localStorage.removeItem(slotKey(n)); } catch (e) { /* 忽略 */ }
+            try { saveStore.remove(slotKey(n)); } catch (e) { /* 忽略 */ }
             renderSlotSelect();
         }
 
@@ -10641,7 +10652,7 @@
         function loadGame() {
             let storageAvailable = true;
             try {
-                localStorage.getItem(LEGACY_SAVE_KEY);
+                saveStore.get(LEGACY_SAVE_KEY);
             } catch (e) {
                 // localStorage unavailable - 在data: URL中会发生
                 storageAvailable = false;
@@ -11254,7 +11265,7 @@
         function resetGame() {
             if (!currentSlot) return;
             if (confirm(`确定要删除当前存档（存档 ${currentSlot}）吗？此存档的所有进度将永久丢失！`)) {
-                try { localStorage.removeItem(slotKey(currentSlot)); } catch (e) { /* 忽略 */ }
+                try { saveStore.remove(slotKey(currentSlot)); } catch (e) { /* 忽略 */ }
                 gameRunning = false;   // 避免 beforeunload 把存档又写回去
                 clearInterval(tickInterval);
                 location.reload();

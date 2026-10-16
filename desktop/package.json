@@ -1,0 +1,40 @@
+{
+  "name": "sanxiu-changsheng",
+  "productName": "散修长生录",
+  "version": "7.22.0",
+  "description": "散修长生录 · 桌面版（Steam）",
+  "author": "wltz",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "prepare-app": "node scripts/build.js",
+    "start:packed": "node scripts/build.js && electron . --packed-preview",
+    "dist": "node scripts/build.js && electron-builder --win dir",
+    "smoke": "electron scripts/smoke.js",
+    "smoke:packed": "node scripts/build.js && electron scripts/smoke.js --packed-preview"
+  },
+  "build": {
+    "appId": "com.wltz.sanxiuchangsheng",
+    "productName": "散修长生录",
+    "executableName": "SanxiuChangsheng",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "app/**/*"
+    ],
+    "asar": true,
+    "win": {
+      "target": "dir"
+    }
+  },
+  "devDependencies": {
+    "electron": "44.8.0",
+    "electron-builder": "26.15.3",
+    "terser": "5.51.2"
+  }
+}
