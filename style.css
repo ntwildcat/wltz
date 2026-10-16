@@ -1055,8 +1055,8 @@ body.in-battle .battle-container {
    「暴击！」文字能看出区别，很容易被忽略（正反馈诊断 C-1） */
 .damage-float.crit {
     font-size: 2.1em;
-    color: #f3c34d;
-    text-shadow: 0 0 6px rgba(243,195,77,0.7), 2px 2px 4px #000;
+    color: var(--float-crit);
+    text-shadow: var(--float-crit-shadow);
     animation: critFloatUp 1.5s ease-out forwards;
 }
 @keyframes critFloatUp {
@@ -1515,7 +1515,7 @@ button.modal-close { background: none; border: none; padding: 0 4px; line-height
 /* 底：松烟 + 极淡纸纹 + 暗角 */
 body {
     background-color: var(--ink);
-    background-image: radial-gradient(ellipse at 50% 30%, rgba(60, 52, 34, 0.35), transparent 70%);
+    background-image: radial-gradient(ellipse at 50% 30%, var(--page-glow), transparent 70%);
     background-attachment: fixed;
 }
 body::before {
@@ -1570,7 +1570,7 @@ body::before {
     transform: rotate(-1.5deg);
     letter-spacing: 0.1em;
 }
-.progress-bar { background: #0e0d0a; border: 1px solid var(--bronze-dim); border-radius: 2px; box-shadow: none; }
+.progress-bar { background: var(--bg-sunken); border: 1px solid var(--bronze-dim); border-radius: 2px; box-shadow: none; }
 .progress-fill span, #progressText { color: var(--paper); text-shadow: none; }
 
 /* 主面板：暗铜双线框，角上用小朱印点缀 */
@@ -1599,7 +1599,7 @@ body::before {
 .action-item:hover, .slot-card:hover, .item-slot:hover { background: var(--bg-l3); border-color: var(--bronze); transform: none; box-shadow: none; }
 .action-item.disabled, .action-item.action-locked { opacity: 0.55; }
 .action-progress-fill, .skill-exp-fill, .mastery-fill, .pool-fill { background: var(--patina); background-image: none; }
-.action-progress-bar, .skill-exp-track, .mastery-track { background: #0e0d0a; border-color: var(--border-l3); border-radius: 1px; }
+.action-progress-bar, .skill-exp-track, .mastery-track { background: var(--bg-sunken); border-color: var(--border-l3); border-radius: 1px; }
 .skill-exp-header { background: var(--bg-l2); border: 1px solid var(--border-l3); border-left: 3px solid var(--bronze); border-radius: 2px; box-shadow: none; }
 .recipe-icon { filter: none; }
 
@@ -1620,7 +1620,7 @@ body::before {
 .infuse-btn, .clone-btn { border-radius: 2px; }
 
 /* 弹窗与通知 */
-.modal { background: rgba(10, 9, 6, 0.8); backdrop-filter: none; }
+.modal { background: var(--overlay); backdrop-filter: none; }
 .modal-content { background: var(--inkstone); border: 1px solid var(--bronze-dim); border-radius: 2px; box-shadow: inset 0 0 0 4px var(--inkstone), inset 0 0 0 5px var(--border-l3), var(--shadow-lg); }
 .modal-title { font-family: var(--font-title); color: var(--text-l1); letter-spacing: 0.15em; }
 .notification {
@@ -1645,7 +1645,7 @@ body::before {
 }
 
 /* 输入 */
-input, select { background: #0e0d0a; border: 1px solid var(--border-l3); border-radius: 2px; color: var(--text-l1); }
+input, select { background: var(--bg-sunken); border: 1px solid var(--border-l3); border-radius: 2px; color: var(--text-l1); }
 input:focus, select:focus { border-color: var(--bronze); box-shadow: none; }
 
 /* 存档 / 装备 / 悟道 等新界面 */
@@ -1891,7 +1891,7 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .realm-lore-mobile { display: none; }
 @media (max-width: 768px) {
     .list-fold-body { grid-template-columns: 1fr; }
-    .realm-lore-mobile { display: block; margin: 0 0 12px; padding: 10px 12px; background: var(--bg-l2); border: 1px solid var(--border-l3); border-left: 3px solid var(--bronze); border-radius: var(--radius-md); font-size: 0.88em; line-height: 1.7; color: #9ca69f; }
+    .realm-lore-mobile { display: block; margin: 0 0 12px; padding: 10px 12px; background: var(--bg-l2); border: 1px solid var(--border-l3); border-left: 3px solid var(--bronze); border-radius: var(--radius-md); font-size: 0.88em; line-height: 1.7; color: var(--text-l3); }
     .realm-lore-mobile > summary { cursor: pointer; list-style: none; color: var(--text-l2); font-weight: bold; }
     .realm-lore-mobile > summary::-webkit-details-marker { display: none; }
     .realm-lore-mobile > summary::after { content: ' ▸'; color: var(--text-l4); font-weight: normal; }
@@ -1928,7 +1928,7 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .panel-content .skill-exp-header .skill-exp-name { display: none; }
 .skill-exp-top { margin-bottom: 4px; }
 .skill-exp-level { font-family: var(--font-title); letter-spacing: 0.05em; color: var(--text-l2); }
-.skill-exp-track { height: 4px; border: none; border-radius: 0; background: #0e0d0a; }
+.skill-exp-track { height: 4px; border: none; border-radius: 0; background: var(--bg-sunken); }
 .skill-exp-fill { background: var(--jade); }
 
 /* 分身条：去框，只留底色 */
@@ -2088,9 +2088,9 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 /* 元气化形 / 元婴离体 / 法则之击：带名字的飘字 */
 .damage-float.strike { font-size: 1.25em; line-height: 1.1; text-align: center; animation: strikeFloat 1.6s ease-out forwards; }
 .damage-float.strike small { display: block; font-size: 0.55em; letter-spacing: 0.1em; opacity: 0.9; }
-.strike-qiForm { color: #8fcfb3; }
-.strike-nascent { color: #a8ecf0; }
-.strike-lawStrike { color: #d8c8ff; font-size: 1.5em; text-shadow: 0 0 10px rgba(176, 168, 255, 0.8), 2px 2px 4px #000; }
+.strike-qiForm { color: var(--float-qi); }
+.strike-nascent { color: var(--float-nascent); }
+.strike-lawStrike { color: var(--float-law); font-size: 1.5em; }
 @keyframes strikeFloat { 0% { transform: translateY(8px) scale(0.7); opacity: 0; } 15% { transform: translateY(0) scale(1.1); opacity: 1; } 30% { transform: scale(1); } 100% { transform: translateY(-80px); opacity: 0; } }
 
 /* 配方完成：卡片上飘出收获 */
@@ -2121,3 +2121,83 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .battle-scene:has(.monster-sprite.enraged) { box-shadow: inset 0 0 28px rgba(196, 72, 58, 0.35); animation: enragePulse 1.6s ease-in-out infinite; }
 @keyframes enragePulse { 0%, 100% { box-shadow: inset 0 0 20px rgba(196, 72, 58, 0.25); } 50% { box-shadow: inset 0 0 36px rgba(196, 72, 58, 0.55); } }
 @media (prefers-reduced-motion: reduce) { .battle-scene:has(.monster-sprite.enraged) { animation: none; } }
+
+
+/* ==========================================================================
+   v7.20 配色主题：宣纸墨韵（默认）/ 青绿山水 / 玄夜星宿 / 松烟铜器
+   <html data-theme> 由页面头部的小脚本在样式表生效前写好；没有该属性时按宣纸墨韵。
+   各主题只换这组变量，界面里的颜色一律引用变量（不要再写死颜色，否则浅色主题会出现深色块 / 看不见的白字）。
+   语义：bg-l1 主面板底、bg-l2 卡片、bg-l3 抬起 / 选中、bg-sunken 进度条底槽与输入框；
+        bronze 结构与选中、jade 进度与正向数值、cinnabar 境界印章 / 主按钮 / 待办；
+        text-l1 正文、text-l2 强调（标题 / 数值）、text-l3 次要、text-l4 提示（对比度均 ≥ 4.5）；
+        gold 金色强调字、azure 冷色信息字、on-accent 朱砂按钮上的字、overlay 弹窗遮罩、page-glow 页面顶部的一层光
+   ========================================================================== */
+:root, :root[data-theme="xuanzhi"] {
+    --float-crit: #b07a10; --float-qi: #2a7d62; --float-nascent: #1f7685; --float-law: #5e44b3; --float-shadow: 0 0 3px rgba(255, 252, 244, 0.95), 0 1px 2px rgba(60, 48, 30, 0.35); --float-crit-shadow: 0 0 4px rgba(255, 252, 244, 0.95), 0 1px 3px rgba(60, 48, 30, 0.4);
+    color-scheme: light;
+    --ink: #e9e2cf; --inkstone: #f3eddf; --inkstone-2: #e6dcc6; --paper: #fbf6ea;
+    --bronze: #2f5566; --bronze-dim: #b9aa8a; --patina: #3f7f6a; --jade: #3f7f6a; --jade-dim: #a9c4b8;
+    --cinnabar: #a83a2e; --cinnabar-2: #b8402f;
+    --bg-l1: #efe8d6; --bg-l2: #f6f1e4; --bg-l3: #fbf8ef; --bg-sunken: #ddd3bd;
+    --border-l1: #2f5566; --border-l2: #3f7f6a; --border-l3: #c9b994; --border-l4: #ddd0b3;
+    --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e;
+    --gold: #8a6420; --violet: #6a4fa3; --azure: #3d6f8f; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c;
+    --on-accent: #fbf6ea; --overlay: rgba(40, 34, 24, 0.45); --page-glow: rgba(255, 255, 255, 0.6);
+    --shadow-lg: 0 4px 14px rgba(60, 48, 30, 0.18);
+}
+:root[data-theme="qinglv"] {
+    --float-crit: #f3c34d; --float-qi: #8fcfb3; --float-nascent: #a8ecf0; --float-law: #d8c8ff; --float-shadow: 2px 2px 4px #000; --float-crit-shadow: 0 0 6px rgba(243, 195, 77, 0.7), 2px 2px 4px #000;
+    color-scheme: dark;
+    --ink: #0b1517; --inkstone: #10202a; --inkstone-2: #172c36; --paper: #ece7d3;
+    --bronze: #c9a85c; --bronze-dim: #2f5560; --patina: #4fae96; --jade: #4fae96; --jade-dim: #2a5e55;
+    --cinnabar: #b8402f; --cinnabar-2: #d0523d;
+    --bg-l1: #0b1517; --bg-l2: #112128; --bg-l3: #16303a; --bg-sunken: #071012;
+    --border-l1: #c9a85c; --border-l2: #4fae96; --border-l3: #2f5560; --border-l4: #1d3640;
+    --text-l1: #eceadb; --text-l2: #d6b86e; --text-l3: #b9c9c4; --text-l4: #8ea7a3;
+    --gold: #d6b86e; --violet: #b8a4f0; --azure: #7fb5d6; --color-hp: #4fae96; --color-warning: #d9a050; --color-danger: #e0604c;
+    --on-accent: #f4efdc; --overlay: rgba(4, 10, 12, 0.78); --page-glow: rgba(61, 126, 166, 0.35);
+    --shadow-lg: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+:root[data-theme="xuanye"] {
+    --float-crit: #f3c34d; --float-qi: #8fcfb3; --float-nascent: #a8ecf0; --float-law: #d8c8ff; --float-shadow: 2px 2px 4px #000; --float-crit-shadow: 0 0 6px rgba(243, 195, 77, 0.7), 2px 2px 4px #000;
+    color-scheme: dark;
+    --ink: #0c0b17; --inkstone: #14122a; --inkstone-2: #1d1a38; --paper: #ece9f7;
+    --bronze: #e0c27a; --bronze-dim: #3b3566; --patina: #7fa4e6; --jade: #7fa4e6; --jade-dim: #34406a;
+    --cinnabar: #b8403a; --cinnabar-2: #d4524a;
+    --bg-l1: #0c0b17; --bg-l2: #13122a; --bg-l3: #1b1936; --bg-sunken: #07060f;
+    --border-l1: #e0c27a; --border-l2: #8b7bd8; --border-l3: #3e3870; --border-l4: #262248;
+    --text-l1: #ece9f7; --text-l2: #e0c27a; --text-l3: #bdb8d6; --text-l4: #948fb6;
+    --gold: #e0c27a; --violet: #c4b4ff; --azure: #9db8f0; --color-hp: #7fa4e6; --color-warning: #e0a85c; --color-danger: #e0645a;
+    --on-accent: #f6f3ff; --overlay: rgba(5, 4, 12, 0.8); --page-glow: rgba(139, 123, 216, 0.32);
+    --shadow-lg: 0 4px 14px rgba(0, 0, 0, 0.65);
+}
+:root[data-theme="songyan"] {
+    --float-crit: #f3c34d; --float-qi: #8fcfb3; --float-nascent: #a8ecf0; --float-law: #d8c8ff; --float-shadow: 2px 2px 4px #000; --float-crit-shadow: 0 0 6px rgba(243, 195, 77, 0.7), 2px 2px 4px #000;
+    color-scheme: dark;
+    --ink: #15140f; --inkstone: #1f1e18; --inkstone-2: #292720; --paper: #dcd1b6;
+    --bronze: #a68a52; --bronze-dim: #6b5d3f; --patina: #6f9c8a; --jade: #6f9c8a; --jade-dim: #3f5a50;
+    --cinnabar: #a83a2e; --cinnabar-2: #c4483a;
+    --bg-l1: #15140f; --bg-l2: #1c1b15; --bg-l3: #24231b; --bg-sunken: #0e0d0a;
+    --border-l1: #a68a52; --border-l2: #6f9c8a; --border-l3: #5c5039; --border-l4: #38352b;
+    --text-l1: #e3d8bd; --text-l2: #b9a878; --text-l3: #b3aa93; --text-l4: #9a917c;
+    --gold: #c2a25f; --violet: #b39ddb; --azure: #7d9bb5; --color-hp: #6f9c8a; --color-warning: #c98a3e; --color-danger: #c4483a;
+    --on-accent: #dcd1b6; --overlay: rgba(10, 9, 6, 0.8); --page-glow: rgba(60, 52, 34, 0.35);
+    --shadow-lg: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+/* 玄夜星宿：背景再撒一层稀疏星点 */
+:root[data-theme="xuanye"] body {
+    background-image: radial-gradient(ellipse at 50% -10%, var(--page-glow), transparent 60%),
+        radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.55), transparent), radial-gradient(1px 1px at 70% 15%, rgba(255, 255, 255, 0.45), transparent),
+        radial-gradient(1.5px 1.5px at 85% 60%, rgba(255, 255, 255, 0.4), transparent), radial-gradient(1px 1px at 35% 80%, rgba(255, 255, 255, 0.4), transparent),
+        radial-gradient(1px 1px at 55% 45%, rgba(255, 255, 255, 0.3), transparent), radial-gradient(1px 1px at 10% 70%, rgba(255, 255, 255, 0.35), transparent);
+}
+/* 宣纸墨韵：纸纹压淡，滚动条改浅 */
+:root[data-theme="xuanzhi"] body::before, :root:not([data-theme]) body::before { opacity: 0.035; }
+
+/* 飘字与血条数字：飘字颜色 / 光晕随主题；血条数字统一白字加深色描边，压在填充条或空底槽上都看得清 */
+.damage-float, .damage-float.strike { text-shadow: var(--float-shadow); }
+.damage-float.crit { text-shadow: var(--float-crit-shadow); }
+.hp-text { color: #fff; text-shadow: 0 0 2px rgba(0, 0, 0, 0.9), 0 1px 2px rgba(0, 0, 0, 0.8); }
+.progress-fill span, #progressText { color: #fff; text-shadow: 0 0 2px rgba(0, 0, 0, 0.85), 0 1px 2px rgba(0, 0, 0, 0.7); }
+/* 切换配色主题的那一帧不做过渡（setColorTheme 加上、两帧后移除） */
+.theme-switching, .theme-switching *, .theme-switching *::before, .theme-switching *::after { transition: none !important; }

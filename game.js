@@ -3965,10 +3965,10 @@
 
             if (damage < 0) {
                 floatDiv.textContent = (isCrit ? '暴击 ' : '') + damage;
-                floatDiv.style.color = isCrit ? '' : '#c4483a';
+                floatDiv.style.color = isCrit ? '' : 'var(--color-danger)';
             } else {
                 floatDiv.textContent = '+' + damage;
-                floatDiv.style.color = '#7fae9a';
+                floatDiv.style.color = 'var(--jade)';
             }
 
             // 随机X偏移
@@ -4142,7 +4142,7 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.7);
+                background: var(--overlay);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -4151,12 +4151,12 @@
 
             const dialog = document.createElement('div');
             dialog.style.cssText = `
-                background: rgba(26,31,58,0.95);
-                border: 2px solid #6f9c8a;
+                background: var(--inkstone);
+                border: 2px solid var(--jade);
                 border-radius: 8px;
                 padding: 30px;
                 text-align: center;
-                color: #dcd1b6;
+                color: var(--text-l1);
                 min-width: 300px;
             `;
 
@@ -4165,18 +4165,18 @@
                 <div style="display: flex; gap: 10px; justify-content: center;">
                     <button style="
                         padding: 10px 20px;
-                        background: #6f9c8a;
-                        border: 1px solid #6f9c8a;
-                        color: #fff;
+                        background: var(--cinnabar);
+                        border: 1px solid var(--cinnabar);
+                        color: var(--on-accent);
                         border-radius: 4px;
                         cursor: pointer;
                         font-weight: bold;
                     ">确认撤退</button>
                     <button style="
                         padding: 10px 20px;
-                        background: rgba(100,100,100,0.3);
-                        border: 1px solid #666;
-                        color: #aaa;
+                        background: var(--bg-sunken);
+                        border: 1px solid var(--border-l3);
+                        color: var(--text-l4);
                         border-radius: 4px;
                         cursor: pointer;
                     ">取消</button>
@@ -5584,7 +5584,7 @@
             const P = gameState.player;
             const owned = P.skillUpgrades || [];
             const intro = document.createElement('div');
-            intro.style.cssText = 'grid-column: 1/-1; color: #888; font-size: 0.85em; line-height: 1.7;';
+            intro.style.cssText = 'grid-column: 1/-1; color: var(--text-l4); font-size: 0.85em; line-height: 1.7;';
             intro.textContent = '技能设施是永久升级：对应技能的等级达到要求后才能购买，每件只能买一次，效果永久生效。';
             container.appendChild(intro);
             SKILL_SHOP_ORDER.forEach(skillName => {
@@ -5593,7 +5593,7 @@
                 if (!skill || !list.length) return;
                 if ((skillName === 'danhuo' && !isDanhuoUnlocked()) || (skillName === 'shenshi' && !isShenshiUnlocked()) || (skillName === 'daoguo' && !isDaoguoUnlocked()) || (skillName === 'wudao' && P.realmIndex < LAW_UNLOCK_REALM)) return;
                 const title = document.createElement('div');
-                title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #6f9c8a; margin-top: 10px; margin-bottom: 5px;';
+                title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: var(--jade); margin-top: 10px; margin-bottom: 5px;';
                 title.textContent = `${skill.icon} ${skill.name}设施（${skill.name} Lv.${skill.level || 1}）`;
                 container.appendChild(title);
                 list.forEach(u => {
@@ -5605,13 +5605,13 @@
                     style += has ? 'opacity: 0.55; cursor: default;' : locked ? 'opacity: 0.55; border-style: dashed; cursor: not-allowed;' : 'cursor: pointer;';
                     card.style.cssText = style;
                     const status = has ? '✓ 已拥有' : locked ? `🔒 需要${skill.name} Lv.${u.level}` : `${COIN_ICON} ${u.price} 灵石`;
-                    const color = has ? '#6f9c8a' : locked ? '#c98a3e' : '#c2a25f';
+                    const color = has ? 'var(--jade)' : locked ? 'var(--color-warning)' : 'var(--gold)';
                     card.innerHTML = `
                         <div style="font-size: 24px; margin-bottom: 5px;">${u.icon}</div>
-                        <div style="font-weight: bold; color: #6f9c8a; margin-bottom: 3px;">${u.name}</div>
-                        <div style="font-size: 0.8em; color: #888; margin-bottom: 8px;">${describeEffects(u.effects).join('<br/>')}</div>
+                        <div style="font-weight: bold; color: var(--jade); margin-bottom: 3px;">${u.name}</div>
+                        <div style="font-size: 0.8em; color: var(--text-l4); margin-bottom: 8px;">${describeEffects(u.effects).join('<br/>')}</div>
                         <div style="color: ${color}; font-weight: bold;">${status}</div>
-                        ${locked ? `<div style="font-size: 0.75em; color: #888; margin-top: 4px;">${u.price} 灵石</div>` : ''}`;
+                        ${locked ? `<div style="font-size: 0.75em; color: var(--text-l4); margin-top: 4px;">${u.price} 灵石</div>` : ''}`;
                     card.onclick = () => (has ? null : locked ? showNotification(`🔒 需要${skill.name} Lv.${u.level}（当前 Lv.${skill.level || 1}）`, '#c98a3e') : buySkillUpgrade(u.id));
                     container.appendChild(card);
                 });
@@ -5713,20 +5713,20 @@
             const art = CULTIVATION_ARTS[player.currentArt];
             let html = '';
             if (root) {
-                html += `<div><b style="color:#b89a5b">${ROOT_ICONS[player.spiritRoot]} ${root.name}${getRootLevel() ? ' · 强化 Lv.' + getRootLevel() : ''}</b>：${describeEffects(getRootEffectsScaled()).join(' · ')}</div>`;
+                html += `<div><b style="color:var(--gold)">${ROOT_ICONS[player.spiritRoot]} ${root.name}${getRootLevel() ? ' · 强化 Lv.' + getRootLevel() : ''}</b>：${describeEffects(getRootEffectsScaled()).join(' · ')}</div>`;
             }
             if (art) {
                 const eff = describeEffects(art.effects);
-                html += `<div><b style="color:#7d9bb5">📜 ${art.name}</b>（修炼×${art.speedMultiplier}）：${eff.length ? eff.join(' · ') : '无特殊效果'}</div>`;
+                html += `<div><b style="color:var(--azure)">📜 ${art.name}</b>（修炼×${art.speedMultiplier}）：${eff.length ? eff.join(' · ') : '无特殊效果'}</div>`;
             }
             // 悟道：已领悟的法则合计
             const lawParts = LAW_IDS.filter(id => getLawInfo(id).level > 0).map(id => `${LAW_EFFECTS[id].icon}${LAW_EFFECTS[id].name.replace('之法则', '')}Lv.${getLawInfo(id).level}`);
             const ups = ownedSkillUpgrades();
             if (ups.length) {
-                html += `<div><b style="color:#7fae9a">🏛 设施</b>：已购置 ${ups.length}/${SKILL_UPGRADES.length} 件（${ups.slice(-3).map(u => u.name).join('、')}${ups.length > 3 ? '…' : ''}）</div>`;
+                html += `<div><b style="color:var(--jade)">🏛 设施</b>：已购置 ${ups.length}/${SKILL_UPGRADES.length} 件（${ups.slice(-3).map(u => u.name).join('、')}${ups.length > 3 ? '…' : ''}）</div>`;
             }
             if (lawParts.length) {
-                html += `<div><b style="color:#c084fc">☯️ 悟道</b>：${lawParts.join(' ')}</div>`;
+                html += `<div><b style="color:var(--violet)">☯️ 悟道</b>：${lawParts.join(' ')}</div>`;
             }
             el.innerHTML = html || '无';
         }
@@ -5778,7 +5778,7 @@
         // 商城功法卡片的说明：修炼速度 + 特效
         function getArtShopDesc(item) {
             const eff = describeEffects(CULTIVATION_ARTS[item.id]?.effects);
-            return item.desc + (eff.length ? `<br/><span style="color:#6fa980">${eff.join('<br/>')}</span>` : '');
+            return item.desc + (eff.length ? `<br/><span style="color:var(--jade)">${eff.join('<br/>')}</span>` : '');
         }
 
         // 游戏配置常量（便于调整平衡性）
@@ -6530,6 +6530,23 @@
         }
 
         // 显示设置：字体大小（缩放根字号，界面里以 em 为单位的文字随之缩放）
+        // 配色主题（v7.20）：宣纸墨韵（默认）/ 青绿山水 / 玄夜星宿 / 松烟铜器。全局偏好存 localStorage['xiuxianTheme']，
+        // 页面 <head> 里的小脚本在样式表生效前就套上，这里负责切换和同步设置页的下拉框
+        const COLOR_THEMES = { xuanzhi: '#e9e2cf', qinglv: '#0b1517', xuanye: '#0c0b17', songyan: '#15140f' };
+        function getColorTheme() { const t = document.documentElement.getAttribute('data-theme'); return COLOR_THEMES[t] ? t : 'xuanzhi'; }
+        function setColorTheme(t) {
+            if (!COLOR_THEMES[t]) t = 'xuanzhi';
+            // 切换瞬间关掉过渡：否则各元素按 0.3s 渐变、半途是两套配色混在一起；折叠的 <details> 里元素的过渡还会卡在旧颜色
+            const root = document.documentElement;
+            root.classList.add('theme-switching');
+            root.setAttribute('data-theme', t);
+            void root.offsetWidth;
+            requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('theme-switching')));
+            const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', COLOR_THEMES[t]);
+            try { localStorage.setItem('xiuxianTheme', t); } catch (e) {}
+            const sel = document.getElementById('colorTheme'); if (sel) sel.value = t;
+        }
+
         function applyDisplaySettings() {
             const pct = (gameState.settings && gameState.settings.fontScale) || 100;
             document.documentElement.style.fontSize = pct + '%';
@@ -6540,6 +6557,7 @@
             document.getElementById('maxOfflineHours').value = settings.maxOfflineHours;
             document.getElementById('enableNotifications').checked = settings.enableNotifications;
             document.getElementById('fontScale').value = String(settings.fontScale || 100);
+            const themeSel = document.getElementById('colorTheme'); if (themeSel) themeSel.value = getColorTheme();
             document.getElementById('breakthroughFx').checked = settings.breakthroughFx !== false;
             document.getElementById('autoBreakthrough').checked = settings.autoBreakthrough !== false;
             renderFxReplay();
@@ -6841,8 +6859,8 @@
                 const jingyuanSlow = Math.round(getJingyuanCultMod() * 100);
                 if (jingyuanSlow < 0) slowReasons.push(`精元亏损 ${jingyuanSlow}%`);
             }
-            const slowText = slowReasons.length ? ` · <span style="color:#c98a3e">${slowReasons.join('、')}</span>` : '';
-            const timeText = Math.abs(adjDur - recipe.duration) > 0.005 ? `${fmt(adjDur)} <small style="color:#888">基础 ${fmt(recipe.duration)}${slowText}</small>` : fmt(recipe.duration);
+            const slowText = slowReasons.length ? ` · <span style="color:var(--color-warning)">${slowReasons.join('、')}</span>` : '';
+            const timeText = Math.abs(adjDur - recipe.duration) > 0.005 ? `${fmt(adjDur)} <small style="color:var(--text-l4)">基础 ${fmt(recipe.duration)}${slowText}</small>` : fmt(recipe.duration);
 
             // 3. 检查材料充足度
             const materials = checkMaterialAvailability(recipe);
@@ -7136,7 +7154,7 @@
                 // 不可用提示
                 let statusHint = '';
                 if (isDisabled) {
-                    statusHint = `<div style="color: #c4483a; font-size: 0.75em; margin-top: 5px;">🔒 需要${getRealmName(action.areaData.minLevel)}</div>`;
+                    statusHint = `<div style="color: var(--color-danger); font-size: 0.75em; margin-top: 5px;">🔒 需要${getRealmName(action.areaData.minLevel)}</div>`;
                 }
 
                 div.innerHTML = `
@@ -7439,7 +7457,7 @@
                 usages.unshift(specialUsages[itemId]);
             }
             if (isEquipmentItem(itemId)) {
-                usages.unshift(`<b style="color:#7fae9a">装备属性：${formatItemStats(itemId) || '无'}</b>`);
+                usages.unshift(`<b style="color:var(--jade)">装备属性：${formatItemStats(itemId) || '无'}</b>`);
             }
             if (itemConfig.effect && itemConfig.effect.workSpeed) {
                 usages.unshift(`装备后工作速度 +${Math.round((1 / itemConfig.effect.workSpeed - 1) * 100)}%（生活技能与悟道耗时 -${Math.round((1 - itemConfig.effect.workSpeed) * 100)}%）`);
@@ -7481,7 +7499,7 @@
             if (itemUsageEl) {
                 let categoryHint = categoryExplanations[itemConfig.type] || '';
                 if (categoryHint) {
-                    categoryHint = '<div style="margin-bottom: 10px; padding: 8px; background: rgba(100,100,100,0.2); border-radius: 3px; font-size: 0.85em; color: #b89a5b;">' + categoryHint + '</div>';
+                    categoryHint = '<div style="margin-bottom: 10px; padding: 8px; background: var(--bg-sunken); border-radius: 3px; font-size: 0.85em; color: var(--gold);">' + categoryHint + '</div>';
                 }
                 itemUsageEl.innerHTML = categoryHint + usageText + comparisonHTML;
             }
@@ -7694,7 +7712,7 @@
             const out = [];
             keys.forEach(k => {
                 const d = ((cfg.stats || {})[k] || 0) - (cur[k] || 0);
-                if (d) out.push(`<span style="color:${d > 0 ? '#7fae9a' : '#c4483a'}">${STAT_LABELS[k] || k}${d > 0 ? '+' : ''}${d}</span>`);
+                if (d) out.push(`<span style="color:${d > 0 ? 'var(--jade)' : 'var(--color-danger)'}">${STAT_LABELS[k] || k}${d > 0 ? '+' : ''}${d}</span>`);
             });
             return out.length ? `（换上后 ${out.join(' ')}）` : '（属性相同）';
         }
@@ -7905,17 +7923,17 @@
             const dungeonContent = document.getElementById('battleContent-dungeons');
 
             if (tab === 'areas') {
-                areaBtn.style.color = '#c2a25f';
-                areaBtn.style.borderBottomColor = '#c2a25f';
-                dungeonBtn.style.color = '#666';
+                areaBtn.style.color = 'var(--gold)';
+                areaBtn.style.borderBottomColor = 'var(--gold)';
+                dungeonBtn.style.color = 'var(--text-l4)';
                 dungeonBtn.style.borderBottomColor = 'transparent';
                 areaContent.style.display = 'block';
                 dungeonContent.style.display = 'none';
             } else {
-                areaBtn.style.color = '#666';
+                areaBtn.style.color = 'var(--text-l4)';
                 areaBtn.style.borderBottomColor = 'transparent';
-                dungeonBtn.style.color = '#c2a25f';
-                dungeonBtn.style.borderBottomColor = '#c2a25f';
+                dungeonBtn.style.color = 'var(--gold)';
+                dungeonBtn.style.borderBottomColor = 'var(--gold)';
                 areaContent.style.display = 'none';
                 dungeonContent.style.display = 'block';
                 updateDungeonDisplay();
@@ -7935,7 +7953,7 @@
 
                 // 检查是否满足境界要求（仅基于最低境界索引）
                 const meetsRequirement = gameState.player.realmIndex >= dungeon.minRealmIndex;
-                const statusColor = record.completed ? '#6f9c8a' : meetsRequirement ? '#c2a25f' : '#666';
+                const statusColor = record.completed ? 'var(--jade)' : meetsRequirement ? 'var(--gold)' : 'var(--text-l4)';
                 const statusText = record.completed ? '✓ 已通关' : meetsRequirement ? '✓ 可进入' : '⛔ 境界不足';
 
                 const requiredRealmName = getRealmName(dungeon.minRealmIndex);
@@ -7947,8 +7965,8 @@
                     <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${dungeonId}'))">
                         <span style="font-size: 24px;">${dungeon.icon}</span>
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; color: #c2a25f;">${dungeon.name}</div>
-                            <div style="font-size: 0.85em; color: #aaa;">${dungeon.desc}</div>
+                            <div style="font-weight: bold; color: var(--gold);">${dungeon.name}</div>
+                            <div style="font-size: 0.85em; color: var(--text-l4);">${dungeon.desc}</div>
                             <div style="font-size: 0.75em; color: ${statusColor}; margin-top: 4px;">${statusText} · 入口：${requiredRealmName}</div>
                             ${dungeonDropHtml(dungeon)}
                         </div>
@@ -8524,10 +8542,10 @@
             // now = 眼下要关心的（阶段要点、减益、要管理的资源、下一次大突破）；more = 已经到手的常驻加成，默认折叠
             const now = [], more = [];
             if (lore) {
-                now.push(`<div><b style="color:#c2a25f">${lore.title}</b>（${GAME_CONFIG.realms[idx].name}）</div>`);
+                now.push(`<div><b style="color:var(--gold)">${lore.title}</b>（${GAME_CONFIG.realms[idx].name}）</div>`);
                 now.push(`<div>📌 ${lore.tip}</div>`);
             }
-            if (isRealmUnstable()) now.push(`<div style="color:#c98a3e">⚠ 境界未稳：攻击 / 防御 −${UNSTABLE_PENALTY * 100}%（修为达 ${UNSTABLE_UNTIL * 100}% 后稳固）</div>`);
+            if (isRealmUnstable()) now.push(`<div style="color:var(--color-warning)">⚠ 境界未稳：攻击 / 防御 −${UNSTABLE_PENALTY * 100}%（修为达 ${UNSTABLE_UNTIL * 100}% 后稳固）</div>`);
             const gradeEff = describeEffects(grade.effects);
             more.push(`<div>🌱 灵根资质：<b>${grade.name}</b>${gradeEff.length ? '（' + gradeEff.join('、') + '）' : ''}${grade.treasure ? ` · 身怀${grade.treasure}` : ''}</div>`);
             if (idx >= 18) {
@@ -8545,7 +8563,7 @@
                 if (usesJingyuan()) {
                     const j = getJingyuan(), off = isHeavenQiOff();
                     const slow = Math.round(-getJingyuanCultMod() * 100);
-                    now.push(`<div${j < JINGYUAN.perAttack ? ' style="color:#c98a3e"' : ''}>💧 精元 ${Math.floor(j)}/${JINGYUAN.max}${slow ? `，修炼 −${slow}%` : ''} · 天地灵气${off ? '已关闭（无加成、不耗精元）' : `伤害 +${bonus}%，每次出手耗 ${JINGYUAN.perAttack}`}
+                    now.push(`<div${j < JINGYUAN.perAttack ? ' style="color:var(--color-warning)"' : ''}>💧 精元 ${Math.floor(j)}/${JINGYUAN.max}${slow ? `，修炼 −${slow}%` : ''} · 天地灵气${off ? '已关闭（无加成、不耗精元）' : `伤害 +${bonus}%，每次出手耗 ${JINGYUAN.perAttack}`}
                         <button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="toggleHeavenQi()">${off ? '开启' : '关闭'}</button></div>`);
                     if (idx === ASCEND_REALM) {
                         now.push(`<div>🌀 空间节点：${hasAscendNode() ? '已找到 ✅' : '未找到（通关一次虚界秘境）'}</div>`);
@@ -8556,7 +8574,7 @@
                 }
                 more.push(`<div>💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%</div>`);
             }
-            if (idx >= FUSION_REQUIRED_REALM && !isFused()) now.push('<div style="color:#c98a3e">🌟 尚未合道：突破前必须先在道果页「合道」</div>');
+            if (idx >= FUSION_REQUIRED_REALM && !isFused()) now.push('<div style="color:var(--color-warning)">🌟 尚未合道：突破前必须先在道果页「合道」</div>');
             if (idx >= LAW_POWER_REALM) {
                 now.push(`<div>☯️ 天地之力：法则平均 ${getLawAvgLevel().toFixed(1)} 级 · 法则战斗效果 ×${LAW_POWER_MULT} · 元气化形每 ${QI_FORM.interval} 秒一击（攻击 ×${getQiFormMult().toFixed(2)}，无视防御）</div>`);
             }
@@ -8591,8 +8609,8 @@
                 XIAN_SHUAI.forEach(sh => {
                     const d = GAME_CONFIG.dungeons[sh.id];
                     if (isShuaiDone(sh)) { more.push(`<div>${d.icon} ${d.name}：已渡过 ✅</div>`); return; }
-                    if (getXianqiao() < sh.at) { now.push(`<div style="color:#888">${d.icon} ${d.name}：仙窍 ${sh.at} 窍时降临（${sh.effect}）</div>`); return; }
-                    now.push(`<div style="color:#c4483a">${d.icon} ${d.name}生效中：${sh.effect}
+                    if (getXianqiao() < sh.at) { now.push(`<div style="color:var(--text-l4)">${d.icon} ${d.name}：仙窍 ${sh.at} 窍时降临（${sh.effect}）</div>`); return; }
+                    now.push(`<div style="color:var(--color-danger)">${d.icon} ${d.name}生效中：${sh.effect}
                         <button type="button" class="btn btn-secondary lore-todo" style="padding:2px 8px;font-size:0.9em;margin-left:4px;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${sh.id}'))">渡${d.name}</button><br><small style="color:var(--text-l4)">${tribulationHint(d)}</small></div>`);
                 });
             }
@@ -8606,7 +8624,7 @@
             }
             const oldDetails = box.querySelector('details');
             const wasOpen = !!(oldDetails && oldDetails.open);
-            box.innerHTML = now.join('') + `<details${wasOpen ? ' open' : ''} style="margin-top:6px;"><summary style="cursor:pointer;color:#7fae9a;">已有的加成（${more.length} 项）</summary>${more.join('')}</details>`;
+            box.innerHTML = now.join('') + `<details${wasOpen ? ' open' : ''} style="margin-top:6px;"><summary style="cursor:pointer;color:var(--jade);">已有的加成（${more.length} 项）</summary>${more.join('')}</details>`;
             // 手机端顶部那一条：只放「眼下要关心的」；有按钮（渡劫 / 渡衰 / 精元开关）或警示时在标题上标出来
             const mBox = document.getElementById('realmLoreMobileBox'), mSum = document.getElementById('realmLoreMobileSummary');
             if (mBox && mSum) {
@@ -8720,7 +8738,7 @@
             });
             orderedTypes.map(type => [type, byType[type]]).forEach(([type, items]) => {
                 const typeLabel = document.createElement('div');
-                typeLabel.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #6f9c8a; margin-top: 10px; margin-bottom: 5px;';
+                typeLabel.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: var(--jade); margin-top: 10px; margin-bottom: 5px;';
                 typeLabel.textContent = typeNames[type] || type;
                 grid.appendChild(typeLabel);
 
@@ -9022,7 +9040,7 @@
                 if (visibleItems.length === 0) return; // 如果没有可见商品，跳过该分类
 
                 const title = document.createElement('div');
-                title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: #6f9c8a; margin-top: 10px; margin-bottom: 5px;';
+                title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: var(--jade); margin-top: 10px; margin-bottom: 5px;';
                 title.textContent = categoryNames[category] || category;
                 shopContainer.appendChild(title);
 
@@ -9046,24 +9064,24 @@
                     card.style.cssText = cardStyle;
 
                     if (!isBought && !isLocked) {
-                        card.onmouseover = () => card.style.borderColor = '#6f9c8a';
-                        card.onmouseout = () => card.style.borderColor = '#555';
+                        card.onmouseover = () => card.style.borderColor = 'var(--jade)';
+                        card.onmouseout = () => card.style.borderColor = 'var(--border-l3)';
                     }
 
                     const priceDisplay = isBought ? '✓ 已拥有'
                         : isOwnedArt ? (gameState.player.currentArt === item.id ? '✓ 当前功法' : '已拥有 · 点击装备')
                         : isLocked ? `🔒 需要${getRealmName(item.minRealmIndex)}`
                         : `${SHOP_CURRENCIES[item.currency || 'coins'].icon()} ${fmtXP(item.price)} ${SHOP_CURRENCIES[item.currency || 'coins'].name}`;
-                    const priceColor = isBought ? '#6f9c8a' : isLocked ? '#c98a3e' : '#c2a25f';
+                    const priceColor = isBought ? 'var(--jade)' : isLocked ? 'var(--color-warning)' : 'var(--gold)';
                     // 未拥有的功法同时显示价格与境界要求，方便对比规划
                     const artExtra = item.type === 'art' && !isOwnedArt
-                        ? `<div style="font-size: 0.75em; color: #888; margin-top: 4px;">${isLocked ? fmtXP(item.price) + ' 灵石' : '需要' + getRealmName(item.minRealmIndex) + '（已达成）'}</div>`
+                        ? `<div style="font-size: 0.75em; color: var(--text-l4); margin-top: 4px;">${isLocked ? fmtXP(item.price) + ' 灵石' : '需要' + getRealmName(item.minRealmIndex) + '（已达成）'}</div>`
                         : '';
 
                     card.innerHTML = `
                         <div style="font-size: 24px; margin-bottom: 5px;">${item.icon}</div>
-                        <div style="font-weight: bold; color: #6f9c8a; margin-bottom: 3px;">${item.name}</div>
-                        <div style="font-size: 0.8em; color: #888; margin-bottom: 8px;">${item.type === 'art' ? getArtShopDesc(item) : item.desc}</div>
+                        <div style="font-weight: bold; color: var(--jade); margin-bottom: 3px;">${item.name}</div>
+                        <div style="font-size: 0.8em; color: var(--text-l4); margin-bottom: 8px;">${item.type === 'art' ? getArtShopDesc(item) : item.desc}</div>
                         <div style="color: ${priceColor}; font-weight: bold;">${priceDisplay}</div>
                         ${artExtra}
                     `;
@@ -9088,7 +9106,7 @@
                 const info = getSkillExpInfo(key);
                 row.innerHTML = `
                     <span class="stat-label">${skill.icon} ${skill.name}:</span>
-                    <span class="stat-value" title="还差 ${info.remain} 升级">Lv.${info.level} <small style="color:#888">(${info.exp}/${info.need})</small></span>
+                    <span class="stat-value" title="还差 ${info.remain} 升级">Lv.${info.level} <small style="color:var(--text-l4)">(${info.exp}/${info.need})</small></span>
                 `;
                 list.appendChild(row);
             });
@@ -10952,19 +10970,19 @@
 
             // P2修复：显示超限警告
             if (exceedsLimit) {
-                content += `<div class="stat-row" style="background: rgba(196,72,58,0.1); border: 1px solid #c4483a; padding: 8px; margin: 5px 0;">
-                    <span class="stat-label" style="color: #c4483a;">⚠️ 离线超过${maxHours}小时上限</span>
+                content += `<div class="stat-row" style="background: rgba(196,72,58,0.1); border: 1px solid var(--color-danger); padding: 8px; margin: 5px 0;">
+                    <span class="stat-label" style="color: var(--color-danger);">⚠️ 离线超过${maxHours}小时上限</span>
                 </div>
-                <div class="stat-row" style="background: rgba(196,72,58,0.1); border: 1px solid #c4483a; padding: 8px; margin: 5px 0;">
-                    <span class="stat-label" style="color: #999;">✗ 超时${wastedHours}小时，奖励已达上限</span>
+                <div class="stat-row" style="background: rgba(196,72,58,0.1); border: 1px solid var(--color-danger); padding: 8px; margin: 5px 0;">
+                    <span class="stat-label" style="color: var(--text-l4);">✗ 超时${wastedHours}小时，奖励已达上限</span>
                 </div>`;
             }
 
             if (rewards.passedRealms && rewards.passedRealms.length) {
                 const unlocks = rewards.passedRealms.filter(i => REALM_UNLOCKS[i]).map(i => `<div style="margin-top:6px;"><b>${getRealmName(i)}</b><br/>${REALM_UNLOCKS[i].map(u => '• ' + u).join('<br/>')}</div>`).join('');
-                content += `<div class="stat-row" style="flex-direction: column; align-items: flex-start; background: rgba(111,156,138,0.1); border: 1px solid #6f9c8a; padding: 8px; margin: 5px 0;">
-                    <span class="stat-label" style="color: #6f9c8a;">🌟 自动突破 ${rewards.passedRealms.length} 个小境界，现在是${getRealmName(rewards.passedRealms[rewards.passedRealms.length - 1])}</span>
-                    ${unlocks ? `<div style="font-size: 0.85em; color: #9ca69f; line-height: 1.6;">期间解锁：${unlocks}</div>` : ''}
+                content += `<div class="stat-row" style="flex-direction: column; align-items: flex-start; background: rgba(111,156,138,0.1); border: 1px solid var(--jade); padding: 8px; margin: 5px 0;">
+                    <span class="stat-label" style="color: var(--jade);">🌟 自动突破 ${rewards.passedRealms.length} 个小境界，现在是${getRealmName(rewards.passedRealms[rewards.passedRealms.length - 1])}</span>
+                    ${unlocks ? `<div style="font-size: 0.85em; color: var(--text-l3); line-height: 1.6;">期间解锁：${unlocks}</div>` : ''}
                 </div>`;
             }
 
@@ -10997,10 +11015,10 @@
 
             // 显示修为溢出转灵石
             if (rewards.cultivationOverflow && rewards.cultivationOverflow > 0) {
-                content += `<div class="stat-row" style="background: rgba(201,138,62,0.1); border: 1px solid #c98a3e; padding: 8px; margin: 5px 0;">
+                content += `<div class="stat-row" style="background: rgba(201,138,62,0.1); border: 1px solid var(--color-warning); padding: 8px; margin: 5px 0;">
                     <span class="stat-label">⚠️ 修为已达上限</span>
                 </div>
-                <div class="stat-row" style="background: rgba(201,138,62,0.1); border: 1px solid #c98a3e; padding: 8px; margin: 5px 0;">
+                <div class="stat-row" style="background: rgba(201,138,62,0.1); border: 1px solid var(--color-warning); padding: 8px; margin: 5px 0;">
                     <span class="stat-label">溢出部分:</span>
                     <span class="stat-value">+${rewards.cultivationOverflow}修为 → +${rewards.overflowCoins}灵石</span>
                 </div>`;
@@ -11011,13 +11029,13 @@
                     <span class="stat-label" style="margin-bottom: 10px;">获得物品:</span>`;
                 rewards.items.forEach(item => {
                     const itemConfig = GAME_CONFIG.items[item.id];
-                    content += `<span style="color: #6f9c8a;">  ${itemConfig.icon} ${itemConfig.name} x${item.qty}</span>`;
+                    content += `<span style="color: var(--jade);">  ${itemConfig.icon} ${itemConfig.name} x${item.qty}</span>`;
                 });
                 content += `</div>`;
             }
 
             if (rewards.lostItems && rewards.lostItems.length > 0) {
-                content += `<div class="stat-row" style="flex-direction: column; align-items: flex-start; color: #c4483a;">
+                content += `<div class="stat-row" style="flex-direction: column; align-items: flex-start; color: var(--color-danger);">
                     <span class="stat-label">❌ 背包已满，以下物品未能获得:</span>` +
                     rewards.lostItems.map(item => `<span>  ${GAME_CONFIG.items[item.id].icon} ${GAME_CONFIG.items[item.id].name} x${item.qty}</span>`).join('') +
                     `</div>`;
@@ -11028,8 +11046,8 @@
             // 检测是否满足突破条件（P1功能）
             const realm = GAME_CONFIG.realms[gameState.player.realmIndex];
             if (gameState.player.cultivationXP >= realm.nextReq) {
-                content = `<div style="background: rgba(111,156,138,0.1); border: 2px solid #6f9c8a; border-radius: 4px; padding: 15px; margin-bottom: 15px;">
-                    <div style="color: #6f9c8a; font-weight: bold; margin-bottom: 10px;">✨ 你已准备好突破！</div>
+                content = `<div style="background: rgba(111,156,138,0.1); border: 2px solid var(--jade); border-radius: 4px; padding: 15px; margin-bottom: 15px;">
+                    <div style="color: var(--jade); font-weight: bold; margin-bottom: 10px;">✨ 你已准备好突破！</div>
                     <button class="btn" onclick="showBreakthroughModal(); closeOfflineModal()" style="width: 100%; margin-bottom: 10px;">🌟 前往突破 🌟</button>
                 </div>` + content;
             }
@@ -11059,8 +11077,8 @@
                 const isCurrentArt = gameState.player.currentArt === artKey;
                 const itemDiv = document.createElement('div');
                 itemDiv.style.cssText = `
-                    background: ${isCurrentArt ? 'rgba(34,197,94,0.2)' : 'rgba(59,130,246,0.1)'};
-                    border: 1px solid ${isCurrentArt ? '#7fae9a' : '#7d9bb5'};
+                    background: ${isCurrentArt ? 'color-mix(in srgb, var(--jade) 16%, var(--bg-l2))' : 'var(--bg-l2)'};
+                    border: 1px solid ${isCurrentArt ? 'var(--jade)' : 'var(--border-l3)'};
                     border-radius: 4px;
                     padding: 12px;
                     margin-bottom: 10px;
@@ -11072,14 +11090,14 @@
                 itemDiv.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: start; gap: 10px;">
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; color: #c2a25f; font-size: 1em;">${art.icon || ''} ${art.name}</div>
-                            <div style="font-size: 0.85em; color: #aaa; margin-top: 4px;">${art.description}</div>
-                            <div style="font-size: 0.8em; color: #888; margin-top: 6px;">
-                                修炼速度倍率：<span style="color: #7d9bb5;">${art.speedMultiplier.toFixed(2)}x</span>
+                            <div style="font-weight: bold; color: var(--gold); font-size: 1em;">${art.icon || ''} ${art.name}</div>
+                            <div style="font-size: 0.85em; color: var(--text-l4); margin-top: 4px;">${art.description}</div>
+                            <div style="font-size: 0.8em; color: var(--text-l4); margin-top: 6px;">
+                                修炼速度倍率：<span style="color: var(--azure);">${art.speedMultiplier.toFixed(2)}x</span>
                             </div>
-                            ${describeEffects(art.effects).length ? `<div style="font-size: 0.8em; color: #6fa980; margin-top: 4px;">特效：${describeEffects(art.effects).join(' · ')}</div>` : ''}
+                            ${describeEffects(art.effects).length ? `<div style="font-size: 0.8em; color: var(--jade); margin-top: 4px;">特效：${describeEffects(art.effects).join(' · ')}</div>` : ''}
                         </div>
-                        <div style="text-align: right; color: ${isCurrentArt ? '#7fae9a' : '#888'}; font-size: 0.9em;">
+                        <div style="text-align: right; color: ${isCurrentArt ? 'var(--jade)' : 'var(--text-l4)'}; font-size: 0.9em;">
                             ${statusText}
                         </div>
                     </div>
