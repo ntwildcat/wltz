@@ -3529,9 +3529,10 @@
             el.style.display = '';
             el.className = 'quest-banner' + (complete ? ' complete' : '');
             el.innerHTML = `
+                <span class="quest-seal" aria-hidden="true">令</span>
                 <div class="quest-head">
-                    <span class="quest-tag">📜 新手任务 ${state.index + 1}/${NEWBIE_QUESTS.length}</span>
-                    <b class="quest-title">${quest.title}</b>
+                    <span class="quest-tag">新手任务 ${state.index + 1}/${NEWBIE_QUESTS.length}</span>
+                    <b class="quest-title">${quest.title}</b>${complete ? '<span class="quest-stamp" aria-hidden="true">成</span>' : ''}
                     <button type="button" class="quest-list-link" onclick="showQuestList()">全部任务</button>
                     <button type="button" class="quest-list-link quest-skip-link" onclick="skipQuests()">我是老玩家，跳过</button>
                 </div>
@@ -4774,6 +4775,7 @@
             if (/落空/.test(entry)) return 'miss';
             if (/^玩家/.test(entry)) return 'player-hit';
             if (/使用|恢复/.test(entry)) return 'heal';
+            if (/被\S*击败|未能击败/.test(entry)) return 'death';   // 战败 / 超时：以前也被「击败」二字归成了胜利
             if (/击败|战胜|遭遇|——/.test(entry)) return /遭遇|——/.test(entry) ? 'info' : 'victory';
             return 'monster-hit';
         }
@@ -4788,7 +4790,11 @@
             battleLogRendered = key;
             const stick = el.scrollHeight - el.scrollTop - el.clientHeight < 28;
             const prev = el.scrollTop;
-            el.innerHTML = battleLogEntries.map(e => `<div class="log-entry log-${battleLogClass(e)}">${typeof e === 'string' ? e : e.text}</div>`).join('');
+            el.innerHTML = battleLogEntries.map(e => {
+                const text = typeof e === 'string' ? e : e.text;
+                const crit = /暴击/.test(text) ? ' log-crit' : '';
+                return `<div class="log-entry log-${battleLogClass(e)}${crit}">${text.replace(/^\[(\d\d:\d\d:\d\d)\]\s*/, '<span class="log-time">$1</span>')}</div>`;
+            }).join('');
             el.scrollTop = stick ? el.scrollHeight : prev;
         }
 
@@ -6329,7 +6335,7 @@
                 const isMs = LAW_MILESTONE_LEVELS.includes(after);
                 const msText = isMs ? '（里程碑：' + describeEffects(def.milestones[after]).join('、') + '）' : '';
                 showNotification(`${def.icon} ${def.name} 领悟到 Lv.${after}${msText}`, '#b89a5b');
-                if (isMs) showQuickCelebration(`${def.icon} ${def.name} 里程碑 Lv.${after}`);
+                if (isMs) showQuickCelebration(`${def.icon} ${def.name} 里程碑 Lv.${after}`, { title: def.name, sub: '里程碑', seal: cnNum(after) + '级' });
             }
             if (document.body.dataset.panel === 'wudao') generateLawList();
             return after >= cap;
@@ -6910,7 +6916,7 @@
                 const name = (getAction(skillName, key) || {}).name || key;
                 const milestone = MASTERY_MILESTONES.includes(after) ? '（里程碑！）' : '';
                 showNotification(`🎓 ${name} 精通 Lv.${after}${milestone}`, '#b89a5b');
-                showQuickCelebration(`🎓 ${name} 精通 Lv.${after}`);
+                showQuickCelebration(`🎓 ${name} 精通 Lv.${after}`, { title: name, sub: '精通', seal: cnNum(after) + '级' });
             }
         }
 
@@ -6999,7 +7005,7 @@
                 skill.level++;
                 const effect = calculateSkillLevelEffect(skillName, skill.level);
                 showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#6f9c8a', 'normal');
-                if (!document.hidden) showQuickCelebration(`${skill.name} 升至 Lv.${skill.level}`);
+                if (!document.hidden) showQuickCelebration(`${skill.name} 升至 Lv.${skill.level}`, { title: skill.name, seal: cnNum(skill.level) + '级' });
                 const ms = LIFE_SKILLS.includes(skillName) && milestonesOf(skillName).find(m => m.level === skill.level);
                 if (ms) showNotification(`🏅 ${skill.name}达到 Lv.${ms.level} 里程碑：${ms.desc}`, '#b89a5b');
             }
@@ -7557,7 +7563,7 @@
                 names.forEach(skillName => {
                     const skill = gameState.skills[skillName];
                     const item = document.createElement('div');
-                    item.className = 'skill-item' + (skillName === activePanel ? ' active' : '');
+                    item.className = 'skill-item sk-' + skillName + (skillName === activePanel ? ' active' : '');   // v7.29 sk-*：选中时的墨痕和经验条按技能着色
                     item.id = 'skill-' + skillName;
                     item.setAttribute('role', 'button');
                     item.tabIndex = 0;
@@ -9406,22 +9412,46 @@
         // 精通升级 / 法则里程碑这类数值跃迁太频繁，不适合用需要点确认的重弹窗（境界解锁提示那种），
         // 但完全静默（只有一条会被刷掉的 toast）又感知不到——加一个屏幕中央短暂浮现、自动消失、不挡手的小庆祝，
         // 复用同一个 DOM 节点：连续触发时只重置文字和计时器，不会叠好几个气泡（正反馈诊断 C-5）
+        // v7.29 传了 art（{ title, sub, seal }）就画成国漫风：一道墨痕上写毛笔大字，旁边盖一枚朱红印；不传仍是一行字
         let quickCelebrationTimer = null;
-        function showQuickCelebration(text) {
+        function showQuickCelebration(text, art = null) {
             if (gameState.settings && gameState.settings.enableNotifications === false) return;
             let el = document.getElementById('quickCelebration');
             if (!el) {
                 el = document.createElement('div');
                 el.id = 'quickCelebration';
-                el.className = 'quick-celebration';
                 document.body.appendChild(el);
             }
-            el.textContent = text;
+            if (art) {
+                el.className = 'quick-celebration qc-art';
+                el.innerHTML = `<span class="qc-swash"></span><span class="qc-title">${art.title}</span>`
+                    + (art.sub ? `<span class="qc-sub">${art.sub}</span>` : '')
+                    + (art.seal ? `<span class="qc-seal">${art.seal}</span>` : '');
+            } else {
+                el.className = 'quick-celebration';
+                el.textContent = text;
+            }
             el.classList.remove('show');
             void el.offsetWidth;   // 强制重排，确保连续触发时动画能重新播放一次
             el.classList.add('show');
             clearTimeout(quickCelebrationTimer);
-            quickCelebrationTimer = setTimeout(() => el.classList.remove('show'), 800);
+            quickCelebrationTimer = setTimeout(() => el.classList.remove('show'), art ? 1400 : 800);
+        }
+        // 阿拉伯数字 → 中文数字（1–9999），印章上用
+        function cnNum(n) {
+            n = Math.floor(n);
+            if (n <= 0) return '零';
+            const D = '零一二三四五六七八九', U = ['', '十', '百', '千'];
+            const s = String(n).slice(-4);
+            let out = '', zero = false;
+            for (let i = 0; i < s.length; i++) {
+                const d = +s[i], u = U[s.length - 1 - i];
+                if (d === 0) { zero = true; continue; }
+                if (zero && out) out += '零';
+                zero = false;
+                out += D[d] + u;
+            }
+            return out.replace(/^一十/, '十');
         }
 
         // 通知类型系统（P1功能）
@@ -9439,6 +9469,10 @@
             // 跟"材料不足"这种日常提示拉开视觉层级（正反馈诊断 C-1），不影响静音/常驻等既有逻辑
             notification.className = 'notification' + (type === 'rare' ? ' notification-rare' : '');
             notification.style.setProperty('--accent', color);   // 颜色只用作左侧色条，底色由样式统一
+            // v7.29 纸条右上角的小印：稀有触发「喜」，错误 / 危险「危」，警示「警」，普通通知不盖
+            const seal = type === 'rare' ? '喜' : ['error', 'danger'].includes(type) ? '危'
+                : (type === 'warning' || IMPORTANT_NOTIFICATION_COLORS.includes(String(color).toLowerCase())) ? '警' : '';
+            if (seal) notification.dataset.seal = seal;
             notification.style.minWidth = '300px';
 
             // 统一UI：所有通知都显示关闭按钮

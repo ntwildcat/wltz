@@ -2511,3 +2511,91 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .scroll-modal .modal-title { font-family: var(--font-brush); font-size: 2em; color: #1a140c; letter-spacing: 0.2em; text-shadow: none; }
 .scroll-modal .btn { background: #a8322a; color: #fff3e6; border-color: #7a1f18; font-family: var(--font-brush); font-size: 1.15em; }
 @media (prefers-reduced-motion: reduce) { .modal.show .modal-content.scroll-modal, #realmDisplay.stamped, .pt-laws, .pt-halo, .pt-core, .pt-nascent { animation: none !important; } }
+
+/* ==========================================================================
+   v7.29 漫画风第二批（一）：通知纸条 / 升级庆祝 / 任务竹简 / 侧栏墨痕 / 战报
+   ========================================================================== */
+/* 通知：一张宣纸条，左边一笔按通知颜色的竖墨，重要的右上角盖小印 */
+.notification { --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; --patina: #3f7f6a; --cinnabar: #a8322a; --cinnabar-2: #a8322a; --border-l1: #7d4f22; --border-l2: #8a6420; background: linear-gradient(100deg, #eee1c1, #f7efdc 35%, #f2e6cb) !important; color: #231f19 !important; border: none !important;
+    padding: 12px 18px 12px 28px; box-shadow: inset 0 0 14px rgba(120, 90, 40, 0.22), 3px 4px 0 rgba(0, 0, 0, 0.38) !important; }
+.notification::before { content: ''; position: absolute; left: 10px; top: 7px; bottom: 7px; width: 7px; background: var(--accent, #6f9c8a); -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 100' preserveAspectRatio='none'><path d='M6 1 Q10 6 8.5 22 Q7 50 9.5 78 Q10 95 6 99 Q2.5 93 3.5 72 Q5 45 2.8 20 Q2.5 5 6 1 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 100' preserveAspectRatio='none'><path d='M6 1 Q10 6 8.5 22 Q7 50 9.5 78 Q10 95 6 99 Q2.5 93 3.5 72 Q5 45 2.8 20 Q2.5 5 6 1 Z'/></svg>") center / 100% 100% no-repeat; }
+.notification[data-seal]::after { content: attr(data-seal); position: absolute; top: -9px; right: -7px; width: 26px; height: 26px; line-height: 26px; text-align: center; font-size: 17px; transform: rotate(9deg); font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); }
+.notification[data-seal="喜"]::after { background: #b8862a; }
+.notification button { color: #675f4e !important; border-color: #c9b994 !important; }
+.notification.notification-rare { animation: slideIn 0.3s, noticeRarePulse 1.6s ease-in-out 0.3s 2; }
+
+/* 中央庆祝（技能升级 / 精通 / 法则里程碑）：一道墨痕 + 毛笔大字 + 朱红印 */
+.quick-celebration.qc-art { display: flex; align-items: center; gap: 12px; padding: 14px 44px 16px; background: none; border: none; border-radius: 0; box-shadow: none; isolation: isolate; }
+.quick-celebration.qc-art.show::before { display: none; }
+.qc-swash { position: absolute; inset: 0 -14px; z-index: -1; background: #0e0c09; opacity: 0.9; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 50' preserveAspectRatio='none'><path d='M3 28 Q30 10 80 14 Q140 18 170 9 Q190 4 198 10 Q196 22 186 30 Q150 42 100 38 Q50 34 14 44 Q2 44 3 28 Z M150 44 Q170 40 190 43 L188 46 Q170 45 152 47 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 50' preserveAspectRatio='none'><path d='M3 28 Q30 10 80 14 Q140 18 170 9 Q190 4 198 10 Q196 22 186 30 Q150 42 100 38 Q50 34 14 44 Q2 44 3 28 Z M150 44 Q170 40 190 43 L188 46 Q170 45 152 47 Z'/></svg>") center / 100% 100% no-repeat; }
+.qc-title { font-family: var(--font-brush); font-size: 2.5em; font-weight: normal; line-height: 1; color: #fff3cf; letter-spacing: 0.06em;
+    -webkit-text-stroke: 1.2px #0e0c09; paint-order: stroke fill; text-shadow: 3px 3px 0 #0e0c09, 0 0 16px rgba(255, 210, 120, 0.55); }
+.qc-sub { font-family: var(--font-brush); font-size: 1.3em; color: #e8c172; align-self: flex-end; margin-bottom: 2px; }
+.qc-seal { writing-mode: vertical-rl; font-size: 1.15em; line-height: 1.05; padding: 6px 4px; transform: rotate(-6deg); font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); }
+.quick-celebration.qc-art.show .qc-swash { animation: qcSwash 0.32s ease-out both; }
+.quick-celebration.qc-art.show .qc-title { animation: qcTitle 0.4s cubic-bezier(.2, 1.4, .3, 1) 0.08s both; }
+.quick-celebration.qc-art.show .qc-seal { animation: qcSeal 0.42s cubic-bezier(.2, 1.4, .3, 1) 0.3s both; }
+@keyframes qcSwash { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes qcTitle { from { opacity: 0; transform: scale(1.5); } to { opacity: 1; transform: scale(1); } }
+@keyframes qcSeal { 0% { opacity: 0; transform: rotate(-6deg) scale(2); } 60% { opacity: 1; transform: rotate(-6deg) scale(0.9); } 100% { opacity: 1; transform: rotate(-6deg) scale(1); } }
+
+/* 任务条：一卷竹简，左上一枚「令」印，完成后标题旁盖「成」 */
+.quest-banner { position: relative; --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; --patina: #3f7f6a; --cinnabar: #a8322a; --cinnabar-2: #a8322a; --border-l1: #7d4f22; --border-l2: #8a6420; color: #231f19; border: none; border-radius: 3px; padding: 12px 14px 12px 60px;
+    background: repeating-linear-gradient(90deg, rgba(110, 80, 30, 0) 0 32px, rgba(110, 80, 30, 0.16) 32px 33px, rgba(255, 255, 255, 0.18) 33px 34px), linear-gradient(180deg, #efe2bf, #e2d0a6);
+    box-shadow: inset 0 0 0 1px rgba(90, 60, 25, 0.35), inset 0 0 16px rgba(120, 90, 40, 0.25), 0 3px 8px rgba(0, 0, 0, 0.35); }
+.quest-banner.complete { background: repeating-linear-gradient(90deg, rgba(110, 80, 30, 0) 0 32px, rgba(110, 80, 30, 0.16) 32px 33px, rgba(255, 255, 255, 0.18) 33px 34px), linear-gradient(180deg, #e8e6c4, #d6d8ac); }
+.quest-seal { position: absolute; left: 13px; top: 13px; width: 34px; height: 34px; line-height: 34px; text-align: center; font-size: 23px; transform: rotate(-5deg); font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); }
+.quest-banner .quest-title { font-family: var(--font-brush); font-size: 1.4em; font-weight: normal; color: #1a140c; letter-spacing: 0.04em; }
+.quest-banner .quest-desc b { color: #7d4f22; }
+.quest-stamp { display: inline-flex; align-items: center; justify-content: center; width: 1.9em; height: 1.9em; font-family: var(--font-brush); font-size: 1.15em; color: #a8322a;
+    border: 2px solid #a8322a; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(168, 50, 42, 0.25); transform: rotate(-14deg); align-self: center; animation: questStamp 0.45s cubic-bezier(.2, 1.4, .3, 1) both; }
+@keyframes questStamp { from { opacity: 0; transform: rotate(-14deg) scale(2.2); } to { opacity: 0.9; transform: rotate(-14deg) scale(1); } }
+.quest-banner .quest-btn { font-family: var(--font-brush); font-size: 1.1em; }
+.quest-banner.complete .quest-btn { background: #a8322a; color: #fff3e6; border-color: #7a1f18; }
+@media (max-width: 768px) { .quest-banner { padding-left: 50px; } .quest-seal { left: 10px; width: 30px; height: 30px; line-height: 30px; font-size: 20px; } }
+
+/* 侧栏：技能名用毛笔字；选中时身后一笔技能色墨痕、左边一笔朱砂竖墨；经验条按技能着色、笔刷收尾 */
+.skill-item { --sk: #b89a5b; }
+.sk-cultivation { --sk: #5aa8ef; } .sk-battle { --sk: #e0574a; } .sk-alchemy { --sk: #36b383; } .sk-forging { --sk: #d99a3a; }
+.sk-farming { --sk: #79b84e; } .sk-mining { --sk: #8aa0b8; } .sk-danhuo { --sk: #f0703f; } .sk-shenshi { --sk: #a283f0; }
+.sk-wudao { --sk: #d8b445; } .sk-daoguo { --sk: #d877b6; }
+.sidebar .skill-item { position: relative; isolation: isolate; }
+.sidebar .skill-item .skill-name { font-family: var(--font-brush); font-size: 1.12em; letter-spacing: 0.04em; }
+.sidebar .skill-item.active { background: transparent; border-color: transparent; box-shadow: none; }
+.sidebar .skill-item.active::before { content: ''; position: absolute; inset: 1px -2px 7px -4px; z-index: -1; background: var(--sk); opacity: 0.32; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+.sidebar .skill-item.active::after { content: ''; position: absolute; left: -1px; top: 4px; bottom: 4px; width: 5px; background: var(--cinnabar, #a8322a); -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 100' preserveAspectRatio='none'><path d='M6 1 Q10 6 8.5 22 Q7 50 9.5 78 Q10 95 6 99 Q2.5 93 3.5 72 Q5 45 2.8 20 Q2.5 5 6 1 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 100' preserveAspectRatio='none'><path d='M6 1 Q10 6 8.5 22 Q7 50 9.5 78 Q10 95 6 99 Q2.5 93 3.5 72 Q5 45 2.8 20 Q2.5 5 6 1 Z'/></svg>") center / 100% 100% no-repeat; }
+.sidebar .skill-item.active .skill-name { color: var(--text-l1); }
+.sidebar .skill-item.active .skill-name .ico { color: var(--sk); }
+.skill-item .skill-bar { background: transparent; box-shadow: inset 0 -1px 0 var(--border-l4); }
+.skill-item .skill-bar i { background: var(--sk); -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 0 L94 0 Q97 1 96 3 Q99 4 97 6 Q100 8 95 10 L0 10 Z'/></svg>") right / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 0 L94 0 Q97 1 96 3 Q99 4 97 6 Q100 8 95 10 L0 10 Z'/></svg>") right / 100% 100% no-repeat; }
+.nav-mini { position: relative; isolation: isolate; }
+body[data-panel="inventory"] .nav-mini[data-nav="inventory"]::before, body[data-panel="equipment"] .nav-mini[data-nav="equipment"]::before,
+body[data-panel="shop"] .nav-mini[data-nav="shop"]::before, body[data-panel="settings"] .nav-mini[data-nav="settings"]::before {
+    content: ''; position: absolute; inset: 20% -3px 8% -3px; z-index: -1; background: var(--cinnabar, #a8322a); opacity: 0.3; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+.mobile-skill-btn.active { position: relative; isolation: isolate; }
+.mobile-skill-btn.active::before { content: ''; position: absolute; inset: 15% -4px 5% -4px; z-index: -1; background: var(--cinnabar, #a8322a); opacity: 0.3; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+
+/* 战报：宣纸 + 朱丝栏，时间单列；暴击朱红，胜 / 败两行用毛笔字并盖小印 */
+.battle-log-hint { display: flex; align-items: baseline; gap: 8px; }
+.blh-title { font-family: var(--font-brush); font-size: 2.1em; color: var(--text-l1); letter-spacing: 0.15em; }
+.battle-log { --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; --patina: #3f7f6a; --cinnabar: #a8322a; --cinnabar-2: #a8322a; --border-l1: #7d4f22; --border-l2: #8a6420; color: #231f19; background: linear-gradient(90deg, #ece0bf, #f5ecd5 10%, #f5ecd5 90%, #ece0bf); border: none; border-radius: 2px;
+    box-shadow: inset 0 0 16px rgba(120, 90, 40, 0.28), inset 3px 0 0 #8a2a20, inset -3px 0 0 #8a2a20, 0 2px 6px rgba(0, 0, 0, 0.35); font-family: inherit; padding: 6px 12px; }
+.battle-log .log-entry { display: flex; align-items: baseline; gap: 8px; padding: 3px 0; border-bottom: 1px solid rgba(168, 50, 42, 0.16); line-height: 1.45; }
+.battle-log .log-entry:last-child { border-bottom: none; }
+.log-time { flex: none; font-family: var(--font-mono); font-size: 0.82em; color: #9a8f78; }
+.battle-log .log-info { color: #675f4e; }
+.battle-log .log-player-hit { color: #2f3f52; }
+.battle-log .log-monster-hit { color: #8f3a2c; }
+.battle-log .log-heal { color: #3f7f6a; }
+.battle-log .log-miss { color: #8a8270; }
+.battle-log .log-crit { color: #a8322a; font-weight: bold; }
+.battle-log .log-victory, .battle-log .log-death { font-family: var(--font-brush); font-weight: normal; font-size: 1.18em; letter-spacing: 0.03em; }
+.battle-log .log-victory { color: #6b4a12; }
+.battle-log .log-death { color: #a8322a; }
+.battle-log .log-victory::after, .battle-log .log-death::after { content: '胜'; flex: none; margin-left: auto; width: 20px; height: 20px; line-height: 20px; text-align: center; font-size: 14px; transform: rotate(-8deg); font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); }
+.battle-log .log-death::after { content: '败'; background: #3a3530; }
+.battle-log .log-victory .log-time, .battle-log .log-death .log-time { font-size: 0.7em; }
+
+@media (prefers-reduced-motion: reduce) {
+    .quick-celebration.qc-art.show .qc-swash, .quick-celebration.qc-art.show .qc-title, .quick-celebration.qc-art.show .qc-seal, .quest-stamp { animation: none !important; }
+}
