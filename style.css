@@ -2943,3 +2943,21 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 .law-card .recipe-header { position: relative; }
 .law-card .recipe-header:has(.law-resonant) { padding-bottom: 12px; }
 .law-card .law-resonant { position: absolute; left: 52px; bottom: -2px; margin: 0; white-space: nowrap; font-size: 0.75em; }
+
+/* ==========================================================================
+   v7.37 本命法宝改版：装备页的本命栏
+   ========================================================================== */
+.life-sword-card { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center; margin: 4px 0 14px; padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, #5aa8ef 45%, var(--border-l3)); border-radius: 2px;
+    background: radial-gradient(ellipse at 15% 50%, rgba(90, 168, 239, 0.16), transparent 60%), var(--bg-l2); box-shadow: inset 0 0 0 3px var(--bg-l2), inset 0 0 0 4px rgba(90, 168, 239, 0.25); }
+.life-sword-card.empty { border-style: dashed; background: var(--bg-l2); }
+.ls-art svg { display: block; width: 96px; height: 92px; overflow: visible; filter: drop-shadow(0 0 4px rgba(120, 190, 255, 0.45)); }
+.life-sword-card.empty .ls-art svg { filter: none; opacity: 0.6; }
+.ls-art svg.ls-lit { filter: drop-shadow(0 0 6px #9fd8ff) drop-shadow(0 0 12px rgba(255, 230, 120, 0.55)); }
+.ls-title { font-family: var(--font-title); font-size: 1.35em; color: var(--text-l1); letter-spacing: 0.06em; }
+.ls-count { margin: 2px 0 4px; font-family: var(--font-num); color: var(--text-l2); }
+.ls-count b { font-size: 1.5em; color: var(--text-l1); }
+.ls-form { margin-left: 10px; font-family: var(--font-title); font-size: 1.05em; padding: 2px 8px 1px; color: #fff2e4; background: #3d6f8f; border-radius: 3px; }
+.ls-line { font-size: 0.86em; color: var(--text-l3); line-height: 1.7; }
+.strike-lifeSword { color: #9fd8ff; }
+@media (max-width: 768px) { .life-sword-card { grid-template-columns: 70px 1fr; } .ls-art svg { width: 70px; height: 68px; } }
