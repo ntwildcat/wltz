@@ -10,7 +10,10 @@
 
 /* ========== CSS 变量系统 ========== */
 :root {
-    --font-title: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', serif;
+    /* v7.31：标题统一用志莽行书毛笔字（与战斗特效 / 卷轴 / 印章同一种字）。原来写的 Ma Shan Zheng 网页从没加载过，实际一直是系统楷体，
+       和新加的毛笔字混在一起很不协调。以数字为主的地方（顶栏数值、技能等级、收获飘字）改用 --font-num，楷体好认 */
+    --font-title: 'ZhiMangXing', 'STXingkai', 'KaiTi', 'STKaiti', serif;
+    --font-num: 'STKaiti', 'KaiTi', serif;
     --font-mono: 'Courier New', 'Consolas', monospace;
 
     /* 间距 */
@@ -1559,7 +1562,7 @@ body::before {
 .header { border-bottom: 1px solid var(--bronze-dim); }
 .header::after { display: none; }
 .info-label { color: var(--text-l4); letter-spacing: 0.08em; }
-.info-value { font-family: var(--font-title); color: var(--text-l1); }
+.info-value { font-family: var(--font-num); color: var(--text-l1); }
 #realmDisplay {
     display: inline-block;
     background: var(--cinnabar);
@@ -1927,7 +1930,7 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 .panel-content .skill-exp-header { background: transparent; border: none; border-radius: 0; padding: 10px 0 14px; margin-bottom: 14px; border-bottom: 1px solid var(--border-l4); }
 .panel-content .skill-exp-header .skill-exp-name { display: none; }
 .skill-exp-top { margin-bottom: 4px; }
-.skill-exp-level { font-family: var(--font-title); letter-spacing: 0.05em; color: var(--text-l2); }
+.skill-exp-level { font-family: var(--font-num); letter-spacing: 0.05em; color: var(--text-l2); }
 .skill-exp-track { height: 4px; border: none; border-radius: 0; background: var(--bg-sunken); }
 .skill-exp-fill { background: var(--jade); }
 
@@ -2094,7 +2097,7 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 @keyframes strikeFloat { 0% { transform: translateY(8px) scale(0.7); opacity: 0; } 15% { transform: translateY(0) scale(1.1); opacity: 1; } 30% { transform: scale(1); } 100% { transform: translateY(-80px); opacity: 0; } }
 
 /* 配方完成：卡片上飘出收获 */
-.gain-float { position: fixed; z-index: 1500; transform: translate(-50%, 0); pointer-events: none; white-space: nowrap; font-family: var(--font-title); font-size: 1.08rem; font-weight: bold; letter-spacing: 0.03em; color: #bdeed8; padding: 1px 10px; border-radius: 12px; background: radial-gradient(ellipse at center, rgba(12, 20, 16, 0.75), rgba(12, 20, 16, 0) 75%); text-shadow: 0 0 10px rgba(111, 156, 138, 0.9), 0 1px 2px #000; animation: gainFloat 1.3s cubic-bezier(.2, .7, .3, 1) forwards; }
+.gain-float { position: fixed; z-index: 1500; transform: translate(-50%, 0); pointer-events: none; white-space: nowrap; font-family: var(--font-num); font-size: 1.08rem; font-weight: bold; letter-spacing: 0.03em; color: #bdeed8; padding: 1px 10px; border-radius: 12px; background: radial-gradient(ellipse at center, rgba(12, 20, 16, 0.75), rgba(12, 20, 16, 0) 75%); text-shadow: 0 0 10px rgba(111, 156, 138, 0.9), 0 1px 2px #000; animation: gainFloat 1.3s cubic-bezier(.2, .7, .3, 1) forwards; }
 .gain-float.gain-item { color: var(--text-l1); text-shadow: 0 0 8px rgba(200, 170, 90, 0.55), 0 1px 2px #000; }
 .gain-float .gain-ico { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: -0.25em; margin-right: 3px; }
 .gain-float .gain-ico .ico { width: 100%; height: 100%; }
@@ -2208,7 +2211,7 @@ body[data-panel="shop"] .cur-chip:not([data-cur]) { border-color: var(--cinnabar
 /* ==========================================================================
    v7.25 战斗舞台（国漫风）：水墨山水背景 + 左右两张立绘 + 漫画式出手特效。美术在 art.js（BattleArt）
    ========================================================================== */
-@font-face { font-family: 'ZhiMangXing'; src: url('fonts/zhimangxing-subset.woff') format('woff'); font-display: swap; }
+@font-face { font-family: 'ZhiMangXing'; src: url('fonts/zhimangxing-subset.woff2') format('woff2'); font-display: swap; }
 :root { --font-brush: 'ZhiMangXing', 'STXingkai', 'KaiTi', 'STKaiti', serif; }
 .battle-scene.bs-stage { position: relative; height: 250px; overflow: hidden; padding: 0; border: 1px solid #000; background: #0c0b09; border-radius: 4px; isolation: isolate; }
 .bs-stage .bs-bg { position: absolute; inset: 0; z-index: 0; }
@@ -2764,3 +2767,27 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 .cr-you { font-family: var(--font-brush); font-size: 13px; fill: #fff2e4; paint-order: stroke fill; stroke: #a8322a; stroke-width: 5px; }
 
 @media (prefers-reduced-motion: reduce) { .guide-elder .bs-art { animation: none !important; } .art-scroll:hover { transform: none; } }
+
+/* ==========================================================================
+   v7.31 标题字体统一为毛笔字：毛笔字本身笔画粗细有变化，再加粗会糊成一团，凡是用 --font-title 的地方都取消加粗、略放大一点
+   ========================================================================== */
+.skill-item .skill-name, .action-name, .recipe-name, .skill-exp-name, .battle-title, .panel-title, .stat-title, .modal-title, .btn,
+.art-name, #battleActions .action-name, #panel-shop .shop-item > div:nth-child(2), .slot-realm, .fx-title, .fx-seal, .tutorial-title { font-weight: normal; }
+.tutorial-title { font-family: var(--font-title); font-size: 1.55em; }
+.stat-title { font-size: 1.12em; }
+.battle-title { font-size: 1.25em; }
+#battleActions .action-name, #panel-shop .shop-item > div:nth-child(2) { font-size: 1.15em; }
+.law-card > .law-level { font-family: var(--font-num); }
+
+/* 其余标题类文字也统一成毛笔字：克制预览、战斗区域 / 秘境标签、商城分类、丹火 / 神识等用途条目名、装备栏物品名 */
+.sec-title, .shop-cat-label, .shop-section-title, .use-title, .use-main > b:first-child, .equip-slot-name, .panel-tab { font-family: var(--font-title); font-weight: normal !important; letter-spacing: 0.04em; }
+.sec-title { font-size: 1.2em; }
+.panel-tab { font-size: 1.2em; }
+.use-main > b:first-child, .use-title { font-size: 1.14em; }
+.equip-slot-name { font-size: 1.15em; }
+.shop-cat-label { font-size: 1.4em; color: var(--text-l1) !important; margin-top: 14px !important; }
+.shop-cat-label::after { content: ''; display: block; width: 90px; height: 6px; margin-top: 1px; background: var(--jade); opacity: 0.7; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+.shop-section-title { font-size: 1.3em; }
+.shop-tab { font-family: var(--font-title); font-weight: normal !important; font-size: 1.12em; letter-spacing: 0.04em; }
+/* 标题里附带的小字说明仍用正文字体，毛笔字太小看不清 */
+.use-title small, .use-main > b:first-child small { font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, SimSun, serif; letter-spacing: 0; }

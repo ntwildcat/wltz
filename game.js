@@ -10188,6 +10188,7 @@
 
                 const title = document.createElement('div');
                 title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: var(--jade); margin-top: 10px; margin-bottom: 5px;';
+                title.className = 'shop-cat-label';   // v7.31 商城分类标题：毛笔字 + 笔触（同背包分类）
                 title.textContent = categoryNames[category] || category;
                 shopContainer.appendChild(title);
 

@@ -1,14 +1,17 @@
-"""重新生成毛笔字体子集 fonts/zhimangxing-subset.woff（志莽行书，SIL OFL 1.1）。
+"""重新生成毛笔字体子集 fonts/zhimangxing-subset.woff2（志莽行书，SIL OFL 1.1）。
 
 什么时候要跑：新增的名称（境界 / 怪物 / 物品 / 配方……）要在毛笔字的地方显示（战斗特效、突破特效、配方卡片名、修炼卡片的书法字），
 而字体子集里还没有这些字时——缺字会退回楷体，看起来不统一。
 
 用法（在仓库根目录）：
-    pip install fonttools
+    pip install fonttools brotli
     python fonts/subset-font.py            # 自动从 Google Fonts 官方仓库下载原字体（约 4MB，只放在临时目录，不进仓库）
     python fonts/subset-font.py 原字体.ttf   # 或者指定本地的 ZhiMangXing-Regular.ttf
 
-收字范围：game.js 里所有 name: '…'、line: '…'（突破台词、Boss 登场台词）、glyph: '…'（成就印章），加上 EXTRA 里的特效用字和数字。字表同时写到 fonts/zhimangxing-chars.txt。
+收字范围（v7.31 起）：game.js / art.js / 页面 HTML 里出现的全部汉字和全角标点，加上 EXTRA 里的特效用字和数字。
+以前只收 name / line / glyph 这几类字段，界面上别处的毛笔标题（如新手教程标题）缺字，缺的字会退回楷体，一行里半毛笔半楷体。
+全收也只有一千多字，woff2 约 400KB。字表同时写到 fonts/zhimangxing-chars.txt。
+玩家自己起的名字里的生僻字仍可能不在子集里，会退回系统行楷 / 楷体。
 """
 import io, os, re, sys, tempfile, urllib.request
 from fontTools import subset
@@ -21,15 +24,15 @@ EXTRA = ("暴击斩破碎灭杀化形元婴离体法则之击金木水火土风�
          "战报令成喜警危胜败级精通里程碑新手任务领取奖励前往"
          "敕突破修为成功率大道尽头飞升服丹开始食物材料矿石种子丹药武器护甲饰品道则特殊货币关闭操作出售全部购买"
          "修行札记境界解锁一览新手任务全部完成引路人前路未完化神而上尚有境炼虚合体大乘真仙金仙太乙大罗道祖试玩到此为止知道了上一步下一步开始修仙选择功法修习中点击切换灵根克制互你感悟查看游戏目标继续"
-         "0123456789+-.%xX!?")
+         "0123456789+-.%xX!?"
+         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz()/:,")
 
 
 def collect():
-    src = io.open(os.path.join(ROOT, 'game.js'), encoding='utf-8').read()
     chars = set(EXTRA)
-    for pat in (r"name: *'([^']+)'", r"line: *'([^']+)'", r"glyph: *'([^']+)'"):
-        for m in re.finditer(pat, src):
-            chars |= set(m.group(1))
+    for name in ('game.js', 'art.js', '凡人修仙放置版.html'):
+        src = io.open(os.path.join(ROOT, name), encoding='utf-8').read()
+        chars |= set(re.findall(r'[　-〿一-鿿＀-￯]', src))
     return ''.join(sorted(c for c in chars if not c.isspace()))
 
 
@@ -40,9 +43,9 @@ def main():
         urllib.request.urlretrieve(URL, ttf)
     text = collect()
     io.open(os.path.join(ROOT, 'fonts', 'zhimangxing-chars.txt'), 'w', encoding='utf-8').write(text)
-    out = os.path.join(ROOT, 'fonts', 'zhimangxing-subset.woff')
+    out = os.path.join(ROOT, 'fonts', 'zhimangxing-subset.woff2')
     opts = subset.Options()
-    opts.flavor = 'woff'
+    opts.flavor = 'woff2'
     opts.layout_features = ['*']
     font = subset.load_font(ttf, opts)
     sub = subset.Subsetter(opts)

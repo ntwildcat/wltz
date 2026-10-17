@@ -16,7 +16,7 @@
             var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', THEMES[t]);
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=13.77">
+    <link rel="stylesheet" href="style.css?v=13.81">
 
 </head>
 <body data-panel="cultivation">
@@ -346,7 +346,7 @@
                                 <!-- 克制预览条 -->
                                 <div id="battleCounterPreview" style="background: rgba(111,156,138,0.1); border: 1px solid var(--jade); border-radius: 4px; padding: 12px; margin-bottom: 15px; display: none;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                        <div style="color: var(--jade); font-weight: bold;">⚡ 克制关系预览</div>
+                                        <div class="sec-title" style="color: var(--jade); font-weight: bold;">⚡ 克制关系预览</div>
                                         <button onclick="showCounterSystemModal()" style="background: rgba(111,156,138,0.2); border: 1px solid var(--jade); color: var(--jade); padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 0.85em;">📖 详情</button>
                                     </div>
                                     <div id="counterInfo" style="color: var(--gold); font-size: 0.9em; line-height: 1.6em;"></div>
@@ -832,7 +832,7 @@
 
             <div class="stat-panel">
                 <div class="stat-row" style="background: rgba(111,156,138,0.1); padding: 15px; margin-bottom: 15px; border-radius: 4px;">
-                    <div style="color: var(--jade); font-weight: bold; margin-bottom: 10px;">📖 克制系统说明</div>
+                    <div class="sec-title" style="color: var(--jade); font-weight: bold; margin-bottom: 10px;">📖 克制系统说明</div>
                     <div style="color: var(--text-l3); font-size: 0.95em; line-height: 1.8;">
                         灵根之间存在相生相克的关系。当你的灵根克制敌人时，伤害提升30%，命中率提升25%。<br/>
                         当你的灵根被敌人克制时，伤害降低20%，命中率降低25%。
@@ -865,7 +865,7 @@
     </div>
 
     <script src="art.js?v=1.5"></script>
-    <script src="game.js?v=14.41"></script>
+    <script src="game.js?v=14.42"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
