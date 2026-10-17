@@ -10254,23 +10254,11 @@
                     const isOwnedArt = item.type === 'art' && (gameState.player.ownedArts || []).includes(item.id);
                     const isLocked = !isOwnedArt && currentRealmIdx < (item.minRealmIndex || 0);
 
+                    // v7.34 商品卡片改成货架上的一格：图标放进按类型着色的光盘，名字毛笔字，价格是一枚价签；已拥有 / 未解锁换状态样式
                     const card = document.createElement('div');
-                    card.className = 'shop-item';
-
-                    let cardStyle = 'padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #555; border-radius: 4px; transition: all 0.3s; text-align: center;';
-                    if (isBought) {
-                        cardStyle += 'opacity: 0.5; background: rgba(0,0,0,0.5); border-color: #888; cursor: not-allowed;';
-                    } else if (isLocked) {
-                        cardStyle += 'opacity: 0.55; border-style: dashed; cursor: not-allowed;';
-                    } else {
-                        cardStyle += 'cursor: pointer;';
-                    }
-                    card.style.cssText = cardStyle;
-
-                    if (!isBought && !isLocked) {
-                        card.onmouseover = () => card.style.borderColor = 'var(--jade)';
-                        card.onmouseout = () => card.style.borderColor = 'var(--border-l3)';
-                    }
+                    card.className = 'shop-item' + (isBought ? ' sh-bought' : isLocked ? ' sh-locked' : '');
+                    const itemCfg = GAME_CONFIG.items[item.id];
+                    card.style.setProperty('--c', item.type === 'art' ? '#5aa8ef' : item.type === 'upgrade' ? '#d8b445' : (itemCfg && ITEM_TYPE_COLORS[itemCfg.type]) || '#b89a5b');
 
                     const priceDisplay = isBought ? '✓ 已拥有'
                         : isOwnedArt ? (gameState.player.currentArt === item.id ? '✓ 当前功法' : '已拥有 · 点击装备')
@@ -10283,10 +10271,10 @@
                         : '';
 
                     card.innerHTML = `
-                        <div style="font-size: 24px; margin-bottom: 5px;">${item.icon}</div>
-                        <div style="font-weight: bold; color: var(--jade); margin-bottom: 3px;">${item.name}</div>
-                        <div style="font-size: 0.8em; color: var(--text-l4); margin-bottom: 8px;">${item.type === 'art' ? getArtShopDesc(item) : item.desc}</div>
-                        <div style="color: ${priceColor}; font-weight: bold;">${priceDisplay}</div>
+                        <div class="sh-icon">${item.icon}</div>
+                        <div class="sh-name">${item.name}</div>
+                        <div class="sh-desc">${item.type === 'art' ? getArtShopDesc(item) : item.desc}</div>
+                        <div class="sh-price" style="color: ${priceColor};">${priceDisplay}</div>
                         ${artExtra}
                     `;
 

@@ -2860,3 +2860,46 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 #cultivationProgress { background-color: #4f9e82; box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.25), inset 0 3px 4px rgba(255, 255, 255, 0.12); -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 0 L94 0 Q97 1 96 3 Q99 4 97 6 Q100 8 95 10 L0 10 Z'/></svg>") right / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 0 L94 0 Q97 1 96 3 Q99 4 97 6 Q100 8 95 10 L0 10 Z'/></svg>") right / 100% 100% no-repeat; }
 #cultivationProgress.full { background-color: #d8a838; }
 #progressText { font-family: var(--font-num); }
+
+/* ==========================================================================
+   v7.34 右侧栏竹简 / 商城货架
+   ========================================================================== */
+/* 右侧栏各块（境界感悟除外，它是札记）：一片竹简——细竖纹 + 双线框，标题毛笔字下面一笔墨，每行用点线连到数值。颜色都走主题变量，四套主题都适用 */
+.side-panel > .stat-panel:not(.lore-journal) { position: relative; border: 1px solid var(--border-l3); border-radius: 2px;
+    background: repeating-linear-gradient(90deg, transparent 0 28px, rgba(127, 110, 80, 0.07) 28px 29px), var(--bg-l2);
+    box-shadow: inset 0 0 0 3px var(--bg-l2), inset 0 0 0 4px color-mix(in srgb, var(--bronze-dim) 55%, transparent); }
+.side-panel > .stat-panel:not(.lore-journal) .stat-title { border-bottom: none; padding-bottom: 2px; margin-bottom: 8px; }
+.side-panel > .stat-panel:not(.lore-journal) .stat-title::after { content: ''; display: block; width: 64px; height: 5px; margin-top: 3px; background: var(--cinnabar, #a8322a); opacity: 0.55; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+.side-panel > .stat-panel .stat-row { position: relative; border-bottom: 1px dotted color-mix(in srgb, var(--bronze-dim) 45%, transparent); }
+.side-panel > .stat-panel .stat-row:last-child { border-bottom: none; }
+
+/* 商城：每件商品是货架上的一格 */
+#panel-shop .shop-item { --c: #b89a5b; position: relative; padding: 14px 12px 12px; text-align: center; cursor: pointer; border-radius: 2px;
+    background: linear-gradient(180deg, var(--bg-l3), var(--bg-l2)); border: 1px solid var(--border-l3);
+    box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--c) 55%, transparent), 0 2px 5px rgba(0, 0, 0, 0.25); transition: transform 0.15s, border-color 0.15s; }
+#panel-shop .shop-item:hover { border-color: var(--c); transform: translateY(-2px); }
+#panel-shop .shop-item.sh-bought, #panel-shop .shop-item.sh-locked { cursor: not-allowed; transform: none; }
+#panel-shop .shop-item.sh-bought { opacity: 0.6; }
+#panel-shop .shop-item.sh-locked { opacity: 0.6; border-style: dashed; }
+#panel-shop .shop-item.sh-locked .sh-icon { filter: grayscale(0.8); }
+.sh-icon { position: relative; width: 58px; height: 58px; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 26px; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--c) 34%, transparent) 0%, color-mix(in srgb, var(--c) 10%, transparent) 55%, transparent 70%); }
+.sh-icon::before { content: ''; position: absolute; inset: 1px; background: var(--c); opacity: 0.65; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M52 6 C79 6 95 27 93 52 C91 77 70 95 47 94 C25 93 6 75 7 50 C8 32 19 16 34 10 L36 15 C23 21 13 34 13 50 C13 71 29 87 48 88 C68 89 85 73 87 52 C89 31 74 12 52 12 Z'/><circle cx='35' cy='12' r='3.2'/></svg>") center / contain no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M52 6 C79 6 95 27 93 52 C91 77 70 95 47 94 C25 93 6 75 7 50 C8 32 19 16 34 10 L36 15 C23 21 13 34 13 50 C13 71 29 87 48 88 C68 89 85 73 87 52 C89 31 74 12 52 12 Z'/><circle cx='35' cy='12' r='3.2'/></svg>") center / contain no-repeat; }
+.sh-icon .ico { position: relative; width: 34px; height: 34px; }
+.sh-name { font-family: var(--font-title); font-size: 1.25em; color: var(--text-l1); letter-spacing: 0.04em; margin-bottom: 3px; }
+.sh-desc { font-size: 0.8em; color: var(--text-l4); margin-bottom: 9px; line-height: 1.55; }
+.sh-price { display: inline-block; font-family: var(--font-num); font-weight: bold; padding: 2px 12px; border: 1px solid currentColor; border-radius: 2px; background: color-mix(in srgb, currentColor 8%, transparent); }
+#panel-shop .shop-item.sh-bought .sh-price { font-family: var(--font-title); font-weight: normal; }
+
+/* 设置页：每组设置同右侧栏的竹简框；勾选框做成一枚小印（勾上是朱红底白勾），下拉框和数字框换成同色系 */
+#panel-settings .stat-panel { position: relative; border: 1px solid var(--border-l3); border-radius: 2px;
+    background: repeating-linear-gradient(90deg, transparent 0 28px, rgba(127, 110, 80, 0.07) 28px 29px), var(--bg-l2);
+    box-shadow: inset 0 0 0 3px var(--bg-l2), inset 0 0 0 4px color-mix(in srgb, var(--bronze-dim) 55%, transparent); }
+#panel-settings .stat-panel .stat-row { border-bottom: 1px dotted color-mix(in srgb, var(--bronze-dim) 45%, transparent); }
+#panel-settings .stat-panel .stat-row:last-child { border-bottom: none; }
+#panel-settings input[type="checkbox"] { -webkit-appearance: none; appearance: none; width: 20px !important; height: 20px !important; margin: 0; flex: none; cursor: pointer;
+    border: 1.5px solid var(--bronze-dim); border-radius: 3px; background: var(--bg-l1); transition: background-color 0.15s, border-color 0.15s; }
+#panel-settings input[type="checkbox"]:checked { border-color: #7a1f18; background: #a8322a url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M4 10.5 Q6 12 8.5 15 Q11 9 16.5 4.5' stroke='%23fff3e6' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / 80% no-repeat;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 236, 214, 0.4); }
+#panel-settings input[type="checkbox"]:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+#panel-settings select, #panel-settings input[type="number"] { background: var(--bg-l1); color: var(--text-l1); border: 1px solid var(--bronze-dim); border-radius: 2px; padding: 4px 8px; font-family: inherit; }
