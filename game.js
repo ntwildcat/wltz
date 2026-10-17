@@ -3404,7 +3404,7 @@
             18: [`⚠ 境界未稳：刚结金丹，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%，之后境界稳固恢复正常`, '⚔️ 结丹对筑基期敌人有大境界压制（命中、伤害更高）', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🗡️ 本命法宝：凑齐「万年雷击木」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青冥剑」。它不占武器栏，炼成即有 2 口飞剑，战斗中每隔几秒「飞剑斩」一击（无视防御）；之后每个大境界都能在炼器页「祭炼」添剑，一路养到道祖 72 口（36 口结两仪剑阵、72 口结周天剑阵）。金丹品质决定飞剑威力（×0.8～×1.2），不限制能养几口', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
             19: ['⚔️ 天劫之地战斗区域开放'],
             21: ['🌌 元婴秘境开放', '👹 结婴心魔：修为满后，突破弹窗里要先「斩心魔」才能冲击元婴。心魔是照着你此刻的实力生出来的——生命、防御、速度与你相同，每次出手比你重两成，换装备它也跟着变；满血、装备好战斗食物再打基本能赢，空手去多半会输。战败损失一半食物，可以重来，打赢一次即可', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🟡 金丹品质会变成元婴品质，决定婴火强度、化神成功率和本命法宝能祭炼到第几重。现在用「金丹淬炼」打磨最快；突破元婴后只能靠「元婴温养」慢慢补（速度是四分之一），化神后彻底定型'],
-            22: ['⚡ 小天劫：元婴、化神期共三道——元婴后期、化神初期、化神后期修为满后，要先在突破弹窗里「渡劫」打赢才能突破。天劫照着你此刻的实力降下，满血、带足食物再渡；渡过一次生命 / 防御永久 +2%', '🌟 修为里程碑：从元婴期起，每个小境界的修为到 25% / 50% / 75% 各得一份感悟奖励（约十分钟打怪的灵石，外加神识；合体期起改给道果），离线也照算', `🛡️ 元婴不灭：秘境战败不再损失修为（食物照常损失一半）；每次进入秘境，第一次被击败时元婴夺舍重生，以 ${NASCENT_REVIVE_HP * 100}% 生命继续战斗`, `🔥 婴火：炼丹、炼器耗时 −${YINGHUO_TIME[0] * 100}%～−${YINGHUO_TIME[1] * 100}%，炼丹翻倍、炼器省料概率 +${YINGHUO_BONUS[0] * 100}%～+${YINGHUO_BONUS[1] * 100}%，元婴品质越高越强（侧栏「境界感悟」显示你的实际数值）`, `⚠ 境界未稳：刚结元婴，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%`, '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
+            22: ['⚡ 小天劫：元婴、化神期共三道——元婴后期、化神初期、化神后期修为满后，要先在突破弹窗里「渡劫」打赢才能突破。天劫照着你此刻的实力降下，满血、带足食物再渡；渡过一次生命 / 防御永久 +2%', '🌟 修为里程碑：从元婴期起，每个小境界的修为到 25% / 50% / 75% 各得一份感悟奖励（约十分钟打怪的灵石，外加神识；合体期起改给道果），离线也照算', `🛡️ 元婴不灭：秘境战败不再损失修为（食物照常损失一半）；每次进入秘境，第一次被击败时元婴夺舍重生，以 ${NASCENT_REVIVE_HP * 100}% 生命继续战斗`, `🔥 婴火：炼丹、炼器耗时 −${YINGHUO_TIME[0] * 100}%～−${YINGHUO_TIME[1] * 100}%，炼丹翻倍、炼器省料概率 +${YINGHUO_BONUS[0] * 100}%～+${YINGHUO_BONUS[1] * 100}%，元婴品质越高越强（侧栏「境界感悟」显示你的实际数值）`, `⚠ 境界未稳：刚结元婴，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%`, '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放', '🏯 可以开宗立派：左侧栏（手机在上方技能栏）出现「宗门」，立派后接宗门任务攒宗门经验与贡献'],
             23: [`💨 瞬移神通：元婴稳固，闪避 +${TELEPORT_DODGE * 100}%`],
             24: ['⚔️ 深渊遗迹战斗区域开放', `📜 化神需要特殊功法：拥有「太虚元神诀」（商城）可让化神成功率 +${HUASHEN_RATE.art * 100}%，可以先攒灵石`],
             25: ['🌠 太虚幻境秘境开放：通关一次即得化神机缘', '💊 化神丹配方解锁，每次冲击化神服一颗', `⚡ 化神成功率极低：基础 ${HUASHEN_RATE.base * 100}% + 元婴品质最多 +${HUASHEN_RATE.quality * 100}% + 拥有「太虚元神诀」+${HUASHEN_RATE.art * 100}% + 通关太虚幻境（机缘）+${HUASHEN_RATE.chance * 100}%；失败耗掉丹药但不掉境界`],
@@ -5718,6 +5718,7 @@
                 if (qy.lastWinAt) qiyuNoteFightSec((winAt - qy.lastWinAt) / 1000);
                 qy.lastWinAt = winAt;
                 const { coins, exp, items, lost, danhuo, shenshi, daoguo } = grantNormalBattleWin(areaKey, battle.currentEnemy.rewardMult || 1);
+                sectNote('win', battle.currentEnemy);
                 if (battle.currentEnemy.elite && Math.random() < ELITE_SHARD_CHANCE) { const got = qiyuAddShard('battle'); if (got) { battleLogEntries.push(`🧩 ${got}`); showNotification(`🧩 击败精英：${got}`, '#c2a25f', 'rare'); } }
                 auto.wins++; auto.coins += coins; auto.exp += exp;
                 battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验${danhuo ? `、${danhuo} 丹火` : ''}${shenshi ? `、${shenshi} 神识` : ''}${daoguo ? `、${daoguo} 道果` : ''}`);
@@ -5846,6 +5847,239 @@
         }
         function dropMapToList(map) {
             return Object.entries(map).map(([id, qty]) => ({ id, qty }));
+        }
+
+        // ==================== 宗门（v7.49 起） ====================
+        // 游戏叫「散修长生录」，所以不做加入宗门，做自立门户：元婴初期起可以开宗立派（开宗仪式复用突破特效），从散修变成一派祖师。
+        // 宗门是一条跟着境界走的并行成长线：宗门经验来自任务，等级同时受境界限制（SECT_LEVELS[].realm），不会一下子全开。
+        // 任务榜：每 4 小时（现实时间）把空位补满到 3 个；同时只能接 1 个（宗门 5 级起 2 个）；花贡献可以把榜上的任务换一个。
+        // 任务进度在线离线都算（离线托管的胜场也算），达成自动完成；供奉类要手动上交。
+        // 奖励：宗门经验 + 贡献，每升一级任务奖励 +15%。贡献目前用于换任务，殿阁 / 外敌来犯 / 宗门商店在后续版本加入。
+        const SECT_REALM = NASCENT_SAFE_REALM;   // 元婴初期
+        const SECT_LEVELS = [
+            { xp: 0, realm: 22 }, { xp: 250, realm: 23 }, { xp: 700, realm: 24 }, { xp: 1400, realm: 26 }, { xp: 2400, realm: 28 },
+            { xp: 3800, realm: 30 }, { xp: 5800, realm: 34 }, { xp: 8500, realm: 38 }, { xp: 12000, realm: 42 }, { xp: 17000, realm: 46 }
+        ];
+        const SECT_BOARD_SIZE = 3, SECT_REFRESH_MS = 4 * 3600 * 1000, SECT_REROLL_COST = 30, SECT_LEVEL_REWARD = 0.15;
+        const SECT_TASK_BASE = { kill: 100, elite: 90, offer: 70, qiyu: 120, dungeon: 150 };
+        const SECT_NAME_A = ['玄', '清', '云', '霞', '松', '鹤', '青', '霄', '明', '归', '太', '紫', '长', '静', '沧'];
+        const SECT_NAME_B = ['宗', '门', '派', '阁', '宫', '谷'];
+
+        function getSect() { return gameState.sect || null; }
+        function isSectUnlocked() { return gameState.player.realmIndex >= SECT_REALM; }
+        function sectLevelInfo() {
+            const s = getSect(), ri = gameState.player.realmIndex;
+            let lv = 1;
+            while (lv < SECT_LEVELS.length && s.xp >= SECT_LEVELS[lv].xp && ri >= SECT_LEVELS[lv].realm) lv++;
+            const next = SECT_LEVELS[lv];
+            return { level: lv, next, blockedByRealm: !!(next && s.xp >= next.xp && ri < next.realm) };
+        }
+        function sectActiveSlots() { return sectLevelInfo().level >= 5 ? 2 : 1; }
+        function sectRewardMult() { return 1 + SECT_LEVEL_REWARD * (sectLevelInfo().level - 1); }
+        function suggestSectName() {
+            return SECT_NAME_A[Math.floor(Math.random() * SECT_NAME_A.length)] + SECT_NAME_A[Math.floor(Math.random() * SECT_NAME_A.length)] + SECT_NAME_B[Math.floor(Math.random() * SECT_NAME_B.length)];
+        }
+
+        // —— 任务生成 ——
+        function sectOfferPick() {
+            const P = gameState.player, pool = [];
+            ['mining', 'farming'].forEach(sk => {
+                Object.entries(GAME_CONFIG.skills[sk].recipes).forEach(([key, r]) => {
+                    if (!r.output || !r.output.items || !r.output.items.length || r.requires) return;
+                    if ((r.requiredRealmIndex || 0) > P.realmIndex || (r.requiredLevel || 1) > (gameState.skills[sk] || {}).level) return;
+                    if (!GAME_CONFIG.items[r.output.items[0].id] || /^seed_|_seed$/.test(r.output.items[0].id)) return;
+                    pool.push({ sk, key, tier: (r.requiredRealmIndex || 0) * 100 + (r.requiredLevel || 1) });
+                });
+            });
+            if (!pool.length) return null;
+            pool.sort((a, b) => a.tier - b.tier);
+            const cand = pool.length > 2 ? pool.slice(Math.max(0, pool.length - 6), pool.length - 1) : pool;   // 不要最高一档：供奉让旧配方继续有用
+            const c = cand[Math.floor(Math.random() * cand.length)];
+            const spec = qiyuYield({ skill: c.sk, action: c.key }, 20), y = spec && spec.y;
+            if (!y || !y.items.length) return null;
+            return { item: y.items[0].id, qty: Math.max(5, Math.min(5000, y.items[0].qty)) };
+        }
+        function sectDungeonPick() {
+            const list = Object.values(GAME_CONFIG.dungeons).filter(d => !d.isTribulation && (d.minRealmIndex || 0) <= gameState.player.realmIndex && (d.monsters || []).length);
+            if (!list.length) return null;
+            list.sort((a, b) => b.minRealmIndex - a.minRealmIndex);
+            return list[Math.floor(Math.random() * Math.min(2, list.length))].id;
+        }
+        function makeSectTask(type) {
+            const t = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), type, progress: 0 };
+            if (type === 'kill') {
+                // 优先挑当前有区域正好是这种地气的词缀，免得接了要干等轮换
+                const present = [...new Set(Object.entries(gameState.skills.battle.actions).filter(([, a]) => isBattleAreaUnlocked(a)).map(([k]) => areaDiqi(k)).filter(Boolean))];
+                const keys = present.length ? present : Object.keys(AFFIXES);
+                t.affix = keys[Math.floor(Math.random() * keys.length)]; t.n = 150;
+            }
+            else if (type === 'elite') t.n = 30;
+            else if (type === 'qiyu') t.n = 2;
+            else if (type === 'offer') { const o = sectOfferPick(); if (!o) return null; Object.assign(t, o); t.n = o.qty; }
+            else if (type === 'dungeon') { const d = sectDungeonPick(); if (!d) return null; t.dungeon = d; t.n = 1; }
+            const reward = Math.round(SECT_TASK_BASE[type] * sectRewardMult());
+            t.xp = reward; t.contrib = reward;
+            return t;
+        }
+        function refillSectBoard() {
+            const s = getSect();
+            const types = Object.keys(SECT_TASK_BASE).sort(() => Math.random() - 0.5);
+            for (const type of types) {
+                if (s.board.length >= SECT_BOARD_SIZE) break;
+                if (s.board.some(t => t.type === type)) continue;
+                const t = makeSectTask(type);
+                if (t) s.board.push(t);
+            }
+        }
+        function tickSectBoard(now = Date.now()) {
+            const s = getSect();
+            if (!s) return false;
+            if (!s.nextRefreshAt) s.nextRefreshAt = now + SECT_REFRESH_MS;
+            if (now < s.nextRefreshAt) return false;
+            refillSectBoard();
+            const periods = Math.floor((now - s.nextRefreshAt) / SECT_REFRESH_MS) + 1;
+            s.nextRefreshAt += periods * SECT_REFRESH_MS;
+            return true;
+        }
+
+        // —— 开宗 ——
+        function foundSect() {
+            if (getSect() || !isSectUnlocked()) return;
+            const input = document.getElementById('sectNameInput');
+            let name = (input && input.value || '').trim().replace(/[<>&"'`]/g, '');
+            if (!name) name = suggestSectName();
+            if (name.length > 8) name = name.slice(0, 8);
+            gameState.sect = { name, foundedAt: Date.now(), xp: 0, contrib: 0, board: [], active: [], done: 0, nextRefreshAt: Date.now() + SECT_REFRESH_MS };
+            refillSectBoard();
+            playBreakthroughEffect(gameState.player.realmIndex, true, true, () => {
+                showQuickCelebration(`🏯 开宗立派：${name}`, { title: name, sub: '开宗立派', seal: '宗' });
+            }, { name: '开宗立派', line: `${name}今日立派，${gameState.player.name || '散修'}自此为一派祖师`, kind: 'nascent', dur: 4.2, sub: name });
+            showNotification(`🏯 ${name}今日开宗立派！宗门页的任务榜已经挂出 ${getSect().board.length} 个任务`, '#c2a25f', 'rare');
+            buildSkillTree();
+            renderSectPanel();
+            saveGame();
+        }
+
+        // —— 接取 / 放弃 / 换 / 上交 ——
+        function acceptSectTask(id) {
+            const s = getSect(), i = s.board.findIndex(t => t.id === id);
+            if (i < 0) return;
+            if (s.active.length >= sectActiveSlots()) { showNotification(`同时只能接 ${sectActiveSlots()} 个任务`, '#c98a3e'); return; }
+            s.active.push(s.board.splice(i, 1)[0]);
+            renderSectPanel(); saveGame();
+        }
+        async function abandonSectTask(id) {
+            const s = getSect(), i = s.active.findIndex(t => t.id === id);
+            if (i < 0) return;
+            if (!await uiConfirm('放弃这个任务？已有的进度不会保留，任务也不会回到榜上。', { title: '放弃任务', danger: true })) return;
+            const j = s.active.findIndex(t => t.id === id);
+            if (j >= 0) s.active.splice(j, 1);
+            renderSectPanel(); saveGame();
+        }
+        function rerollSectTask(id) {
+            const s = getSect(), i = s.board.findIndex(t => t.id === id);
+            if (i < 0) return;
+            if (s.contrib < SECT_REROLL_COST) { showNotification(`贡献不够（需要 ${SECT_REROLL_COST}）`, '#c98a3e'); return; }
+            const others = Object.keys(SECT_TASK_BASE).filter(ty => !s.board.some(t => t.type === ty) && !s.active.some(t => t.type === ty));
+            const type = (others.length ? others : Object.keys(SECT_TASK_BASE))[Math.floor(Math.random() * (others.length || Object.keys(SECT_TASK_BASE).length))];
+            const t = makeSectTask(type);
+            if (!t) { showNotification('暂时没有可换的任务', '#c98a3e'); return; }
+            s.contrib -= SECT_REROLL_COST;
+            s.board[i] = t;
+            renderSectPanel(); saveGame();
+        }
+        function submitSectOffer(id) {
+            const s = getSect(), t = s.active.find(x => x.id === id);
+            if (!t || t.type !== 'offer') return;
+            const have = (gameState.player.inventory.find(i => i.id === t.item) || { qty: 0 }).qty;
+            if (have < t.n) { showNotification(`${GAME_CONFIG.items[t.item].name}不够（${fmtXP(have)}/${fmtXP(t.n)}）`, '#c98a3e'); return; }
+            consumeItem(t.item, t.n);
+            t.progress = t.n;
+            completeSectTask(t);
+        }
+        function completeSectTask(t) {
+            const s = getSect(), before = sectLevelInfo().level;
+            s.active = s.active.filter(x => x.id !== t.id);
+            s.xp += t.xp; s.contrib += t.contrib; s.done = (s.done || 0) + 1;
+            const after = sectLevelInfo().level;
+            showNotification(`🏯 宗门任务完成：${sectTaskTitle(t)}\n宗门经验 +${t.xp} · 贡献 +${t.contrib}`, '#c2a25f', 'rare');
+            if (after > before) showQuickCelebration(`🏯 ${s.name}升到 ${after} 级`, { title: s.name, sub: '宗门升级', seal: cnNum(after) + '级' });
+            renderSectPanel(); buildSkillTree(); saveGame();
+        }
+
+        // —— 进度：由战斗 / 奇遇 / 秘境调用 ——
+        function sectNote(kind, data) {
+            const s = getSect();
+            if (!s || !s.active.length) return;
+            const done = [];
+            s.active.forEach(t => {
+                let add = 0;
+                if (kind === 'win' && t.type === 'kill' && data.affixes && data.affixes.includes(t.affix)) add = 1;
+                if (kind === 'win' && t.type === 'elite' && data.elite) add = 1;
+                if (kind === 'qiyu' && t.type === 'qiyu') add = 1;
+                if (kind === 'dungeon' && t.type === 'dungeon' && t.dungeon === data) add = 1;
+                if (!add) return;
+                t.progress = Math.min(t.n, t.progress + add);
+                if (t.progress >= t.n) done.push(t);
+            });
+            done.forEach(completeSectTask);
+        }
+
+        // —— 文字 ——
+        function sectTaskTitle(t) {
+            if (t.type === 'kill') return `讨伐：击败 ${t.n} 个带「${AFFIXES[t.affix].name}」的敌人`;
+            if (t.type === 'elite') return `清剿：击败 ${t.n} 个精英`;
+            if (t.type === 'qiyu') return `游历：处理 ${t.n} 桩奇遇（离开不算）`;
+            if (t.type === 'offer') return `供奉：上交 ${GAME_CONFIG.items[t.item].icon}${GAME_CONFIG.items[t.item].name} ×${fmtXP(t.n)}`;
+            if (t.type === 'dungeon') return `历练：通关「${GAME_CONFIG.dungeons[t.dungeon].name}」`;
+            return '';
+        }
+        function sectTaskHint(t) {
+            if (t.type === 'kill') {
+                const where = Object.entries(gameState.skills.battle.actions).filter(([k, a]) => isBattleAreaUnlocked(a) && areaDiqi(k) === t.affix).map(([, a]) => a.name);
+                return `${AFFIXES[t.affix].desc}。普通战斗里精英的第二个词缀也算；` + (where.length ? `现在的地气：${where.join('、')}` : `眼下没有区域是这种地气，${fmtLeft(diqiLeftMs())}后轮换`);
+            }
+            if (t.type === 'elite') return `普通战斗里 ${Math.round(ELITE_CHANCE * 100)}% 的敌人是精英，在线离线都算`;
+            if (t.type === 'qiyu') return '修炼、生活技能、战斗时遇到的奇遇，选任一选项即算';
+            if (t.type === 'offer') { const have = (gameState.player.inventory.find(i => i.id === t.item) || { qty: 0 }).qty; return `背包里有 ${fmtXP(have)}，够了就能上交`; }
+            if (t.type === 'dungeon') return '通关一次即可';
+            return '';
+        }
+        function sectTaskCard(t, mode) {
+            const pct = Math.min(100, Math.round(t.progress / t.n * 100));
+            const btns = mode === 'board'
+                ? `<button type="button" class="btn btn-small" onclick="acceptSectTask('${t.id}')">接取</button><button type="button" class="btn btn-small btn-secondary" onclick="rerollSectTask('${t.id}')">换一个（${SECT_REROLL_COST} 贡献）</button>`
+                : (t.type === 'offer' ? `<button type="button" class="btn btn-small" onclick="submitSectOffer('${t.id}')">上交</button>` : '') + `<button type="button" class="btn btn-small btn-secondary" onclick="abandonSectTask('${t.id}')">放弃</button>`;
+            return `<div class="sect-task${mode === 'active' ? ' active' : ''}"><div class="sect-task-title">${sectTaskTitle(t)}</div>
+                <div class="sect-task-hint">${sectTaskHint(t)}</div>
+                ${mode === 'active' && t.type !== 'offer' ? `<div class="sect-task-bar"><i style="width:${pct}%"></i><span>${fmtXP(t.progress)}/${fmtXP(t.n)}</span></div>` : ''}
+                <div class="sect-task-foot"><span>奖励：宗门经验 ${t.xp} · 贡献 ${t.contrib}</span><span class="sect-task-btns">${btns}</span></div></div>`;
+        }
+        function renderSectPanel() {
+            const box = document.getElementById('sectContent');
+            if (!box) return;
+            const s = getSect();
+            if (!s) {
+                box.innerHTML = isSectUnlocked()
+                    ? `<div class="sect-found"><div class="sect-found-title">开宗立派</div>
+                        <div class="sect-found-text">修成元婴，便不再只是一介散修。可以在此立下自己的宗门：接宗门任务攒宗门经验与贡献，宗门等级随之提升（同时受境界限制），每升一级任务奖励 +15%。</div>
+                        <div class="sect-found-row"><input id="sectNameInput" class="sect-name-input" maxlength="8" placeholder="宗门名（最多 8 字）" value="${suggestSectName()}"/><button type="button" class="btn" onclick="foundSect()">🏯 开宗立派</button></div></div>`
+                    : `<div class="sect-found"><div class="sect-found-text">修成元婴（${getRealmName(SECT_REALM)}）后可以开宗立派。</div></div>`;
+                return;
+            }
+            tickSectBoard();
+            const info = sectLevelInfo();
+            const cur = SECT_LEVELS[info.level - 1], next = info.next;
+            const pct = next ? Math.min(100, Math.round((s.xp - cur.xp) / (next.xp - cur.xp) * 100)) : 100;
+            const nextText = !next ? '已满级' : info.blockedByRealm ? `经验已够，${getRealmName(next.realm)}后升到 ${info.level + 1} 级` : `${fmtXP(s.xp)}/${fmtXP(next.xp)}（${info.level + 1} 级还需${getRealmName(next.realm)}）`;
+            const slots = sectActiveSlots();
+            box.innerHTML = `<div class="sect-head"><div class="sect-name">${s.name}</div><div class="sect-meta">宗门 <b>${info.level}</b> 级 · 贡献 <b>${fmtXP(s.contrib)}</b> · 已完成任务 ${s.done || 0}</div>
+                    <div class="sect-xp"><i style="width:${pct}%"></i></div><div class="sect-xp-text">宗门经验 ${nextText} · 任务奖励 ×${sectRewardMult().toFixed(2)}${info.level < 5 ? ' · 5 级起可同时接 2 个任务' : ''}</div></div>
+                <div class="qiyu-sub">进行中（${s.active.length}/${slots}）</div>
+                ${s.active.length ? s.active.map(t => sectTaskCard(t, 'active')).join('') : '<div class="qiyu-empty">还没有接任务，从下面的任务榜里挑一个。</div>'}
+                <div class="qiyu-sub">任务榜（${s.board.length}/${SECT_BOARD_SIZE}）· ${fmtLeft(s.nextRefreshAt - Date.now())}后补满</div>
+                ${s.board.length ? s.board.map(t => sectTaskCard(t, 'board')).join('') : '<div class="qiyu-empty">榜上的任务都接完了，等下一次补充。</div>'}
+                <div class="qiyu-note">任务榜每 4 小时把空位补满到 ${SECT_BOARD_SIZE} 个，离线也照常补。讨伐、清剿、游历、历练的进度在线离线都算，达成自动完成；供奉要手动上交。放弃的任务不回到榜上。</div>`;
         }
 
         // ==================== 敌人词缀、地气与精英（v7.47） ====================
@@ -6412,7 +6646,8 @@
         }
 
         function tickQiyu(dt) {
-            if (++qiyuTickCount % 10 === 0) { qiyuPruneBuffs(); renderQiyuSeal(); if (isQiyuModalOpen()) renderQiyuModal(); tickInjury(); }
+            if (++qiyuTickCount % 10 === 0) { qiyuPruneBuffs(); renderQiyuSeal(); if (isQiyuModalOpen()) renderQiyuModal(); tickInjury();
+                if (getSect()) { const refilled = tickSectBoard(); if (document.body.dataset.panel === 'sect' && (refilled || qiyuTickCount % 100 === 0)) renderSectPanel(); } }
             const act = qiyuActivity();
             if (!act) return;
             const q = getQiyu();
@@ -6548,6 +6783,7 @@
                 const opt = ev.opts[optIndex];
                 if (!opt) return;
                 let result = qiyuApply(opt.spec, ev.id);
+                sectNote('qiyu');
                 if (def && Math.random() < QIYU_SHARD_CHANCE) {
                     const got = qiyuAddShard(def.cat);
                     if (got) result += `\n🧩 意外收获：${got}`;
@@ -6696,6 +6932,7 @@
                     hp.current = battle.playerHP.current <= 0 ? Math.floor(hp.max * 0.5) : Math.min(hp.max, battle.playerHP.current);
                     if (won) {
                         const g = grantNormalBattleWin(areaKey, battle.currentEnemy.rewardMult || 1);
+                        sectNote('win', battle.currentEnemy);
                         if (battle.currentEnemy.elite && Math.random() < ELITE_SHARD_CHANCE) { if (qiyuAddShard('battle')) r.shards = (r.shards || 0) + 1; }
                         r.wins++; r.coins += g.coins; r.exp += g.exp; streak = 0;
                         mergeDrops(r.drops, g.items); mergeDrops(r.lostDrops, g.lost);
@@ -6729,6 +6966,7 @@
         function completeDungeon(dungeonId) {
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
             if (dungeon.isTribulation) { completeTribulation(dungeonId); return; }   // 天劫：渡过一次即可，不循环挑战
+            sectNote('dungeon', dungeonId);
 
             // 隐藏战斗UI
             const battleContainer = document.getElementById('battleContainer');
@@ -8613,6 +8851,9 @@
                 renderEquipmentPanel();
             } else if (panelName === 'settings') {
                 loadSettingsPanel();
+            } else if (panelName === 'sect') {
+                updateSkillTree('sect');
+                renderSectPanel();
             }
         }
 
@@ -8714,6 +8955,13 @@
                 btn.onclick = () => switchPanel(skillName);
                 bar.appendChild(btn);
             });
+            if (isSectUnlocked()) {
+                const sBtn = document.createElement('button');
+                sBtn.className = 'mobile-skill-btn sk-sect' + (current === 'sect' ? ' active' : '');
+                sBtn.innerHTML = `🏯 <b class="msb-name">宗门</b><small class="msb-lv">${getSect() ? 'Lv.' + sectLevelInfo().level : '未立'}</small>`;
+                sBtn.onclick = () => switchPanel('sect');
+                bar.appendChild(sBtn);
+            }
             // 手机顶部栏最前面的「装备」入口（放在最前，免得被挤到横向滚动的看不见处）
             const eqBtn = document.createElement('button');
             eqBtn.className = 'mobile-skill-btn' + (current === 'equipment' ? ' active' : '');
@@ -8767,6 +9015,23 @@
                     placed++;
                 });
             });
+            if (isSectUnlocked()) {
+                const s = getSect(), info = s ? sectLevelInfo() : null;
+                const sep = document.createElement('div');
+                sep.className = 'skill-sep';
+                tree.appendChild(sep);
+                const item = document.createElement('div');
+                item.className = 'skill-item sk-sect' + (activePanel === 'sect' ? ' active' : '');
+                item.id = 'skill-sect';
+                item.setAttribute('role', 'button');
+                item.tabIndex = 0;
+                item.onclick = () => switchPanel('sect');
+                const cur = info ? SECT_LEVELS[info.level - 1] : null, nx = info && info.next;
+                const pct = !info ? 0 : nx ? Math.min(100, Math.round((s.xp - cur.xp) / (nx.xp - cur.xp) * 100)) : 100;
+                item.title = s ? `${s.name}：宗门 ${info.level} 级` : '可以开宗立派';
+                item.innerHTML = `<div class="skill-name">🏯 宗门</div><div class="skill-level">${s ? 'Lv.' + info.level : '未立'}</div><div class="skill-bar"><i style="width:${pct}%"></i></div>`;
+                tree.appendChild(item);
+            }
         }
 
         function updateSkillTree(activeSkill) {
@@ -12483,11 +12748,11 @@
         // force = true：设置里「回放」时使用，即使关闭了突破特效也播放（不传 onDone，回放不触发境界解锁提示）
         // onDone：特效结束（播完 / 被跳过 / 特效被关闭直接跳过）后调用，performBreakthrough 用它来弹境界解锁提示，
         // 不用 setTimeout 猜时长——玩家随时可能点击跳过特效，猜的时长会不准
-        function playBreakthroughEffect(newRealmIndex, major, force = false, onDone = null) {
+        function playBreakthroughEffect(newRealmIndex, major, force = false, onDone = null, override = null) {
             if (!force && gameState.settings && gameState.settings.breakthroughFx === false) { if (onDone) onDone(); return; }
             stopBreakthroughFx();
-            const realmName = getRealmName(newRealmIndex);
-            let cfg = major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null;
+            const realmName = override ? override.sub : getRealmName(newRealmIndex);   // override：开宗仪式等非突破场合借用这套特效
+            let cfg = override || (major ? (BREAKTHROUGH_FX[newRealmIndex] || { name: realmName.slice(0, 2), line: '大道更进一步', kind: 'core', dur: 4.2 }) : null);
             if (cfg && cfg.kind === 'qi') cfg = { ...cfg, line: `${(SPIRIT_ROOT_EFFECTS[gameState.player.spiritRoot] || {}).name || '灵根'}觉醒，引气入体` };
             const dur = major ? cfg.dur : 1.6;
             const peak = major ? (FX_PEAK[cfg.kind] || dur * 0.5) : FX_PEAK.minor;

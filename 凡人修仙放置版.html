@@ -16,7 +16,7 @@
             var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', THEMES[t]);
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=13.95">
+    <link rel="stylesheet" href="style.css?v=13.96">
 
 </head>
 <body data-panel="cultivation">
@@ -328,6 +328,12 @@
                             <div class="skill-exp-header" data-skill="wudao"></div>
                             <div class="law-intro">参悟八种法则，领悟越深，战斗与生活的加成越强。法则等级上限随境界提高；与自己灵根同名的法则参悟更快。参悟会占用主角的行动（分身不能参悟）。</div>
                             <div class="action-list law-list" id="wudaoActions"></div>
+                        </div>
+
+                        <!-- 宗门面板（v7.49） -->
+                        <div id="panel-sect" class="panel-content hidden">
+                            <div class="panel-title">🏯 宗门</div>
+                            <div id="sectContent"></div>
                         </div>
 
                         <!-- 战斗面板 -->
@@ -875,7 +881,7 @@
     </div>
 
     <script src="art.js?v=1.5"></script>
-    <script src="game.js?v=14.59"></script>
+    <script src="game.js?v=14.62"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

@@ -3015,3 +3015,26 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 .diqi-line { margin: 4px 0; font-size: 0.8em; color: var(--text-l2); line-height: 1.5; }
 .diqi-counter { color: var(--text-l4); }
 .injury-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 0 0 10px; padding: 8px 12px; border-left: 3px solid var(--cinnabar-2); background: var(--bg-l2); font-size: 0.88em; color: var(--text-l2); }
+/* v7.49 宗门 */
+.skill-item.sk-sect { --sk: var(--cinnabar-2); }
+.sect-found { padding: 16px; border: 1px solid var(--border-l3); background: var(--bg-l2); border-radius: 3px; }
+.sect-found-title { font-family: var(--font-brush); font-size: 1.8em; color: var(--text-l1); margin-bottom: 8px; }
+.sect-found-text { font-size: 0.9em; color: var(--text-l3); line-height: 1.7; }
+.sect-found-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.sect-name-input { flex: 1; min-width: 140px; padding: 8px 10px; background: var(--bg-l1); border: 1px solid var(--border-l3); color: var(--text-l1); font: inherit; border-radius: 2px; }
+.sect-head { padding: 12px 14px; margin-bottom: 12px; border: 1px solid var(--border-l3); background: var(--bg-l2); border-radius: 3px; }
+.sect-name { font-family: var(--font-brush); font-size: 2em; color: var(--text-l1); letter-spacing: 0.08em; line-height: 1.2; }
+.sect-meta { font-size: 0.88em; color: var(--text-l2); margin: 4px 0 8px; }
+.sect-meta b { color: var(--text-l1); }
+.sect-xp { height: 6px; background: var(--bg-l1); border-radius: 3px; overflow: hidden; }
+.sect-xp i { display: block; height: 100%; background: var(--cinnabar-2); }
+.sect-xp-text { margin-top: 6px; font-size: 0.8em; color: var(--text-l4); }
+.sect-task { padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border-l4); background: var(--bg-l2); border-radius: 2px; }
+.sect-task.active { border-color: var(--bronze-dim); background: var(--bg-l3); }
+.sect-task-title { font-size: 0.95em; color: var(--text-l1); font-weight: bold; }
+.sect-task-hint { margin: 4px 0; font-size: 0.8em; color: var(--text-l4); line-height: 1.5; }
+.sect-task-bar { position: relative; height: 16px; margin: 6px 0; background: var(--bg-l1); border-radius: 2px; overflow: hidden; }
+.sect-task-bar i { display: block; height: 100%; background: var(--jade); opacity: 0.7; }
+.sect-task-bar span { position: absolute; inset: 0; text-align: center; font-size: 0.75em; line-height: 16px; color: var(--text-l1); }
+.sect-task-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.8em; color: var(--text-l2); }
+.sect-task-btns { display: flex; gap: 6px; flex-wrap: wrap; }
