@@ -2298,6 +2298,7 @@
             clearActiveDomain();
             const dungeon = GAME_CONFIG.dungeons[dungeonId];
             gameState.dungeons[dungeonId].completed = true;
+            gameState.dungeons[dungeonId].fails = 0;   // v7.48 连败保底清零
             gameState.dungeons.currentDungeon = null;
             gameState.currentAction = null;
             gameState.currentActionProgress = 0;
@@ -4373,8 +4374,9 @@
         // 秘境：玩家命中怪物的概率（含境界压制、灵根克制、灵根 / 功法命中特效）
         function getDungeonPlayerHit(monster) {
             const playerSPD = gameState.player.stats.spd || 50;
-            const monsterSPD = monster.spd || 40;
+            const monsterSPD = (monster.spd || 40) * (dungeonAffixIs('jifeng') ? DUNGEON_AFFIX_TUNE.jifengSpd : 1);
             let hitChance = BATTLE_FORMULAS.calculateHitChance(playerSPD, monsterSPD);
+            if (dungeonAffixIs('huanshen') && !domainSideDodgeVoid('foe')) hitChance *= 1 - DUNGEON_AFFIX_TUNE.huanshenDodge;   // 秘境劫象·幻身（雷域下失效）
             const monsterRealmIndex = GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon].baseRealmIndex || 0;
             const realmSuppression = REALM_SUPPRESSION.calculate(gameState.player.realmIndex, monsterRealmIndex);
             hitChance *= realmSuppression.hitMod;
@@ -4389,7 +4391,7 @@
         // 秘境：怪物命中玩家的概率（含反向境界压制、克制、玩家闪避特效）
         function getDungeonMonsterHit(monster) {
             const eff = getMonsterEffectiveStats(monster);
-            const monsterSPD = eff.spd || 40;
+            const monsterSPD = (eff.spd || 40) * (dungeonAffixIs('jifeng') ? DUNGEON_AFFIX_TUNE.jifengSpd : 1);
             const playerSPD = gameState.player.stats.spd || 50;
             let hitChance = BATTLE_FORMULAS.calculateHitChance(monsterSPD, playerSPD);
             const monsterRealmIndex = GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon].baseRealmIndex || 0;
@@ -4411,7 +4413,7 @@
 
             if (Math.random() < hitChance) {
                 const baseDmg = gameState.player.stats.atk || 20;
-                let playerDmg = BATTLE_FORMULAS.calculateDamage({ atk: baseDmg }, { def: eff.def || 0 });
+                let playerDmg = BATTLE_FORMULAS.calculateDamage({ atk: baseDmg }, { def: (eff.def || 0) * (dungeonAffixIs('tiebi') ? DUNGEON_AFFIX_TUNE.tiebiDef : 1) });
                 playerDmg = Math.floor(playerDmg * realmSuppression.dmgMod * heavenQi);
                 playerDmg = Math.floor(playerDmg * counterModifier.damage);
                 playerDmg = Math.floor(playerDmg * getBattleSkillDmgMult());   // 战斗技能等级加成
@@ -4420,7 +4422,7 @@
                 if (isCrit) playerDmg = Math.floor(playerDmg * (BASE_CRIT.dmg + getMod('critDmg')));
                 playerDmg = Math.max(1, playerDmg);
 
-                gameState.dungeons.currentMonsterHP -= playerDmg;
+                damageDungeonMonster(playerDmg);
 
                 // P1-1 显示伤害飘字和日志
                 showDamageFloat(-playerDmg, false, isCrit);
@@ -4437,7 +4439,7 @@
             const eff = getMonsterEffectiveStats(monster);
 
             if (Math.random() < hitChance) {
-                const baseDmg = (eff.atk || 10) * getDungeonEnrageMult();   // 秘境久战狂暴
+                const baseDmg = (eff.atk || 10) * getDungeonEnrageMult() * getDungeonPityMult();   // 秘境久战狂暴；连败保底
                 let monsterDmg = baseDmg + Math.random() * baseDmg * 0.3 - baseDmg * 0.15;
 
                 // 玩家防御减伤
@@ -4481,7 +4483,8 @@
             if (gameState.dungeons.currentMonsterIndex < dungeon.monsters.length - 1) {
                 gameState.dungeons.currentMonsterIndex++;
                 const nextMonster = dungeon.monsters[gameState.dungeons.currentMonsterIndex];
-                gameState.dungeons.currentMonsterHP = nextMonster.hp;
+                gameState.dungeons.currentMonsterHP = Math.round(nextMonster.hp * getDungeonPityMult());
+                resetDungeonShield(nextMonster);
                 gameState.dungeons.monsterAttackTimer = 0;
                 gameState.dungeons.battleState = 'monster_dead';
 
@@ -4574,10 +4577,9 @@
 
             // 2. 损失食物（50%；天劫 / 心魔 / 三衰只丢 20%，并记一次失败给下次减弱劫力）
             const foodLossRate = dungeon.isTribulation ? 0.2 : 0.5;
-            if (dungeon.isTribulation) {
-                const rec = gameState.dungeons[dungeonId] || (gameState.dungeons[dungeonId] = { completed: false });
-                rec.fails = (rec.fails || 0) + 1;
-            }
+            const failRec = gameState.dungeons[dungeonId] || (gameState.dungeons[dungeonId] = { completed: false });
+            failRec.fails = (failRec.fails || 0) + 1;   // 天劫：劫力减弱；普通秘境（v7.48）：连败保底
+            const reviewText = dungeonReviewText(dungeonId, monster, { fails: failRec.fails });
             const shuaiCfg = XIAN_SHUAI.find(sh => sh.id === dungeonId);
             let orificeLost = 0, originLost = 0;
             if (shuaiCfg && shuaiCfg.failLoseOrigin && getLawOrigin() > 0) {
@@ -4627,6 +4629,7 @@
                                     (dungeon.isTribulation ? `下次再渡：劫力减弱至 ${Math.round(getTribPityMult(dungeonId) * 100)}%（失败 ${getTribFails(dungeonId)}/${TRIB_PITY.maxFails} 次封顶）\n` : '') +
                                     `血量: ${gameState.player.stats.hp.current}/${gameState.player.stats.hp.max} (+50%)`;
             showNotification(notificationText, '#c4483a', 'danger');
+            setTimeout(() => uiAlert(reviewText, { title: '战败复盘' }), 400);
 
             // === 更新全局死亡统计 ===
             updateGlobalDeathStats(lostCultivation, foodLost);
@@ -5436,7 +5439,7 @@
             }
             // 合体起元气化形、大乘起元婴离体 / 法则之击：定时额外攻击（无视防御）
             tickPeriodicStrikes(gameState.dungeons, timeDelta).forEach(h => {
-                gameState.dungeons.currentMonsterHP -= h.dmg;
+                damageDungeonMonster(h.dmg);
                 showStrikeFloat(h);
                 addBattleLog(`${h.label}：造成${h.dmg}点伤害（无视防御）`, 'player-hit');
             });
@@ -5853,7 +5856,7 @@
         // 精英 0 败。综合战斗收入不对症约 +7%、对症约 +14%（方案约束：新系统叠满不超过 +15%）。
         const AFFIXES = {
             tiebi:    { name: '铁壁', icon: '🛡️', desc: '防御 ×2', counter: '无视防御的周期攻击、火域（双方防御 -30%）' },
-            jifeng:   { name: '疾风', icon: '💨', desc: '速度 +50%', counter: '冰域（双方速度 -30%）、命中加成' },
+            jifeng:   { name: '疾风', icon: '💨', desc: '速度 +50%', counter: '雷域（命中 +20%）、提高速度' },
             huanshen: { name: '幻身', icon: '👥', desc: '闪避 +30%', counter: '雷域（闪避失效）、命中加成' },
             shixue:   { name: '嗜血', icon: '🩸', desc: '造成伤害的 30% 化为自身生命', counter: '闪避（水域）、高防御' },
             gangqi:   { name: '罡气', icon: '🔆', desc: '开场护盾 = 30% 最大生命，2 秒没挨打就回满', counter: '攻速（风域）、多段周期攻击' },
@@ -5942,7 +5945,7 @@
             const domTip = (k, why) => { if (dom) tips.push(`灵域选「${SPIRIT_DOMAINS[k].name}」（${why}）`); };
             (enemy.affixes || []).forEach(k => {
                 if (k === 'tiebi') { if (strikes.length) tips.push(`铁壁挡不住无视防御的周期攻击：你有${strikes.join('、')}`); domTip('fire', '双方防御 -30%'); }
-                if (k === 'jifeng') { domTip('ice', '双方速度 -30%'); tips.push('命中看双方速度差：提高速度（饰品 / 淬炼饰品）能抵消它的速度'); }
+                if (k === 'jifeng') { domTip('thunder', '双方命中 +20%，抵消它的速度'); tips.push('命中看双方速度差：提高速度（饰品 / 淬炼饰品）能抵消它的速度'); }
                 if (k === 'huanshen') { domTip('thunder', '闪避失效'); tips.push('幻身让你更难打中：提高速度能拉高命中率'); }
                 if (k === 'shixue') { domTip('water', '闪避 +15%，挨打少它回血就少'); tips.push('嗜血按它打中你的伤害回血：提高防御（换装备 / 淬炼）能同时压低它的回血'); }
                 if (k === 'gangqi') { domTip('wind', '攻击间隔 -0.5 秒，护盾来不及回满'); tips.push('罡气 2 秒没挨打才回满：提高速度缩短出手间隔，就能一直压着它的护盾'); if (strikes.length) tips.push(`周期攻击能持续压住罡气：你有${strikes.join('、')}`); }
@@ -5966,6 +5969,77 @@
             const diqi = areaDiqi(areaKey);
             if (diqi && (e.affixes || []).includes(diqi)) tips.push(`这里现在是「${AFFIXES[diqi].name}」地气，${fmtLeft(diqiLeftMs())}后轮换，也可以先去别的区域`);
             if (e.elite) tips.push('这是精英（生命 ×1.5、两个词缀），普通敌人会好打得多');
+            if (tips.length) lines.push('\n你可以试：\n' + tips.map(t => '· ' + t).join('\n'));
+            return lines.join('\n');
+        }
+
+        // ==================== 秘境劫象（v7.48） ====================
+        // 元婴圆满起的 8 个普通秘境各有一个固定词缀（入口卡片上提前写明），只用「拖慢击杀」的四种：铁壁 / 疾风 / 幻身 / 罡气。
+        // 秘境每只怪有久战时限（标准击杀用时 × 1.8），这四种词缀实测最多把击杀拖慢约 1.4 倍，标准玩家最慢一只约 1.1 倍 × 1.4 ≈ 1.54 倍，
+        // 仍在时限内：不针对也能通关（只是慢），针对了更快。影响生死的嗜血 / 狂暴 / 反震不放进秘境（生存的标定没法可靠复核）。
+        // 天劫、心魔、三衰、三尸、证道不加词缀：它们各有独立机制和按法则等级标定的通过率。
+        const DUNGEON_AFFIX = {
+            taixuDream: 'gangqi', voidRealm: 'huanshen', tiandaoRealm: 'tiebi', taiyiRealm: 'jifeng',
+            taiqingRealm: 'gangqi', shangqingRealm: 'huanshen', yuqingRealm: 'jifeng', luotianRealm: 'tiebi'
+        };
+        // 秘境里的词缀数值比普通战斗弱：秘境一只怪要打一两分钟、出手慢还会落空，普通战斗的数值在这里会拖慢 1.4～3.5 倍（罡气的护盾会一直回满）
+        const DUNGEON_AFFIX_TUNE = { tiebiDef: 1.5, jifengSpd: 1.3, huanshenDodge: 0.15, gangqiShield: 0.2 };
+        const DUNGEON_AFFIX_DESC = { tiebi: '防御 ×1.5', jifeng: '速度 +30%', huanshen: '闪避 +15%', gangqi: '开场护盾 = 20% 最大生命（打破后不再回满）' };
+        function getDungeonAffix(id = gameState.dungeons && gameState.dungeons.currentDungeon) { return DUNGEON_AFFIX[id] || null; }
+        function dungeonAffixIs(k) { return getDungeonAffix() === k; }
+        function resetDungeonShield(monster) {
+            const D = gameState.dungeons;
+            D.affixShieldMax = dungeonAffixIs('gangqi') ? Math.round(monster.hp * DUNGEON_AFFIX_TUNE.gangqiShield) : 0;
+            D.affixShield = D.affixShieldMax;
+            D.affixNoHit = 0;
+        }
+        function damageDungeonMonster(dmg) {
+            const D = gameState.dungeons;
+            let left = dmg;
+            if (D.affixShield > 0) { const ab = Math.min(D.affixShield, left); D.affixShield -= ab; left -= ab; }
+            D.affixNoHit = 0;
+            D.currentMonsterHP -= left;
+        }
+        function dungeonAffixHtml(id) {
+            const k = getDungeonAffix(id);
+            if (!k) return '';
+            const a = AFFIXES[k];
+            return `<div class="diqi-line" title="应对：${a.counter}">${a.icon} 劫象·${a.name}：所有敌人${DUNGEON_AFFIX_DESC[k]}<br/><span class="diqi-counter">应对：${a.counter}</span></div>`;
+        }
+
+        // 普通秘境连续失败保底（v7.48）：同一秘境每连败一次，敌人攻击与生命 -3%，最多 -15%，通关后清零（天劫另有 TRIB_PITY）
+        const DUNGEON_PITY = { per: 0.03, maxFails: 5 };
+        function getDungeonPityMult(id = gameState.dungeons && gameState.dungeons.currentDungeon) {
+            const d = GAME_CONFIG.dungeons[id];
+            if (!d || d.isTribulation) return 1;
+            const fails = Math.min(DUNGEON_PITY.maxFails, ((gameState.dungeons && gameState.dungeons[id]) || {}).fails || 0);
+            return 1 - DUNGEON_PITY.per * fails;
+        }
+
+        // 秘境 / 天劫战败复盘
+        function dungeonReviewText(dungeonId, monster, info) {
+            const d = GAME_CONFIG.dungeons[dungeonId], D = gameState.dungeons;
+            const lines = [`倒在：${d.name} · 第 ${D.currentMonsterIndex + 1}/${d.monsters.length} 只「${monster.name}」，它还剩 ${Math.max(0, Math.round(D.currentMonsterHP / monster.hp * 100))}% 生命`];
+            const tips = [];
+            if (d.isTribulation) {
+                if (d.mirror && d.mirror.hitFrac) {
+                    const frac = getEffectiveHitFrac(d);
+                    lines.push(`劫力：每击约打掉你 ${Math.round(frac * 100)}% 生命，约 ${Math.ceil(1 / frac)} 击打穿`);
+                    tips.push('天劫按「几击打穿你」定生死：靠食物把血线拉回来，提高闪避 / 速度能少挨几击');
+                } else if (d.isHeartDemon) tips.push('心魔照着你此刻的实力生成：满血进场、带足食物最关键');
+                if (d.tribulationRealm >= 37) tips.push(`法则平均 ${getLawAvgLevel().toFixed(0)} 级，建议 ${d.tribulationRealm >= 41 ? 20 : 10} 级以上，法则越深越稳`);
+                if (d.isTribulation && info.fails) tips.push(`已失败 ${info.fails} 次，下次劫力减弱到 ${Math.round(getTribPityMult(dungeonId) * 100)}%`);
+            } else {
+                const lim = getDungeonEnrageLimit(dungeonId, D.currentMonsterIndex), el = D.monsterElapsed || 0;
+                if (lim) {
+                    lines.push(`久战：这只怪的时限 ${lim} 秒，你打了 ${Math.round(el)} 秒${el > lim ? `，超时 ${Math.round(el - lim)} 秒，它的攻击已经 ×${getDungeonEnrageMult().toFixed(1)}` : ''}`);
+                    if (el > lim) tips.push('输在久战狂暴：输出不够，换当前境界的炼器装备、淬炼、更好的功法，或先去提升境界');
+                }
+                const k = getDungeonAffix(dungeonId);
+                if (k) { lines.push(`劫象：${AFFIXES[k].name}（${DUNGEON_AFFIX_DESC[k]}）`); affixCounterTips({ affixes: [k] }).forEach(t => tips.push(t)); }
+                tips.push(`连败保底：下次进来敌人攻击与生命 -${Math.round((1 - getDungeonPityMult(dungeonId)) * 100)}%（每连败一次 -3%，最多 -15%，通关清零）`);
+            }
+            if (!getFoodCount()) tips.push('身上没有可用的战斗食物了');
             if (tips.length) lines.push('\n你可以试：\n' + tips.map(t => '· ' + t).join('\n'));
             return lines.join('\n');
         }
@@ -6666,6 +6740,7 @@
 
             // 标记秘境为完成
             gameState.dungeons[dungeonId].completed = true;
+            gameState.dungeons[dungeonId].fails = 0;   // v7.48 连败保底清零
             gameState.dungeons.currentDungeon = null;
             gameState.currentAction = null;
             gameState.currentActionProgress = 0;
@@ -10085,6 +10160,8 @@
                         <div class="dg-name">${dungeon.name}</div>
                         <div class="dg-desc">${dungeon.desc}</div>
                         <div class="dg-status" style="color: ${statusColor};">${statusText} · 入口：${requiredRealmName}</div>
+                        ${dungeonAffixHtml(dungeonId)}
+                        ${getDungeonPityMult(dungeonId) < 1 ? `<div class="diqi-line">🛡️ 连败保底：敌人攻击与生命 -${Math.round((1 - getDungeonPityMult(dungeonId)) * 100)}%（通关清零）</div>` : ''}
                         ${dungeonDropHtml(dungeon)}
                     </div>
                     ${record.completed ? '<span class="dg-seal">已通关</span>' : ''}
@@ -10500,6 +10577,8 @@
             // 初始化第一个怪物
             const firstMonster = dungeon.monsters[0];
             gameState.dungeons.currentMonsterHP = firstMonster.hp;
+            if (!dungeon.isTribulation) gameState.dungeons.currentMonsterHP = Math.round(firstMonster.hp * getDungeonPityMult(dungeonId));   // 连败保底
+            resetDungeonShield(firstMonster);
 
             gameState.currentAction = {
                 skill: 'battle',
