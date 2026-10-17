@@ -3886,6 +3886,7 @@
             }
 
             gameState.player.name = name;
+            gameState.createdAt = Date.now();   // v7.56：结局卷轴的「入道至今」
             gameState.player.gender = document.getElementById('playerGender').value;
             gameState.player.origin = origin;
             gameState.player.spiritRoot = spiritRoot;
@@ -6095,6 +6096,47 @@
                 ${sectShopHtml()}`;
         }
 
+        // ==================== 通关与结局（v7.56） ====================
+        // 证道之后突破到道祖（最终境界）即算通关：突破特效与境界说明关掉后弹一次「大道终成」结局卷轴（生涯总结 + 通关印），
+        // 设置页「突破特效回放」里可以回看。通关后游戏照常继续，道祖之后的成长见结局卷轴最后一段。
+        function endingStatsHtml() {
+            const P = gameState.player, D = gameState.dungeons || {};
+            const rows = [];
+            if (gameState.createdAt) rows.push(['入道至今', `${Math.max(1, Math.round((Date.now() - gameState.createdAt) / 86400000))} 天`]);
+            const root = (SPIRIT_ROOT_EFFECTS[P.spiritRoot] || {}).name;
+            if (root) rows.push(['灵根', `${root} · ${(getRootGrade() || {}).name || ''}`]);
+            if (P.provenLaw && LAW_EFFECTS[P.provenLaw]) rows.push(['证道法则', LAW_EFFECTS[P.provenLaw].name]);
+            const trials = Object.values(GAME_CONFIG.dungeons).filter(d => d.isTribulation && D[d.id] && D[d.id].completed).length;
+            rows.push(['渡过的劫数', `${trials} 场（天劫、心魔、衰相、三尸、证道）`]);
+            rows.push(['秘境战败', `${D.totalDeathCount || 0} 次`]);
+            const picks = Object.keys(DAO_PATHS).map(n => daoPathPick(n)).filter(Boolean).map(o => o.name);
+            if (picks.length) rows.push(['道途', picks.join(' · ')]);
+            const s = getSect();
+            if (s) rows.push(['宗门', `${s.name} · ${sectLevelInfo().level} 级 · 完成任务 ${s.done || 0} 个 · 弟子 ${(s.disciples || []).length} 名`]);
+            rows.push(['奇物', `${((gameState.qiyu && gameState.qiyu.relics) || []).length}/${QIYU_RELICS.length} 件`]);
+            rows.push(['成就', `${Object.keys(gameState.achievements || {}).length}/${ACHIEVEMENTS.length} 个`]);
+            return rows.map(([k, v]) => `<div class="ending-row"><span>${k}</span><b>${v}</b></div>`).join('');
+        }
+        function showEnding() {
+            const P = gameState.player;
+            document.getElementById('endingContent').innerHTML = `
+                <div class="ending-title">大道终成</div>
+                <div class="ending-sub">${P.name || '无名散修'}${P.provenLaw && LAW_EFFECTS[P.provenLaw] ? `以${LAW_EFFECTS[P.provenLaw].name}` : ''}证道，成就道祖。自一介凡人起，至此已走到这条路的尽头。</div>
+                <div class="ending-seal">通关</div>
+                <div class="ending-stats">${endingStatsHtml()}</div>
+                <div class="ending-after"><b>之后</b>：游戏照常继续。道祖之后仍可变强——器灵温养、神魂参悟、本源温养没有上限，法则本源可以一直凝结；天道侵蚀与自守道心仍要照看。</div>`;
+            document.getElementById('endingModal').classList.add('show');
+        }
+        function closeEnding() { document.getElementById('endingModal').classList.remove('show'); }
+        function tickEnding() {
+            const P = gameState.player;
+            if (!gameRunning || P.realmIndex < DAOZU_REALM || P.endingSeen) return;
+            if (document.querySelector('.modal.show') || document.querySelector('.fx-overlay')) return;
+            P.endingSeen = Date.now();
+            showEnding();
+            saveGame();
+        }
+
         // ==================== 道途（v7.52） ====================
         // 原来的质变机制都是到境界自动获得。道途在大境界节点三选一一条「道心」：战斗 / 生存 / 生活各一，给机制不给大数值。
         // v7.52 结丹、元婴；v7.53 化神、炼虚、合体、大乘、真仙、大罗；战斗加成在渡劫类战斗里不生效。首次选择免费；之后可以重选，花约 15 分钟打怪收入的灵石（当前最高区域每场灵石 × 600），选完 24 小时内不能再改。
@@ -6799,6 +6841,7 @@
         function tickQiyu(dt) {
             if (++qiyuTickCount % 10 === 0) { qiyuPruneBuffs(); renderQiyuSeal(); if (isQiyuModalOpen()) renderQiyuModal(); tickInjury();
                 tickDaoPathPrompt();
+                tickEnding();
                 if (getSect()) {
                     const sc = getSect(), refilled = tickSectBoard();
                     tickInvasion();
@@ -13264,7 +13307,7 @@
             if (!box) return;
             const reached = Object.keys(BREAKTHROUGH_FX).map(Number).filter(i => i <= gameState.player.realmIndex).sort((a, b) => a - b);
             box.innerHTML = reached.length
-                ? reached.map(i => `<button class="btn btn-secondary fx-replay-btn" onclick="replayBreakthroughFx(${i})">▶ ${BREAKTHROUGH_FX[i].name}<small>${getRealmName(i)}</small></button>`).join('')
+                ? reached.map(i => `<button class="btn btn-secondary fx-replay-btn" onclick="replayBreakthroughFx(${i})">▶ ${BREAKTHROUGH_FX[i].name}<small>${getRealmName(i)}</small></button>`).join('') + (gameState.player.endingSeen ? `<button class="btn btn-secondary fx-replay-btn" onclick="showEnding()">▶ 结局<small>大道终成</small></button>` : '')
                 : '<div class="settings-hint">还没有突破过大境界。突破后可以在这里回放对应的特效。</div>';
         }
 

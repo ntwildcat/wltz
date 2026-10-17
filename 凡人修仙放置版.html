@@ -16,7 +16,7 @@
             var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', THEMES[t]);
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=14.00">
+    <link rel="stylesheet" href="style.css?v=14.01">
 
 </head>
 <body data-panel="cultivation">
@@ -822,6 +822,14 @@
         </div>
     </div>
 
+    <!-- 通关结局（v7.56） -->
+    <div id="endingModal" class="modal">
+        <div class="modal-content scroll-modal ending-modal" role="dialog" aria-modal="true">
+            <div id="endingContent"></div>
+            <button class="btn" onclick="closeEnding()" style="width: 100%; margin-top: 16px;">继续修行</button>
+        </div>
+    </div>
+
     <!-- 功法切换模态框 -->
     <div id="artSwitchModal" class="modal">
         <div class="modal-content art-switch-modal" role="dialog" aria-modal="true" style="max-width: 500px;">
@@ -890,7 +898,7 @@
     </div>
 
     <script src="art.js?v=1.5"></script>
-    <script src="game.js?v=14.71"></script>
+    <script src="game.js?v=14.72"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
