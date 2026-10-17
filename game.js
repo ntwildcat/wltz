@@ -6190,7 +6190,7 @@
         function daoPathHtml() {
             const nodes = Object.keys(DAO_PATHS).filter(n => gameState.player.realmIndex >= DAO_PATHS[n].realm);
             if (!nodes.length) return '';
-            return `<div class="qiyu-sub dao-sub">道途</div>${nodes.map(daoPathNodeHtml).join('')}<div class="qiyu-note">大境界节点三选一一条道心（战斗 / 生存 / 生活各一），永久生效；可以重选，花约 15 分钟打怪的灵石，选完 24 小时内不能再改。战斗类道心在渡劫类战斗（天劫、心魔、衰相、三尸、证道）里不生效。</div>`;
+            return `<div class="qiyu-sub dao-sub">道途</div>${nodes.map(daoPathNodeHtml).join('')}<div class="qiyu-note">大境界节点三选一一条道心（战斗 / 生存 / 生活各一），永久生效；可以重选，花约 15 分钟打怪的灵石，选完 24 小时内不能再改。战斗类道心在渡劫类战斗（天劫、心魔、衰相、三尸、证道）里不生效。${NEW_SYS_CAP_NOTE}</div>`;
         }
         function renderDaoPathModal() {
             const el = document.getElementById('daoPathContent');
@@ -6534,6 +6534,25 @@
             }
             return total;
         }
+        // v7.55 新系统生活加成封顶：奇物 + 殿阁（含弟子）+ 道途对同一项生活加成的合计，耗时最多 -13%（≈ 产出 +15%），
+        // 翻倍 / 节省 / 产出 / 经验最多 +15%（《宗门与玩法改进方案》第 2 节「叠满不超过 +15%」）。单独用哪个都不受影响；
+        // 奇遇的限时机缘是短期奖励，不计入封顶；战斗类加成不封顶（战斗类在渡劫里本就不生效）。
+        const NEW_SYS_LIFE_CAP = { time: -0.13, double: 0.15, save: 0.15, out: 0.15, exp: 0.15 };
+        function newSystemMod(key) {
+            const q = gameState.qiyu;
+            const relic = q && q.relics && q.relics.length ? (qiyuRelicTotals()[key] || 0) : 0;
+            let perm = relic + getSectMod(key) + getDaoPathMod(key);
+            const i = key.indexOf(':'), cap = i > 0 ? NEW_SYS_LIFE_CAP[key.slice(0, i)] : undefined;
+            if (cap !== undefined) perm = cap < 0 ? Math.max(cap, perm) : Math.min(cap, perm);
+            return perm + (getQiyuMod(key) - relic);   // getQiyuMod = 奇物 + 机缘，这里只把机缘加回来
+        }
+        function newSystemLifeCapped(key) {
+            const q = gameState.qiyu;
+            const relic = q && q.relics && q.relics.length ? (qiyuRelicTotals()[key] || 0) : 0;
+            const raw = relic + getSectMod(key) + getDaoPathMod(key), cap = NEW_SYS_LIFE_CAP[key.split(':')[0]];
+            return cap !== undefined && (cap < 0 ? raw < cap : raw > cap);
+        }
+        const NEW_SYS_CAP_NOTE = '奇物、殿阁（含弟子）、道途给同一项生活加成合计封顶：耗时最多 -13%，翻倍 / 节省 / 产出 / 经验最多 +15%（奇遇的限时机缘不算在内）。';
         function qiyuActiveBuffs() {
             const now = Date.now();
             return (gameState.qiyu && gameState.qiyu.buffs || []).filter(b => b.until > now);
@@ -6972,7 +6991,7 @@
             if (!el) return;
             const q = getQiyu();
             el.innerHTML = `<div class="qiyu-sub">待处理（${q.pending.length}/${QIYU_MAX_PENDING}）</div>${qiyuCardsHtml()}${qiyuBuffsHtml()}${qiyuRelicsHtml()}
-                <div class="qiyu-note">修炼、做生活技能或战斗时会遇到奇遇：在线平均每 1.5 小时一桩，离线平均每 2 小时一桩，最多积攒 ${QIYU_MAX_PENDING} 桩，攒满后不再遇到新的。限时机缘按现实时间计时，离线期间照常生效。奇遇分五类，残片按奇遇的类别归类，同类攒满 ${QIYU_SHARDS_PER_RELIC} 枚合成该类一件还没有的奇物，奇物永久生效。</div>`;
+                <div class="qiyu-note">修炼、做生活技能或战斗时会遇到奇遇：在线平均每 1.5 小时一桩，离线平均每 2 小时一桩，最多积攒 ${QIYU_MAX_PENDING} 桩，攒满后不再遇到新的。限时机缘按现实时间计时，离线期间照常生效。奇遇分五类，残片按奇遇的类别归类，同类攒满 ${QIYU_SHARDS_PER_RELIC} 枚合成该类一件还没有的奇物，奇物永久生效。${NEW_SYS_CAP_NOTE}</div>`;
         }
         function isQiyuModalOpen() { const m = document.getElementById('qiyuModal'); return !!(m && m.classList.contains('show')); }
         function openQiyuModal() {
@@ -7934,7 +7953,7 @@
                 const note = (!cur ? '首次选择免费' : left > 0 ? `${fmtLeft(left)}后可再换` : `换形制 ${SECT_HALL_SWITCH_COST} 贡献`) + (dis ? ` · ${dis.name}驻守，好处 +${Math.round(discipleBonus(dis, h) * 100)}%` : '');
                 const forms = Object.entries(cfg.forms).map(([id, f]) => `<button type="button" class="hall-form${cur === id ? ' on' : ''}" onclick="chooseSectHall('${h}', '${id}')"><b>${f.name}</b><span>${hallEffectText(f)}</span></button>`).join('');
                 return `<div class="hall"><div class="hall-head">${cfg.icon} ${cfg.name}<span>${note}</span></div><div class="hall-forms${h === 'yanwu' ? ' many' : ''}">${forms}</div></div>`;
-            }).join('') + `<div class="qiyu-note">战斗伤害、受到的伤害、灵域专精这些战斗效果在渡劫类战斗（天劫、心魔、衰相、三尸、证道）里不生效。</div>`;
+            }).join('') + `<div class="qiyu-note">战斗伤害、受到的伤害、灵域专精这些战斗效果在渡劫类战斗（天劫、心魔、衰相、三尸、证道）里不生效。${NEW_SYS_CAP_NOTE}${(() => { const capped = ['time:alchemy', 'time:forging', 'time:farming', 'time:mining', 'double:mining', 'double:farming', 'save:alchemy', 'save:forging'].filter(newSystemLifeCapped); return capped.length ? ` <span class="hall-bad">现在已封顶：${[...new Set(capped.map(k => qiyuSkillName(k.split(':')[1])))].join('、')}</span>` : ''; })()}</div>`;
         }
 
 
@@ -8461,9 +8480,7 @@
             total += getAvatarMod(key);   // 化神期身外化身：永久小幅 +攻击/防御
             total += getXianMod(key);   // 真仙：道体（每个亮着的仙窍生命 / 防御 +1%）与三衰
             total += getEndlessMod(key);   // 大乘以后的无上限修炼：器灵温养 / 神魂参悟 / 本源温养
-            total += getQiyuMod(key);   // 奇遇的限时机缘与奇物
-            total += getSectMod(key);   // 宗门殿阁
-            total += getDaoPathMod(key);   // 道途
+            total += newSystemMod(key);   // 奇遇机缘 / 奇物 / 宗门殿阁与弟子 / 道途（生活类合计封顶，见 NEW_SYS_LIFE_CAP）
             return total;
         }
 
