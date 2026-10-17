@@ -746,44 +746,49 @@
                         golden_sword: { name: '结丹剑', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldensword', qty: 1 }], skill: 'forging', exp: 220 }, requiredLevel: 25, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
                         golden_armor: { name: '结丹法袍', desc: '灵矿石 ×5 + 玄晶 ×2', duration: 60, output: { items: [{ id: 'goldenarmor', qty: 1 }], skill: 'forging', exp: 260 }, requiredLevel: 27, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
                         golden_pendant: { name: '结丹佩', desc: '灵晶 ×1 + 玄晶 ×3', duration: 50, output: { items: [{ id: 'goldenpendant', qty: 1 }], skill: 'forging', exp: 300 }, requiredLevel: 30, requires: { spiritcrystal: 1, crystal: 3 }, unlocked: false },
-                        life_sword: { name: '青冥剑（本命法宝）', desc: '万年雷击木 ×2 + 灵晶 ×2 + 玄晶 ×3｜结丹后可炼，一生仅此一把、不可出售；之后每个大境界可在这里祭炼一重，金丹品质越高威力越大、能祭炼的重数越多', duration: 120, output: { items: [{ id: 'lifesword', qty: 1 }], skill: 'forging', exp: 450 }, requiredLevel: 28, requiredRealmIndex: 18, unique: true, requires: { jinleizhu: 2, spiritcrystal: 2, crystal: 3 }, unlocked: false },
+                        life_sword: { name: '青冥剑（本命法宝）', desc: '万年雷击木 ×2 + 灵晶 ×2 + 玄晶 ×3｜结丹后可炼，一生仅此一套；不占武器栏，炼成即有 2 口飞剑，战斗中定时飞剑斩敌，之后在这里按境界祭炼添剑', duration: 120, output: { lifeForge: 1, skill: 'forging', exp: 450 }, requiredLevel: 28, requiredRealmIndex: 18, unique: true, requires: { jinleizhu: 2, spiritcrystal: 2, crystal: 3 }, unlocked: false },
+                        life_refine_jiedan: { name: '祭炼青冥剑·结丹', desc: '灵矿石 ×5 + 玄晶 ×2｜每次添 2 口飞剑，这一档从 2 口祭到 6 口', duration: 60, output: { lifeRefine: 1, skill: 'forging', exp: 260 }, requiredLevel: 28, requiredRealmIndex: 18, requires: { spiritore: 5, crystal: 2 }, unlocked: false },
                         yuanying_sword: { name: '元婴灵剑', desc: '灵晶 ×3 + 玄晶 ×5', duration: 90, output: { items: [{ id: 'yuanyingsword', qty: 1 }], skill: 'forging', exp: 500 }, requiredLevel: 36, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
-                        // 祭炼本命法宝（lifeRefine = 祭炼到第几重）：材料与同境界武器相同再加一根金雷竹，每重只做一次
-                        life_refine_1: { name: '祭炼青冥剑·一重', desc: '万年雷击木 ×1 + 灵晶 ×3 + 玄晶 ×5｜本命法宝攻击升至元婴级（任何品质的金丹都能炼）', duration: 90, output: { lifeRefine: 1, skill: 'forging', exp: 500 }, requiredLevel: 36, requiredRealmIndex: 22, requires: { jinleizhu: 1, spiritcrystal: 3, crystal: 5 }, unlocked: false },
+                        life_refine_yuanying: { name: '祭炼青冥剑·元婴', desc: '灵晶 ×3 + 玄晶 ×5｜每次添 2 口飞剑，这一档从 6 口祭到 12 口', duration: 90, output: { lifeRefine: 2, skill: 'forging', exp: 500 }, requiredLevel: 36, requiredRealmIndex: 22, requires: { spiritcrystal: 3, crystal: 5 }, unlocked: false },
                         yuanying_armor: { name: '元婴法衣', desc: '灵晶 ×4 + 玄晶 ×4', duration: 90, output: { items: [{ id: 'yuanyingarmor', qty: 1 }], skill: 'forging', exp: 560 }, requiredLevel: 39, requires: { spiritcrystal: 4, crystal: 4 }, unlocked: false },
                         yuanying_pendant: { name: '元婴佩', desc: '灵晶 ×2 + 仙矿 ×1', duration: 80, output: { items: [{ id: 'yuanyingpendant', qty: 1 }], skill: 'forging', exp: 620 }, requiredLevel: 40, requires: { spiritcrystal: 2, immortalore: 1 }, unlocked: false },
                         huashen_sword: { name: '化神剑', desc: '混沌石 ×3 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashensword', qty: 1 }], skill: 'forging', exp: 800 }, requiredLevel: 45, requires: { chaosstone: 3, immortalore: 2 }, unlocked: false },
-                        life_refine_2: { name: '祭炼青冥剑·二重', desc: '万年雷击木 ×1 + 混沌石 ×3 + 仙矿 ×2｜本命法宝攻击升至化神级', duration: 110, output: { lifeRefine: 2, skill: 'forging', exp: 800 }, requiredLevel: 45, requiredRealmIndex: 26, requires: { jinleizhu: 1, chaosstone: 3, immortalore: 2 }, unlocked: false },
+                        life_refine_huashen: { name: '祭炼青冥剑·化神', desc: '混沌石 ×3 + 仙矿 ×2｜每次添 2 口飞剑，这一档从 12 口祭到 18 口', duration: 110, output: { lifeRefine: 3, skill: 'forging', exp: 800 }, requiredLevel: 45, requiredRealmIndex: 26, requires: { chaosstone: 3, immortalore: 2 }, unlocked: false },
                         huashen_armor: { name: '化神法衣', desc: '混沌石 ×4 + 仙矿 ×2', duration: 110, output: { items: [{ id: 'huashenarmor', qty: 1 }], skill: 'forging', exp: 880 }, requiredLevel: 48, requires: { chaosstone: 4, immortalore: 2 }, unlocked: false },
                         huashen_pendant: { name: '化神佩', desc: '混沌石 ×2 + 灵晶 ×3', duration: 100, output: { items: [{ id: 'huashenpendant', qty: 1 }], skill: 'forging', exp: 950 }, requiredLevel: 50, requires: { chaosstone: 2, spiritcrystal: 3 }, unlocked: false },
                         heti_sword: { name: '合体剑', desc: '天道石 ×3 + 混沌石 ×2', duration: 150, output: { items: [{ id: 'hetisword', qty: 1 }], skill: 'forging', exp: 2400 }, requiredLevel: 64, requires: { daostone: 3, chaosstone: 2 }, unlocked: false },
-                        life_refine_4: { name: '祭炼青冥剑·四重', desc: '万年雷击木 ×1 + 天道石 ×3 + 混沌石 ×2｜本命法宝攻击升至合体级（须中品以上金丹）', duration: 150, output: { lifeRefine: 4, skill: 'forging', exp: 2400 }, requiredLevel: 64, requiredRealmIndex: 34, requires: { jinleizhu: 1, daostone: 3, chaosstone: 2 }, unlocked: false },
+                        life_refine_heti: { name: '祭炼青冥剑·合体', desc: '天道石 ×3 + 混沌石 ×2｜每次添 2 口飞剑，这一档从 24 口祭到 30 口', duration: 150, output: { lifeRefine: 5, skill: 'forging', exp: 2400 }, requiredLevel: 64, requiredRealmIndex: 34, requires: { daostone: 3, chaosstone: 2 }, unlocked: false },
                         heti_armor: { name: '合体法衣', desc: '天道石 ×4 + 混沌石 ×2', duration: 150, output: { items: [{ id: 'hetiarmor', qty: 1 }], skill: 'forging', exp: 2600 }, requiredLevel: 65, requires: { daostone: 4, chaosstone: 2 }, unlocked: false },
                         heti_pendant: { name: '合体佩', desc: '天道石 ×2 + 灵晶 ×3', duration: 140, output: { items: [{ id: 'hetipendant', qty: 1 }], skill: 'forging', exp: 2800 }, requiredLevel: 66, requires: { daostone: 2, spiritcrystal: 3 }, unlocked: false },
                         // 炼虚期炼器（索引64-66解锁）
                         lianxu_sword: { name: '炼虚剑', desc: '虚晶 ×3 + 混沌石 ×3', duration: 130, output: { items: [{ id: 'lianxusword', qty: 1 }], skill: 'forging', exp: 1100 }, requiredLevel: 56, requires: { voidcrystal: 3, chaosstone: 3 }, unlocked: false },
-                        life_refine_3: { name: '祭炼青冥剑·三重', desc: '万年雷击木 ×1 + 虚晶 ×3 + 混沌石 ×3｜本命法宝攻击升至炼虚级（下品金丹的上限）', duration: 130, output: { lifeRefine: 3, skill: 'forging', exp: 1100 }, requiredLevel: 56, requiredRealmIndex: 30, requires: { jinleizhu: 1, voidcrystal: 3, chaosstone: 3 }, unlocked: false },
+                        life_refine_lianxu: { name: '祭炼青冥剑·炼虚', desc: '虚晶 ×3 + 混沌石 ×3｜每次添 2 口飞剑，这一档从 18 口祭到 24 口', duration: 130, output: { lifeRefine: 4, skill: 'forging', exp: 1100 }, requiredLevel: 56, requiredRealmIndex: 30, requires: { voidcrystal: 3, chaosstone: 3 }, unlocked: false },
                         lianxu_armor: { name: '炼虚法衣', desc: '虚晶 ×4 + 混沌石 ×3', duration: 130, output: { items: [{ id: 'lianxuarmor', qty: 1 }], skill: 'forging', exp: 1200 }, requiredLevel: 59, requires: { voidcrystal: 4, chaosstone: 3 }, unlocked: false },
                         lianxu_pendant: { name: '炼虚佩', desc: '虚晶 ×2 + 灵晶 ×4', duration: 120, output: { items: [{ id: 'lianxupendant', qty: 1 }], skill: 'forging', exp: 1300 }, requiredLevel: 60, requires: { voidcrystal: 2, spiritcrystal: 4 }, unlocked: false },
                         // 大乘期炼器（索引76-80解锁）
                         dacheng_sword: { name: '大乘剑', desc: '鸿蒙精华 ×4 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengsword', qty: 1 }], skill: 'forging', exp: 3400 }, requiredLevel: 76, requires: { taiyiessence: 4, chaosstone: 4 }, unlocked: false },
-                        life_refine_5: { name: '祭炼青冥剑·五重', desc: '万年雷击木 ×1 + 鸿蒙精华 ×4 + 混沌石 ×4｜本命法宝攻击升至大乘级（须上品以上金丹）', duration: 180, output: { lifeRefine: 5, skill: 'forging', exp: 3400 }, requiredLevel: 76, requiredRealmIndex: 38, requires: { jinleizhu: 1, taiyiessence: 4, chaosstone: 4 }, unlocked: false },
+                        life_refine_dacheng: { name: '祭炼青冥剑·大乘', desc: '鸿蒙精华 ×4 + 混沌石 ×4｜每次添 2 口飞剑，这一档从 30 口祭到 36 口（满 36 口结成两仪剑阵）', duration: 180, output: { lifeRefine: 6, skill: 'forging', exp: 3400 }, requiredLevel: 76, requiredRealmIndex: 38, requires: { taiyiessence: 4, chaosstone: 4 }, unlocked: false },
                         dacheng_armor: { name: '大乘法衣', desc: '鸿蒙精华 ×5 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengarmor', qty: 1 }], skill: 'forging', exp: 3600 }, requiredLevel: 78, requires: { taiyiessence: 5, chaosstone: 4 }, unlocked: false },
                         dacheng_pendant: { name: '大乘佩', desc: '鸿蒙精华 ×3 + 灵晶 ×5', duration: 170, output: { items: [{ id: 'dachengpendant', qty: 1 }], skill: 'forging', exp: 3800 }, requiredLevel: 80, requires: { taiyiessence: 3, spiritcrystal: 5 }, unlocked: false },
                         // 真仙装备（v7.17）：炼器已满级，改由境界解锁；属性约为大乘装备的 1.35 倍
                         xian_sword: { name: '真仙剑', desc: '仙灵晶 ×4 + 鸿蒙精华 ×3', duration: 200, output: { items: [{ id: 'xiansword', qty: 1 }], skill: 'forging', exp: 4200 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 4, taiyiessence: 3 }, unlocked: false },
+                        life_refine_xian: { name: '祭炼青冥剑·真仙', desc: '仙灵晶 ×4 + 鸿蒙精华 ×3｜每次添 2 口飞剑，这一档从 36 口祭到 42 口', duration: 200, output: { lifeRefine: 7, skill: 'forging', exp: 4200 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 4, taiyiessence: 3 }, unlocked: false },
                         xian_armor: { name: '真仙法衣', desc: '仙灵晶 ×5 + 混沌石 ×4', duration: 200, output: { items: [{ id: 'xianarmor', qty: 1 }], skill: 'forging', exp: 4400 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 5, chaosstone: 4 }, unlocked: false },
                         xian_pendant: { name: '真仙佩', desc: '仙灵晶 ×3 + 灵晶 ×5', duration: 190, output: { items: [{ id: 'xianpendant', qty: 1 }], skill: 'forging', exp: 4600 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 3, spiritcrystal: 5 }, unlocked: false },
                         // 金仙 / 太乙装备（v7.23）：各约为上一境界装备的 1.35 倍
                         jinxian_sword: { name: '金仙剑', desc: '仙金 ×4 + 仙灵晶 ×3', duration: 215, output: { items: [{ id: 'jinxiansword', qty: 1 }], skill: 'forging', exp: 5000 }, requiredLevel: 80, requiredRealmIndex: 44, requires: { xianjin: 4, xianlingjing: 3 }, unlocked: false },
+                        life_refine_jinxian: { name: '祭炼青冥剑·金仙', desc: '仙金 ×4 + 仙灵晶 ×3｜每次添 2 口飞剑，这一档从 42 口祭到 48 口', duration: 215, output: { lifeRefine: 8, skill: 'forging', exp: 5000 }, requiredLevel: 80, requiredRealmIndex: 44, requires: { xianjin: 4, xianlingjing: 3 }, unlocked: false },
                         jinxian_armor: { name: '金仙法衣', desc: '仙金 ×5 + 混沌石 ×4', duration: 215, output: { items: [{ id: 'jinxianarmor', qty: 1 }], skill: 'forging', exp: 5200 }, requiredLevel: 80, requiredRealmIndex: 44, requires: { xianjin: 5, chaosstone: 4 }, unlocked: false },
                         jinxian_pendant: { name: '金仙佩', desc: '仙金 ×3 + 灵晶 ×5', duration: 205, output: { items: [{ id: 'jinxianpendant', qty: 1 }], skill: 'forging', exp: 5400 }, requiredLevel: 80, requiredRealmIndex: 44, requires: { xianjin: 3, spiritcrystal: 5 }, unlocked: false },
                         taiyi_sword: { name: '太乙剑', desc: '玉魄 ×4 + 仙金 ×3', duration: 230, output: { items: [{ id: 'taiyisword', qty: 1 }], skill: 'forging', exp: 6000 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 4, xianjin: 3 }, unlocked: false },
+                        life_refine_taiyi: { name: '祭炼青冥剑·太乙', desc: '玉魄 ×4 + 仙金 ×3｜每次添 2 口飞剑，这一档从 48 口祭到 56 口', duration: 230, output: { lifeRefine: 9, skill: 'forging', exp: 6000 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 4, xianjin: 3 }, unlocked: false },
                         taiyi_armor: { name: '太乙法衣', desc: '玉魄 ×5 + 仙灵晶 ×4', duration: 230, output: { items: [{ id: 'taiyiarmor', qty: 1 }], skill: 'forging', exp: 6200 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 5, xianlingjing: 4 }, unlocked: false },
                         taiyi_pendant: { name: '太乙佩', desc: '玉魄 ×3 + 灵晶 ×6', duration: 220, output: { items: [{ id: 'taiyipendant', qty: 1 }], skill: 'forging', exp: 6400 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 3, spiritcrystal: 6 }, unlocked: false },
                         daluo_sword: { name: '大罗剑', desc: '玄黄精 ×4 + 玉魄 ×3', duration: 245, output: { items: [{ id: 'daluosword', qty: 1 }], skill: 'forging', exp: 7000 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 4, yupo: 3 }, unlocked: false },
+                        life_refine_daluo: { name: '祭炼青冥剑·大罗', desc: '玄黄精 ×4 + 玉魄 ×3｜每次添 2 口飞剑，这一档从 56 口祭到 64 口', duration: 245, output: { lifeRefine: 10, skill: 'forging', exp: 7000 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 4, yupo: 3 }, unlocked: false },
                         daluo_armor: { name: '大罗法衣', desc: '玄黄精 ×5 + 仙金 ×4', duration: 245, output: { items: [{ id: 'daluoarmor', qty: 1 }], skill: 'forging', exp: 7200 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 5, xianjin: 4 }, unlocked: false },
                         daluo_pendant: { name: '大罗佩', desc: '玄黄精 ×3 + 灵晶 ×7', duration: 235, output: { items: [{ id: 'daluopendant', qty: 1 }], skill: 'forging', exp: 7400 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 3, spiritcrystal: 7 }, unlocked: false },
+                        life_refine_daozu: { name: '祭炼青冥剑·道祖', desc: '玄黄精 ×6 + 玉魄 ×4｜每次添 2 口飞剑，这一档从 64 口祭到 72 口（满 72 口结成周天剑阵）', duration: 260, output: { lifeRefine: 11, skill: 'forging', exp: 8000 }, requiredLevel: 80, requiredRealmIndex: 50, requires: { xuanhuang: 6, yupo: 4 }, unlocked: false },
                     },
                     actions: {}
                 },
@@ -1019,7 +1024,7 @@
                 spiritarmor: { name: '灵甲', icon: '🛡️', type: 'armor', sellPrice: 160, stats: { def: 16, hp: 30 } },
                 goldensword: { name: '结丹剑', icon: '🗡️', type: 'weapon', sellPrice: 260, stats: { atk: 62 } },
                 goldenpendant: { name: '结丹佩', icon: '📿', type: 'jewelry', sellPrice: 300, stats: { spd: 6, hp: 40 } },
-                lifesword: { name: '青冥剑', icon: '🗡️', type: 'weapon', sellPrice: 0, stats: { atk: 68, spd: 3 } },  // 本命法宝：不可出售；stats 由 refreshLifeTreasureStats() 按境界与金丹品质实时改写
+                lifesword: { name: '青冥剑（旧版）', icon: '🗡️', type: 'special', sellPrice: 0 },  // v7.37 前的本命法宝是一把武器；读档时 migrateLifeSword 会把它挪进本命栏，这里只为兼容老存档
                 jinleizhu: { name: '万年雷击木', icon: '🪵', type: 'material', sellPrice: 600 },
                 // 五行之精（v7.06）：虚界秘境掉落，补全五行灵根用
                 jin_essence: { name: '庚金之精', icon: '🟡', type: 'material', sellPrice: 1500 },
@@ -1422,7 +1427,7 @@
             if (typeof P.fiveRoots !== 'boolean') P.fiveRoots = P.realmIndex >= 30;   // 已经飞升的老存档视为补过
             syncFiveRootsRecipe();
             if (!P.btFails) P.btFails = {};
-            if (typeof P.lifeTreasureTier !== 'number') P.lifeTreasureTier = 0;
+            migrateLifeSword();   // v7.37 本命法宝改版：旧的青冥剑武器挪进本命栏
             if (P.activeDomain === undefined) P.activeDomain = null;
             if (typeof P.avatarLevel !== 'number') P.avatarLevel = 0;
             if (!P.temper) P.temper = { weapon: 0, armor: 0, jewelry: 0 };
@@ -3072,6 +3077,7 @@
 
         // 战斗中定时触发的额外攻击（都无视防御，乘战斗技能等级加成）：合体的元气化形、大乘的元婴离体与法则之击
         const PERIODIC_STRIKES = [
+            { key: 'lifeSword', label: '🗡️ 飞剑斩', interval: () => getLifeSwordInterval(), mult: () => getLifeSwordMult() },   // v7.37 本命法宝
             { key: 'qiForm', label: '🌀 元气化形', interval: QI_FORM.interval, mult: () => getQiFormMult() },
             { key: 'nascent', label: '👶 元婴离体', interval: NASCENT_STRIKE.interval, mult: () => getNascentStrikeMult() },
             { key: 'lawStrike', label: '☯️ 法则之击', interval: () => getLawStrikeInterval(), mult: () => getLawStrikeMult(), erosion: true },
@@ -3148,41 +3154,83 @@
         }
         const BREAKTHROUGH_RATE_NAMES = { 13: '筑基', 17: '结丹', 21: '元婴', 25: '化神' };
 
-        // 本命法宝「青竹蜂云剑」：唯一、不可出售。不会自己变强——原著韩立是不断用金雷竹祭炼、一把把加上去的：
-        // 结丹期炼成（初成），之后每个大境界在炼器页「祭炼」一重，攻击升到该境界炼器武器的水平再乘金丹品质倍数。
-        // 金丹品质决定最多能祭炼几重（原著"本命法宝品质决定战力上限"）；祭炼到顶后，更高境界改用普通炼器武器。
-        const LIFE_TREASURE_ID = 'lifesword';
-        const LIFE_REFINE_TIERS = [
-            { name: '初成', atk: 62, realm: 18 },
-            { name: '一重', atk: 80, realm: 22 },
-            { name: '二重', atk: 110, realm: 26 },
-            { name: '三重', atk: 150, realm: 30 },
-            { name: '四重', atk: 220, realm: 34 },
-            { name: '五重', atk: 320, realm: 38 }
+        // 本命法宝「青冥剑」（v7.37 改版）。原著里本命飞剑是一整套、靠一口口祭炼添上去的；旧版只是一把「攻击高 10%～50% 的武器」，
+        // 占武器栏、把炼器武器架空，到大乘五重封顶后（真仙起）还不如同阶炼器剑，金丹品质又一次性卡死能祭几重。现在：
+        // · 不占武器栏，单独一个本命栏，和炼器武器叠加；
+        // · 战斗中每隔几秒「飞剑斩」一击（无视防御，进 PERIODIC_STRIKES），威力 = 攻击 × (0.25 + 0.005 × 剑数) × 金丹品质倍数（0.8～1.2）；
+        // · 剑数 2 → 72：结丹炼成时 2 口，之后在炼器页按境界「祭炼」，每次 +2 口，每个大境界一档上限，一路养到道祖；
+        // · 36 口结成两仪剑阵（出手间隔 3 → 2.5 秒）；72 口结成周天剑阵（飞剑带破邪雷，对心魔 / 衰相 / 三尸 ×1.3）。
+        // 标准玩家把剑养满时，飞剑斩约占普通出手输出的 15%～25%，和旧版青冥剑比同阶武器多出的那部分相当，秘境 / 天劫的标定不受影响
+        const LIFE_TREASURE_ID = 'lifesword';   // 旧版物品 id，只用于迁移
+        const LIFE_SWORD = { start: 2, perRefine: 2, max: 72, liangyi: 36, zhoutian: 72, interval: 3, liangyiInterval: 2.5, base: 0.25, perSword: 0.005, poxie: 1.3 };
+        const LIFE_SWORD_TIERS = [
+            { name: '结丹', realm: 18, cap: 6 }, { name: '元婴', realm: 22, cap: 12 }, { name: '化神', realm: 26, cap: 18 }, { name: '炼虚', realm: 30, cap: 24 },
+            { name: '合体', realm: 34, cap: 30 }, { name: '大乘', realm: 38, cap: 36 }, { name: '真仙', realm: 42, cap: 42 }, { name: '金仙', realm: 44, cap: 48 },
+            { name: '太乙', realm: 46, cap: 56 }, { name: '大罗', realm: 48, cap: 64 }, { name: '道祖', realm: 50, cap: 72 }
         ];
-        function getLifeRefineTier() { return gameState.player.lifeTreasureTier || 0; }
-        function getLifeRefineCap(q = getCoreQuality()) { return q >= 65 ? 5 : q >= 35 ? 4 : 3; }   // 下品三重 / 中品四重 / 上品、极品五重
-        function getLifeTreasureMult() { return 1.1 + 0.4 * getCoreQuality() / 100; }
-        function getLifeTreasureStats(tier = getLifeRefineTier()) {
-            const atk = LIFE_REFINE_TIERS[tier].atk * getLifeTreasureMult();
-            return { atk: Math.round(atk), spd: Math.round(atk / 20) };
+        function getLifeSwords() { const ls = gameState.player.lifeSword; return ls ? (ls.swords || 0) : 0; }
+        function ownsLifeTreasure() { return getLifeSwords() > 0; }
+        // 当前境界能养到几口
+        function getLifeSwordCap(r = gameState.player.realmIndex) {
+            let cap = 0;
+            LIFE_SWORD_TIERS.forEach(t => { if (r >= t.realm) cap = t.cap; });
+            return cap;
         }
-        function refreshLifeTreasure() {
-            const item = GAME_CONFIG.items[LIFE_TREASURE_ID];
-            item.stats = getLifeTreasureStats();
-            item.name = `青冥剑·${LIFE_REFINE_TIERS[getLifeRefineTier()].name}`;
+        function getLifeSwordQualityMult() { return 0.8 + 0.4 * getCoreQuality() / 100; }
+        function getLifeSwordFormation(n = getLifeSwords()) { return n >= LIFE_SWORD.zhoutian ? '周天剑阵' : n >= LIFE_SWORD.liangyi ? '两仪剑阵' : ''; }
+        function getLifeSwordInterval() { return getLifeSwords() >= LIFE_SWORD.liangyi ? LIFE_SWORD.liangyiInterval : LIFE_SWORD.interval; }
+        // 当前对手是不是邪祟（心魔 / 衰相 / 三尸）：周天剑阵的破邪雷对它们加伤
+        function isEvilFoe() {
+            const a = gameState.currentAction;
+            const d = a && a.isDungeon ? GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon] : null;
+            return !!(d && (d.isHeartDemon || d.isShuai || XIAN_SHUAI.some(sh => sh.id === d.id)));
         }
-        function ownsLifeTreasure() {
-            const P = gameState.player;
-            return P.equipment.weapon === LIFE_TREASURE_ID || P.inventory.some(i => i.id === LIFE_TREASURE_ID);
+        function getLifeSwordBaseMult(n = getLifeSwords()) { return n ? (LIFE_SWORD.base + LIFE_SWORD.perSword * n) * getLifeSwordQualityMult() : 0; }
+        function getLifeSwordMult() {
+            const n = getLifeSwords();
+            if (!n) return 0;
+            return getLifeSwordBaseMult(n) * (n >= LIFE_SWORD.zhoutian && isEvilFoe() ? LIFE_SWORD.poxie : 1);
         }
-        // 祭炼配方能不能做：返回拦截原因，null 表示可以
+        // 祭炼配方能不能做（tier = LIFE_SWORD_TIERS 的下标）：返回拦截原因，null 表示可以
         function lifeRefineBlock(tier) {
-            if (!ownsLifeTreasure()) return '还没有本命法宝——先炼制「青冥剑」';
-            if (getLifeRefineTier() >= tier) return `青冥剑已祭炼到${LIFE_REFINE_TIERS[getLifeRefineTier()].name}`;
-            if (getLifeRefineTier() < tier - 1) return `须先祭炼${LIFE_REFINE_TIERS[tier - 1].name}`;
-            if (tier > getLifeRefineCap()) return `${getCoreGradeName()}只能承载到${LIFE_REFINE_TIERS[getLifeRefineCap()].name}，这一重祭炼不上去——改用普通炼器武器`;
+            const t = LIFE_SWORD_TIERS[tier], n = getLifeSwords();
+            if (!t) return '没有这一档祭炼';
+            if (!ownsLifeTreasure()) return '还没有本命法宝——先在炼器页炼制「青冥剑」';
+            if (gameState.player.realmIndex < t.realm) return `${getRealmName(t.realm)}才能祭炼这一档`;
+            if (n >= t.cap) return `青冥剑这一档已祭满（${t.cap} 口）`;
+            const from = tier ? LIFE_SWORD_TIERS[tier - 1].cap : LIFE_SWORD.start;
+            if (n < from) return `须先把上一档祭满到 ${from} 口`;
             return null;
+        }
+        function addLifeSwords(times = 1) {
+            const P = gameState.player, before = getLifeSwords();
+            P.lifeSword.swords = Math.min(LIFE_SWORD.max, before + LIFE_SWORD.perRefine * times);
+            const after = P.lifeSword.swords;
+            if (before < LIFE_SWORD.liangyi && after >= LIFE_SWORD.liangyi) showNotification(`🗡️ 青冥剑满 ${LIFE_SWORD.liangyi} 口，结成「两仪剑阵」：飞剑斩改为每 ${LIFE_SWORD.liangyiInterval} 秒一击`, '#c2a25f', 'rare');
+            if (before < LIFE_SWORD.zhoutian && after >= LIFE_SWORD.zhoutian) showNotification(`⚡ 七十二口青冥剑齐聚，结成「周天剑阵」：飞剑带破邪雷，对心魔 / 衰相 / 三尸伤害 ×${LIFE_SWORD.poxie}`, '#c2a25f', 'rare');
+            return after - before;
+        }
+        // 老存档迁移：青冥剑原来是一把武器（lifeTreasureTier 0～5 = 初成～五重）。挪进本命栏，按原重数折算剑数（初成 6 口，每重 +6），
+        // 原来装在武器栏的，补发一把玩家当前境界档的炼器剑装上，免得读档后攻击突然掉下来
+        const LIFE_MIGRATE_WEAPONS = [[48, 'daluosword'], [46, 'taiyisword'], [44, 'jinxiansword'], [42, 'xiansword'], [38, 'dachengsword'], [34, 'hetisword'],
+            [30, 'lianxusword'], [26, 'huashensword'], [22, 'yuanyingsword'], [0, 'goldensword']];
+        function migrateLifeSword() {
+            const P = gameState.player;
+            const equipped = P.equipment && P.equipment.weapon === LIFE_TREASURE_ID;
+            const inBag = (P.inventory || []).some(i => i.id === LIFE_TREASURE_ID);
+            if (!equipped && !inBag) { if (P.lifeSword === undefined) P.lifeSword = null; delete P.lifeTreasureTier; return; }
+            const swords = Math.min(LIFE_SWORD.max, 6 + 6 * Math.max(0, Math.min(5, P.lifeTreasureTier || 0)));
+            P.lifeSword = { swords: Math.max(getLifeSwords(), swords) };
+            P.inventory = P.inventory.filter(i => i.id !== LIFE_TREASURE_ID);
+            let gift = null;
+            if (equipped) {
+                gift = (LIFE_MIGRATE_WEAPONS.find(([r]) => P.realmIndex >= r) || [])[1] || 'goldensword';
+                P.equipment.weapon = gift;
+            }
+            delete P.lifeTreasureTier;
+            const msg = `本命法宝改版了：青冥剑不再占武器栏，挪进了单独的本命栏（装备页可查看）。\n\n· 你原来的祭炼进度折算为 ${P.lifeSword.swords} 口飞剑${getLifeSwordFormation() ? `，已结成${getLifeSwordFormation()}` : ''}\n· 战斗中它会每隔几秒「飞剑斩」一击，无视防御\n· 之后在炼器页按境界「祭炼青冥剑」继续添剑，可一路养到道祖 72 口`
+                + (gift ? `\n· 武器栏空出来了，已补发一把「${GAME_CONFIG.items[gift].name}」装上` : '');
+            setTimeout(() => { if (typeof uiAlert === 'function') uiAlert(msg, { title: '本命法宝改版' }); }, 1200);
         }
 
         // 境界感悟：侧栏显示当前所处的原著阶段，以及这个阶段在游戏里实际要做 / 实际生效的事（只写有机制对应的内容）
@@ -3242,7 +3290,7 @@
             15: ['⚱️ 古老遗迹秘境开放'],
             16: ['⚔️ 魔窟深渊战斗区域开放', `⚱️ 修炼页解锁「凝立丹鼎」：一次性操作（灵矿石×8 + 玄晶×2），为结丹强化根基，结丹成功率 +${DANDING_BONUS * 100}%`],
             17: ['⚡ 天劫之地秘境开放（有几率掉落「万年雷击木」，结丹后炼本命法宝要用，可以先攒着）', '💊 金丹秘药配方解锁，每次冲击结丹服一颗，多备几颗', `⚡ 结丹比筑基更难：成功率看灵根资质（天灵根 ${ROOT_GRADES.tian.jiedan * 100}% / 真灵根 ${ROOT_GRADES.zhen.jiedan * 100}% / 伪灵根 ${ROOT_GRADES.wei.jiedan * 100}%），失败耗掉丹药但不掉境界，可以重试`],
-            18: [`⚠ 境界未稳：刚结金丹，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%，之后境界稳固恢复正常`, '⚔️ 结丹对筑基期敌人有大境界压制（命中、伤害更高）', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🗡️ 本命法宝：凑齐「万年雷击木」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青冥剑」。一生只能炼一把、不可出售；之后每个大境界都能在炼器页「祭炼」一重（同境界武器的材料 + 1 截雷击木），威力超过同阶普通法器。金丹品质决定威力倍数和最多能祭炼几重（下品三重、中品四重、上品以上五重），祭炼到顶后再改用普通炼器武器', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
+            18: [`⚠ 境界未稳：刚结金丹，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%，之后境界稳固恢复正常`, '⚔️ 结丹对筑基期敌人有大境界压制（命中、伤害更高）', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🗡️ 本命法宝：凑齐「万年雷击木」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青冥剑」。它不占武器栏，炼成即有 2 口飞剑，战斗中每隔几秒「飞剑斩」一击（无视防御）；之后每个大境界都能在炼器页「祭炼」添剑，一路养到道祖 72 口（36 口结两仪剑阵、72 口结周天剑阵）。金丹品质决定飞剑威力（×0.8～×1.2），不限制能养几口', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
             19: ['⚔️ 天劫之地战斗区域开放'],
             21: ['🌌 元婴秘境开放', '👹 结婴心魔：修为满后，突破弹窗里要先「斩心魔」才能冲击元婴。心魔是照着你此刻的实力生出来的——生命、防御、速度与你相同，每次出手比你重两成，换装备它也跟着变；满血、装备好战斗食物再打基本能赢，空手去多半会输。战败损失一半食物，可以重来，打赢一次即可', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🟡 金丹品质会变成元婴品质，决定婴火强度、化神成功率和本命法宝能祭炼到第几重。现在用「金丹淬炼」打磨最快；突破元婴后只能靠「元婴温养」慢慢补（速度是四分之一），化神后彻底定型'],
             22: ['⚡ 小天劫：元婴、化神期共三道——元婴后期、化神初期、化神后期修为满后，要先在突破弹窗里「渡劫」打赢才能突破。天劫照着你此刻的实力降下，满血、带足食物再渡；渡过一次生命 / 防御永久 +2%', '🌟 修为里程碑：从元婴期起，每个小境界的修为到 25% / 50% / 75% 各得一份感悟奖励（约十分钟打怪的灵石，外加神识；合体期起改给道果），离线也照算', `🛡️ 元婴不灭：秘境战败不再损失修为（食物照常损失一半）；每次进入秘境，第一次被击败时元婴夺舍重生，以 ${NASCENT_REVIVE_HP * 100}% 生命继续战斗`, `🔥 婴火：炼丹、炼器耗时 −${YINGHUO_TIME[0] * 100}%～−${YINGHUO_TIME[1] * 100}%，炼丹翻倍、炼器省料概率 +${YINGHUO_BONUS[0] * 100}%～+${YINGHUO_BONUS[1] * 100}%，元婴品质越高越强（侧栏「境界感悟」显示你的实际数值）`, `⚠ 境界未稳：刚结元婴，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%`, '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放'],
@@ -3290,9 +3338,9 @@
                 `🧘 境界感悟面板可「收敛法则」（不动用法则之力，侵蚀不涨），或「自降修为」退回大罗后期（侵蚀清零，首次获得道心：攻击 / 生命 / 防御 +${DAO_HEART_BONUS * 100}%，再证道须重打证道之战）`,
                 '🏁 道祖是最终境界'],
         };
-        LIFE_REFINE_TIERS.slice(1).forEach((t, i) => {
-            const limit = [null, null, null, '下品金丹的上限', '须中品以上金丹', '须上品以上金丹'][i + 1];
-            (REALM_UNLOCKS[t.realm] = REALM_UNLOCKS[t.realm] || []).push(`🗡️ 炼器页可「祭炼青冥剑·${t.name}」（需先拥有本命法宝并祭炼到上一重）${limit ? '，' + limit : ''}`);
+        LIFE_SWORD_TIERS.slice(1).forEach((t, i) => {
+            const note = t.cap === LIFE_SWORD.liangyi ? '，满 36 口结成两仪剑阵（飞剑斩每 2.5 秒一击）' : t.cap === LIFE_SWORD.zhoutian ? '，满 72 口结成周天剑阵（破邪雷：对心魔 / 衰相 / 三尸 ×1.3）' : '';
+            (REALM_UNLOCKS[t.realm] = REALM_UNLOCKS[t.realm] || []).push(`🗡️ 炼器页可「祭炼青冥剑·${t.name}」：本命飞剑可养到 ${t.cap} 口${note}`);
         });
         // 每个有天劫的境界都提示一次：本境界修为满后要先渡哪一劫
         TRIBULATION_REALMS.filter(r => r !== 41).forEach(r => {   // 飞升天劫不看修为，41 的提示单独写在上面
@@ -3401,7 +3449,7 @@
             { id: 'ACH_BIG_TRIB',    glyph: '劫', name: '大劫不灭',   desc: '渡过第一次大天劫',                         check: () => hasSurvivedTribulation(33) },
             { id: 'ACH_HETI',        glyph: '合', name: '合体',       desc: '突破到合体初期',                         check: () => gameState.player.realmIndex >= 34 },
             { id: 'ACH_FUSION',      glyph: '道', name: '合道',       desc: '元婴分身、身外化身归于本体',               check: () => isFused() },
-            { id: 'ACH_LIFE_SWORD_5', glyph: '冥', name: '五重祭炼',  desc: '把青冥剑祭炼到五重',                       check: () => getLifeRefineTier() >= 5 },
+            { id: 'ACH_LIFE_SWORD_5', glyph: '冥', name: '两仪剑阵',  desc: '青冥剑养到 36 口，结成两仪剑阵',            check: () => getLifeSwords() >= LIFE_SWORD.liangyi },
             { id: 'ACH_DACHENG',     glyph: '乘', name: '大乘',       desc: '突破到大乘初期',                         check: () => gameState.player.realmIndex >= 38 },
             { id: 'ACH_LAW_MASTER',  glyph: '法', name: '法则入门',   desc: `任一法则练到 ${LAW_MASTER_LEVEL} 级`,      check: () => LAW_IDS.some(id => getLawInfo(id).level >= LAW_MASTER_LEVEL) },
             { id: 'ACH_ALL_DUNGEONS', glyph: '境', name: '踏遍秘境',  get desc() { return `通关全部 ${NORMAL_DUNGEON_IDS.length} 个秘境`; },                       check: () => NORMAL_DUNGEON_IDS.every(isDungeonDone) },
@@ -3425,7 +3473,8 @@
             { id: 'ACH_ORIGIN',      glyph: '源', name: '本源三十',   desc: '凝结 30 道法则本源',                       check: () => getLawOrigin() >= 30 },
             { id: 'ACH_CORPSE',      glyph: '尸', name: '斩尽三尸',   desc: '斩出善尸、恶尸、自我尸',                   check: () => XIAN_SHUAI.filter(sh => sh.kind === 'corpse').every(isShuaiDone) },
             { id: 'ACH_DAOZU',       glyph: '祖', name: '道祖',       desc: '证道，成就道祖',                           check: () => gameState.player.realmIndex >= DAOZU_REALM },
-            { id: 'ACH_DAO_HEART',   glyph: '心', name: '道心自守',   desc: '身为道祖而自降修为，不被天道吞噬',           check: () => !!gameState.player.daoHeart }
+            { id: 'ACH_DAO_HEART',   glyph: '心', name: '道心自守',   desc: '身为道祖而自降修为，不被天道吞噬',           check: () => !!gameState.player.daoHeart },
+            { id: 'ACH_LIFE_SWORD_72', glyph: '阵', name: '周天剑阵',  desc: '七十二口青冥剑齐聚，结成周天剑阵',          check: () => getLifeSwords() >= LIFE_SWORD.zhoutian },
         ];
         function getAchievementStore() {
             if (!gameState.achievements || typeof gameState.achievements !== 'object') gameState.achievements = {};
@@ -4793,6 +4842,12 @@
                 BattleArt.slash(fx, { color: '#9ff0d8', x: 70, y: 46 });
             } else if (h.key === 'corpseE') {
                 BattleArt.claw(fx, { color: '#c070ff', x: 66, y: 32 });
+            } else if (h.key === 'lifeSword') {
+                // 飞剑斩：一阵剑光连斩；周天剑阵再劈一道破邪雷
+                const c = '#9fd8ff';
+                BattleArt.slash(fx, { color: c, x: 64, y: 40 });
+                setTimeout(() => BattleArt.slash(fx, { color: c, x: 76, y: 54 }), 90);
+                if (getLifeSwords() >= LIFE_SWORD.zhoutian) BattleArt.lightning(fx, { x: 72 });
             } else {
                 BattleArt.slash(fx, { color: rootColor, x: 70, y: 46 });
             }
@@ -7183,7 +7238,9 @@
                 gameState.currentActionProgress = 0;
                 return;
             }
-            if ((action.unique && ownsLifeTreasure()) || (action.output.lifeRefine && lifeRefineBlock(action.output.lifeRefine))) {
+            const refineStop = action.output.lifeRefine && lifeRefineBlock(action.output.lifeRefine - 1);
+            if ((action.unique && ownsLifeTreasure()) || refineStop) {
+                if (refineStop) showNotification(`🗡️ ${refineStop}，已停止`, '#c98a3e');
                 gameState.currentAction = null;
                 gameState.currentActionProgress = 0;
                 return;
@@ -7323,11 +7380,18 @@
                 showNotification(`⚱️ 丹鼎已立，根基稳固——结丹成功率 +${DANDING_BONUS * 100}%`, '#b39ddb');
             }
             if (finalOutput.lifeRefine) {
-                gameState.player.lifeTreasureTier = finalOutput.lifeRefine;
+                addLifeSwords(1);
+                showNotification(`🗡️ 青冥剑祭炼成功：现有 ${getLifeSwords()} 口飞剑`, '#c2a25f');
+                if (lifeRefineBlock(finalOutput.lifeRefine - 1)) {   // 这一档祭满了就停
+                    gameState.currentAction = null;
+                    gameState.currentActionProgress = 0;
+                }
+            }
+            if (finalOutput.lifeForge && !ownsLifeTreasure()) {
+                gameState.player.lifeSword = { swords: LIFE_SWORD.start };
                 gameState.currentAction = null;
                 gameState.currentActionProgress = 0;
-                calculateStats();
-                showNotification(`🗡️ 青冥剑祭炼成功：${LIFE_REFINE_TIERS[finalOutput.lifeRefine].name}（攻击 ${getLifeTreasureStats().atk}）`, '#c2a25f', 'rare');
+                showNotification(`🗡️ 本命法宝「青冥剑」炼成！滴血认主，${LIFE_SWORD.start} 口飞剑与心神相连——它不占武器栏，战斗中会自己飞剑斩敌（装备页可查看）`, '#c2a25f', 'rare');
             }
             if (isNascentInfusing(action)) {
                 gameState.player.nascentInfuse = (gameState.player.nascentInfuse || 0) + action.output.nascentInfuse;
@@ -7338,12 +7402,7 @@
                 const before = getCoreGradeName();
                 applyCoreTemper(action.output.coreTemper);
                 if (getCoreGradeName() !== before) showNotification(`🟡 品质提升：${getCoreGradeName()}（${getCoreQuality().toFixed(1)}）`, '#c2a25f', 'rare');
-                calculateStats();   // 本命法宝威力随金丹品质变化
-            }
-            if (action.unique && finalOutput.items && finalOutput.items.some(i => i.id === LIFE_TREASURE_ID)) {
-                gameState.currentAction = null;
-                gameState.currentActionProgress = 0;
-                showNotification('🗡️ 本命法宝「青冥剑」炼成！滴血认主，与心神相连——去装备页把它装进武器栏', '#c2a25f', 'rare');
+                calculateStats();
             }
 
             // 处理技能经验
@@ -7840,10 +7899,13 @@
                 parts.push(gameState.player.danDing ? '⚱️ 已完成（一次性）' : `⚱️ 结丹成功率 +${DANDING_BONUS * 100}%（一次性）`);
             }
             if (output.lifeRefine) {
-                const t = output.lifeRefine, cur = getLifeRefineTier();
-                parts.push(ownsLifeTreasure() && cur >= t
-                    ? `🗡️ 已祭炼至${LIFE_REFINE_TIERS[cur].name}`
-                    : `🗡️ 本命法宝攻击 → ${getLifeTreasureStats(t).atk}（当前${ownsLifeTreasure() ? LIFE_REFINE_TIERS[cur].name : '未炼成'} · 可祭炼到${LIFE_REFINE_TIERS[getLifeRefineCap()].name}）`);
+                const t = LIFE_SWORD_TIERS[output.lifeRefine - 1];
+                parts.push(ownsLifeTreasure() && getLifeSwords() >= t.cap
+                    ? `🗡️ 这一档已祭满（${t.cap} 口）`
+                    : `🗡️ 每次 +${LIFE_SWORD.perRefine} 口飞剑，祭到 ${t.cap} 口（现有 ${getLifeSwords()} 口）`);
+            }
+            if (output.lifeForge) {
+                parts.push(ownsLifeTreasure() ? `🗡️ 已炼成（${getLifeSwords()} 口）` : `🗡️ 炼成本命法宝：${LIFE_SWORD.start} 口飞剑，不占武器栏`);
             }
             if (output.exp) {
                 parts.push(`+${output.exp}exp`);
@@ -8330,14 +8392,14 @@
                 return;
             }
             if (actionObj.unique && ownsLifeTreasure()) {
-                showNotification('本命法宝与性命相连，一生只能炼制一件——你已经拥有青冥剑', '#c98a3e', 'normal');
+                showNotification('本命法宝与性命相连，一生只能炼制一套——你已经有青冥剑了，去「祭炼青冥剑」添剑', '#c98a3e', 'normal');
                 return;
             }
             if (actionObj.output && ((actionObj.output.marrowCleanse && gameState.player.marrowCleansed) || (actionObj.output.danDing && gameState.player.danDing) || (actionObj.output.fiveRoots && hasFiveRoots()))) {
                 showNotification(`${actionObj.name}已经完成（一次性）`, '#c98a3e', 'normal');
                 return;
             }
-            const refineBlock = actionObj.output && actionObj.output.lifeRefine && lifeRefineBlock(actionObj.output.lifeRefine);
+            const refineBlock = actionObj.output && actionObj.output.lifeRefine && lifeRefineBlock(actionObj.output.lifeRefine - 1);
             if (refineBlock) {
                 showNotification(refineBlock, '#c98a3e', 'normal');
                 return;
@@ -8543,8 +8605,8 @@
                 huashenpill: '元婴圆满冲击化神时服用，每次冲击耗一颗（成功率看元婴品质、太虚元神诀、太虚幻境机缘）',
                 huaxupill: '化神圆满飞升上界（突破炼虚）时服用；还须先通关一次虚界秘境找到界壁裂隙',
                 danhuo_seed: '丹火种子：在丹火技能「培育丹火」里使用，一次得到 25 丹火',
-                jinleizhu: '天劫之地秘境通关有几率获得；炼制本命法宝「青冥剑」和每一重祭炼都要用',
-                lifesword: '本命法宝：与心神相连，一生仅此一把、不可出售。每个大境界可在炼器页祭炼一重，攻击升到该境界武器之上并按金丹品质放大；金丹品质决定最多能祭炼几重',
+                jinleizhu: '天劫之地秘境通关有几率获得；炼制本命法宝「青冥剑」要用 2 截',
+                lifesword: '旧版的本命法宝。读档时会自动挪进本命栏（装备页），按原祭炼进度折算成飞剑口数',
                 shenshi_seed: '神识种子：在神识技能「培育神识」里使用，一次得到 20 神识'
             };
 
@@ -8813,6 +8875,16 @@
         }
 
         // 装备界面：三类装备栏 + 总属性 + 背包里可换的装备
+        // 本命栏的小画：一把把飞剑排成扇形，口数越多越密（最多画 18 把，周天剑阵时剑身带雷光）
+        function lifeSwordFanSvg(n) {
+            const shown = Math.max(1, Math.min(18, Math.ceil(n / 4))), lit = n >= LIFE_SWORD.zhoutian;
+            let body = '';
+            for (let i = 0; i < shown; i++) {
+                const a = shown === 1 ? 0 : -70 + 140 * i / (shown - 1);
+                body += `<g transform="rotate(${a.toFixed(1)} 50 88)"><path d="M50 18 L53 70 L50 76 L47 70 Z" fill="${n ? '#dff3ff' : '#6d665a'}" stroke="#0e0c09" stroke-width="1.4"/><path d="M44 72 L56 72" stroke="#0e0c09" stroke-width="3"/><path d="M50 74 L50 86" stroke="${n ? '#5aa8ef' : '#4a443a'}" stroke-width="2.6"/></g>`;
+            }
+            return `<svg viewBox="0 0 100 96"${lit ? ' class="ls-lit"' : ''}>${body}</svg>`;
+        }
         function renderEquipmentPanel() {
             const box = document.getElementById('equipmentContent');
             if (!box) return;
@@ -8848,6 +8920,17 @@
                         ${nextId ? `<button class="btn btn-secondary equip-btn" onclick="switchPanel('shop')">去商城</button>` : ''}</div>`;
                 }
             }
+            // v7.37 本命栏：青冥剑不占武器栏，单独一块显示剑数、剑阵、飞剑斩威力和本境界还能养到几口
+            const ls = getLifeSwords(), lsCap = getLifeSwordCap();
+            const lifeCard = gameState.player.realmIndex < 18 ? '' : `<div class="life-sword-card${ls ? '' : ' empty'}">
+                <div class="ls-art" aria-hidden="true">${lifeSwordFanSvg(ls)}</div>
+                <div class="ls-body">
+                    <div class="ls-title">本命法宝 · 青冥剑</div>
+                    ${ls ? `<div class="ls-count"><b>${ls}</b> / ${LIFE_SWORD.max} 口${getLifeSwordFormation() ? `<span class="ls-form">${getLifeSwordFormation()}</span>` : ''}</div>
+                    <div class="ls-line">飞剑斩：每 ${getLifeSwordInterval()} 秒一击，攻击 ×${getLifeSwordBaseMult().toFixed(2)}，无视防御（金丹品质 ×${getLifeSwordQualityMult().toFixed(2)}${ls >= LIFE_SWORD.zhoutian ? `；破邪雷对心魔 / 衰相 / 三尸再 ×${LIFE_SWORD.poxie}` : ''}）</div>
+                    <div class="ls-line">${ls >= LIFE_SWORD.max ? '七十二口已齐' : ls >= lsCap ? `本境界已养到上限 ${lsCap} 口，突破大境界后可继续祭炼` : `本境界可养到 ${lsCap} 口：去炼器页「祭炼青冥剑」，每次 +${LIFE_SWORD.perRefine} 口`}${ls < LIFE_SWORD.liangyi ? `；${LIFE_SWORD.liangyi} 口结两仪剑阵` : ls < LIFE_SWORD.zhoutian ? `；${LIFE_SWORD.zhoutian} 口结周天剑阵` : ''}</div>`
+                    : `<div class="ls-line">尚未炼成。凑齐「万年雷击木」×2（天劫之地秘境掉落），在炼器页炼制。它不占武器栏，战斗中会每隔几秒飞剑斩敌，之后按境界祭炼添剑，一路养到道祖 72 口</div>`}
+                </div></div>`;
             const temperText = TEMPER_SLOTS.map(t => `${t.name}+${Math.round(getTemper(t.key) * TEMPER_PER_LEVEL * 100)}%`).join(' ');
             const forgeBonus = parseFloat(((SKILL_LEVEL_EFFECTS.forging.formula((gameState.skills.forging || {}).level || 1) - 1) * 100).toFixed(1));
             const summary = `<div class="equip-summary">
@@ -8869,7 +8952,7 @@
             // v7.28 顶部立绘：随境界变化（气焰 / 金丹 / 元婴 / 光环 / 法则环），装了武器才持剑
             const hero = typeof BattleArt !== 'undefined'
                 ? `<div class="equip-hero">${BattleArt.portrait(gameState.player.spiritRoot, gameState.player.realmIndex, { sword: !!eq.weapon, caption: `${gameState.player.name || '散修'} · ${getRealmName(gameState.player.realmIndex)}` })}</div>` : '';
-            box.innerHTML = `${hero}<div class="equip-slots">${slots}</div>${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（可以在炼器里打造）</div>'}`;
+            box.innerHTML = `${hero}<div class="equip-slots">${slots}</div>${lifeCard}${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（可以在炼器里打造）</div>'}`;
         }
 
         // 旧存档迁移：装备曾同时保留在背包里，现在装备栏与背包分开。每件已装备的物品从背包扣掉 1 件；
@@ -9677,7 +9760,7 @@
             if (!box) return;
             const P = gameState.player;
             const idx = P.realmIndex;
-            const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, P.danDing, isRealmUnstable(), getLifeRefineTier(), ownsLifeTreasure(),
+            const key = [idx, P.rootGrade, getCoreQuality().toFixed(1), P.marrowCleansed, P.danDing, isRealmUnstable(), getLifeSwords(), ownsLifeTreasure(),
                 hasSurvivedTribulation(HEART_DEMON_REALM), hasHuashenArt(), hasHuashenChance(),
                 usesJingyuan() ? Math.floor(getJingyuan()) : '', hasAscendNode(), isHeavenQiOff(), JSON.stringify(P.btFails || {}), getXianqiao(),
                 hasSurvivedTribulation(idx), hasFiveRoots(), isFused(), idx >= LAW_POWER_REALM ? getLawAvgLevel().toFixed(1) : '',
@@ -9697,9 +9780,9 @@
             const gradeEff = describeEffects(grade.effects);
             more.push(`<div>🌱 灵根资质：<b>${grade.name}</b>${gradeEff.length ? '（' + gradeEff.join('、') + '）' : ''}${grade.treasure ? ` · 身怀${grade.treasure}` : ''}</div>`);
             if (idx >= 18) {
-                const core = `<div>🟡 ${idx >= 22 ? '元婴' : '金丹'}：<b>${getCoreGradeName()}</b>（品质 ${getCoreQuality().toFixed(1)}${idx >= 26 ? '，已定型' : idx >= 22 ? '，可用「元婴温养」缓慢提高' : ''}）· 本命法宝威力 ×${getLifeTreasureMult().toFixed(2)}，最多祭炼到${LIFE_REFINE_TIERS[getLifeRefineCap()].name}</div>`;
+                const core = `<div>🟡 ${idx >= 22 ? '元婴' : '金丹'}：<b>${getCoreGradeName()}</b>（品质 ${getCoreQuality().toFixed(1)}${idx >= 26 ? '，已定型' : idx >= 22 ? '，可用「元婴温养」缓慢提高' : ''}）· 本命飞剑威力 ×${getLifeSwordQualityMult().toFixed(2)}</div>`;
                 (idx < 26 ? now : more).push(core);   // 还能打磨时放在上面，定型后收起来
-                more.push(`<div>🗡️ 本命法宝：${ownsLifeTreasure() ? `${GAME_CONFIG.items[LIFE_TREASURE_ID].name}（攻击 ${getLifeTreasureStats().atk}）` : '尚未炼成'}</div>`);
+                more.push(`<div>🗡️ 本命法宝：${ownsLifeTreasure() ? `青冥剑 ${getLifeSwords()} 口${getLifeSwordFormation() ? '·' + getLifeSwordFormation() : ''}（本境界可养到 ${getLifeSwordCap()} 口）` : '尚未炼成'}</div>`);
             }
             if (idx >= NASCENT_SAFE_REALM) {
                 const pct = v => Math.round(Math.abs(v) * 100);
@@ -10393,7 +10476,6 @@
         function calculateStats() {
             // P4重写：境界驱动的属性系统（替代技能等级驱动）
             const realmIndex = gameState.player.realmIndex;
-            refreshLifeTreasure();   // 本命法宝的属性/名字随祭炼重数与金丹品质变化，所有显示处都读这份配置
             statsRealmUnstable = isRealmUnstable();
 
             // === 第一步：从凡人境界基础属性开始 ===
@@ -12044,11 +12126,19 @@
             }
             // 一次性的配方（洗髓易经 / 本命法宝）离线最多完成一次，完成后停下
             const oneShotDone = (action.output.marrowCleanse && gameState.player.marrowCleansed) || (action.output.danDing && gameState.player.danDing) || (action.output.fiveRoots && hasFiveRoots())
-                || (action.unique && ownsLifeTreasure()) || (action.output.lifeRefine && !!lifeRefineBlock(action.output.lifeRefine));
-            if (action.output.marrowCleanse || action.output.danDing || action.output.fiveRoots || action.unique || action.output.lifeRefine) {
+                || (action.unique && ownsLifeTreasure());
+            if (action.output.marrowCleanse || action.output.danDing || action.output.fiveRoots || action.unique) {
                 completions = oneShotDone ? 0 : Math.min(completions, 1);
                 if (completions <= 0) { gameState.currentAction = null; gameState.lastActiveTime = now; return; }
                 gameState.currentAction = null;
+            }
+            // 祭炼青冥剑：离线最多把当前这一档祭满，满了就停
+            if (action.output.lifeRefine) {
+                const ti = action.output.lifeRefine - 1;
+                const left = lifeRefineBlock(ti) ? 0 : Math.ceil((LIFE_SWORD_TIERS[ti].cap - getLifeSwords()) / LIFE_SWORD.perRefine);
+                completions = Math.min(completions, left);
+                if (completions <= 0) { gameState.currentAction = null; gameState.lastActiveTime = now; return; }
+                if (completions >= left) gameState.currentAction = null;
             }
 
             // 需要材料的配方：完成次数受材料库存限制，并扣除离线消耗
@@ -12226,9 +12316,12 @@
             if (perAction.fiveRoots && completions > 0) gameState.player.fiveRoots = true;
             checkRealmStability();
             if (perAction.lifeRefine && completions > 0) {
-                gameState.player.lifeTreasureTier = perAction.lifeRefine;
-                calculateStats();
-                showNotification(`🗡️ 离线期间青冥剑祭炼成功：${LIFE_REFINE_TIERS[perAction.lifeRefine].name}`, '#c2a25f');
+                addLifeSwords(completions);
+                showNotification(`🗡️ 离开期间青冥剑祭炼 ${completions} 次：现有 ${getLifeSwords()} 口飞剑`, '#c2a25f');
+            }
+            if (perAction.lifeForge && completions > 0 && !ownsLifeTreasure()) {
+                gameState.player.lifeSword = { swords: LIFE_SWORD.start };
+                showNotification(`🗡️ 离开期间本命法宝「青冥剑」炼成（${LIFE_SWORD.start} 口飞剑）`, '#c2a25f', 'rare');
             }
 
             // 背包放不下的物品单独记录并在结算窗里提示，不再静默丢失
