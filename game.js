@@ -859,7 +859,13 @@
                         gather: { name: '凝聚丹火', desc: '从金丹中提取丹火（货币：淬炼装备、强化灵根）', duration: 15, output: { danhuo: 5, skill: 'danhuo', exp: 30 }, requiredLevel: 1, unlocked: true },
                         seed: { name: '培育丹火', desc: '以丹火种子培育，一次得到 25 丹火（种子来自天劫之地）', duration: 20, output: { danhuo: 25, skill: 'danhuo', exp: 60 }, requiredLevel: 2, requires: { danhuo_seed: 1 }, unlocked: false },
                         refine: { name: '提炼丹火', desc: '更高效的提炼：耗时翻倍，产出更多', duration: 30, output: { danhuo: 13, skill: 'danhuo', exp: 110 }, requiredLevel: 6, unlocked: false },
-                        condense: { name: '凝练丹火', desc: '炼火成髓：丹火技能的顶级提取法', duration: 60, output: { danhuo: 30, skill: 'danhuo', exp: 260 }, requiredLevel: 12, unlocked: false }
+                        condense: { name: '凝练丹火', desc: '炼火成髓：不耗材料的提取法里最好的一种', duration: 60, output: { danhuo: 30, skill: 'danhuo', exp: 260 }, requiredLevel: 12, unlocked: false },
+                        // v7.40 后期配方：以该境界的矿 / 灵植换大量货币，每档入门时约等于同境界战斗区域每小时的该货币收入（战斗还另给灵石、经验、掉落和另两种货币）
+                        xuhuo: { name: '虚火炼髓', desc: '虚晶 ×1 → 丹火 ×300', duration: 240, output: { danhuo: 300, skill: 'danhuo', exp: 1000 }, requiredLevel: 18, requiredRealmIndex: 30, requires: { voidcrystal: 1 }, unlocked: false },
+                        hongmeng: { name: '鸿蒙真火', desc: '鸿蒙精华 ×1 → 丹火 ×400', duration: 300, output: { danhuo: 400, skill: 'danhuo', exp: 1500 }, requiredLevel: 22, requiredRealmIndex: 38, requires: { taiyiessence: 1 }, unlocked: false },
+                        xianyan: { name: '仙焰淬灵', desc: '仙灵晶 ×1 + 仙灵稻 ×1 → 丹火 ×700', duration: 300, output: { danhuo: 700, skill: 'danhuo', exp: 2200 }, requiredLevel: 26, requiredRealmIndex: 42, requires: { xianlingjing: 1, xian_rice: 1 }, unlocked: false },
+                        zaohua: { name: '造化神火', desc: '玉魄 ×1 + 造化果 ×1 → 丹火 ×950', duration: 300, output: { danhuo: 950, skill: 'danhuo', exp: 3000 }, requiredLevel: 30, requiredRealmIndex: 46, requires: { yupo: 1, zaohua: 1 }, unlocked: false },
+                        xuanhuang: { name: '玄黄圣火', desc: '玄黄精 ×1 + 造化果 ×1 → 丹火 ×1400', duration: 300, output: { danhuo: 1400, skill: 'danhuo', exp: 4000 }, requiredLevel: 35, requiredRealmIndex: 48, requires: { xuanhuang: 1, zaohua: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -892,7 +898,13 @@
                         seed: { name: '培育神识', desc: '以神识种子培育，一次得到 20 神识（种子来自元婴秘境）', duration: 25, output: { shenshi: 20, skill: 'shenshi', exp: 80 }, requiredLevel: 2, requires: { shenshi_seed: 1 }, unlocked: false },
                         refine: { name: '提炼神识', desc: '更高效的提炼：耗时翻倍，产出更多', duration: 40, output: { shenshi: 10, skill: 'shenshi', exp: 150 }, requiredLevel: 5, unlocked: false },
                         meditate: { name: '神识入定', desc: '悟道果 ×1 → 神识 ×15', duration: 60, output: { shenshi: 15, skill: 'shenshi', exp: 260 }, requiredLevel: 10, requires: { daofruit: 1 }, unlocked: false },
-                        deep: { name: '深度入定', desc: '神识技能的顶级提取法', duration: 90, output: { shenshi: 28, skill: 'shenshi', exp: 420 }, requiredLevel: 15, unlocked: false }
+                        deep: { name: '深度入定', desc: '不耗材料的提取法里最好的一种', duration: 90, output: { shenshi: 28, skill: 'shenshi', exp: 420 }, requiredLevel: 15, unlocked: false },
+                        // v7.40 后期配方：以该境界的矿 / 灵植换大量货币，每档入门时约等于同境界战斗区域每小时的该货币收入（战斗还另给灵石、经验、掉落和另两种货币）
+                        xukong: { name: '虚空观想', desc: '虚晶 ×1 → 神识 ×140', duration: 240, output: { shenshi: 140, skill: 'shenshi', exp: 1000 }, requiredLevel: 18, requiredRealmIndex: 30, requires: { voidcrystal: 1 }, unlocked: false },
+                        hongmeng: { name: '鸿蒙照影', desc: '鸿蒙精华 ×1 → 神识 ×175', duration: 300, output: { shenshi: 175, skill: 'shenshi', exp: 1500 }, requiredLevel: 22, requiredRealmIndex: 38, requires: { taiyiessence: 1 }, unlocked: false },
+                        xianshi: { name: '仙识通玄', desc: '仙灵晶 ×1 + 仙灵稻 ×1 → 神识 ×330', duration: 300, output: { shenshi: 330, skill: 'shenshi', exp: 2200 }, requiredLevel: 26, requiredRealmIndex: 42, requires: { xianlingjing: 1, xian_rice: 1 }, unlocked: false },
+                        zaohua: { name: '造化神游', desc: '玉魄 ×1 + 造化果 ×1 → 神识 ×555', duration: 300, output: { shenshi: 555, skill: 'shenshi', exp: 3000 }, requiredLevel: 30, requiredRealmIndex: 46, requires: { yupo: 1, zaohua: 1 }, unlocked: false },
+                        xuanhuang: { name: '玄黄照界', desc: '玄黄精 ×1 + 造化果 ×1 → 神识 ×830', duration: 300, output: { shenshi: 830, skill: 'shenshi', exp: 4000 }, requiredLevel: 35, requiredRealmIndex: 48, requires: { xuanhuang: 1, zaohua: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -906,7 +918,12 @@
                         condense: { name: '凝练道果', desc: '悟道果 ×1 → 道果 ×6（货币：道果淬体、道果悟法）', duration: 90, output: { daoguo: 6, skill: 'daoguo', exp: 200 }, requiredLevel: 1, requires: { daofruit: 1 }, unlocked: true },
                         seed: { name: '培育道果', desc: '以道果种子培育，一次得到 30 道果（种子来自天道秘境）', duration: 120, output: { daoguo: 30, skill: 'daoguo', exp: 300 }, requiredLevel: 3, requires: { daoguo_seed: 1 }, unlocked: false },
                         refine: { name: '提炼道果', desc: '悟道果 ×2 + 混沌石 ×1 → 道果 ×20', duration: 150, output: { daoguo: 20, skill: 'daoguo', exp: 400 }, requiredLevel: 8, requires: { daofruit: 2, chaosstone: 1 }, unlocked: false },
-                        deep: { name: '归元凝道', desc: '悟道果 ×3 + 天道石 ×1 → 道果 ×45', duration: 240, output: { daoguo: 45, skill: 'daoguo', exp: 700 }, requiredLevel: 15, requires: { daofruit: 3, daostone: 1 }, unlocked: false }
+                        deep: { name: '归元凝道', desc: '悟道果 ×3 + 天道石 ×1 → 道果 ×45', duration: 240, output: { daoguo: 45, skill: 'daoguo', exp: 700 }, requiredLevel: 15, requires: { daofruit: 3, daostone: 1 }, unlocked: false },
+                        // v7.40 后期配方：以该境界的矿 / 灵植换大量货币，每档入门时约等于同境界战斗区域每小时的该货币收入（战斗还另给灵石、经验、掉落和另两种货币）
+                        hongmeng: { name: '鸿蒙凝道', desc: '鸿蒙精华 ×1 + 悟道果 ×1 → 道果 ×95', duration: 300, output: { daoguo: 95, skill: 'daoguo', exp: 1500 }, requiredLevel: 16, requiredRealmIndex: 38, requires: { taiyiessence: 1, daofruit: 1 }, unlocked: false },
+                        xianling: { name: '仙灵凝道', desc: '仙灵晶 ×1 + 仙灵稻 ×1 → 道果 ×200', duration: 300, output: { daoguo: 200, skill: 'daoguo', exp: 2200 }, requiredLevel: 20, requiredRealmIndex: 42, requires: { xianlingjing: 1, xian_rice: 1 }, unlocked: false },
+                        zaohua: { name: '造化凝道', desc: '玉魄 ×1 + 造化果 ×1 → 道果 ×290', duration: 300, output: { daoguo: 290, skill: 'daoguo', exp: 3000 }, requiredLevel: 25, requiredRealmIndex: 46, requires: { yupo: 1, zaohua: 1 }, unlocked: false },
+                        xuanhuang: { name: '玄黄凝道', desc: '玄黄精 ×1 + 造化果 ×1 → 道果 ×435', duration: 300, output: { daoguo: 435, skill: 'daoguo', exp: 4000 }, requiredLevel: 30, requiredRealmIndex: 48, requires: { xuanhuang: 1, zaohua: 1 }, unlocked: false }
                     },
                     actions: {}
                 }
@@ -6633,17 +6650,20 @@
             { id: 'fire_room',    skill: 'danhuo', level: 10, price: 12000,  icon: '🔥', name: '地火室',   effects: { 'time:danhuo': -0.05, 'exp:danhuo': 0.08 } },
             { id: 'fire_pot',     skill: 'danhuo', level: 15, price: 40000,  icon: '🏺', name: '聚火鼎',   effects: { 'out:danhuo': 0.15 } },
             { id: 'fire_pit',     skill: 'danhuo', level: 20, price: 120000, icon: '☀️', name: '九阳火池', effects: { 'out:danhuo': 0.20 } },
+            { id: 'fire_sun',     skill: 'danhuo', level: 30, price: 30000000, icon: '🌞', name: '太阳真火炉', effects: { 'out:danhuo': 0.20, 'time:danhuo': -0.05 } },
             // 神识
             { id: 'sense_mat',   skill: 'shenshi', level: 5,  price: 3000,   icon: '🪷', name: '静心蒲团', effects: { 'out:shenshi': 0.10 } },
             { id: 'sense_pool',  skill: 'shenshi', level: 10, price: 12000,  icon: '🌊', name: '洗神池',   effects: { 'time:shenshi': -0.05, 'exp:shenshi': 0.08 } },
             { id: 'sense_lamp',  skill: 'shenshi', level: 15, price: 40000,  icon: '🏮', name: '观照灯',   effects: { 'out:shenshi': 0.15 } },
             { id: 'sense_tower', skill: 'shenshi', level: 20, price: 120000, icon: '🔭', name: '通明台',   effects: { 'out:shenshi': 0.20, cloneSpeed: 0.05 } },
+            { id: 'sense_mirror', skill: 'shenshi', level: 30, price: 30000000, icon: '🪞', name: '万象镜', effects: { 'out:shenshi': 0.20, 'time:shenshi': -0.05 } },
             // 悟道
             // 道果
             { id: 'dao_altar',    skill: 'daoguo', level: 5,  price: 60000,   icon: '🛕', name: '凝道坛',   effects: { 'out:daoguo': 0.10 } },
             { id: 'dao_cave',     skill: 'daoguo', level: 10, price: 200000,  icon: '🕳️', name: '归元洞',   effects: { 'time:daoguo': -0.05, 'exp:daoguo': 0.08 } },
             { id: 'dao_pagoda',   skill: 'daoguo', level: 15, price: 500000,  icon: '🗼', name: '悟真塔',   effects: { 'out:daoguo': 0.15 } },
             { id: 'dao_heaven',   skill: 'daoguo', level: 20, price: 1200000, icon: '🌌', name: '洞天福地', effects: { 'out:daoguo': 0.20 } },
+            { id: 'dao_source',   skill: 'daoguo', level: 30, price: 50000000, icon: '⛲', name: '道源池', effects: { 'out:daoguo': 0.20, 'time:daoguo': -0.05 } },
             { id: 'law_stone',    skill: 'wudao', level: 5,  price: 20000,  icon: '🪨', name: '悟道石',   effects: { 'time:wudao': -0.05 } },
             { id: 'law_platform', skill: 'wudao', level: 10, price: 60000,  icon: '⛩️', name: '悟道台',   effects: { 'time:wudao': -0.06 } },
             { id: 'law_tree',     skill: 'wudao', level: 15, price: 150000, icon: '🌳', name: '悟道茶树', effects: { 'exp:wudao': 0.10 } }
@@ -7533,8 +7553,15 @@
 
         // 计算技能等级效果显示文本
         function calculateSkillLevelEffect(skillName, level) {
+            // 丹火 / 神识 / 道果：每级产出 +2%（applySkillLevelBonus），之前界面上没写出来
+            const curOut = CURRENCY_NAMES[skillName] ? `产出 +${(level - 1) * 2}%` : '';
             const effect = SKILL_LEVEL_EFFECTS[skillName];
-            if (!effect) return '';
+            if (!effect) return curOut;
+            if (curOut) return `${curOut}，${calculateSkillLevelEffectBase(skillName, level)}`;
+            return calculateSkillLevelEffectBase(skillName, level);
+        }
+        function calculateSkillLevelEffectBase(skillName, level) {
+            const effect = SKILL_LEVEL_EFFECTS[skillName];
 
             const multiplier = effect.formula(level);
 
