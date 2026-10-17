@@ -5859,7 +5859,7 @@
         // 宗门是一条跟着境界走的并行成长线：宗门经验来自任务，等级同时受境界限制（SECT_LEVELS[].realm），不会一下子全开。
         // 任务榜：每 4 小时（现实时间）把空位补满到 3 个；同时只能接 1 个（宗门 5 级起 2 个）；花贡献可以把榜上的任务换一个。
         // 任务进度在线离线都算（离线托管的胜场也算），达成自动完成；供奉类要手动上交。
-        // 奖励：宗门经验 + 贡献，每升一级任务奖励 +15%。贡献用于换任务、更换殿阁形制（v7.50）。
+        // 奖励：宗门经验 + 贡献，每升一级任务奖励 +15%。贡献用于换任务、更换殿阁形制（v7.50）、宗门商店（v7.51）。
         const SECT_REALM = NASCENT_SAFE_REALM;   // 元婴初期
         const SECT_LEVELS = [
             { xp: 0, realm: 22 }, { xp: 250, realm: 23 }, { xp: 700, realm: 24 }, { xp: 1400, realm: 26 }, { xp: 2400, realm: 28 },
@@ -6085,7 +6085,9 @@
                 <div class="qiyu-sub">任务榜（${s.board.length}/${SECT_BOARD_SIZE}）· ${fmtLeft(s.nextRefreshAt - Date.now())}后补满</div>
                 ${s.board.length ? s.board.map(t => sectTaskCard(t, 'board')).join('') : '<div class="qiyu-empty">榜上的任务都接完了，等下一次补充。</div>'}
                 <div class="qiyu-note">任务榜每 4 小时把空位补满到 ${SECT_BOARD_SIZE} 个，离线也照常补。讨伐、清剿、游历、历练的进度在线离线都算，达成自动完成；供奉要手动上交。放弃的任务不回到榜上。</div>
-                ${sectHallsHtml()}`;
+                ${sectHallsHtml()}
+                ${invasionHtml()}
+                ${sectShopHtml()}`;
         }
 
         // ==================== 敌人词缀、地气与精英（v7.47） ====================
@@ -6095,13 +6097,13 @@
         // 标定（筑基 / 结丹 / 元婴标准玩家）：普通区域一两下打死敌人，七种地气平均慢 5%～8%（幻身 +28%、元婴罡气 +40%，其余几乎无影响），0 败；
         // 精英 0 败。综合战斗收入不对症约 +7%、对症约 +14%（方案约束：新系统叠满不超过 +15%）。
         const AFFIXES = {
-            tiebi:    { name: '铁壁', icon: '🛡️', desc: '防御 ×2', counter: '无视防御的周期攻击、火域（双方防御 -30%）' },
-            jifeng:   { name: '疾风', icon: '💨', desc: '速度 +50%', counter: '雷域（命中 +20%）、提高速度' },
-            huanshen: { name: '幻身', icon: '👥', desc: '闪避 +30%', counter: '雷域（闪避失效）、命中加成' },
-            shixue:   { name: '嗜血', icon: '🩸', desc: '造成伤害的 30% 化为自身生命', counter: '闪避（水域）、高防御' },
-            gangqi:   { name: '罡气', icon: '🔆', desc: '开场护盾 = 30% 最大生命，2 秒没挨打就回满', counter: '攻速（风域）、多段周期攻击' },
-            fanzhen:  { name: '反震', icon: '🪞', desc: '受到伤害的 20% 反弹给你（按你的防御减免）', counter: '高防御、回复（木域）' },
-            kuangbao: { name: '狂暴', icon: '😡', desc: '生命低于 50% 时攻击 +50%', counter: '爆发速杀（金域暴击）、高防御' }
+            tiebi:    { name: '铁壁', icon: '🛡️', desc: '防御 ×2', counter: '无视防御的周期攻击、提高攻击' },
+            jifeng:   { name: '疾风', icon: '💨', desc: '速度 +50%', counter: '提高速度（命中看双方速度差）' },
+            huanshen: { name: '幻身', icon: '👥', desc: '闪避 +30%', counter: '雷域（闪避失效）、提高速度' },
+            shixue:   { name: '嗜血', icon: '🩸', desc: '造成伤害的 30% 化为自身生命', counter: '高防御（它打中你越少回血越少）、提高输出' },
+            gangqi:   { name: '罡气', icon: '🔆', desc: '开场护盾 = 30% 最大生命，2 秒没挨打就回满', counter: '风域（出手更快，护盾来不及回满）、多段周期攻击' },
+            fanzhen:  { name: '反震', icon: '🪞', desc: '受到伤害的 20% 反弹给你（按你的防御减免）', counter: '高防御、风域（速战速决）' },
+            kuangbao: { name: '狂暴', icon: '😡', desc: '生命低于 50% 时攻击 +50%', counter: '雷域（命中 +20%，在它狂暴前打完）、高防御' }
         };
         const AFFIX_TUNE = { tiebiDef: 2, jifengSpd: 1.5, huanshenDodge: 0.3, shixueHeal: 0.3, gangqiShield: 0.3, gangqiReset: 2, fanzhenRate: 0.2, kuangbaoAtk: 1.5, kuangbaoAt: 0.5 };
         const DIQI_FROM_REALM = 14;   // 筑基初期起的区域才有地气与精英（新手期不打扰）
@@ -6184,14 +6186,16 @@
             const strikes = PERIODIC_STRIKES.filter(s => s.mult() > 0).map(s => s.label.replace(/^\S+\s/, ''));
             const domTip = (k, why) => { if (dom) tips.push(`灵域选「${SPIRIT_DOMAINS[k].name}」（${why}）`); };
             (enemy.affixes || []).forEach(k => {
-                if (k === 'tiebi') { if (strikes.length) tips.push(`铁壁挡不住无视防御的周期攻击：你有${strikes.join('、')}`); domTip('fire', '双方防御 -30%'); }
-                if (k === 'jifeng') { domTip('thunder', '双方命中 +20%，抵消它的速度'); tips.push('命中看双方速度差：提高速度（饰品 / 淬炼饰品）能抵消它的速度'); }
+                // 对策按实测（v7.51，化神标准玩家对 8 种灵域逐个测）：化神～真仙灵域敌我同受，火域 / 金域会让敌人也更凶，长战里胜率大跌，所以不推荐
+                if (k === 'tiebi') { if (strikes.length) tips.push(`铁壁挡不住无视防御的周期攻击：你有${strikes.join('、')}`); tips.push('铁壁让你每下打得更轻：提高攻击（换装备 / 淬炼武器）'); }
+                if (k === 'jifeng') tips.push('命中看双方速度差：提高速度（饰品 / 淬炼饰品）能抵消它的速度');
                 if (k === 'huanshen') { domTip('thunder', '闪避失效'); tips.push('幻身让你更难打中：提高速度能拉高命中率'); }
-                if (k === 'shixue') { domTip('water', '闪避 +15%，挨打少它回血就少'); tips.push('嗜血按它打中你的伤害回血：提高防御（换装备 / 淬炼）能同时压低它的回血'); }
+                if (k === 'shixue') tips.push('嗜血按它打中你的伤害回血：提高防御（换装备 / 淬炼）能同时压低它的回血');
                 if (k === 'gangqi') { domTip('wind', '攻击间隔 -0.5 秒，护盾来不及回满'); tips.push('罡气 2 秒没挨打才回满：提高速度缩短出手间隔，就能一直压着它的护盾'); if (strikes.length) tips.push(`周期攻击能持续压住罡气：你有${strikes.join('、')}`); }
-                if (k === 'fanzhen') { tips.push('反震按你的防御减免：提高防御最直接'); domTip('wood', '每秒回复 1.5% 生命'); }
-                if (k === 'kuangbao') { domTip('metal', '暴击率 +20%，在它狂暴前打完'); tips.push('狂暴只在它生命低于一半时发作：输出越高，它狂暴的时间越短'); }
+                if (k === 'fanzhen') { tips.push('反震按你的防御减免：提高防御最直接'); domTip('wind', '出手更快，速战速决'); }
+                if (k === 'kuangbao') { domTip('thunder', '命中 +20%，在它狂暴前打完'); tips.push('狂暴只在它生命低于一半时发作：输出越高、防御越高越稳'); }
             });
+            if (dom && !isDomainOneSided() && (enemy.affixes || []).length) tips.push('化神到真仙的灵域对敌我同时生效：火域（双方攻击 +25%）、金域（双方暴击）会让敌人也更凶，长一点的战斗里慎用');
             return tips;
         }
         function battleReviewText(battle, areaKey) {
@@ -6653,7 +6657,12 @@
 
         function tickQiyu(dt) {
             if (++qiyuTickCount % 10 === 0) { qiyuPruneBuffs(); renderQiyuSeal(); if (isQiyuModalOpen()) renderQiyuModal(); tickInjury();
-                if (getSect()) { const refilled = tickSectBoard(); if (document.body.dataset.panel === 'sect' && (refilled || qiyuTickCount % 100 === 0)) renderSectPanel(); } }
+                if (getSect()) {
+                    const sc = getSect(), refilled = tickSectBoard();
+                    tickInvasion();
+                    if (sc.hallDown && Object.keys(sc.hallDown).some(h => sc.hallDown[h] <= Date.now())) { Object.keys(sc.hallDown).forEach(h => { if (sc.hallDown[h] <= Date.now()) delete sc.hallDown[h]; }); calculateStats(); }
+                    if (document.body.dataset.panel === 'sect' && (refilled || qiyuTickCount % 100 === 0)) renderSectPanel();
+                } }
             const act = qiyuActivity();
             if (!act) return;
             const q = getQiyu();
@@ -7476,14 +7485,14 @@
         }
         function sectHallForm(hall) {
             const s = getSect();
-            if (!s || !s.halls || !s.halls[hall] || sectLevelInfo().level < SECT_HALLS[hall].level) return null;
+            if (!s || !s.halls || !s.halls[hall] || sectLevelInfo().level < SECT_HALLS[hall].level || hallIsDown(hall)) return null;   // hallIsDown：外敌攻破山门后停用
             return SECT_HALLS[hall].forms[s.halls[hall]] || null;
         }
         function getSectMod(key) {
             const s = gameState.sect;
             if (!s || !s.halls) return 0;
             if (SECT_BATTLE_KEYS.has(key) && inTribulationFight()) return 0;
-            const sig = (s.hallsSig || '') + '|' + (s.xp || 0) + '|' + gameState.player.realmIndex;
+            const sig = (s.hallsSig || '') + '|' + (s.xp || 0) + '|' + gameState.player.realmIndex + '|' + Object.keys(s.hallDown || {}).filter(hallIsDown).join(',');
             if (sectModCache.sig !== sig) {
                 const totals = {};
                 Object.keys(SECT_HALLS).forEach(h => { const f = sectHallForm(h); if (f) Object.entries(f.effects).forEach(([k, v]) => { totals[k] = (totals[k] || 0) + v; }); });
@@ -7526,12 +7535,153 @@
             showNotification(`${cfg.icon} ${cfg.name}：${first ? '定下' : '改为'}「${cfg.forms[formId].name}」`, '#c2a25f');
             renderSectPanel(); updateUI(); saveGame();
         }
+        // ==================== 外敌来犯 / 宗门商店（v7.51） ====================
+        // 外敌来犯：宗门 2 级起，每 8～16 小时（现实时间）一次，提前 1 小时预告来犯者和它的两个词缀；可以在宗门页预先选「迎敌灵域」。
+        // 到点自动开打（离线也照常，回来时在「本次亮点」里看结果），用你当时的属性、食物和迎敌灵域；不消耗神识。
+        // 胜：贡献 + 宗门经验，20% 概率得 1 枚「战斗」奇物残片。败：随机一座已定形制的殿阁停用 2 小时，弹出复盘；不丢修为、不丢物品（吃掉的食物不返还）。
+        // 宗门 8 / 10 级来犯者升档：生命与攻击各 +15% / +30%，奖励 ×1.5 / ×2。
+        const INVADE_FROM_LEVEL = 2, INVADE_GAP_MIN = 8 * 3600e3, INVADE_GAP_MAX = 16 * 3600e3, INVADE_WARN_MS = 3600e3, INVADE_HALL_DOWN_MS = 2 * 3600e3;
+        const INVADE_TUNE = { hp: 6, atk: 1.6, timeout: 120 };
+        const INVADE_REWARD = { contrib: 220, xp: 120, shard: 0.2 };
+
+        function invadeTier() { const lv = sectLevelInfo().level; return lv >= 10 ? 3 : lv >= 8 ? 2 : 1; }
+        function bestBattleArea() {
+            const list = Object.entries(gameState.skills.battle.actions).filter(([, a]) => isBattleAreaUnlocked(a)).sort(([, a], [, b]) => b.areaData.minLevel - a.areaData.minLevel);
+            return list.length ? list[0][0] : null;
+        }
+        function scheduleInvasion(now = Date.now()) {
+            const s = getSect(), keys = Object.keys(AFFIXES), a = keys.splice(Math.floor(Math.random() * keys.length), 1)[0], b = keys[Math.floor(Math.random() * keys.length)];
+            s.invasion = { at: now + INVADE_GAP_MIN + Math.random() * (INVADE_GAP_MAX - INVADE_GAP_MIN), affixes: [a, b], warned: false };
+        }
+        function buildInvader(area, affixes) {
+            const tpl = (BATTLE_ENEMY_CONFIGS[area] || BATTLE_ENEMY_CONFIGS.forest).slice(-1)[0];
+            const sc = P4_AREA_SCALE[area] || { hp: 1, atk: 1 }, gear = 1, tier = invadeTier(), tm = 1 + 0.15 * (tier - 1);
+            const hp = Math.max(1, Math.round(tpl.hp * sc.hp * INVADE_TUNE.hp * tm));
+            const e = { ...tpl, name: '来犯·' + tpl.name, hp, currentHP: hp, atk: Math.max(1, Math.round(tpl.atk * sc.atk * gear * INVADE_TUNE.atk * tm)), affixes: affixes.slice(), invader: true };
+            if (affixes.includes('tiebi')) e.def = Math.round(e.def * AFFIX_TUNE.tiebiDef);
+            if (affixes.includes('jifeng')) e.spd = Math.round(e.spd * AFFIX_TUNE.jifengSpd);
+            if (affixes.includes('gangqi')) { e.shieldMax = Math.round(e.hp * AFFIX_TUNE.gangqiShield); e.shield = e.shieldMax; e.noHit = 0; }
+            return e;
+        }
+        function fightInvader() {
+            const s = getSect(), P = gameState.player, area = bestBattleArea();
+            if (!area) return null;
+            const e = buildInvader(area, s.invasion.affixes);
+            const saved = { speed: gameState.battleSpeed, d1: P.activeDomain, d2: P.activeDomain2, food: P.foodUseTimer };
+            gameState.battleSpeed = 5;
+            P.activeDomain = isDomainUnlocked() && s.invasionDomain && SPIRIT_DOMAINS[s.invasionDomain] ? s.invasionDomain : null;
+            P.activeDomain2 = null;
+            const battle = { currentArea: area, playerHP: { current: P.stats.hp.max, max: P.stats.hp.max }, currentEnemy: e, log: [], turnCount: 0 };
+            try {
+                P.foodUseTimer = FOOD_CONFIG.autoEatConfig.cooldown;
+                pickBestFood();
+                do { stepNormalBattle(battle); } while (e.currentHP > 0 && battle.playerHP.current > 0 && battle.turnCount < INVADE_TUNE.timeout);
+            } finally {
+                gameState.battleSpeed = saved.speed; P.activeDomain = saved.d1; P.activeDomain2 = saved.d2; P.foodUseTimer = saved.food;
+            }
+            return { won: e.currentHP <= 0, battle, area };
+        }
+        function resolveInvasion() {
+            const s = getSect(), tier = invadeTier(), mult = (tier === 3 ? 2 : tier === 2 ? 1.5 : 1) * sectRewardMult();
+            const r = fightInvader();
+            if (!r) { scheduleInvasion(); return; }
+            const e = r.battle.currentEnemy;
+            let text;
+            if (r.won) {
+                const c = Math.round(INVADE_REWARD.contrib * mult), x = Math.round(INVADE_REWARD.xp * mult);
+                s.contrib += c; s.xp += x;
+                const shard = Math.random() < INVADE_REWARD.shard ? qiyuAddShard('battle') : '';
+                text = `🏯 击退「${e.name}」！贡献 +${c}、宗门经验 +${x}${shard ? '\n🧩 ' + shard : ''}`;
+                showNotification(text, '#c2a25f', 'rare');
+            } else {
+                const halls = Object.keys((s.halls || {})).filter(h => sectHallForm(h));
+                const h = halls.length ? halls[Math.floor(Math.random() * halls.length)] : null;
+                if (h) { s.hallDown = s.hallDown || {}; s.hallDown[h] = Date.now() + INVADE_HALL_DOWN_MS; calculateStats(); }
+                text = `💥 「${e.name}」攻破山门${h ? `，${SECT_HALLS[h].name}停用 2 小时` : ''}（不丢修为与物品）`;
+                showNotification(text, '#c4483a');
+                const review = battleReviewText(r.battle, null) + `\n· 下次外敌来犯会提前 1 小时预告，可以在宗门页按它的词缀选迎敌灵域`;
+                setTimeout(() => uiAlert(review, { title: '外敌来犯 · 复盘' }), 500);
+            }
+            s.lastInvasion = { at: Date.now(), won: r.won, text };
+            scheduleInvasion();
+            renderSectPanel(); saveGame();
+        }
+        function tickInvasion(now = Date.now()) {
+            const s = getSect();
+            if (!s || sectLevelInfo().level < INVADE_FROM_LEVEL) return;
+            if (!s.invasion) { scheduleInvasion(now); return; }
+            if (!s.invasion.warned && now >= s.invasion.at - INVADE_WARN_MS && now < s.invasion.at) {
+                s.invasion.warned = true;
+                showNotification(`⚠️ 外敌将在 ${fmtLeft(s.invasion.at - now)}后来犯：带「${s.invasion.affixes.map(k => AFFIXES[k].name).join('」「')}」。可以去宗门页选迎敌灵域`, '#c98a3e', 'warning');
+            }
+            if (now >= s.invasion.at) resolveInvasion();
+        }
+        function hallIsDown(h) { const s = getSect(); return !!(s && s.hallDown && (s.hallDown[h] || 0) > Date.now()); }
+        function setInvasionDomain(k) { const s = getSect(); s.invasionDomain = SPIRIT_DOMAINS[k] ? k : null; renderSectPanel(); saveGame(); }
+        function invasionHtml() {
+            const s = getSect(), lv = sectLevelInfo().level;
+            if (lv < INVADE_FROM_LEVEL) return `<div class="qiyu-sub">外敌来犯</div><div class="hall locked"><div class="hall-head">⚔️ 外敌来犯<span>宗门 ${INVADE_FROM_LEVEL} 级开放</span></div></div>`;
+            if (!s.invasion) scheduleInvasion();
+            const inv = s.invasion, now = Date.now(), soon = now >= inv.at - INVADE_WARN_MS;
+            const area = bestBattleArea(), e = area ? buildInvader(area, inv.affixes) : null;
+            const tier = invadeTier();
+            const dom = isDomainUnlocked()
+                ? `<div class="invade-dom">迎敌灵域：<select onchange="setInvasionDomain(this.value)"><option value="">不用灵域</option>${Object.entries(SPIRIT_DOMAINS).map(([k, d]) => `<option value="${k}"${s.invasionDomain === k ? ' selected' : ''}>${d.name}（${d.desc}）</option>`).join('')}</select></div>`
+                : `<div class="invade-dom">化神后可以选迎敌灵域</div>`;
+            const foe = soon && e ? `来犯者：${e.name}（生命 ${fmtXP(e.hp)}、攻击 ${fmtXP(e.atk)}）${affixTagsHtml(inv.affixes)}<br/>应对：${inv.affixes.map(k => AFFIXES[k].counter).join('；')}`
+                : `下一次约在 ${fmtLeft(inv.at - now)}后，开打前 1 小时预告来犯者和词缀`;
+            const down = Object.keys(s.hallDown || {}).filter(hallIsDown).map(h => `${SECT_HALLS[h].name}停用中，还剩 ${fmtLeft(s.hallDown[h] - now)}`).join('；');
+            return `<div class="qiyu-sub">外敌来犯${tier > 1 ? `（${tier === 3 ? '三' : '二'}档）` : ''}</div><div class="hall"><div class="invade-foe">${foe}</div>${dom}
+                ${down ? `<div class="invade-down">💥 ${down}</div>` : ''}
+                ${s.lastInvasion ? `<div class="invade-last">上一次：${s.lastInvasion.text.replace(/\n/g, ' ')}</div>` : ''}
+                <div class="qiyu-note">到点自动开打（离线也照常），用你当时的属性、食物和迎敌灵域。胜：贡献 ${Math.round(INVADE_REWARD.contrib * (tier === 3 ? 2 : tier === 2 ? 1.5 : 1) * sectRewardMult())}、宗门经验 ${Math.round(INVADE_REWARD.xp * (tier === 3 ? 2 : tier === 2 ? 1.5 : 1) * sectRewardMult())}，20% 概率得战斗类奇物残片；败：随机一座殿阁停用 2 小时，不丢修为与物品。宗门 8 / 10 级来犯者升档（更强，奖励 ×1.5 / ×2）。</div></div>`;
+        }
+
+        // 宗门商店：只卖「选择」和「便利」，不卖裸属性
+        const SECT_SHOP = {
+            shard:  { name: '奇物残片（指定类别）', cost: 300, desc: '选一类得到 1 枚奇物残片；该类已集齐则计入还差最多的一类' },
+            refill: { name: '任务榜补满令', cost: 80, desc: '立即把任务榜的空位补满' },
+            reset:  { name: '易阵符', cost: 60, desc: '所有殿阁的换形制冷却立即清零' }
+        };
+        const SECT_WEEK_MS = 7 * 24 * 3600e3;
+        function sectShardLimit() { const lv = sectLevelInfo().level; return 2 + (lv >= 8 ? 1 : 0) + (lv >= 10 ? 1 : 0); }
+        function sectShardBought() { const s = getSect(), w = Math.floor(Date.now() / SECT_WEEK_MS); if (s.shopWeek !== w) { s.shopWeek = w; s.shardBought = 0; } return s.shardBought || 0; }
+        function buySectItem(id, cat) {
+            const s = getSect(), it = SECT_SHOP[id];
+            if (!s || !it) return;
+            if (s.contrib < it.cost) { showNotification(`贡献不够（需要 ${it.cost}）`, '#c98a3e'); return; }
+            if (id === 'shard') {
+                if (sectShardBought() >= sectShardLimit()) { showNotification('本周的奇物残片已经买满了', '#c98a3e'); return; }
+                const got = qiyuAddShard(cat);
+                if (!got) { showNotification('奇物已经全部集齐', '#c98a3e'); return; }
+                s.shardBought = sectShardBought() + 1;
+                s.contrib -= it.cost;
+                showNotification(`🧩 ${got}`, '#c2a25f', 'rare');
+            } else if (id === 'refill') {
+                if (s.board.length >= SECT_BOARD_SIZE) { showNotification('任务榜已经是满的', '#c98a3e'); return; }
+                s.contrib -= it.cost; refillSectBoard();
+                showNotification('📜 任务榜已补满', '#c2a25f');
+            } else if (id === 'reset') {
+                s.contrib -= it.cost; s.hallSwitchAt = {};
+                showNotification('🔁 殿阁换形制的冷却已清零', '#c2a25f');
+            }
+            renderSectPanel(); saveGame();
+        }
+        function sectShopHtml() {
+            const s = getSect();
+            const bought = sectShardBought(), lim = sectShardLimit();
+            const cats = Object.entries(QIYU_CAT_NAMES).map(([c, n]) => `<button type="button" class="btn btn-small btn-secondary" onclick="buySectItem('shard', '${c}')"${bought >= lim ? ' disabled' : ''}>${n}</button>`).join('');
+            return `<div class="qiyu-sub">宗门商店（贡献 ${fmtXP(s.contrib)}）</div>
+                <div class="sect-task"><div class="sect-task-title">${SECT_SHOP.shard.name} · ${SECT_SHOP.shard.cost} 贡献</div><div class="sect-task-hint">${SECT_SHOP.shard.desc}。本周已买 ${bought}/${lim}（宗门 8 / 10 级各 +1）</div><div class="sect-task-btns">${cats}</div></div>
+                ${['refill', 'reset'].map(id => `<div class="sect-task"><div class="sect-task-foot"><span><b>${SECT_SHOP[id].name}</b> · ${SECT_SHOP[id].cost} 贡献<br/><span class="sect-task-hint">${SECT_SHOP[id].desc}</span></span><span class="sect-task-btns"><button type="button" class="btn btn-small" onclick="buySectItem('${id}')">买</button></span></div></div>`).join('')}`;
+        }
+
         function sectHallsHtml() {
             const s = getSect(), lv = sectLevelInfo().level;
             return `<div class="qiyu-sub">殿阁</div>` + Object.entries(SECT_HALLS).map(([h, cfg]) => {
                 if (lv < cfg.level) return `<div class="hall locked"><div class="hall-head">${cfg.icon} ${cfg.name}<span>宗门 ${cfg.level} 级开放</span></div></div>`;
                 const cur = (s.halls || {})[h];
-                const left = cur ? (s.hallSwitchAt[h] || 0) + SECT_HALL_COOLDOWN_MS - Date.now() : 0;
+                const left = cur ? ((s.hallSwitchAt || {})[h] || 0) + SECT_HALL_COOLDOWN_MS - Date.now() : 0;
                 const note = !cur ? '首次选择免费' : left > 0 ? `${fmtLeft(left)}后可再换` : `换形制 ${SECT_HALL_SWITCH_COST} 贡献`;
                 const forms = Object.entries(cfg.forms).map(([id, f]) => `<button type="button" class="hall-form${cur === id ? ' on' : ''}" onclick="chooseSectHall('${h}', '${id}')"><b>${f.name}</b><span>${hallEffectText(f)}</span></button>`).join('');
                 return `<div class="hall"><div class="hall-head">${cfg.icon} ${cfg.name}<span>${note}</span></div><div class="hall-forms${h === 'yanwu' ? ' many' : ''}">${forms}</div></div>`;
@@ -13442,7 +13592,7 @@
             const levels = {};
             Object.keys(gameState.skills || {}).forEach(k => { if (gameState.skills[k] && gameState.skills[k].level) levels[k] = gameState.skills[k].level; });
             const mastery = a && !a.isBattle && !a.isDungeon && getMasteryStore(a.skill) ? { skill: a.skill, key: a.action, level: getMasteryInfo(a.skill, a.action).level } : null;
-            return { realm: P.realmIndex, levels, inv: new Set(P.inventory.map(i => i.id)), mastery };
+            return { realm: P.realmIndex, levels, inv: new Set(P.inventory.map(i => i.id)), mastery, time: Date.now() };
         }
         function offlineHighlights(exceedsLimit, wastedHours) {
             const s = offlineSnap, out = [];
@@ -13456,12 +13606,15 @@
                 const lv = getMasteryInfo(s.mastery.skill, s.mastery.key).level;
                 if (lv > s.mastery.level) out.push(`🎓 「${(getAction(s.mastery.skill, s.mastery.key) || {}).name || s.mastery.key}」精通 Lv.${s.mastery.level} → Lv.${lv}`);
             }
+            const li = getSect() && getSect().lastInvasion;
+            if (li && li.at >= s.time) out.push(li.text.replace(/\n/g, ' '));
             const fresh = P.inventory.filter(i => !s.inv.has(i.id) && GAME_CONFIG.items[i.id]).map(i => `${GAME_CONFIG.items[i.id].icon}${GAME_CONFIG.items[i.id].name}`);
             if (fresh.length) out.push(`🎒 背包里新出现：${fresh.slice(0, 6).join('、')}${fresh.length > 6 ? ` 等 ${fresh.length} 种` : ''}`);
             return out;
         }
         function handleOfflineTime(quietUnder = 0) {
             offlineSnap = takeOfflineSnap();
+            if (getSect()) tickInvasion();   // 外敌来犯：离线期间到点的先结算，结果进「本次亮点」
             const from = gameState.lastActiveTime, act = qiyuActivity();
             const secs = Math.min(Math.max(0, (Date.now() - from) / 1000), (gameState.settings?.maxOfflineHours || 24) * 3600);
             const before = getQiyu().pending.length;

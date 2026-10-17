@@ -3052,3 +3052,9 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 .hall-good { color: var(--jade); }
 .hall-bad { color: var(--cinnabar-2); }
 @media (max-width: 600px) { .hall-forms, .hall-forms.many { grid-template-columns: 1fr 1fr; } }
+/* v7.51 外敌来犯 / 宗门商店 */
+.invade-foe { font-size: 0.88em; color: var(--text-l2); line-height: 1.7; }
+.invade-dom { margin-top: 8px; font-size: 0.85em; color: var(--text-l3); }
+.invade-dom select { max-width: 100%; margin-left: 4px; padding: 3px 6px; background: var(--bg-l1); color: var(--text-l1); border: 1px solid var(--border-l3); font: inherit; }
+.invade-down { margin-top: 6px; font-size: 0.85em; color: var(--cinnabar-2); }
+.invade-last { margin-top: 6px; font-size: 0.82em; color: var(--text-l4); }
