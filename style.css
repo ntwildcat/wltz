@@ -2961,3 +2961,106 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 .ls-line { font-size: 0.86em; color: var(--text-l3); line-height: 1.7; }
 .strike-lifeSword { color: #9fd8ff; }
 @media (max-width: 768px) { .life-sword-card { grid-template-columns: 70px 1fr; } .ls-art svg { width: 70px; height: 68px; } }
+
+/* ===== 奇遇（v7.45）===== */
+.qiyu-seal { position: fixed; right: 20px; bottom: 20px; z-index: 950; width: 54px; height: 54px; padding: 0; border: 2px solid #7a2219; border-radius: 6px; background: #a8322a; color: #fff2e4; cursor: pointer; transform: rotate(-6deg); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45), inset 0 0 0 2px rgba(255, 230, 200, 0.25); display: flex; align-items: center; justify-content: center; }
+.qiyu-seal[hidden] { display: none; }
+.qiyu-seal:hover { background: #b8402f; }
+.qiyu-seal-char { font-family: var(--font-brush); font-size: 32px; line-height: 1; }
+.qiyu-seal-count { position: absolute; top: -8px; right: -8px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--jade); color: #fff; font-size: 12px; line-height: 20px; font-weight: bold; transform: rotate(6deg); box-sizing: border-box; }
+.qiyu-seal-count[hidden] { display: none; }
+.qiyu-seal.has-new { animation: qiyuPulse 2.4s ease-in-out infinite; }
+@keyframes qiyuPulse { 0%, 100% { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45), 0 0 0 0 rgba(196, 72, 58, 0.55); } 50% { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45), 0 0 0 10px rgba(196, 72, 58, 0); } }
+@media (prefers-reduced-motion: reduce) { .qiyu-seal.has-new { animation: none; } }
+@media (max-width: 768px) { .qiyu-seal { right: 12px; bottom: calc(82px + env(safe-area-inset-bottom)); width: 46px; height: 46px; } .qiyu-seal-char { font-size: 27px; } }
+.qiyu-modal { max-width: 560px; width: calc(100% - 32px); box-sizing: border-box; }
+.qiyu-sub { margin: 4px 0 8px; font-size: 0.9em; color: var(--text-l2); letter-spacing: 0.04em; }
+.qiyu-card { border: 1px solid var(--border-l3); background: var(--bg-l2); border-radius: 3px; padding: 10px 12px; margin-bottom: 10px; }
+.qiyu-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.qiyu-ico { font-size: 1.3em; }
+.qiyu-name { font-family: var(--font-brush); font-size: 1.45em; color: var(--text-l1); letter-spacing: 0.06em; }
+.qiyu-where { font-size: 0.8em; color: var(--text-l4); }
+.qiyu-opts { display: flex; flex-direction: column; gap: 6px; }
+.qiyu-opt { display: flex; gap: 10px; align-items: baseline; text-align: left; width: 100%; padding: 8px 10px; border: 1px solid var(--border-l4); border-radius: 2px; background: var(--bg-l3); color: var(--text-l3); cursor: pointer; font: inherit; font-size: 0.88em; line-height: 1.5; }
+.qiyu-opt:hover { border-color: var(--cinnabar-2); color: var(--text-l1); }
+.qiyu-opt-label { flex: none; min-width: 4.5em; font-weight: bold; color: var(--text-l1); }
+.qiyu-leave { opacity: 0.75; }
+.qiyu-empty { padding: 12px; text-align: center; color: var(--text-l4); font-size: 0.9em; }
+.qiyu-buffs { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.qiyu-buff { display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; border-left: 3px solid var(--jade); background: var(--bg-l2); font-size: 0.88em; color: var(--text-l2); }
+.qiyu-buff.neg { border-left-color: var(--cinnabar-2); }
+.qiyu-buff-left { color: var(--text-l4); white-space: nowrap; }
+.qiyu-note { margin-top: 8px; font-size: 0.8em; color: var(--text-l4); line-height: 1.6; }
+.offline-qiyu { margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px dashed var(--border-l3); }
+/* v7.46 奇物匣 / 本次亮点 */
+.qiyu-foot { margin-top: 8px; font-size: 0.78em; color: var(--text-l4); }
+.relic-cat { margin-bottom: 10px; }
+.relic-cat-head { display: flex; justify-content: space-between; font-size: 0.85em; color: var(--text-l2); margin-bottom: 4px; }
+.relic-cat-head span { color: var(--text-l4); }
+.relic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.relic { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; border: 1px dashed var(--border-l4); border-radius: 2px; background: var(--bg-l2); text-align: center; min-width: 0; }
+.relic.owned { border-style: solid; border-color: var(--bronze-dim); background: var(--bg-l3); }
+.relic-ico { font-size: 1.4em; line-height: 1.2; color: var(--text-l4); }
+.relic-name { font-size: 0.8em; color: var(--text-l1); }
+.relic:not(.owned) .relic-name { color: var(--text-l4); }
+.relic-eff { font-size: 0.7em; color: var(--text-l4); line-height: 1.35; word-break: break-all; }
+.relic.owned .relic-eff { color: var(--jade); }
+@media (max-width: 480px) { .relic-grid { grid-template-columns: repeat(2, 1fr); } }
+.offline-hl { margin-bottom: 12px; }
+.offline-hl-row { padding: 6px 10px; margin-bottom: 4px; border-left: 3px solid var(--bronze-dim); background: var(--bg-l2); font-size: 0.9em; color: var(--text-l3); line-height: 1.6; }
+.offline-bill summary { cursor: pointer; color: var(--text-l2); font-size: 0.9em; padding: 4px 0; }
+/* v7.47 词缀 / 地气 / 伤势 */
+.affix-tag { display: inline-block; margin-left: 6px; padding: 0 5px; font-size: 0.72em; line-height: 1.6; border: 1px solid var(--cinnabar-2); color: var(--cinnabar-2); border-radius: 2px; vertical-align: middle; white-space: nowrap; }
+.affix-shield { display: inline-block; margin-left: 6px; font-size: 0.72em; color: var(--jade); vertical-align: middle; }
+.diqi-line { margin: 4px 0; font-size: 0.8em; color: var(--text-l2); line-height: 1.5; }
+.diqi-counter { color: var(--text-l4); }
+.injury-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 0 0 10px; padding: 8px 12px; border-left: 3px solid var(--cinnabar-2); background: var(--bg-l2); font-size: 0.88em; color: var(--text-l2); }
+/* v7.49 宗门 */
+.skill-item.sk-sect { --sk: var(--cinnabar-2); }
+.sect-found { padding: 16px; border: 1px solid var(--border-l3); background: var(--bg-l2); border-radius: 3px; }
+.sect-found-title { font-family: var(--font-brush); font-size: 1.8em; color: var(--text-l1); margin-bottom: 8px; }
+.sect-found-text { font-size: 0.9em; color: var(--text-l3); line-height: 1.7; }
+.sect-found-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.sect-name-input { flex: 1; min-width: 140px; padding: 8px 10px; background: var(--bg-l1); border: 1px solid var(--border-l3); color: var(--text-l1); font: inherit; border-radius: 2px; }
+.sect-head { padding: 12px 14px; margin-bottom: 12px; border: 1px solid var(--border-l3); background: var(--bg-l2); border-radius: 3px; }
+.sect-name { font-family: var(--font-brush); font-size: 2em; color: var(--text-l1); letter-spacing: 0.08em; line-height: 1.2; }
+.sect-meta { font-size: 0.88em; color: var(--text-l2); margin: 4px 0 8px; }
+.sect-meta b { color: var(--text-l1); }
+.sect-xp { height: 6px; background: var(--bg-l1); border-radius: 3px; overflow: hidden; }
+.sect-xp i { display: block; height: 100%; background: var(--cinnabar-2); }
+.sect-xp-text { margin-top: 6px; font-size: 0.8em; color: var(--text-l4); }
+.sect-task { padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border-l4); background: var(--bg-l2); border-radius: 2px; }
+.sect-task.active { border-color: var(--bronze-dim); background: var(--bg-l3); }
+.sect-task-title { font-size: 0.95em; color: var(--text-l1); font-weight: bold; }
+.sect-task-hint { margin: 4px 0; font-size: 0.8em; color: var(--text-l4); line-height: 1.5; }
+.sect-task-bar { position: relative; height: 16px; margin: 6px 0; background: var(--bg-l1); border-radius: 2px; overflow: hidden; }
+.sect-task-bar i { display: block; height: 100%; background: var(--jade); opacity: 0.7; }
+.sect-task-bar span { position: absolute; inset: 0; text-align: center; font-size: 0.75em; line-height: 16px; color: var(--text-l1); }
+.sect-task-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.8em; color: var(--text-l2); }
+.sect-task-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+/* v7.50 殿阁 */
+.hall { padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border-l4); background: var(--bg-l2); border-radius: 2px; }
+.hall.locked { opacity: 0.6; }
+.hall-head { display: flex; justify-content: space-between; gap: 8px; font-size: 0.95em; color: var(--text-l1); font-weight: bold; }
+.hall-head span { font-weight: normal; font-size: 0.8em; color: var(--text-l4); }
+.hall-forms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+.hall-forms.many { grid-template-columns: repeat(4, 1fr); }
+.hall-form { display: flex; flex-direction: column; gap: 3px; text-align: left; padding: 7px 8px; border: 1px solid var(--border-l4); border-radius: 2px; background: var(--bg-l3); color: var(--text-l3); cursor: pointer; font: inherit; font-size: 0.8em; line-height: 1.45; min-width: 0; }
+.hall-form b { color: var(--text-l1); font-size: 1.05em; }
+.hall-form:hover { border-color: var(--bronze-dim); }
+.hall-form.on { border-color: var(--cinnabar-2); box-shadow: inset 0 0 0 1px var(--cinnabar); }
+.hall-good { color: var(--jade); }
+.hall-bad { color: var(--cinnabar-2); }
+@media (max-width: 600px) { .hall-forms, .hall-forms.many { grid-template-columns: 1fr 1fr; } }
+/* v7.51 外敌来犯 / 宗门商店 */
+.invade-foe { font-size: 0.88em; color: var(--text-l2); line-height: 1.7; }
+.invade-dom { margin-top: 8px; font-size: 0.85em; color: var(--text-l3); }
+.invade-dom select { max-width: 100%; margin-left: 4px; padding: 3px 6px; background: var(--bg-l1); color: var(--text-l1); border: 1px solid var(--border-l3); font: inherit; }
+.invade-down { margin-top: 6px; font-size: 0.85em; color: var(--cinnabar-2); }
+.invade-last { margin-top: 6px; font-size: 0.82em; color: var(--text-l4); }
+/* v7.52 道途 */
+.dao-kind { margin-left: 6px; font-weight: normal; font-size: 0.8em; color: var(--text-l4); }
+.dao-sub { margin-top: 14px; }
+/* v7.54 弟子 */
+.dis-talent { display: inline-block; margin-left: 4px; padding: 0 5px; font-size: 0.75em; font-weight: normal; line-height: 1.6; border: 1px solid var(--bronze-dim); color: var(--text-l2); border-radius: 2px; }
+.sect-task-foot select { max-width: 100%; padding: 2px 4px; background: var(--bg-l1); color: var(--text-l1); border: 1px solid var(--border-l3); font: inherit; }
