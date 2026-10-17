@@ -1139,7 +1139,13 @@
                     { id: 'heti_art', name: '合体真经', icon: '📖', price: 45000000, desc: '修炼速度 ×8', minRealmIndex: 34, type: 'art' },                // 180万/分
                     { id: 'dao_art', name: '太上合道经', icon: '🕮', price: 110000000, desc: '修炼速度 ×9.5', minRealmIndex: 36, type: 'art' },            // 380万/分
                     { id: 'dacheng_art', name: '大乘真经', icon: '📖', price: 220000000, desc: '修炼速度 ×12', minRealmIndex: 38, type: 'art' },           // 560万/分
-                    { id: 'taiyi_art', name: '鸿蒙化元经', icon: '🕮', price: 520000000, desc: '修炼速度 ×15', minRealmIndex: 40, type: 'art' }            // 1170万/分
+                    { id: 'taiyi_art', name: '鸿蒙化元经', icon: '🕮', price: 520000000, desc: '修炼速度 ×15', minRealmIndex: 40, type: 'art' },
+                    // v7.42 仙界功法：修炼速度与鸿蒙化元经相同（仙界修炼按 ×15 标定），价值在本境界玩法的特效
+                    { id: 'xianyuan_art', name: '仙元周天经', icon: '🕮', price: 2500000000, desc: '修炼速度 ×15（与鸿蒙化元经相同）', minRealmIndex: 42, type: 'art' },
+                    { id: 'jinque_art', name: '金阙淬婴诀', icon: '🕮', price: 3000000000, desc: '修炼速度 ×15（与鸿蒙化元经相同）', minRealmIndex: 43, type: 'art' },
+                    { id: 'yuxu_art', name: '玉虚造化经', icon: '🕮', price: 8000000000, desc: '修炼速度 ×15（与鸿蒙化元经相同）', minRealmIndex: 46, type: 'art' },
+                    { id: 'luotian_art', name: '罗天本源经', icon: '🕮', price: 20000000000, desc: '修炼速度 ×15（与鸿蒙化元经相同）', minRealmIndex: 48, type: 'art' },
+                    { id: 'taichu_art', name: '太初守一经', icon: '🕮', price: 30000000000, desc: '修炼速度 ×15（与鸿蒙化元经相同）', minRealmIndex: 50, type: 'art' }            // 1170万/分
                 ]
             }
         };
@@ -2419,7 +2425,7 @@
             if (key === 'hpPct' || key === 'atkPct' || key === 'defPct') v -= getActiveShuai().reduce((n, sh) => n + (sh.bodyPenalty || 0), 0);
             if ((key === 'hpPct' || key === 'defPct') && gameState.player.realmIndex >= TAIYI_REALM) v += JADE_BODY.bonus;   // 太乙玉身
             if (key === 'hpPct' || key === 'atkPct' || key === 'defPct') {
-                v += LAW_ORIGIN.per * getLawOrigin();                 // 大罗：法则本源，本源愈多实力愈强
+                v += getLawOriginPer() * getLawOrigin();                 // 大罗：法则本源，本源愈多实力愈强
                 if (gameState.player.daoHeart) v += DAO_HEART_BONUS;  // 道心（自降修为留下的）
             }
             if (key === 'cultSpeed') {
@@ -2444,6 +2450,7 @@
         // 法则本源：大罗起修炼「凝结法则本源」，每道本源攻击 / 生命 / 防御 +per，不设上限；10 道为大罗后期的突破条件
         const LAW_ORIGIN = { per: 0.03 };
         function getLawOrigin() { return Math.max(0, gameState.player.lawOrigin || 0); }
+        function getLawOriginPer() { return LAW_ORIGIN.per + getMod('lawOriginPer'); }   // 罗天本源经：每道 +1%
         // 极难被彻底灭杀：大罗起秘境夺舍重生次数与复活生命提高
         const DALUO_REVIVES = 6, DALUO_REVIVE_HP = 0.7;
         function getReviveHp() { return gameState.player.realmIndex >= DALUO_REALM ? DALUO_REVIVE_HP : NASCENT_REVIVE_HP; }
@@ -2476,7 +2483,7 @@
         function decayErosion(seconds) {
             const P = gameState.player;
             if (!isDaozu() || !(P.erosion > 0)) return;
-            P.erosion = Math.max(0, P.erosion - EROSION.decayPerHour * seconds / 3600);
+            P.erosion = Math.max(0, P.erosion - EROSION.decayPerHour * (1 + getMod('erosionDecay')) * seconds / 3600);   // 太初守一经
             if (P.assimilated && P.erosion < EROSION.recoverAt) {
                 P.assimilated = false;
                 invalidateLawTotals(); calculateStats();
@@ -2521,7 +2528,7 @@
         // 每成一次，元婴离体伤害 +strikePerLevel × 攻击（金仙元婴已非大乘时可比）。
         const NASCENT_TEMPER = { max: 9, base: 0.35, perQuality: 0.35, strikePerLevel: 0.1 };
         function getNascentTemper() { return Math.min(NASCENT_TEMPER.max, gameState.player.nascentTemper || 0); }
-        function getNascentTemperRate() { return Math.min(0.95, NASCENT_TEMPER.base + NASCENT_TEMPER.perQuality * getCoreQuality() / 100); }
+        function getNascentTemperRate() { return Math.min(0.95, NASCENT_TEMPER.base + NASCENT_TEMPER.perQuality * getCoreQuality() / 100 + getMod('nascentTemperRate')); }   // 金阙淬婴诀 +10%
         // 结算 n 次淬炼，返回成功次数（满九次后不再消耗）
         function rollNascentTemper(n) {
             let ok = 0;
@@ -2550,7 +2557,8 @@
             const lv = getWorldLevel();
             if (!lv) return null;
             const per = SMALL_WORLD.perHour;
-            return { coins: lv * getBestAreaCoins() * SMALL_WORLD.coinWins, daoguo: lv * per.daoguo, danhuo: lv * per.danhuo, shenshi: lv * per.shenshi };
+            const m = 1 + getMod('worldOut');   // 玉虚造化经
+            return { coins: lv * getBestAreaCoins() * SMALL_WORLD.coinWins * m, daoguo: lv * per.daoguo * m, danhuo: lv * per.danhuo * m, shenshi: lv * per.shenshi * m };
         }
         // 按经过的秒数结算小世界产出（零头留在 smallWorldAcc 里，下次接着累计）
         function settleSmallWorld(seconds) {
@@ -6148,6 +6156,33 @@
                 effects: { hpPct: 0.20, defPct: 0.16, 'time:life': -0.12 },
                 description: '大乘期最终法门，元婴离体，法则随心，上界罕有人能修至此境。',
                 origin: null
+            },
+            // v7.42 仙界功法：仙界境界靠开穴 / 淬炼 / 推演等专门修炼推进，这些修炼的耗时是按鸿蒙化元经 ×15 标定的，
+            // 所以仙界功法修炼速度不再提高，改为各带一条挂在本境界玩法上的特效（开穴、淬炼元婴、小世界、法则本源、天道侵蚀）
+            xianyuan_art: {
+                id: 'xianyuan_art', name: '仙元周天经', tier: 15, speedMultiplier: 15.0,
+                effects: { hpPct: 0.22, defPct: 0.18, orificeTime: -0.10 },
+                description: '真仙法门：仙元在仙穴间周天运转，开穴更顺。', origin: null
+            },
+            jinque_art: {
+                id: 'jinque_art', name: '金阙淬婴诀', tier: 16, speedMultiplier: 15.0,
+                effects: { atkPct: 0.18, defPct: 0.18, nascentTemperRate: 0.10 },
+                description: '金仙法门：以法则丝缕护住元婴，淬炼时少有崩损。', origin: null
+            },
+            yuxu_art: {
+                id: 'yuxu_art', name: '玉虚造化经', tier: 17, speedMultiplier: 15.0,
+                effects: { hpPct: 0.24, defPct: 0.18, worldOut: 0.25 },
+                description: '太乙法门：推演体内小世界，令其生生不息。', origin: null
+            },
+            luotian_art: {
+                id: 'luotian_art', name: '罗天本源经', tier: 18, speedMultiplier: 15.0,
+                effects: { atkPct: 0.20, hpPct: 0.20, lawOriginPer: 0.01 },
+                description: '大罗法门：法则本源与界面相合，每一道都更厚重。', origin: null
+            },
+            taichu_art: {
+                id: 'taichu_art', name: '太初守一经', tier: 19, speedMultiplier: 15.0,
+                effects: { hpPct: 0.22, defPct: 0.22, erosionDecay: 0.5 },
+                description: '道祖法门：守住本我一念，天道侵蚀退得更快。', origin: null
             }
         };
 
@@ -6826,7 +6861,9 @@
                 atkPct: v => `攻击 ${sign(v)}`, hpPct: v => `生命 ${sign(v)}`, defPct: v => `防御 ${sign(v)}`, spdPct: v => `速度 ${sign(v)}`,
                 hit: v => `命中 ${sign(v)}`, crit: v => `暴击率 ${sign(v)}`, critDmg: v => `暴击伤害 ${sign(v)}`, dodge: v => `闪避 ${sign(v)}`,
                 foodPct: v => `食物恢复 ${sign(v)}`, gearPct: v => `装备属性 ${sign(v)}`, dropPct: v => `秘境掉落 ${sign(v)}`,
-                cultSpeed: v => `修炼速度 ${sign(v)}`, cloneSpeed: v => `分身速度 ${sign(v)}${isFused() ? '（已并入本体）' : ''}`, autoOffline: v => `离线自动战斗效率 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
+                cultSpeed: v => `修炼速度 ${sign(v)}`,
+                orificeTime: v => `开辟仙穴耗时 ${sign(v)}`, nascentTemperRate: v => `淬炼元婴成功率 ${sign(v)}`, worldOut: v => `小世界产出 ${sign(v)}`,
+                lawOriginPer: v => `法则本源每道攻击 / 生命 / 防御 ${sign(v)}`, erosionDecay: v => `天道侵蚀消退速度 ${sign(v)}`, cloneSpeed: v => `分身速度 ${sign(v)}${isFused() ? '（已并入本体）' : ''}`, autoOffline: v => `离线自动战斗效率 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
             };
             return Object.entries(effects).map(([key, v]) => {
                 if (fixed[key]) return fixed[key](v);
@@ -6967,7 +7004,7 @@
                 const currentArt = CULTIVATION_ARTS[gameState.player.currentArt];
                 const cultMult = 1 + getMod('cultSpeed');   // 悟道法则的修炼速度加成
                 // 仙衰：仙灵力外泄，开辟仙窍变慢
-                const shuai = recipeKey && (GAME_CONFIG.skills.cultivation.recipes[recipeKey] || {}).output?.xianqiao ? getOrificeTimeMult() : 1;
+                const shuai = recipeKey && (GAME_CONFIG.skills.cultivation.recipes[recipeKey] || {}).output?.xianqiao ? getOrificeTimeMult() * (1 + getMod('orificeTime')) : 1;   // 仙衰 / 仙元周天经
                 if (currentArt) {
                     return duration * shuai / (currentArt.speedMultiplier * cultMult); // 倍率越高，持续时间越短
                 }
@@ -7423,7 +7460,7 @@
             if (finalOutput.lawOrigin) {
                 gameState.player.lawOrigin = getLawOrigin() + finalOutput.lawOrigin;
                 calculateStats();
-                showNotification(`🔮 凝结法则本源：${getLawOrigin()} 道（攻击 / 生命 / 防御 +${Math.round(getLawOrigin() * LAW_ORIGIN.per * 100)}%）`, '#c2a25f', getLawOrigin() === 10 ? 'rare' : 'info');
+                showNotification(`🔮 凝结法则本源：${getLawOrigin()} 道（攻击 / 生命 / 防御 +${Math.round(getLawOrigin() * getLawOriginPer() * 100)}%）`, '#c2a25f', getLawOrigin() === 10 ? 'rare' : 'info');
             }
             if (finalOutput.worldDeduce) {
                 const before = getWorldLevel();
@@ -9499,6 +9536,11 @@
                 lianxu_art: svg(book('#8a6ad8', '#4a2f8a', m('<path d="M0 -5.4Q4.6 -3 4.6 1Q4.6 5.4 0 5.4Q-4.6 5.4 -4.6 1Q-4.6 -3 0 -5.4Z" fill="#c8b8f0" stroke="#4a2f8a" stroke-width=".9"/><circle r="1.4" fill="#4a2f8a" stroke="none"/>')) + sparkle(25, 5, 2.4)),
                 taixuhuashi_art: svg(book('#d8d0e8', '#6a5a8a', m('<path d="M0 -5A5 5 0 0 1 0 5A2.5 2.5 0 0 1 0 0A2.5 2.5 0 0 0 0 -5Z" fill="#3a2f56" stroke="none"/><path d="M0 -5A5 5 0 0 0 0 5A2.5 2.5 0 0 0 0 0A2.5 2.5 0 0 1 0 -5Z" fill="#f0ecf8" stroke="none"/><circle r="5" stroke="#6a5a8a" stroke-width=".9"/>')) + sparkle(25, 5, 2.2) + sparkle(9, 25, 1.8)),
                 dacheng_art: svg(book('#e8b84a', '#8a6a1a', m('<circle r="5" fill="#fff4d8" stroke="#8a6a1a" stroke-width="1"/><circle r="2.2" fill="#e8b84a" stroke="none"/>')) + sparkle(25, 5, 2.6) + sparkle(9, 26, 2)),
+                xianyuan_art: svg(book('#5a3ea8', '#2e1f66', m('<circle r="4.6" stroke="#e8dcff" stroke-width="1"/><circle cx="0" cy="-4.6" r="1.2" fill="#e8dcff" stroke="none"/><circle cx="4" cy="2.3" r="1.2" fill="#e8dcff" stroke="none"/><circle cx="-4" cy="2.3" r="1.2" fill="#e8dcff" stroke="none"/>'))),
+                jinque_art: svg(book('#b8902a', '#6a4e10', m('<path d="M-4.5 4H4.5M-3.5 4V-1L0 -4.5L3.5 -1V4" stroke="#fff0b8" stroke-width="1.1"/><circle cy="1" r="1.4" fill="#fff0b8" stroke="none"/>'))),
+                yuxu_art: svg(book('#3f7d68', '#1f4a3a', m('<circle r="4.8" fill="#bfe8d8" stroke="#1f4a3a" stroke-width="1"/><path d="M-4.8 0Q-2 -2.4 0 0Q2 2.4 4.8 0" stroke="#1f4a3a" stroke-width="1"/>'))),
+                luotian_art: svg(book('#4a2a2a', '#241010', m('<path d="M0 -5L1.6 -1.6L5 0L1.6 1.6L0 5L-1.6 1.6L-5 0L-1.6 -1.6Z" fill="#f0c890" stroke="#241010" stroke-width=".8"/>'))),
+                taichu_art: svg(book('#e8e0cc', '#8a7a5a', m('<circle r="4.6" stroke="#3a3020" stroke-width="1.1"/><circle r="1.5" fill="#3a3020" stroke="none"/>'))),
                 taiyi_art: svg(book('#3a2f0a', '#151005', m('<path d="M0 -5.4L4.6 2.6H-4.6Z" fill="#f3d36a" stroke="#151005" stroke-width="1"/><circle r="5" stroke="#f3d36a" stroke-width=".8" opacity=".8"/>')) + sparkle(25, 5, 2.6) + sparkle(9, 26, 2.2) + sparkle(16, 3, 2)),
                 primordial_art: svg(book('#2a2a3a', '#111118', m('<path d="M0 -5A5 5 0 0 1 0 5A2.5 2.5 0 0 1 0 0A2.5 2.5 0 0 0 0 -5Z" fill="#1c1c26" stroke="none"/><path d="M0 -5A5 5 0 0 0 0 5A2.5 2.5 0 0 0 0 0A2.5 2.5 0 0 1 0 -5Z" fill="#fff" stroke="none"/><circle r="5" stroke="#1c1c26" stroke-width=".9"/>')) + sparkle(25, 5, 2.4))
             };
@@ -9911,7 +9953,7 @@
             }
             if (idx === TAIYI_REALM + 1 && getSoulTemper() < SOUL_TEMPER.max) now.push(`<div>👁️ 淬炼神魂 ${getSoulTemper()}/${SOUL_TEMPER.max}：修炼页「淬炼神魂」，神魂大成即进阶大罗</div>`);
             if (idx >= DALUO_REALM) {
-                now.push(`<div>🔮 法则本源 ${getLawOrigin()} 道：攻击 / 生命 / 防御 +${Math.round(getLawOrigin() * LAW_ORIGIN.per * 100)}%（修炼页「凝结法则本源」，不设上限）</div>`);
+                now.push(`<div>🔮 法则本源 ${getLawOrigin()} 道：攻击 / 生命 / 防御 +${Math.round(getLawOrigin() * getLawOriginPer() * 100)}%（修炼页「凝结法则本源」，不设上限）</div>`);
                 more.push(`<div>🛡️ 极难灭杀：战斗区域被击败不退出；秘境可夺舍重生 ${DALUO_REVIVES} 次，每次恢复 ${DALUO_REVIVE_HP * 100}% 生命（天劫类仍只有一次）</div>`);
             }
             if (idx === DAOZU_REALM - 1) {
@@ -10311,8 +10353,9 @@
                 if (!gameState.player.ownedArts.includes(itemId)) gameState.player.ownedArts.push(itemId);
                 const art = CULTIVATION_ARTS[itemId];
                 const currentSpeed = CULTIVATION_ARTS[gameState.player.currentArt]?.speedMultiplier || 1;
+                const currentTier = CULTIVATION_ARTS[gameState.player.currentArt]?.tier || 0;
 
-                if (art && art.speedMultiplier > currentSpeed) {
+                if (art && (art.speedMultiplier > currentSpeed || (art.speedMultiplier === currentSpeed && art.tier > currentTier))) {   // 仙界功法速度相同，按品阶算更好
                     gameState.player.currentArt = itemId;
                     calculateStats();   // 功法特效可能改变属性
                     const speedBonus = ((art.speedMultiplier - 1) * 100).toFixed(0);
