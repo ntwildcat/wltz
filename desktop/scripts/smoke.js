@@ -104,7 +104,7 @@ app.on('browser-window-created', (_, win) => {
         check('离开页面时自动存档', afterClose.player.coins === 777777, String(afterClose.player.coins));
 
         // 删除存档
-        await js(`window.confirm = () => true; deleteSlot(1)`); await sleep(200);
+        await js(`deleteSlot(1); document.querySelector('#uiDialog .ui-ok').click()`); await sleep(200);   // v7.32 起删除确认是游戏内对话框
         check('删除存档连同 .bak 一起删', !fs.existsSync(slotFile) && !fs.existsSync(slotFile + '.bak'));
 
         check('控制台无报错', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '));

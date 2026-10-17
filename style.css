@@ -2791,3 +2791,72 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 .shop-tab { font-family: var(--font-title); font-weight: normal !important; font-size: 1.12em; letter-spacing: 0.04em; }
 /* 标题里附带的小字说明仍用正文字体，毛笔字太小看不清 */
 .use-title small, .use-main > b:first-child small { font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, SimSun, serif; letter-spacing: 0; }
+
+/* ==========================================================================
+   v7.32 游戏内确认 / 提示框（替代浏览器自带对话框）：宣纸卷轴，危险操作的确认键朱红
+   ========================================================================== */
+.ui-dialog { z-index: 3000; }
+.ui-dialog-box { max-width: 440px; width: calc(100% - 48px); text-align: left; }
+.ui-dialog-box .modal-title { font-size: 1.6em; margin-bottom: 10px; text-align: center; }
+.ui-dialog-msg { color: #3a342a; line-height: 1.85; font-size: 0.95em; max-height: 50vh; overflow-y: auto; }
+.ui-dialog-actions { display: flex; gap: 10px; margin-top: 18px; }
+.ui-dialog-actions .btn { flex: 1; font-family: var(--font-title); font-size: 1.15em; }
+.ui-dialog-box .btn.ui-cancel { background: transparent; color: #4a4438; border: 1.5px solid #8a7e66; }
+.ui-dialog-box .btn.ui-cancel:hover { background: rgba(120, 90, 40, 0.1); }
+.ui-dialog-box .btn.ui-ok { background: #3f7f6a; color: #f5ecd4; border-color: #2c5e4e; }
+.ui-dialog-box .btn.ui-ok.danger { background: #a8322a; border-color: #7a1f18; color: #fff3e6; }
+
+/* ==========================================================================
+   v7.33 战斗名牌 / 区域与秘境卡片小画 / 顶栏修为笔刷条
+   ========================================================================== */
+/* 双方名牌：墨色斜切牌子，玩家在左（灵根色），敌人在右（朱红，镜像排列）；名字毛笔字，血条是一笔墨，属性是三枚小印 */
+.combatant { --c: #6fbf9a; position: relative; background: linear-gradient(180deg, #1c1813, #100d0a); border: none; border-radius: 0; padding: 10px 18px 10px 14px; color: #e8dcc0;
+    border-left: 4px solid var(--c); clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05); }
+.combatant.player { border-color: var(--c); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset 30px 0 40px -30px var(--c); }
+.combatant.monster { --c: #d0473a; border-left: none; border-right: 4px solid var(--c); padding: 10px 14px 10px 18px; text-align: right;
+    clip-path: polygon(16px 0, 100% 0, 100% 100%, 0 100%); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset -30px 0 40px -30px var(--c); }
+.combatant-name { font-family: var(--font-title); font-weight: normal; font-size: 1.45em; letter-spacing: 0.06em; color: #f6ead0 !important; margin-bottom: 2px;
+    -webkit-text-stroke: 0.6px #0e0c09; paint-order: stroke fill; text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6); }
+.combatant-name::after { content: ''; display: block; width: 70%; height: 6px; margin-top: 1px; background: var(--c); opacity: 0.75; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+.combatant.monster .combatant-name::after { margin-left: auto; transform: scaleX(-1); }
+.combatant .hp-bar { height: 18px; margin: 6px 0 4px; background: #2a231a; border: none; border-radius: 0; box-shadow: none; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 20' preserveAspectRatio='none'><path d='M3 6 Q6 2 14 3 L60 2.5 Q110 1.5 160 3 L190 2 Q198 3 197 8 Q199 12 196 15 Q192 18.5 180 17.5 L120 18.5 Q70 19 30 17.8 L10 18 Q2 17 2.5 12 Q1 9 3 6 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 20' preserveAspectRatio='none'><path d='M3 6 Q6 2 14 3 L60 2.5 Q110 1.5 160 3 L190 2 Q198 3 197 8 Q199 12 196 15 Q192 18.5 180 17.5 L120 18.5 Q70 19 30 17.8 L10 18 Q2 17 2.5 12 Q1 9 3 6 Z'/></svg>") center / 100% 100% no-repeat; }
+.combatant.monster .hp-bar, .combatant.monster .atk-bar { transform: scaleX(-1); }
+.combatant.monster .hp-text { transform: translate(-50%, -50%) scaleX(-1); }
+.combatant.player .hp-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--c) 45%, #0e0c09), var(--c)); }
+.combatant.monster .hp-fill, .combatant .hp-fill.low { background: linear-gradient(90deg, #6e1a14, #d0473a); }
+.combatant .hp-text { font-family: var(--font-num); font-size: 0.82em; color: #fff8ea; text-shadow: 0 0 3px #000, 1px 1px 0 #000; }
+.combatant .atk-bar { height: 3px; background: rgba(255, 255, 255, 0.08); border: none; border-radius: 0; box-shadow: none; }
+.combatant .atk-fill { background: color-mix(in srgb, var(--c) 70%, #fff); }
+.combatant .atk-fill.ready { background: #fff4d8; box-shadow: 0 0 6px var(--c); }
+.combatant-stats { gap: 6px; margin-top: 8px; color: #e8dcc0; }
+.combatant.monster .combatant-stats { justify-content: flex-end; }
+.combatant-stats .cs-stat { display: inline-flex; align-items: center; gap: 4px; background: rgba(255, 255, 255, 0.05); padding: 1px 7px 1px 1px; border-radius: 2px; font-family: var(--font-num); font-size: 1.05em; }
+.cs-stat i { font-style: normal; font-size: 0.95em; line-height: 1; padding: 3px 4px 2px; font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); background: color-mix(in srgb, var(--c) 70%, #2a1810); box-shadow: none; }
+
+/* 区域 / 秘境卡片顶部小画 */
+.area-art { position: relative; height: 76px; margin: 0 0 8px; border-radius: 3px; overflow: hidden; isolation: isolate; border: 1px solid #000; box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.6); }
+.area-art .bs-bg-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.area-art::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.75); }
+.aa-foes { position: absolute; right: 6px; bottom: 0; z-index: 1; display: flex; align-items: flex-end; gap: 0; height: 100%; }
+.aa-foe { display: block; height: 82%; margin-left: -10px; line-height: 0; }
+.aa-foe:nth-child(2) { height: 70%; } .aa-foe:nth-child(3) { height: 60%; }
+.aa-foe .bs-art { height: 100%; width: auto; overflow: visible; }
+.action-item.disabled .area-art, .dungeon-row.locked .area-art { filter: grayscale(0.85) brightness(0.6); }
+.area-card.active .area-art { box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.6), 0 0 0 2px var(--gold); }
+.dungeon-row { position: relative; display: block; cursor: pointer; }
+.dungeon-row .area-art { height: 84px; }
+.dungeon-row.locked { opacity: 0.6; }
+.dg-name { font-family: var(--font-title); font-size: 1.35em; color: var(--text-l1); letter-spacing: 0.05em; }
+.dg-desc { font-size: 0.85em; color: var(--text-l4); margin-top: 2px; }
+.dg-status { font-size: 0.78em; margin-top: 4px; }
+.dg-seal { position: absolute; top: 8px; right: 10px; font-size: 0.95em; padding: 3px 7px 2px; transform: rotate(8deg); font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); }
+@media (max-width: 768px) {
+    .dungeon-row .area-art { height: 66px; }
+    .area-art { height: 60px; }
+}
+
+/* 顶栏修为条：一笔墨，填充是玉青墨色、笔刷收尾 */
+.info-item .progress-bar { height: 22px; background: #221c15; border: none; border-radius: 0; box-shadow: none; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 20' preserveAspectRatio='none'><path d='M3 6 Q6 2 14 3 L60 2.5 Q110 1.5 160 3 L190 2 Q198 3 197 8 Q199 12 196 15 Q192 18.5 180 17.5 L120 18.5 Q70 19 30 17.8 L10 18 Q2 17 2.5 12 Q1 9 3 6 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 20' preserveAspectRatio='none'><path d='M3 6 Q6 2 14 3 L60 2.5 Q110 1.5 160 3 L190 2 Q198 3 197 8 Q199 12 196 15 Q192 18.5 180 17.5 L120 18.5 Q70 19 30 17.8 L10 18 Q2 17 2.5 12 Q1 9 3 6 Z'/></svg>") center / 100% 100% no-repeat; }
+#cultivationProgress { background-color: #4f9e82; box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.25), inset 0 3px 4px rgba(255, 255, 255, 0.12); -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 0 L94 0 Q97 1 96 3 Q99 4 97 6 Q100 8 95 10 L0 10 Z'/></svg>") right / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10' preserveAspectRatio='none'><path d='M0 0 L94 0 Q97 1 96 3 Q99 4 97 6 Q100 8 95 10 L0 10 Z'/></svg>") right / 100% 100% no-repeat; }
+#cultivationProgress.full { background-color: #d8a838; }
+#progressText { font-family: var(--font-num); }
