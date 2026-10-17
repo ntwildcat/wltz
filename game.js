@@ -502,52 +502,55 @@
                     monsters: [{ name: '心魔', type: '无', hp: 1000, atk: 100, spd: 50, def: 30, attackSpeed: 2.5, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { skillExp: 300 }
                 },
+                // 天劫 / 三衰 / 三尸 / 证道的出手间隔 interval（v7.30 由 1.0 改 1.1）：以前秘境计时到点清零，0.1 秒累加的浮点误差让「1.0 秒」实际是 1.1 秒出手一次，
+                // 这些关卡的 hitFrac / hpMult 都是在 1.1 秒的节奏下标定的。修好计时后按原来实际的节奏写成 1.1，难度不变。
+                // 玩家自己的出手以前也被向上取到 0.1 秒的整数倍，修好后标准玩家在各劫的出手快了 1%～9%，hpMult 按同样比例补回（同一标准玩家新旧各跑 100 次核对过胜率）
                 tribulation24: {
                     id: 'tribulation24', name: '第一次小天劫', desc: '元婴初成，第一道小天劫便已降下——照着你此刻的实力，备足食物再渡', icon: '⚡',
                     isTribulation: true, kind: 'small', tribulationRealm: 24, minRealmIndex: 24, baseRealmIndex: 24,
-                    mirror: { hpMult: 1.5, hitFrac: 0.14, interval: 1.0 },
+                    mirror: { hpMult: 1.59, hitFrac: 0.14, interval: 1.1 },
                     monsters: [{ name: '劫云傀儡', type: '无', hp: 5000, atk: 500, spd: 60, def: 80, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [30000, 50000], shenshi: [60, 100], skillExp: 400 }
                 },
                 tribulation26: {
                     id: 'tribulation26', name: '第二次小天劫', desc: '劫云再聚，比上一次更重', icon: '⚡',
                     isTribulation: true, kind: 'small', tribulationRealm: 26, minRealmIndex: 26, baseRealmIndex: 26,
-                    mirror: { hpMult: 1.75, hitFrac: 0.15, interval: 1.0 },
+                    mirror: { hpMult: 1.89, hitFrac: 0.15, interval: 1.1 },
                     monsters: [{ name: '雷劫化身', type: '无', hp: 5000, atk: 500, spd: 60, def: 80, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [100000, 150000], shenshi: [100, 160], skillExp: 600 }
                 },
                 tribulation28: {
                     id: 'tribulation28', name: '第三次小天劫', desc: '凡界最后一道小天劫，渡过之后便是飞升上界', icon: '🌩️',
                     isTribulation: true, kind: 'small', tribulationRealm: 28, minRealmIndex: 28, baseRealmIndex: 28,
-                    mirror: { hpMult: 2, hitFrac: 0.17, interval: 1.0 },
+                    mirror: { hpMult: 2.02, hitFrac: 0.17, interval: 1.1 },
                     monsters: [{ name: '雷劫化身', type: '无', hp: 5000, atk: 500, spd: 60, def: 80, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [250000, 350000], shenshi: [150, 240], skillExp: 800 }
                 },
                 tribulation33: {
                     id: 'tribulation33', name: '第一次大天劫', desc: '炼虚之后的大天劫，威能远胜小天劫；寿元再长，也躲不过劫数', icon: '☄️',
                     isTribulation: true, kind: 'big', tribulationRealm: 33, minRealmIndex: 33, baseRealmIndex: 33,
-                    mirror: { hpMult: 2, hitFrac: 0.195, interval: 1.0 },
+                    mirror: { hpMult: 2.1, hitFrac: 0.195, interval: 1.1 },
                     monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [800000, 1200000], shenshi: [250, 400], skillExp: 1300 }
                 },
                 tribulation37: {
                     id: 'tribulation37', name: '第二次大天劫', desc: '大劫再临，劫数更凶', icon: '☄️',
                     isTribulation: true, kind: 'big', tribulationRealm: 37, minRealmIndex: 37, baseRealmIndex: 37,
-                    mirror: { hpMult: 2.25, hitFrac: 0.25, interval: 1.0 },
+                    mirror: { hpMult: 2.43, hitFrac: 0.25, interval: 1.1 },
                     monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [4000000, 6000000], daoguo: [150, 250], skillExp: 2000 }
                 },
                 tribulation39: {
                     id: 'tribulation39', name: '第三次大天劫', desc: '大乘修士也躲不过的大天劫', icon: '☄️',
                     isTribulation: true, kind: 'big', tribulationRealm: 39, minRealmIndex: 39, baseRealmIndex: 39,
-                    mirror: { hpMult: 2.5, hitFrac: 0.29, interval: 1.0 },
+                    mirror: { hpMult: 2.73, hitFrac: 0.29, interval: 1.1 },
                     monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [15000000, 22000000], daoguo: [250, 400], skillExp: 3000 }
                 },
                 tribulation41: {
                     id: 'tribulation41', name: '飞升天劫', desc: '飞升之劫，九死一生——渡过之后体内灵气才能化为仙元', icon: '🌌',
                     isTribulation: true, kind: 'big', tribulationRealm: 41, minRealmIndex: 41, baseRealmIndex: 41,
-                    mirror: { hpMult: 2.5, hitFrac: 0.32, interval: 1.0 },
+                    mirror: { hpMult: 2.53, hitFrac: 0.32, interval: 1.1 },
                     monsters: [{ name: '飞升劫雷', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [40000000, 60000000], daoguo: [400, 600], skillExp: 5000 }
                 },
@@ -557,21 +560,21 @@
                 shuaiXian: {
                     id: 'shuaiXian', name: '元衰', desc: '仙元自行外泄，打通仙穴越来越慢', icon: '🥀',
                     isTribulation: true, isShuai: true, minRealmIndex: 42, baseRealmIndex: 42,
-                    mirror: { hpMult: 2.5, hitFrac: 0.24, interval: 1.0 },
+                    mirror: { hpMult: 2.7, hitFrac: 0.24, interval: 1.1 },
                     monsters: [{ name: '元衰之气', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [20000000, 30000000], daoguo: [200, 300], skillExp: 3000 }
                 },
                 shuaiQiao: {
                     id: 'shuaiQiao', name: '穴衰', desc: '新开的仙穴黯淡无光，道体失去支撑', icon: '🕳️',
                     isTribulation: true, isShuai: true, minRealmIndex: 42, baseRealmIndex: 42,
-                    mirror: { hpMult: 2.5, hitFrac: 0.24, interval: 1.0 },
+                    mirror: { hpMult: 2.7, hitFrac: 0.24, interval: 1.1 },
                     monsters: [{ name: '穴衰之影', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [20000000, 30000000], daoguo: [200, 300], skillExp: 3000 }
                 },
                 shuaiShen: {
                     id: 'shuaiShen', name: '体衰', desc: '道体衰败，生命、攻击、防御一齐下滑', icon: '🍂',
                     isTribulation: true, isShuai: true, minRealmIndex: 42, baseRealmIndex: 42,
-                    mirror: { hpMult: 2.5, hitFrac: 0.24, interval: 1.0 },
+                    mirror: { hpMult: 2.7, hitFrac: 0.24, interval: 1.1 },
                     monsters: [{ name: '体衰之相', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [20000000, 30000000], daoguo: [200, 300], skillExp: 3000 }
                 },
@@ -582,14 +585,14 @@
                 shuaiHun: {
                     id: 'shuaiHun', name: '神衰', desc: '元神黯淡，元婴离体与法则之击一齐停摆', icon: '🌑',
                     isTribulation: true, isShuai: true, minRealmIndex: 44, baseRealmIndex: 44,
-                    mirror: { hpMult: 2.5, hitFrac: 0.25, interval: 1.0 },
+                    mirror: { hpMult: 2.65, hitFrac: 0.25, interval: 1.1 },
                     monsters: [{ name: '神衰之魇', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [40000000, 60000000], daoguo: [400, 600], skillExp: 5000 }
                 },
                 shuaiSha: {
                     id: 'shuaiSha', name: '戾衰', desc: '戾气自体内反噬，战斗中生命不断流失；渡衰失败还会折损仙穴', icon: '🩸',
                     isTribulation: true, isShuai: true, minRealmIndex: 44, baseRealmIndex: 44,
-                    mirror: { hpMult: 2.5, hitFrac: 0.33, interval: 1.0 },
+                    mirror: { hpMult: 2.65, hitFrac: 0.33, interval: 1.1 },
                     monsters: [{ name: '戾衰凶煞', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [40000000, 60000000], daoguo: [400, 600], skillExp: 5000 }
                 },
@@ -599,21 +602,21 @@
                 corpseShan: {
                     id: 'corpseShan', name: '善尸', desc: '执念于善的分身，以善念牵绊本体、欲取而代之', icon: '🕊️',
                     isTribulation: true, isShuai: true, minRealmIndex: 49, baseRealmIndex: 49,
-                    mirror: { hpMult: 2.5, hitFrac: 0.3, interval: 1.0 },
+                    mirror: { hpMult: 2.6, hitFrac: 0.3, interval: 1.1 },
                     monsters: [{ name: '善尸', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [80000000, 120000000], daoguo: [700, 1000], skillExp: 7000 }
                 },
                 corpseE: {
                     id: 'corpseE', name: '恶尸', desc: '执念于恶的分身，噬心夺魄，一心夺舍本体', icon: '👹',
                     isTribulation: true, isShuai: true, minRealmIndex: 49, baseRealmIndex: 49,
-                    mirror: { hpMult: 2.5, hitFrac: 0.33, interval: 1.0 },
+                    mirror: { hpMult: 2.6, hitFrac: 0.33, interval: 1.1 },
                     monsters: [{ name: '恶尸', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [80000000, 120000000], daoguo: [700, 1000], skillExp: 7000 }
                 },
                 corpseWo: {
                     id: 'corpseWo', name: '自我尸', desc: '执念于自我的分身，与本体最像、也最想成为本体', icon: '🪞',
                     isTribulation: true, isShuai: true, minRealmIndex: 49, baseRealmIndex: 49,
-                    mirror: { hpMult: 2.5, hitFrac: 0.40, interval: 1.0 },
+                    mirror: { hpMult: 2.6, hitFrac: 0.40, interval: 1.1 },
                     monsters: [{ name: '自我尸', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [80000000, 120000000], daoguo: [700, 1000], skillExp: 7000 }
                 },
@@ -623,7 +626,7 @@
                 zhengdao: {
                     id: 'zhengdao', name: '证道之战', desc: '灭杀这条法则的现任道祖，取而代之', icon: '⚖️',
                     isTribulation: true, minRealmIndex: 49, baseRealmIndex: 50,
-                    mirror: { hpMult: 12, hitFrac: 0.42, interval: 1.0 },
+                    mirror: { hpMult: 12.5, hitFrac: 0.42, interval: 1.1 },
                     monsters: [{ name: '道祖', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [200000000, 300000000], daoguo: [1500, 2200], skillExp: 10000 }
                 }
@@ -1972,13 +1975,18 @@
             const voidHave = (gameState.player.inventory.find(i => i.id === 'voidcrystal') || { qty: 0 }).qty;
             if (P.daoguo < daoguoCost) { spendNotify('daoguo', daoguoCost); return; }
             if (voidHave < voidCost) { showNotification(`虚晶不足：需要 ${voidCost}，现有 ${voidHave}`, '#c4483a', 'error'); return; }
+            const daozeId = daozeItemId(lawId, tier + 1);
+            if (!inventoryCanHold([daozeId], voidHave === voidCost ? ['voidcrystal'] : [])) {
+                showNotification('❌ 背包已满，化出的道则放不下：先出售或整理出一格再化虚', '#c4483a', 'error');
+                return;
+            }
             const tierName = DAOZE_TIER_NAMES[tier];
             const ok = confirm(`确定要化虚吗？\n\n消耗 ${def.name} ${levelCost} 级（Lv.${info.level} → Lv.${info.level - levelCost}）+ 道果 ${daoguoCost} + 虚晶 ${voidCost}\n\n获得：${tierName}${daoze.name} ×1（可在「装备」界面的道基槽镶嵌）\n\n法则等级可以再参悟回来，不是不可逆。`);
             if (!ok) return;
             consumeLawLevels(lawId, levelCost);
             P.daoguo -= daoguoCost;
             consumeItem('voidcrystal', voidCost);
-            addToInventory(daozeItemId(lawId, tier + 1), 1, true);
+            addToInventory(daozeId, 1, true);
             showNotification(`☯️ 化虚成功：获得${tierName}${daoze.name} ×1`, '#6f9c8a');
             calculateStats();
             updateUI();
@@ -2463,6 +2471,7 @@
         function tickSmallWorld() { if (gameState.player.realmIndex >= TAIYI_REALM) settleSmallWorld(0.1); }
         function settleSmallWorldOffline(seconds) {
             if (gameState.player.realmIndex < TAIYI_REALM) return;
+            seconds = Math.min(seconds, (gameState.settings?.maxOfflineHours || 24) * 3600);   // 与主角 / 分身一样受离线上限（v7.30，以前离开多久算多久）
             const got = settleSmallWorld(seconds);
             if (!got || !Object.keys(got).length) return;
             const parts = [];
@@ -3575,6 +3584,10 @@
             if (!quest || !isQuestComplete(quest)) return;
             const state = getQuestState();
             const reward = quest.reward;
+            if (!inventoryCanHold((reward.items || []).map(i => i.id))) {
+                showNotification('❌ 背包已满，任务奖励放不下：先出售或整理出空格再领取', '#c4483a', 'error');
+                return;
+            }
             if (reward.coins) gameState.player.coins += reward.coins;
             (reward.items || []).forEach(i => addToInventory(i.id, i.qty));
             showNotification(`📜 任务完成：${quest.title}\n奖励 ${questRewardText(reward)}`, '#b89a5b');
@@ -3700,6 +3713,7 @@
                 updateStatsDisplay();
             }, 50);
             gameRunning = true;
+            claimSlotOwnership();
 
             // 立即保存游戏（确保新创建的角色不会丢失）
             gameState.tutorialSeen = false;
@@ -3836,12 +3850,14 @@
                 }
                 c.progress += 0.1;
                 const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
-                if (c.progress >= duration) {
+                if (c.progress >= duration - PROGRESS_EPS) {
                     const fast = duration < FAST_ACTION_SECONDS;
+                    let ok;
                     if (fast) notifyMuted = true;
-                    try { completeAction(c.action, { double: getCloneDoubleBonus(), batch: fast }); } finally { notifyMuted = false; }
+                    try { ok = completeAction(c.action, { double: getCloneDoubleBonus(), batch: fast }); } finally { notifyMuted = false; }
                     if (fast) flushFastUI();
-                    c.progress = 0;
+                    if (ok === false) { stopClone(slot, true); return; }
+                    c.progress = Math.min(Math.max(0, c.progress - duration), duration);   // 保留零头（同主角）
                 }
                 tickCloneBar(slot, duration);
             });
@@ -3899,17 +3915,23 @@
             if (!(duration > 0)) return;
             let n = Math.floor(budget / duration);
             let ranOut = false;
+            const owned = id => (gameState.player.inventory.find(i => i.id === id) || { qty: 0 }).qty;
+            let use = {};
             if (action.requires) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    const owned = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
-                    const affordable = Math.floor(owned / qty);
+                    const affordable = Math.floor(owned(itemId) / qty);
                     if (affordable < n) { n = affordable; ranOut = true; }
                 });
                 const saveRate = Math.min(0.9, getSkillMod('save', skill) + getMasteryBonus(skill, key).save);
-                Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    if (n > 0) consumeItem(itemId, Math.round(qty * n * (1 - saveRate)));
-                });
+                use = Object.fromEntries(Object.entries(action.requires).map(([itemId, qty]) => [itemId, Math.round(qty * n * (1 - saveRate))]));
             }
+            // 背包放不下产出：这段离线不结算、不扣材料，并停下
+            if (n > 0 && !inventoryCanHold(outputIdsOf(action), Object.keys(use).filter(id => use[id] >= owned(id)))) {
+                showNotification(`❌ ${label}：背包已满，${action.name}的产出放不下，离开期间没有结算（材料没有消耗），已停止`, '#c4483a', 'warning');
+                c.action = null; c.progress = 0; generateRecipeList(skill);
+                return;
+            }
+            if (n > 0) Object.entries(use).forEach(([itemId, q]) => consumeItem(itemId, q));
             if (n > 0) {
                 const per = JSON.parse(JSON.stringify(action.output));
                 applySkillLevelBonus(skill, per, 'raw');
@@ -3979,12 +4001,14 @@
             }
             f.progress += 0.1;
             const duration = getAdjustedDuration('farming', action.duration, f.action.action);
-            if (f.progress >= duration) {
+            if (f.progress >= duration - PROGRESS_EPS) {
                 const fast = duration < FAST_ACTION_SECONDS;
+                let ok;
                 if (fast) notifyMuted = true;
-                try { completeAction(f.action, { batch: fast }); } finally { notifyMuted = false; }
+                try { ok = completeAction(f.action, { batch: fast }); } finally { notifyMuted = false; }
                 if (fast) flushFastUI();
-                f.progress = 0;
+                if (ok === false) { stopFarmPlot(true); return; }
+                f.progress = Math.min(Math.max(0, f.progress - duration), duration);   // 保留零头（同主角）
             }
             tickPlotBar(duration);
         }
@@ -4104,11 +4128,15 @@
                 let guard = 0, did = 0;
                 if (fast) notifyMuted = true;
                 try {
-                    while (gameState.currentAction && adjustedDuration > 0 && gameState.currentActionProgress >= adjustedDuration && guard++ < 60) {
-                        completeAction(gameState.currentAction, { batch: fast });
+                    while (gameState.currentAction && adjustedDuration > 0 && gameState.currentActionProgress >= adjustedDuration - PROGRESS_EPS && guard++ < 60) {
+                        if (completeAction(gameState.currentAction, { batch: fast }) === false) {   // 背包放不下产出
+                            gameState.currentAction = null;
+                            updateUI();
+                        }
                         did++;
                         if (!gameState.currentAction) { gameState.currentActionProgress = 0; break; }
-                        gameState.currentActionProgress = adjustedDuration < 0.1 ? gameState.currentActionProgress - adjustedDuration : 0;
+                        // 保留零头：每 0.1 秒累加的进度很少正好等于耗时，清零会让在线比离线慢（耗时 1 秒实际要 1.1 秒）
+                        gameState.currentActionProgress = Math.max(0, gameState.currentActionProgress - adjustedDuration);
                     }
                 } finally {
                     notifyMuted = false;
@@ -5176,10 +5204,12 @@
             const monsterAttackInterval = Math.max(MIN_ATTACK_INTERVAL, (monster.attackSpeed || 2.5) + domainSideInterval('foe'));
 
             // 1. 玩家攻击计时
+            // v7.30：到点后减去间隔而不是清零（同普通战斗）。清零会把多出来的时间扔掉，出手间隔变成 0.1 × 倍速的整数倍，
+            // 4 倍速下 0.6 秒的出手实际要 0.8 秒——同一个秘境开不开倍速胜负都不一样
             gameState.player.attackTimer += timeDelta;
-            if (gameState.player.attackTimer >= playerAttackInterval) {
+            if (gameState.player.attackTimer >= playerAttackInterval - PROGRESS_EPS) {
                 performPlayerAttack(monster);
-                gameState.player.attackTimer = 0;
+                gameState.player.attackTimer = Math.min(gameState.player.attackTimer - playerAttackInterval, playerAttackInterval);
             }
             // 合体起元气化形、大乘起元婴离体 / 法则之击：定时额外攻击（无视防御）
             tickPeriodicStrikes(gameState.dungeons, timeDelta).forEach(h => {
@@ -5190,9 +5220,9 @@
 
             // 2. 怪物攻击计时
             gameState.dungeons.monsterAttackTimer += timeDelta;
-            if (gameState.dungeons.monsterAttackTimer >= monsterAttackInterval) {
+            if (gameState.dungeons.monsterAttackTimer >= monsterAttackInterval - PROGRESS_EPS) {
                 performMonsterAttack(monster);
-                gameState.dungeons.monsterAttackTimer = 0;
+                gameState.dungeons.monsterAttackTimer = Math.min(gameState.dungeons.monsterAttackTimer - monsterAttackInterval, monsterAttackInterval);
             }
 
             // 3. 检查怪物状态
@@ -7078,6 +7108,7 @@
 
         // 极速行动（如礼包饰品 ×100 速度）：连续完成时静音通知，界面每 0.4 秒刷新一次、存档每 5 秒一次
         const FAST_ACTION_SECONDS = 0.5;
+        const PROGRESS_EPS = 1e-9;   // 进度 / 计时每 0.1 秒累加，0.1 加十次是 0.9999999999999999，比较时留这点容差
         let notifyMuted = false, fastUiTs = 0, fastSaveTs = 0;
         function flushFastUI() {
             const now = Date.now();
@@ -7109,6 +7140,19 @@
                 return;
             }
 
+            // 消耗所需的材料（P2功能 - 材料消耗）；灵根/功法的「节省材料」特效有概率整次不消耗
+            const actionKey = act.action;
+            const mastery = getMasteryBonus(act.skill, actionKey);
+            const saveMaterials = action.requires && Math.random() < getSkillMod('save', act.skill) + mastery.save;
+            // 背包放不下产出：什么都不扣，返回 false 让调用方（主角 / 分身 / 第二块田）停下
+            const freedSlots = action.requires && !saveMaterials
+                ? Object.entries(action.requires).filter(([id, q]) => (gameState.player.inventory.find(i => i.id === id) || { qty: 0 }).qty <= q).map(([id]) => id) : [];
+            if (!inventoryCanHold(outputIdsOf(action), freedSlots)) {
+                showNotification(`❌ 背包已满，${action.name}的产出放不下，已停止（材料没有消耗）`, '#c4483a', 'error');
+                return false;
+            }
+            if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980', 'rare');
+
             // 丹火助炼：炼丹时消耗丹火，提高翻倍产出概率（丹火不够时自动不助炼）
             let boostDouble = 0;
             if (act.skill === 'alchemy' && gameState.player.alchemyBoost) {
@@ -7118,12 +7162,6 @@
                     boostDouble = DANHUO_BOOST_DOUBLE;
                 }
             }
-
-            // 消耗所需的材料（P2功能 - 材料消耗）；灵根/功法的「节省材料」特效有概率整次不消耗
-            const actionKey = act.action;
-            const mastery = getMasteryBonus(act.skill, actionKey);
-            const saveMaterials = action.requires && Math.random() < getSkillMod('save', act.skill) + mastery.save;
-            if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980', 'rare');
             if (action.requires && !saveMaterials) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
                     const invIndex = gameState.player.inventory.findIndex(i => i.id === itemId);
@@ -8342,6 +8380,18 @@
             }
             return null;
         }
+
+        // 背包放不放得下这些物品（v7.30）：已有的同名物品直接叠加，新物品各占一格；freed = 这次会被用光、腾出格子的材料 id。
+        // 制作 / 化虚 / 领任务奖励都先问这里，放不下就不扣材料、不发放——以前是先扣材料再放，放不下的产出直接消失
+        function inventoryCanHold(ids, freed = []) {
+            const inv = gameState.player.inventory;
+            const cap = gameState.player.inventoryCapacity || 50;
+            const has = id => inv.some(i => i.id === id);
+            const need = new Set(ids.filter(id => !has(id)));
+            const free = cap - inv.length + new Set(freed.filter(has)).size;
+            return need.size <= free;
+        }
+        function outputIdsOf(action) { return ((action && action.output && action.output.items) || []).map(i => i.id); }
 
         function addToInventory(itemId, qty = 1, silent = false) {
             // 检查背包容量
@@ -11450,6 +11500,7 @@
         // ==================== 存档系统 ====================
         function saveGame() {
             if (!currentSlot) return;   // 还没选择存档槽位（存档选择界面）时不保存
+            if (tabSuperseded) return;   // 同一存档已在别的标签页打开：这一页不再写，免得覆盖那边的进度
             gameState.lastSaveTime = Date.now();
             // 页面在后台时，后台的自动存档不能刷新「最后活跃时间」，否则回来时只按最后一次自动存档算离线，离线收益几乎为 0
             // （切到后台那一刻的时间由 visibilitychange 显式记录）
@@ -11645,6 +11696,31 @@
             remove: key => localStorage.removeItem(key)
         };
 
+        // 同一存档在两个标签页同时打开会互相覆盖（v7.30）：进入存档时写一个「占用者」标记；别的标签页发现标记换了人，
+        // 就暂停游戏、不再存档，提示到新打开的那页继续。只管网页版（localStorage 的 storage 事件），桌面版只有一个窗口
+        const TAB_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        let tabSuperseded = false;
+        const ownerKey = n => slotKey(n) + '_owner';
+        function claimSlotOwnership() {
+            if (window.desktopSaves || !currentSlot) return;
+            try { localStorage.setItem(ownerKey(currentSlot), TAB_ID + '|' + Date.now()); } catch (e) { /* 存储不可用时不做检测 */ }
+        }
+        window.addEventListener('storage', e => {
+            if (window.desktopSaves || !currentSlot || tabSuperseded || !e.newValue || e.key !== ownerKey(currentSlot)) return;
+            if (e.newValue.split('|')[0] === TAB_ID) return;
+            tabSuperseded = true;
+            gameRunning = false;
+            clearInterval(tickInterval);
+            const box = document.createElement('div');
+            box.className = 'modal show';
+            box.id = 'supersededModal';
+            box.innerHTML = `<div class="modal-content" role="alertdialog" aria-modal="true" style="max-width: 420px; text-align: center;">
+                <div class="modal-title">存档已在别处打开</div>
+                <p style="line-height: 1.8; color: var(--text-l3);">存档 ${currentSlot} 刚在另一个标签页（或窗口）里打开了。为免两边互相覆盖进度，这一页已暂停，不会再存档。<br/>请到新打开的那一页继续；想在这一页继续，就刷新本页重新选择存档。</p>
+                <button class="btn" onclick="location.reload()" style="width: 100%; margin-top: 10px;">刷新本页</button></div>`;
+            document.body.appendChild(box);
+        });
+
         function readSlot(n) {
             try {
                 const raw = saveStore.get(slotKey(n));
@@ -11724,7 +11800,7 @@
 
         function deleteSlot(n) {
             if (!confirm(`确定要删除存档 ${n} 吗？此存档的所有进度将永久丢失！`)) return;
-            try { saveStore.remove(slotKey(n)); } catch (e) { /* 忽略 */ }
+            try { saveStore.remove(slotKey(n)); if (!window.desktopSaves) localStorage.removeItem(ownerKey(n)); } catch (e) { /* 忽略 */ }
             renderSlotSelect();
         }
 
@@ -11775,6 +11851,7 @@
             calculateStats();
             updateStatsDisplay();
             gameRunning = true;
+            claimSlotOwnership();
             updateSlotLabel();
             applyDisplaySettings();
 
@@ -11930,10 +12007,11 @@
 
             // 需要材料的配方：完成次数受材料库存限制，并扣除离线消耗
             let materialsRanOut = false;
+            const ownedQty = id => (gameState.player.inventory.find(i => i.id === id) || { qty: 0 }).qty;
+            let use = {};
             if (action.requires) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    const owned = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
-                    const affordable = Math.floor(owned / qty);
+                    const affordable = Math.floor(ownedQty(itemId) / qty);
                     if (affordable < completions) {
                         completions = affordable;
                         materialsRanOut = true;
@@ -11941,11 +12019,16 @@
                 });
                 // 「节省材料」特效：按概率折算实际消耗（库存判断仍按全额，偏保守）
                 const saveRate = Math.min(0.9, getSkillMod('save', savedAction.skill) + getMasteryBonus(savedAction.skill, savedAction.action).save);
-                Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    if (completions > 0) consumeItem(itemId, Math.round(qty * completions * (1 - saveRate)));
-                });
-                if (materialsRanOut) gameState.currentAction = null;
+                use = Object.fromEntries(Object.entries(action.requires).map(([itemId, qty]) => [itemId, Math.round(qty * completions * (1 - saveRate))]));
             }
+            // 背包放不下产出：这段离线不结算、不扣材料，并停下（v7.30，以前材料照扣、产出丢失）
+            if (completions > 0 && !inventoryCanHold(outputIdsOf(action), Object.keys(use).filter(id => use[id] >= ownedQty(id)))) {
+                showNotification(`❌ 背包已满，${action.name}的产出放不下，离开期间没有结算（材料没有消耗），已停止。请先出售或整理背包`, '#c4483a', 'warning');
+                completions = 0;
+                gameState.currentAction = null;
+            }
+            if (completions > 0) Object.entries(use).forEach(([itemId, q]) => consumeItem(itemId, q));
+            if (materialsRanOut) gameState.currentAction = null;
 
             let offlineRewards = {
                 coins: 0,
@@ -12466,7 +12549,7 @@
         function resetGame() {
             if (!currentSlot) return;
             if (confirm(`确定要删除当前存档（存档 ${currentSlot}）吗？此存档的所有进度将永久丢失！`)) {
-                try { saveStore.remove(slotKey(currentSlot)); } catch (e) { /* 忽略 */ }
+                try { saveStore.remove(slotKey(currentSlot)); if (!window.desktopSaves) localStorage.removeItem(ownerKey(currentSlot)); } catch (e) { /* 忽略 */ }
                 gameRunning = false;   // 避免 beforeunload 把存档又写回去
                 clearInterval(tickInterval);
                 location.reload();
