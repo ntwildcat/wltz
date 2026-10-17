@@ -1388,7 +1388,7 @@
         const DANHUO_BOOST_DOUBLE = 0.25;        // 炼丹助炼：额外翻倍概率
         const SCOUT_COST = 60, SCOUT_MULT = 1.5;  // 神识探查：花费与下次秘境掉落倍率
         const SHEN_UPGRADES = {
-            clone: { name: '分身强化', icon: '🌀', max: 10, base: 20, desc: '分身耗时 -3%/级（最快与主角持平），分身产出翻倍概率 +2%/级' },
+            clone: { name: '分身强化', icon: '🌀', max: 10, base: 20, desc: '分身耗时 -3%/级（最快与主角持平），分身产出翻倍概率 +2%/级；合道后并入本体（见合道说明）' },
             focus: { name: '专注', icon: '⏱', max: 10, base: 24, desc: '生活技能与悟道耗时 -1.5%/级（最多 -15%）' },
             sense: { name: '神识感应', icon: '👁️', max: 10, base: 24, desc: '战斗暴击率 +1%/级、闪避 +1%/级' }
         };
@@ -1545,6 +1545,11 @@
 
         // 分身产出翻倍概率加成（分身强化）
         function getCloneDoubleBonus() { return 0.02 * getShenLevel('clone'); }
+        // v7.38 分身归体：合道后分身消失，原先养分身的神识等级 / 分身强化 / 分身速度并入本体，不再白白失效。
+        // 本体生活技能与悟道耗时 × (分身耗时倍率 ÷ 1.6)，倍率不再封底 1.0（全满约 ×0.74 → 本体耗时 ×0.46）；翻倍概率照旧 +2%/级
+        const CLONE_BASE_FACTOR = 1.6;
+        function getFusedCloneTimeMult() { return isFused() ? getCloneFactorRaw() / CLONE_BASE_FACTOR : 1; }
+        function getFusedDoubleBonus() { return isFused() ? getCloneDoubleBonus() : 0; }
 
         // 丹火 / 神识产出
         function addCurrency(output) {
@@ -1890,7 +1895,7 @@
             const P = ensureCurrencyState();
             if (!isDaoguoUnlocked()) { showNotification('合体初期才能合道', '#c98a3e'); return; }
             if (isFused()) { showNotification('你已经合道了', '#c98a3e'); return; }
-            const ok = await uiConfirm('合道后元婴分身与身外化身都归于本体：分身永久消失，且不可逆（无法再召回分身，神识里的「分身强化」也会失效）。\n\n换来的是（法力成倍增长）：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・身外化身的攻击 / 防御加成翻倍\n・神识产出 +50%、道果产出 +30%\n\n注意：合体初期突破中期之前必须合道。', { title: '确定要合道吗？', okText: '合道（不可逆）', danger: true });
+            const ok = await uiConfirm('合道后元婴分身与身外化身都归于本体：分身永久消失，且不可逆（无法再召回分身）。分身的本事并入本体：神识等级、「分身强化」、分身速度加成换算成本体生活技能与悟道提速（耗时 × 分身耗时倍率 ÷ 1.6，倍率不再封底 1.0），「分身强化」的翻倍概率也归本体。\n\n换来的是（法力成倍增长）：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・身外化身的攻击 / 防御加成翻倍\n・神识产出 +50%、道果产出 +30%\n\n注意：合体初期突破中期之前必须合道。', { title: '确定要合道吗？', okText: '合道（不可逆）', danger: true });
             if (!ok || isFused()) return;
             P.fusion = { active: true, at: Date.now() };
             getClones().forEach(c => { c.action = null; c.progress = 0; });
@@ -1906,8 +1911,8 @@
             const P = ensureCurrencyState();
             const bl = getDaoBody(), ll = getDaoLaw();
             const fusedCard = isFused()
-                ? `<div class="use-row"><div class="use-main"><b>🌟 已合道</b><div class="use-effect">所有主行动速度 +100% · 生命 / 攻击 / 防御 / 速度 +15% · 身外化身加成翻倍 · 神识产出 +50% · 道果产出 +30%<br/>分身与化身已归于本体，不可逆。</div></div><span class="use-max">已合道</span></div>`
-                : `<div class="use-row"><div class="use-main"><b>🌟 合道（不可逆）</b><div class="use-effect">元婴分身与身外化身归于本体：所有主行动速度 +100%、生命 / 攻击 / 防御 / 速度 +15%、身外化身加成翻倍、神识产出 +50%、道果产出 +30%。<br/>代价：分身永久消失，无法解除。<b>合体初期突破中期之前必须合道。</b></div></div><button type="button" class="btn use-btn" onclick="startFusion()">合道</button></div>`;
+                ? `<div class="use-row"><div class="use-main"><b>🌟 已合道</b><div class="use-effect">所有主行动速度 +100% · 生命 / 攻击 / 防御 / 速度 +15% · 身外化身加成翻倍 · 神识产出 +50% · 道果产出 +30%<br/>分身归体：生活技能与悟道耗时 ×${getFusedCloneTimeMult().toFixed(2)}（分身耗时倍率 ×${getCloneFactorRaw().toFixed(2)} ÷ ${CLONE_BASE_FACTOR}，合道后不再封底 1.0）${getFusedDoubleBonus() ? `、产出翻倍 +${Math.round(getFusedDoubleBonus() * 100)}%` : ''}，神识等级 / 分身强化 / 分身速度继续生效。<br/>分身与化身已归于本体，不可逆。</div></div><span class="use-max">已合道</span></div>`
+                : `<div class="use-row"><div class="use-main"><b>🌟 合道（不可逆）</b><div class="use-effect">元婴分身与身外化身归于本体：所有主行动速度 +100%、生命 / 攻击 / 防御 / 速度 +15%、身外化身加成翻倍、神识产出 +50%、道果产出 +30%。<br/>代价：分身永久消失，无法解除；分身的速度并入本体（生活技能与悟道耗时 × 分身耗时倍率 ÷ ${CLONE_BASE_FACTOR}，按现在算 ×${(getCloneFactorRaw() / CLONE_BASE_FACTOR).toFixed(2)}，分身倍率不再封底 1.0）。<b>合体初期突破中期之前必须合道。</b></div></div><button type="button" class="btn use-btn" onclick="startFusion()">合道</button></div>`;
             const maxTimes = Math.floor(Math.min(P.danhuo / FUSE_COST.danhuo, P.shenshi / FUSE_COST.shenshi));
             return `
                 <div class="use-balance">${DAOGUO_ICON} 道果 <b>${Math.floor(P.daoguo)}</b><small>产出：道果技能的配方（凝练 / 培育 / 提炼 / 归元）· 合体级战斗区域胜利 · 天道秘境通关 · 丹火与神识融合。道果不能出售，只用来变强和购买商品。</small></div>
@@ -3877,10 +3882,12 @@
             return activeClones().findIndex(c => c.action && c.action.skill === skill && c.action.action === key);
         }
 
-        function getCloneFactor() {
+        // 不封底的分身耗时倍率：分身本身最快与主角持平（getCloneFactor 封底 1.0），合道后并入本体时用不封底的值，每一级都还有用
+        function getCloneFactorRaw() {
             const base = SKILL_LEVEL_EFFECTS.shenshi.formula((gameState.skills.shenshi || {}).level || 1) / (1 + getMod('cloneSpeed'));
-            return Math.max(1.0, base * (1 - 0.03 * getShenLevel('clone')));   // 神识「分身强化」：-3%/级，最快与主角持平
+            return base * (1 - 0.03 * getShenLevel('clone'));   // 神识「分身强化」：-3%/级
         }
+        function getCloneFactor() { return Math.max(1.0, getCloneFactorRaw()); }   // 最快与主角持平
 
         function getCloneDuration(skill, duration, key) {
             return getAdjustedDuration(skill, duration, key) * getCloneFactor();
@@ -6760,7 +6767,7 @@
                 atkPct: v => `攻击 ${sign(v)}`, hpPct: v => `生命 ${sign(v)}`, defPct: v => `防御 ${sign(v)}`, spdPct: v => `速度 ${sign(v)}`,
                 hit: v => `命中 ${sign(v)}`, crit: v => `暴击率 ${sign(v)}`, critDmg: v => `暴击伤害 ${sign(v)}`, dodge: v => `闪避 ${sign(v)}`,
                 foodPct: v => `食物恢复 ${sign(v)}`, gearPct: v => `装备属性 ${sign(v)}`, dropPct: v => `秘境掉落 ${sign(v)}`,
-                cultSpeed: v => `修炼速度 ${sign(v)}`, cloneSpeed: v => `分身速度 ${sign(v)}`, autoOffline: v => `离线自动战斗效率 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
+                cultSpeed: v => `修炼速度 ${sign(v)}`, cloneSpeed: v => `分身速度 ${sign(v)}${isFused() ? '（已并入本体）' : ''}`, autoOffline: v => `离线自动战斗效率 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
             };
             return Object.entries(effects).map(([key, v]) => {
                 if (fixed[key]) return fixed[key](v);
@@ -6892,7 +6899,7 @@
                 const ws = GAME_CONFIG.items[id]?.effect?.workSpeed;
                 if (ws) mult *= ws;
             });
-            return mult * (1 - 0.015 * getShenLevel('focus')) * (isFused() ? FUSION_BONUS.workSpeed : 1) * getCorpseWorkMult();   // 善尸牵绊 / 善尸化身   // 神识「专注」：耗时 -1.5%/级；合道：耗时 ×0.5
+            return mult * (1 - 0.015 * getShenLevel('focus')) * (isFused() ? FUSION_BONUS.workSpeed : 1) * getFusedCloneTimeMult() * getCorpseWorkMult();   // 善尸牵绊 / 善尸化身   // 神识「专注」：耗时 -1.5%/级；合道：耗时 ×0.5
         }
 
         // 其他技能：仅受工作速度倍率 = duration × getWorkSpeedMultiplier()
@@ -7312,7 +7319,7 @@
             }
 
             // 灵根/功法的「产出翻倍」特效
-            if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', act.skill) + mastery.double + boostDouble + (bonus.double || 0)) {
+            if (finalOutput.items && finalOutput.items.length && Math.random() < getSkillMod('double', act.skill) + mastery.double + boostDouble + (bonus.double || 0) + getFusedDoubleBonus()) {
                 finalOutput.items.forEach(item => { item.qty *= 2; });
                 showNotification('✨ 产出翻倍！', '#6fa980', 'rare');
             }
@@ -7512,7 +7519,7 @@
                 const percentage = Math.round((multiplier - 1) * 100);
                 return `伤害 +${percentage}%`;
             } else if (effect.effectType === 'clone') {
-                return `分身耗时 ×${multiplier.toFixed(2)}`;
+                return isFused() ? `分身耗时 ×${multiplier.toFixed(2)}（已合道：并入本体，生活技能耗时 ×${getFusedCloneTimeMult().toFixed(2)}）` : `分身耗时 ×${multiplier.toFixed(2)}`;
             }
             return '';
         }
@@ -12185,7 +12192,7 @@
             offlineRewards.cultivation = (perAction.cultivation || 0) * completions;
             offlineRewards.xianqiao = (perAction.xianqiao || 0) * completions;
             // 「产出翻倍」特效：按概率折算（期望值）；丹火助炼按能负担的次数折算
-            const doubleRate = getSkillMod('double', savedAction.skill) + getMasteryBonus(savedAction.skill, savedAction.action).double + applyAlchemyBoostBatch(savedAction.skill, action, completions);
+            const doubleRate = getSkillMod('double', savedAction.skill) + getMasteryBonus(savedAction.skill, savedAction.action).double + getFusedDoubleBonus() + applyAlchemyBoostBatch(savedAction.skill, action, completions);
             (perAction.items || []).forEach(item => {
                 offlineRewards.items.push({ id: item.id, qty: Math.floor(item.qty * completions * (1 + doubleRate) + 1e-9) });
             });
