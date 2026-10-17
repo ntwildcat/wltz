@@ -1072,7 +1072,9 @@
                     { id: 'farming_slot', name: '第二块灵田', icon: '🌾', price: 5000, desc: '解锁第二块灵田：可与主角同时种植灵田配方，速度相同，可种同一种作物（只能买一次）', type: 'upgrade', bought: false },
                     { id: 'jewelry_slot2', name: '第二饰品栏位', icon: '💍', price: 8000, desc: '解锁第二个饰品栏位（可同时佩戴两件不同的饰品）', minRealmIndex: 18, type: 'upgrade', bought: false },
                     { id: 'daoze_slot2', name: '第二道基槽位', icon: '☯️', price: 15000, desc: '解锁第二个道基槽位（可同时镶嵌两枚不同法则的道则）', minRealmIndex: 30, type: 'upgrade', bought: false },
-                    { id: 'daoze_slot3', name: '第三道基槽位', icon: '☯️', price: 35000, desc: '解锁第三个道基槽位', minRealmIndex: 32, type: 'upgrade', bought: false }
+                    { id: 'daoze_slot3', name: '第三道基槽位', icon: '☯️', price: 35000, desc: '解锁第三个道基槽位', minRealmIndex: 32, type: 'upgrade', bought: false },
+                    { id: 'daoze_slot4', name: '第四道基槽位', icon: '☯️', price: 50000000, desc: '解锁第四个道基槽位（金仙起法则上限 40，可化先天品道则）', minRealmIndex: 44, type: 'upgrade', bought: false },
+                    { id: 'daoze_slot5', name: '第五道基槽位', icon: '☯️', price: 300000000, desc: '解锁第五个道基槽位', minRealmIndex: 48, type: 'upgrade', bought: false }
                 ],
                 food: [
                     { id: 'millet', name: '灵米', icon: '🌾', price: 10, desc: '普通食物' },
@@ -1996,27 +1998,31 @@
         // 兑换成一枚「道则」（实体物品），镶嵌进新增的「道基」槽后提供比留着法则等级更集中的定向加成。
         function isVoidUnlocked() { return gameState.player.realmIndex >= 30; }   // v6.89：原索引21 → +9
 
-        // 第 5 品「本源品」大乘初期（索引29）起才能化虚，需要 isDachengUnlocked()
-        const DAOZE_TIER_NAMES = ['下品', '中品', '上品', '极品', '本源品'];
-        const DAOZE_TIER_LEVEL_COST = [5, 10, 15, 20, 28];
-        const DAOZE_TIER_DAOGUO_COST = [20, 70, 145, 243, 420];
-        const DAOZE_TIER_VOID_COST = [8, 28, 58, 97, 170];
+        // 第 5 品「本源品」大乘初期起才能化虚；v7.41 加第 6 品「先天品」（金仙，法则上限 40）、第 7 品「混元品」（太乙，法则上限 50），
+        // 材料换成该境界的仙金 / 玉魄。每品耗的法则等级约为当时法则上限的九成（本源品 28/30、先天品 36/40、混元品 45/50）
+        const DAOZE_TIER_NAMES = ['下品', '中品', '上品', '极品', '本源品', '先天品', '混元品'];
+        const DAOZE_TIER_LEVEL_COST = [5, 10, 15, 20, 28, 36, 45];
+        const DAOZE_TIER_DAOGUO_COST = [20, 70, 145, 243, 420, 6000, 15000];
+        const DAOZE_TIER_MAT = ['voidcrystal', 'voidcrystal', 'voidcrystal', 'voidcrystal', 'voidcrystal', 'xianjin', 'yupo'];
+        const DAOZE_TIER_VOID_COST = [8, 28, 58, 97, 170, 40, 60];   // 每品耗的材料数量（材料见 DAOZE_TIER_MAT）
+        const DAOZE_TIER_REALM = [30, 30, 30, 30, 38, 44, 46];
+        const DAOZE_MAT_HINT = { voidcrystal: '采矿Lv50解锁「采虚晶」', xianjin: '采矿Lv86「采仙金」', yupo: '采矿Lv90「采玉魄」' };
         // 每种法则对应一枚道则：主效果贴合法则本身的方向，副效果联动一个生活技能或战斗维度；数值按品阶（下/中/上/极品）递增
         const DAOZE_DEF = {
-            metal:   { name: '金之道则', color: '#d8c078', primary: { key: 'atkPct',         values: [0.03, 0.06, 0.10, 0.15, 0.22] }, secondary: { key: 'critDmg',        values: [0.02, 0.04, 0.07, 0.11, 0.16] } },
-            wood:    { name: '木之道则', color: '#7fae9a', primary: { key: 'hpPct',          values: [0.03, 0.06, 0.10, 0.15, 0.22] }, secondary: { key: 'regen',          values: [0.0008, 0.0015, 0.0025, 0.004, 0.006] } },
-            water:   { name: '水之道则', color: '#7d9bb5', primary: { key: 'foodPct',        values: [0.03, 0.06, 0.10, 0.15, 0.22] }, secondary: { key: 'double:alchemy', values: [0.02, 0.04, 0.07, 0.11, 0.16] } },
-            fire:    { name: '火之道则', color: '#d9614f', primary: { key: 'crit',           values: [0.02, 0.04, 0.06, 0.09, 0.13] }, secondary: { key: 'out:danhuo',     values: [0.02, 0.04, 0.07, 0.11, 0.16] } },
-            earth:   { name: '土之道则', color: '#b08d5a', primary: { key: 'defPct',         values: [0.03, 0.06, 0.10, 0.15, 0.22] }, secondary: { key: 'double:mining',  values: [0.02, 0.04, 0.07, 0.11, 0.16] } },
-            wind:    { name: '风之道则', color: '#b7c9c2', primary: { key: 'spdPct',         values: [0.03, 0.06, 0.10, 0.15, 0.22] }, secondary: { key: 'time:life',      values: [-0.02, -0.04, -0.07, -0.11, -0.16] } },
-            thunder: { name: '雷之道则', color: '#b39ddb', primary: { key: 'hit',            values: [0.02, 0.04, 0.06, 0.09, 0.13] }, secondary: { key: 'dropPct',        values: [0.02, 0.04, 0.07, 0.11, 0.16] } },
-            ice:     { name: '冰之道则', color: '#a8d8e8', primary: { key: 'dodge',          values: [0.02, 0.04, 0.06, 0.09, 0.13] }, secondary: { key: 'cultSpeed',      values: [0.02, 0.04, 0.07, 0.11, 0.16] } }
+            metal:   { name: '金之道则', color: '#d8c078', primary: { key: 'atkPct',         values: [0.03, 0.06, 0.10, 0.15, 0.22, 0.30, 0.40] }, secondary: { key: 'critDmg',        values: [0.02, 0.04, 0.07, 0.11, 0.16, 0.22, 0.30] } },
+            wood:    { name: '木之道则', color: '#7fae9a', primary: { key: 'hpPct',          values: [0.03, 0.06, 0.10, 0.15, 0.22, 0.30, 0.40] }, secondary: { key: 'regen',          values: [0.0008, 0.0015, 0.0025, 0.004, 0.006, 0.008, 0.011] } },
+            water:   { name: '水之道则', color: '#7d9bb5', primary: { key: 'foodPct',        values: [0.03, 0.06, 0.10, 0.15, 0.22, 0.30, 0.40] }, secondary: { key: 'double:alchemy', values: [0.02, 0.04, 0.07, 0.11, 0.16, 0.22, 0.30] } },
+            fire:    { name: '火之道则', color: '#d9614f', primary: { key: 'crit',           values: [0.02, 0.04, 0.06, 0.09, 0.13, 0.18, 0.24] }, secondary: { key: 'out:danhuo',     values: [0.02, 0.04, 0.07, 0.11, 0.16, 0.22, 0.30] } },
+            earth:   { name: '土之道则', color: '#b08d5a', primary: { key: 'defPct',         values: [0.03, 0.06, 0.10, 0.15, 0.22, 0.30, 0.40] }, secondary: { key: 'double:mining',  values: [0.02, 0.04, 0.07, 0.11, 0.16, 0.22, 0.30] } },
+            wind:    { name: '风之道则', color: '#b7c9c2', primary: { key: 'spdPct',         values: [0.03, 0.06, 0.10, 0.15, 0.22, 0.30, 0.40] }, secondary: { key: 'time:life',      values: [-0.02, -0.04, -0.07, -0.11, -0.16, -0.20, -0.25] } },
+            thunder: { name: '雷之道则', color: '#b39ddb', primary: { key: 'hit',            values: [0.02, 0.04, 0.06, 0.09, 0.13, 0.18, 0.24] }, secondary: { key: 'dropPct',        values: [0.02, 0.04, 0.07, 0.11, 0.16, 0.22, 0.30] } },
+            ice:     { name: '冰之道则', color: '#a8d8e8', primary: { key: 'dodge',          values: [0.02, 0.04, 0.06, 0.09, 0.13, 0.18, 0.24] }, secondary: { key: 'cultSpeed',      values: [0.02, 0.04, 0.07, 0.11, 0.16, 0.22, 0.30] } }
         };
         function daozeItemId(lawId, tier) { return `daoze_${lawId}_${tier}`; }
 
-        // 生成 32 件道则物品（8 法则 × 4 品阶），效果走标准特效词汇（getMod 会自动通过 getEquippedEffectSum 读取已镶嵌的道则）
+        // 生成 56 件道则物品（8 法则 × 7 品阶），效果走标准特效词汇（getMod 会自动通过 getEquippedEffectSum 读取已镶嵌的道则）
         (function buildDaozeItems() {
-            const sellPrices = [800, 2200, 5000, 10000, 22000];
+            const sellPrices = [800, 2200, 5000, 10000, 22000, 50000, 110000];
             // 道则图标：一枚按法则染色的晶石，四个品阶共用同一个形状（品阶体现在名字与光晕）
             const gemIcon = (c, glow) => icoSvg(`<path d="M16 3L27 12L23 29H9L5 12Z" fill="${c}" opacity="${glow}"/><path d="M16 3L27 12L16 16Z" fill="${c}" opacity="1"/><path d="M16 3L5 12L16 16Z" fill="${c}" opacity=".85"/><path d="M9 29L16 16L23 29Z" fill="${c}" opacity=".7"/>${icoSparkle(16, 7, 1.8)}`);
             Object.entries(DAOZE_DEF).forEach(([lawId, def]) => {
@@ -2047,10 +2053,10 @@
 
         function isDachengUnlocked() { return gameState.player.realmIndex >= 38; }   // v6.89：原索引29 → +9
 
-        // 化虚：把某个法则的 n 级（对应 tier 0-4，第 5 品「本源品」需大乘初期）兑成一枚道则，扣道果 + 虚晶
+        // 化虚：把某个法则的 n 级（对应 tier 0-6，高品的境界门槛见 DAOZE_TIER_REALM）兑成一枚道则，扣道果 + 该品材料（虚晶 / 仙金 / 玉魄）
         async function huaxuLaw(lawId, tier) {
             if (!isVoidUnlocked()) { showNotification('炼虚初期才能化虚', '#c98a3e'); return; }
-            if (tier >= 4 && !isDachengUnlocked()) { showNotification('本源品要到大乘初期才能化虚', '#c98a3e'); return; }
+            if (gameState.player.realmIndex < DAOZE_TIER_REALM[tier]) { showNotification(`${DAOZE_TIER_NAMES[tier]}要到${getRealmName(DAOZE_TIER_REALM[tier])}才能化虚`, '#c98a3e'); return; }
             const def = LAW_EFFECTS[lawId];
             const daoze = DAOZE_DEF[lawId];
             if (!def || !daoze) return;
@@ -2058,27 +2064,28 @@
             const info = getLawInfo(lawId);
             if (info.level < levelCost) { showNotification(`${def.name}等级不足：需要 Lv.${levelCost}，当前 Lv.${info.level}`, '#c98a3e'); return; }
             const P = ensureCurrencyState();
-            const voidHave = (gameState.player.inventory.find(i => i.id === 'voidcrystal') || { qty: 0 }).qty;
+            const mat = DAOZE_TIER_MAT[tier], matName = GAME_CONFIG.items[mat].name;
+            const voidHave = (gameState.player.inventory.find(i => i.id === mat) || { qty: 0 }).qty;
             if (P.daoguo < daoguoCost) { spendNotify('daoguo', daoguoCost); return; }
-            if (voidHave < voidCost) { showNotification(`虚晶不足：需要 ${voidCost}，现有 ${voidHave}`, '#c4483a', 'error'); return; }
+            if (voidHave < voidCost) { showNotification(`${matName}不足：需要 ${voidCost}，现有 ${voidHave}`, '#c4483a', 'error'); return; }
             const daozeId = daozeItemId(lawId, tier + 1);
-            if (!inventoryCanHold([daozeId], voidHave === voidCost ? ['voidcrystal'] : [])) {
+            if (!inventoryCanHold([daozeId], voidHave === voidCost ? [mat] : [])) {
                 showNotification('❌ 背包已满，化出的道则放不下：先出售或整理出一格再化虚', '#c4483a', 'error');
                 return;
             }
             const tierName = DAOZE_TIER_NAMES[tier];
-            const ok = await uiConfirm(`消耗 ${def.name} ${levelCost} 级（Lv.${info.level} → Lv.${info.level - levelCost}）+ 道果 ${daoguoCost} + 虚晶 ${voidCost}\n\n获得：${tierName}${daoze.name} ×1（可在「装备」界面的道基槽镶嵌）\n\n法则等级可以再参悟回来，不是不可逆。`, { title: '确定要化虚吗？', okText: '化虚' });
+            const ok = await uiConfirm(`消耗 ${def.name} ${levelCost} 级（Lv.${info.level} → Lv.${info.level - levelCost}）+ 道果 ${daoguoCost} + ${matName} ${voidCost}\n\n获得：${tierName}${daoze.name} ×1（可在「装备」界面的道基槽镶嵌）\n\n法则等级可以再参悟回来，不是不可逆。`, { title: '确定要化虚吗？', okText: '化虚' });
             if (!ok) return;
             // 等待确认期间游戏照常运行：再核一遍资源和背包
-            const voidNow = (gameState.player.inventory.find(i => i.id === 'voidcrystal') || { qty: 0 }).qty;
+            const voidNow = (gameState.player.inventory.find(i => i.id === mat) || { qty: 0 }).qty;
             if (getLawInfo(lawId).level < levelCost || P.daoguo < daoguoCost || voidNow < voidCost
-                || !inventoryCanHold([daozeId], voidNow === voidCost ? ['voidcrystal'] : [])) {
+                || !inventoryCanHold([daozeId], voidNow === voidCost ? [mat] : [])) {
                 showNotification('化虚条件已变化（资源不足或背包已满），请重新确认', '#c98a3e', 'warning');
                 return;
             }
             consumeLawLevels(lawId, levelCost);
             P.daoguo -= daoguoCost;
-            consumeItem('voidcrystal', voidCost);
+            consumeItem(mat, voidCost);
             addToInventory(daozeId, 1, true);
             showNotification(`☯️ 化虚成功：获得${tierName}${daoze.name} ×1`, '#6f9c8a');
             calculateStats();
@@ -2097,23 +2104,24 @@
             if (!isVoidUnlocked()) return '';
             const info = getLawInfo(lawId);
             const P = gameState.player;
-            const voidHave = (P.inventory.find(i => i.id === 'voidcrystal') || { qty: 0 }).qty;
-            const tierNames = isDachengUnlocked() ? DAOZE_TIER_NAMES : DAOZE_TIER_NAMES.slice(0, 4);   // 本源品要大乘初期才显示
+            const matHave = id => (P.inventory.find(i => i.id === id) || { qty: 0 }).qty;
+            const tierNames = DAOZE_TIER_NAMES.filter((_, i) => P.realmIndex >= DAOZE_TIER_REALM[i]);   // 高品要到对应境界才显示（本源品大乘、先天品金仙、混元品太乙）
             const btns = tierNames.map((name, i) => {
                 const lackLevel = Math.max(0, DAOZE_TIER_LEVEL_COST[i] - info.level);
                 const lackDaoguo = Math.max(0, DAOZE_TIER_DAOGUO_COST[i] - (P.daoguo || 0));
-                const lackVoid = Math.max(0, DAOZE_TIER_VOID_COST[i] - voidHave);
+                const mat = DAOZE_TIER_MAT[i], matName = GAME_CONFIG.items[mat].name;
+                const lackVoid = Math.max(0, DAOZE_TIER_VOID_COST[i] - matHave(mat));
                 const can = !lackLevel && !lackDaoguo && !lackVoid;
                 const lacks = [];
                 if (lackLevel) lacks.push(`法则还差 ${lackLevel} 级`);
                 if (lackDaoguo) lacks.push(`道果还差 ${lackDaoguo}`);
-                if (lackVoid) lacks.push(`虚晶还差 ${lackVoid}（采矿Lv50解锁「采虚晶」）`);
+                if (lackVoid) lacks.push(`${matName}还差 ${lackVoid}（${DAOZE_MAT_HINT[mat]}）`);
                 const title = can
-                    ? `消耗 ${DAOZE_TIER_LEVEL_COST[i]} 级 + 道果 ${DAOZE_TIER_DAOGUO_COST[i]} + 虚晶 ${DAOZE_TIER_VOID_COST[i]}`
+                    ? `消耗 ${DAOZE_TIER_LEVEL_COST[i]} 级 + 道果 ${DAOZE_TIER_DAOGUO_COST[i]} + ${matName} ${DAOZE_TIER_VOID_COST[i]}`
                     : lacks.join('，');
                 return `<button type="button" class="btn btn-secondary law-huaxu-btn" ${can ? '' : 'disabled'} title="${title}" onclick="event.stopPropagation(); huaxuLaw('${lawId}', ${i})">☯️ ${name}</button>`;
             }).join('');
-            return `<div class="law-huaxu-block"><div class="law-huaxu-title">☯️ 化虚兑道则（消耗法则等级+道果+虚晶，换实体道则去装备页镶嵌）</div><div class="law-huaxu">${btns}</div></div>`;
+            return `<div class="law-huaxu-block"><div class="law-huaxu-title">☯️ 化虚兑道则（消耗法则等级+道果+虚晶 / 仙金 / 玉魄，换实体道则去装备页镶嵌）</div><div class="law-huaxu">${btns}</div></div>`;
         }
 
         // ---- 炼虚期：天劫（v6.68） ----
@@ -8860,11 +8868,12 @@
         function getJewelrySlots() {
             return 1 + ((gameState.player.boughtUpgrades || []).includes('jewelry_slot2') ? 1 : 0);
         }
-        // 道基槽位：炼虚初期起 1 个，商城可买到第 2、3 个
+        // 道基槽位：炼虚初期起 1 个，商城可买到第 2～5 个（第 4 个金仙、第 5 个大罗）
+        const DAOZE_SLOT_IDS = ['daoze_slot2', 'daoze_slot3', 'daoze_slot4', 'daoze_slot5'];
         function getDaozeSlots() {
             if (!isVoidUnlocked()) return 0;
             const owned = gameState.player.boughtUpgrades || [];
-            return 1 + (owned.includes('daoze_slot2') ? 1 : 0) + (owned.includes('daoze_slot3') ? 1 : 0);
+            return 1 + DAOZE_SLOT_IDS.filter(id => owned.includes(id)).length;
         }
         function daozeLawOf(itemId) { return (GAME_CONFIG.items[itemId] || {}).daozeLaw || null; }
 
@@ -8979,12 +8988,14 @@
             if (isVoidUnlocked()) {
                 const dSlots = getDaozeSlots();
                 for (let i = 0; i < dSlots; i++) slots += slotCard('daoze', (eq.daoze || [])[i], `☯️ 道基${dSlots > 1 ? i + 1 : ''}`);
-                if (dSlots < 3) {
-                    const nextId = dSlots < 1 ? null : (dSlots === 1 ? 'daoze_slot2' : 'daoze_slot3');
+                if (dSlots < 1 + DAOZE_SLOT_IDS.length) {
+                    const nextId = dSlots < 1 ? null : DAOZE_SLOT_IDS[dSlots - 1];
+                    const nextCfg = nextId && GAME_CONFIG.shop.upgrades.find(u => u.id === nextId);
+                    const canBuy = nextCfg && gameState.player.realmIndex >= (nextCfg.minRealmIndex || 0);
                     slots += `<div class="equip-slot locked"><div class="equip-slot-label">☯️ 道基${dSlots + 1}</div>
                         <div class="equip-slot-empty">🔒 第${dSlots + 1}个道基槽位</div>
-                        <div class="equip-slot-stats">${nextId ? '可在商城购买' : '炼虚初期后自动解锁第一个'}</div>
-                        ${nextId ? `<button class="btn btn-secondary equip-btn" onclick="switchPanel('shop')">去商城</button>` : ''}</div>`;
+                        <div class="equip-slot-stats">${!nextId ? '炼虚初期后自动解锁第一个' : canBuy ? '可在商城购买' : `${getRealmName(nextCfg.minRealmIndex)}后可在商城购买`}</div>
+                        ${canBuy ? `<button class="btn btn-secondary equip-btn" onclick="switchPanel('shop')">去商城</button>` : ''}</div>`;
                 }
             }
             // v7.37 本命栏：青冥剑不占武器栏，单独一块显示剑数、剑阵、飞剑斩威力和本境界还能养到几口
@@ -10292,7 +10303,7 @@
                     updateUI();
                 } else if (itemId === 'jewelry_slot2') {
                     showNotification('✨ 已解锁第二个饰品栏位！去「装备」界面佩戴', '#6f9c8a');
-                } else if (itemId === 'daoze_slot2' || itemId === 'daoze_slot3') {
+                } else if (DAOZE_SLOT_IDS.includes(itemId)) {
                     showNotification('✨ 已解锁新的道基槽位！去「装备」界面镶嵌道则', '#6f9c8a');
                 }
             } else if (item.type === 'art') {
