@@ -730,6 +730,7 @@
                         jinsui_nectar: { name: '金髓仙浆', desc: '悟道果 ×3 + 仙灵稻 ×3 + 仙金 ×1（战斗食物：恢复13000生命）', duration: 190, output: { items: [{ id: 'jinsui_nectar', qty: 2 }], skill: 'alchemy', exp: 4200 }, requiredLevel: 88, requiredRealmIndex: 44, requires: { daofruit: 3, xian_rice: 3, xianjin: 1 }, unlocked: false },
                         yupo_jelly: { name: '玉魄琼脂', desc: '悟道果 ×3 + 造化果 ×2 + 玉魄 ×1（战斗食物：恢复18000生命）', duration: 210, output: { items: [{ id: 'yupo_jelly', qty: 2 }], skill: 'alchemy', exp: 4800 }, requiredLevel: 92, requiredRealmIndex: 46, requires: { daofruit: 3, zaohua: 2, yupo: 1 }, unlocked: false },
                         xuanhuang_dew: { name: '玄黄玉液', desc: '悟道果 ×3 + 造化果 ×3 + 玄黄精 ×1（战斗食物：恢复24000生命）', duration: 230, output: { items: [{ id: 'xuanhuang_dew', qty: 2 }], skill: 'alchemy', exp: 5400 }, requiredLevel: 96, requiredRealmIndex: 48, requires: { daofruit: 3, zaohua: 3, xuanhuang: 1 }, unlocked: false },
+                        taichu_nectar: { name: '太初琼浆', desc: '悟道果 ×3 + 造化果 ×4 + 太初晶 ×1（战斗食物：恢复32000生命）', duration: 250, output: { items: [{ id: 'taichu_nectar', qty: 2 }], skill: 'alchemy', exp: 6000 }, requiredLevel: 98, requiredRealmIndex: 50, requires: { daofruit: 3, zaohua: 4, taichujing: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -791,6 +792,9 @@
                         daluo_armor: { name: '大罗法衣', desc: '玄黄精 ×5 + 仙金 ×4', duration: 245, output: { items: [{ id: 'daluoarmor', qty: 1 }], skill: 'forging', exp: 7200 }, requiredLevel: 96, requiredRealmIndex: 48, requires: { xuanhuang: 5, xianjin: 4 }, unlocked: false },
                         daluo_pendant: { name: '大罗佩', desc: '玄黄精 ×3 + 灵晶 ×7', duration: 235, output: { items: [{ id: 'daluopendant', qty: 1 }], skill: 'forging', exp: 7400 }, requiredLevel: 97, requiredRealmIndex: 48, requires: { xuanhuang: 3, spiritcrystal: 7 }, unlocked: false },
                         life_refine_daozu: { name: '祭炼青冥剑·道祖', desc: '玄黄精 ×6 + 玉魄 ×4｜每次添 2 口飞剑，这一档从 64 口祭到 72 口（满 72 口结成周天剑阵）', duration: 260, output: { lifeRefine: 11, skill: 'forging', exp: 8000 }, requiredLevel: 99, requiredRealmIndex: 50, requires: { xuanhuang: 6, yupo: 4 }, unlocked: false },
+                        daozu_sword: { name: '道祖剑', desc: '太初晶 ×4 + 玄黄精 ×3', duration: 260, output: { items: [{ id: 'daozusword', qty: 1 }], skill: 'forging', exp: 8000 }, requiredLevel: 98, requiredRealmIndex: 50, requires: { taichujing: 4, xuanhuang: 3 }, unlocked: false },
+                        daozu_armor: { name: '道祖法衣', desc: '太初晶 ×5 + 玉魄 ×4', duration: 260, output: { items: [{ id: 'daozuarmor', qty: 1 }], skill: 'forging', exp: 8200 }, requiredLevel: 98, requiredRealmIndex: 50, requires: { taichujing: 5, yupo: 4 }, unlocked: false },
+                        daozu_pendant: { name: '道祖佩', desc: '太初晶 ×3 + 灵晶 ×8', duration: 250, output: { items: [{ id: 'daozupendant', qty: 1 }], skill: 'forging', exp: 8400 }, requiredLevel: 99, requiredRealmIndex: 50, requires: { taichujing: 3, spiritcrystal: 8 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -839,6 +843,7 @@
                         xianjin: { name: '采仙金', desc: '产出仙金（金仙装备、金髓仙浆、玉身转化的材料）', duration: 140, output: { items: [{ id: 'xianjin', qty: 1 }], skill: 'mining', exp: 2300 }, requiredLevel: 86, requiredRealmIndex: 44, unlocked: false },
                         yupo: { name: '采玉魄', desc: '产出玉魄（太乙装备、玉魄琼脂、推演小世界的材料）', duration: 170, output: { items: [{ id: 'yupo', qty: 1 }], skill: 'mining', exp: 2800 }, requiredLevel: 90, requiredRealmIndex: 46, unlocked: false },
                         xuanhuang: { name: '采玄黄精', desc: '产出玄黄精（大罗装备、玄黄玉液、凝结法则本源的材料）', duration: 200, output: { items: [{ id: 'xuanhuang', qty: 1 }], skill: 'mining', exp: 3400 }, requiredLevel: 94, requiredRealmIndex: 48, unlocked: false },
+                        taichujing: { name: '采太初晶', desc: '产出太初晶（道祖装备、太初琼浆的材料）', duration: 230, output: { items: [{ id: 'taichujing', qty: 1 }], skill: 'mining', exp: 4000 }, requiredLevel: 98, requiredRealmIndex: 50, unlocked: false }
                     },
                     actions: {}
                 },
@@ -1039,6 +1044,12 @@
                 daluoarmor: { name: '大罗法衣', icon: '🥼', type: 'armor', sellPrice: 52000, stats: { def: 582, hp: 1600 } },
                 daluopendant: { name: '大罗佩', icon: '📿', type: 'jewelry', sellPrice: 33000, stats: { spd: 119, hp: 1033 } },
                 xuanhuang_dew: { name: '玄黄玉液', icon: '🍶', type: 'food', sellPrice: 23000 },
+                // v7.44 道祖：原来道祖和大罗共用罗天战场与大罗装备，补一档道祖自己的矿 / 装备 / 食物（数值延续每档 ×1.35）
+                taichujing: { name: '太初晶', icon: '💠', type: 'ore', sellPrice: 22000 },
+                daozusword: { name: '道祖剑', icon: '🗡️', type: 'weapon', sellPrice: 63000, stats: { atk: 1427 } },
+                daozuarmor: { name: '道祖法衣', icon: '🥼', type: 'armor', sellPrice: 70000, stats: { def: 786, hp: 2160 } },
+                daozupendant: { name: '道祖佩', icon: '📿', type: 'jewelry', sellPrice: 44500, stats: { spd: 161, hp: 1395 } },
+                taichu_nectar: { name: '太初琼浆', icon: '🍶', type: 'food', sellPrice: 31000 },
                 nascentsoul_essence: { name: '元婴精魄', icon: '👁️', type: 'material', sellPrice: 2000 },
 
                 // P6/P7 新作物
@@ -1096,7 +1107,8 @@
                     { id: 'xianlingjing', name: '仙灵晶', icon: '💠', price: 10000000, desc: '真仙装备 / 仙界食物材料', minRealmIndex: 42 },
                     { id: 'xianjin', name: '仙金', icon: '🪙', price: 20000000, desc: '金仙装备 / 玉身转化材料', minRealmIndex: 44 },
                     { id: 'yupo', name: '玉魄', icon: '💎', price: 40000000, desc: '太乙装备 / 推演小世界材料', minRealmIndex: 46 },
-                    { id: 'xuanhuang', name: '玄黄精', icon: '🟤', price: 80000000, desc: '大罗装备 / 法则本源材料', minRealmIndex: 48 }
+                    { id: 'xuanhuang', name: '玄黄精', icon: '🟤', price: 80000000, desc: '大罗装备 / 法则本源材料', minRealmIndex: 48 },
+                    { id: 'taichujing', name: '太初晶', icon: '💠', price: 160000000, desc: '道祖装备 / 太初琼浆材料', minRealmIndex: 50 }
                 ],
                 // 丹火商城（结丹初期起）：用丹火买炼丹 / 战斗食物材料；食物是秘境的刚需
                 danhuo_shop: [
@@ -1138,7 +1150,9 @@
                     { id: 'yupo', name: '玉魄 ×1', icon: '💎', price: 400, currency: 'daoguo', bundle: 1, desc: '太乙装备 / 推演小世界材料', minRealmIndex: 46 },
                     { id: 'yupo_jelly', name: '玉魄琼脂 ×2', icon: '🍮', price: 320, currency: 'daoguo', bundle: 2, desc: '战斗食物（恢复 18000 生命）', minRealmIndex: 46 },
                     { id: 'xuanhuang', name: '玄黄精 ×1', icon: '🟤', price: 650, currency: 'daoguo', bundle: 1, desc: '大罗装备 / 法则本源材料', minRealmIndex: 48 },
-                    { id: 'xuanhuang_dew', name: '玄黄玉液 ×2', icon: '🍶', price: 500, currency: 'daoguo', bundle: 2, desc: '战斗食物（恢复 24000 生命）', minRealmIndex: 48 }
+                    { id: 'xuanhuang_dew', name: '玄黄玉液 ×2', icon: '🍶', price: 500, currency: 'daoguo', bundle: 2, desc: '战斗食物（恢复 24000 生命）', minRealmIndex: 48 },
+                    { id: 'taichujing', name: '太初晶 ×1', icon: '💠', price: 1000, currency: 'daoguo', bundle: 1, desc: '道祖装备 / 太初琼浆材料', minRealmIndex: 50 },
+                    { id: 'taichu_nectar', name: '太初琼浆 ×2', icon: '🍶', price: 800, currency: 'daoguo', bundle: 2, desc: '战斗食物（恢复 32000 生命）', minRealmIndex: 50 }
                 ],
                 arts: [
                     // v7.04 功法重新定价：原价只相当于同期一两分钟的打怪收入，买不买不构成选择。
@@ -1285,6 +1299,15 @@
                     cooldown: 3.0,
                     minRealm: 48,
                     description: '以玄黄精化开的玉液，大罗修士的战斗补给'
+                },
+                taichu_nectar: {
+                    id: 'taichu_nectar',
+                    name: '太初琼浆',
+                    icon: '🍶',
+                    hpRestore: 32000,         // 恢复HP（v7.44 道祖）
+                    cooldown: 3.0,
+                    minRealm: 50,
+                    description: '以太初晶化开的琼浆，道祖的战斗补给'
                 }
             },
             // 默认食物配置
@@ -1427,6 +1450,11 @@
                 xuanhuang: svg(rock('#c9a86a', '#5a4220', `<path d="M10 13L16 10L22 14M12 20L20 18" stroke="#f3e2b8" stroke-width="1" opacity=".85"/>${sparkle(23, 8, 2.4, '#f3e2b8')}${sparkle(9, 21, 1.8, '#f3e2b8')}`)),
                 daluosword: svg(sword('#f8f0ff', '#fff', '#8a6ad0', '<circle cx="16" cy="16" r="15" stroke="#c9a86a" stroke-width="1.4" opacity=".9"/>')),
                 daluoarmor: svg(robe('#f3ead6', '#5a4220', '<path d="M12 24Q14 22 16 24Q18 22 20 24" stroke="#c9a86a" stroke-width="1"/>')),
+                taichujing: svg(rock('#f3ecd8', '#6a5a3a', `<circle cx="16" cy="17" r="4.2" stroke="#3a3020" stroke-width="1.1"/><circle cx="16" cy="17" r="1.3" fill="#3a3020" stroke="none"/>${sparkle(24, 8, 2.6, '#fffbe8')}${sparkle(8, 22, 1.8, '#fffbe8')}`)),
+                daozusword: svg(sword('#fffbe8', '#fff', '#3a3020', '<circle cx="16" cy="16" r="15" stroke="#f3ecd8" stroke-width="1.6" opacity=".95"/><circle cx="16" cy="16" r="12.5" stroke="#c9a86a" stroke-width=".8" opacity=".7"/>')),
+                daozuarmor: svg(robe('#fffbe8', '#3a3020', '<circle cx="16" cy="22" r="2.6" stroke="#3a3020" stroke-width="1"/><circle cx="16" cy="22" r=".9" fill="#3a3020" stroke="none"/>')),
+                daozupendant: svg(pendant('#3a3020', '#fffbe8', `${sparkle(25, 22, 2.6, '#fffbe8')}<circle cx="16" cy="20" r="8.4" stroke="#f3ecd8" stroke-width="1" opacity=".9"/>`)),
+                taichu_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#3a3020"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#f3ecd8"/><circle cx="16" cy="20" r="3.4" stroke="#3a3020" stroke-width="1"/><circle cx="16" cy="20" r="1" fill="#3a3020" stroke="none"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".7"/>${sparkle(25, 7, 2.2, '#fffbe8')}`),
                 daluopendant: svg(pendant('#8a6ad0', '#f3ead6', `${sparkle(25, 22, 2.6, '#f3e2b8')}<circle cx="16" cy="20" r="8" stroke="#c9a86a" stroke-width=".9" opacity=".85"/>`)),
                 xuanhuang_dew: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#5a4220"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#c9a86a"/><path d="M10 18Q16 21 22 18" stroke="#f3e2b8" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2, '#f3e2b8')}${sparkle(9, 9, 1.8, '#f3e2b8')}`),
                 taiyi_nectar: svg(`<rect x="13.5" y="2" width="5" height="4" rx="1" fill="#8a6a1a"/><path d="M14 6Q14 9 10 12Q6 16 7 22Q8 29 16 29Q24 29 25 22Q26 16 22 12Q18 9 18 6Z" fill="#f3d36a"/><path d="M10 18Q16 21 22 18" stroke="#fff8dc" stroke-width="1" opacity=".8"/><path d="M11 14Q9 17 10 21" stroke="#fff" stroke-width="1.3" opacity=".6"/>${sparkle(25, 7, 2.2)}${sparkle(9, 9, 1.8)}`),
@@ -1642,7 +1670,8 @@
             xianbattle:        { danhuo: [30, 42], shenshi: [26, 38], daoguo: [10, 15] },
             jinxianbattle:     { danhuo: [38, 52], shenshi: [33, 47], daoguo: [13, 19] },
             taiyibattle:       { danhuo: [48, 66], shenshi: [42, 60], daoguo: [17, 24] },
-            daluobattle:       { danhuo: [60, 84], shenshi: [53, 76], daoguo: [22, 31] }
+            daluobattle:       { danhuo: [60, 84], shenshi: [53, 76], daoguo: [22, 31] },
+            daozubattle:       { danhuo: [75, 105], shenshi: [66, 95], daoguo: [28, 39] }
         };
         function rollAreaCurrency(areaKey, bonus) {
             const cfg = BATTLE_CURRENCY[areaKey] || {};
@@ -2699,6 +2728,7 @@
         // 普通战斗区域的敌人系数：血量与攻击分开缩放（原始模板见 enterBattleArea）。
         // 标定：无特效玩家（桃木剑、最低境界）通关率约 65%，且敌人平均每击约打掉玩家 12% 最大生命，
         // 让防御/闪避/生命类特效在普通战斗里同样有价值（只缩放血量会变成纯输出检定，输出型灵根占尽优势）。
+        const DAOZU_AREA_HP = 0.13, DAOZU_AREA_ATK = 0.53;   // 太初道场系数（标定见技术文档 v7.44）
         const P4_AREA_SCALE = {
             forest: { hp: 1.12, atk: 1.12 }, mountain: { hp: 1.1, atk: 1.17 }, deepMountain: { hp: 1.218, atk: 1.844 },
             swamp: { hp: 1.393, atk: 2.115 }, abyss: { hp: 1.087, atk: 1.782 }, goldenPlains: { hp: 1.357, atk: 2.602 },
@@ -2716,7 +2746,9 @@
             // 太乙起玉身）穿装备 80 场全胜、敌人约 6 击打死玩家、每场约 3 秒；不穿装备胜率 22% / 8%（九霄战场 32%）
             jinxianbattle: { hp: 0.046, atk: 0.263 }, taiyibattle: { hp: 0.064, atk: 0.355 },
             // v7.24 大罗：同口径相对玉虚战场——100 场穿装备全胜、约 6 击打死玩家、每场约 3 秒；不穿装备胜率 3%
-            daluobattle: { hp: 0.09, atk: 0.39 }
+            daluobattle: { hp: 0.09, atk: 0.39 },
+            // v7.44 道祖：同口径相对罗天战场（见技术文档 v7.44）
+            daozubattle: { hp: DAOZU_AREA_HP, atk: DAOZU_AREA_ATK }
         };
         // v7.18 装备门槛：用户反馈"同境界不穿装备、食物管够也能慢慢磨过去"。在上面的标定之上再乘一层敌人攻击，
         // 标定口径：刚能进入该区域的境界、真灵根、无淬炼，模拟 40 场——
@@ -2727,7 +2759,7 @@
         const GEAR_CHECK_ATK = {
             goldenPlains: 1.75, tribulationGround: 2.5, voidSea: 1.5, abyssRuins: 2, chaosWastes: 1.5, nineNether: 1.5,
             voidAbyss: 1.5, huashiRealm: 1.5, daoWastes: 1.5, fusionVoid: 1.5, taiyiField: 1.75, lingjieAbyss: 1.75, xianbattle: 1.5,
-            jinxianbattle: 1.5, taiyibattle: 1.5, daluobattle: 1.5
+            jinxianbattle: 1.5, taiyibattle: 1.5, daluobattle: 1.5, daozubattle: 1.5
         };
         Object.entries(GEAR_CHECK_ATK).forEach(([k, m]) => { if (P4_AREA_SCALE[k]) P4_AREA_SCALE[k].atk *= m; });
 
@@ -3414,6 +3446,7 @@
             50: [`🌟 成就道祖：证道法则的效果 ×${DAOZU.provenMult}，法则之击每 ${DAOZU.strikeInterval} 秒一击、威力 ×${DAOZU.strikeMult}——在这条法则之下无敌`,
                 `🌀 天道侵蚀：每次法则之击 +${EROSION.perStrike}、展开灵域 +${EROSION.perDomain}，每小时消退 ${EROSION.decayPerHour}；满 ${EROSION.assimilateAt} 被天道同化，法则效果、道丝、法则之击、灵域全部失效，退到 ${EROSION.recoverAt} 以下恢复`,
                 `🧘 境界感悟面板可「收敛法则」（不动用法则之力，侵蚀不涨），或「自降修为」退回大罗后期（侵蚀清零，首次获得道心：攻击 / 生命 / 防御 +${DAO_HEART_BONUS * 100}%，再证道须重打证道之战）`,
+                '⚔️ 太初道场（道祖专属战斗区域）、采矿 Lv98「采太初晶」、炼器道祖剑 / 法衣 / 佩、炼丹太初琼浆',
                 '🏁 道祖是最终境界'],
         };
         LIFE_SWORD_TIERS.slice(1).forEach((t, i) => {
@@ -5739,7 +5772,8 @@
             xianbattle:        [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'xianlingjing', p: 0.15, qty: 1 }, { id: 'daofruit', p: 0.12, qty: 1 }, { id: 'seed_xianrice', p: 0.04, qty: 1 }, { id: 'nascentsoul_essence', p: 0.04, qty: 1 }],
             jinxianbattle:     [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'xianjin', p: 0.15, qty: 1 }, { id: 'xianlingjing', p: 0.12, qty: 1 }, { id: 'xian_rice', p: 0.08, qty: 1 }, { id: 'nascentsoul_essence', p: 0.05, qty: 1 }],
             taiyibattle:       [{ id: 'taiyiessence', p: 0.32, qty: [1, 3] }, { id: 'yupo', p: 0.15, qty: 1 }, { id: 'xianjin', p: 0.12, qty: 1 }, { id: 'seed_zaohua', p: 0.04, qty: 1 }, { id: 'nascentsoul_essence', p: 0.05, qty: 1 }],
-            daluobattle:       [{ id: 'taiyiessence', p: 0.34, qty: [1, 3] }, { id: 'xuanhuang', p: 0.15, qty: 1 }, { id: 'yupo', p: 0.12, qty: 1 }, { id: 'zaohua', p: 0.08, qty: 1 }, { id: 'nascentsoul_essence', p: 0.06, qty: 1 }]
+            daluobattle:       [{ id: 'taiyiessence', p: 0.34, qty: [1, 3] }, { id: 'xuanhuang', p: 0.15, qty: 1 }, { id: 'yupo', p: 0.12, qty: 1 }, { id: 'zaohua', p: 0.08, qty: 1 }, { id: 'nascentsoul_essence', p: 0.06, qty: 1 }],
+            daozubattle:       [{ id: 'taiyiessence', p: 0.34, qty: [1, 3] }, { id: 'taichujing', p: 0.15, qty: 1 }, { id: 'xuanhuang', p: 0.12, qty: 1 }, { id: 'zaohua', p: 0.08, qty: 1 }, { id: 'nascentsoul_essence', p: 0.06, qty: 1 }]
         };
 
         // 掉落数量文字（如 1–2 / 1）
@@ -9187,7 +9221,9 @@
                 xianbattle: { name: '九霄战场', desc: '真仙修士交锋的九霄之上', minLevel: 42, maxLevel: 43, enemies: ['xian-beast', 'void-immortal'], coins: 1040000, exp: 409600 },
                 jinxianbattle: { name: '金阙战场', desc: '金仙以法则交锋之地', minLevel: 44, maxLevel: 45, enemies: ['jinxian-guard', 'daosi-soldier'], coins: 2080000, exp: 819200 },
                 taiyibattle: { name: '玉虚战场', desc: '太乙修士推演天地的战场', minLevel: 46, maxLevel: 47, enemies: ['yuxu-immortal', 'world-spirit'], coins: 4160000, exp: 1638400 },
-                daluobattle: { name: '罗天战场', desc: '大罗修士与界面共存之地，法则本源相激', minLevel: 48, maxLevel: 50, enemies: ['luotian-envoy', 'origin-puppet'], coins: 8320000, exp: 3276800 }
+                daluobattle: { name: '罗天战场', desc: '大罗修士与界面共存之地，法则本源相激', minLevel: 48, maxLevel: 50, enemies: ['luotian-envoy', 'origin-puppet'], coins: 8320000, exp: 3276800 },
+                // v7.44 道祖：奖励延续每档 ×2，敌人按道祖装备相对罗天战场标定
+                daozubattle: { name: '太初道场', desc: '诸道祖以证道法则相搏之地', minLevel: 50, maxLevel: 50, enemies: ['taichu-shade', 'wuxiang-lord'], coins: 16640000, exp: 6553600 }
             };
 
             const actions = {};
@@ -9392,6 +9428,10 @@
                 daluobattle: [
                     { name: '罗天巡使', hp: 100000, atk: 4000, def: 680, spd: 135, icon: '👤' },
                     { name: '本源灵傀', hp: 106000, atk: 4260, def: 640, spd: 145, icon: '🤖' }
+                ],
+                daozubattle: [
+                    { name: '太初道影', hp: 100000, atk: 4000, def: 700, spd: 140, icon: '👤' },
+                    { name: '无相道尊', hp: 106000, atk: 4260, def: 660, spd: 150, icon: '🧙' }
                 ]
             };
 
