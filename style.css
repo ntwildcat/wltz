@@ -2923,3 +2923,23 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
     .combatant-stats .cs-stat { font-size: 0.9em; padding: 0 4px 0 0; gap: 2px; }
     .cs-stat i { padding: 2px 3px 1px; font-size: 0.85em; }
 }
+
+/* ==========================================================================
+   v7.36 配色对比度修正（四套主题逐页检查）
+   ========================================================================== */
+/* 战斗名牌的数值：旧规则 .combatant-stats span 给里面的数字套了一层 var(--bg-l1) 底色，浅色主题下是浅底配浅字，几乎看不见 */
+.combatant-stats .cs-stat > span { background: transparent; padding: 0; color: #f0e4c6; }
+/* 顶栏修为条的底槽跟主题走（以前写死深墨色，浅色主题下是一大块黑） */
+.info-item .progress-bar { background: var(--bg-sunken); }
+/* 战报时间戳：宣纸上太淡 */
+.log-time { color: #7a6f5c; }
+/* 撤退按钮：深色主题下朱红字压在深底上偏暗，提亮并改毛笔字 */
+.btn-retreat { font-family: var(--font-title); font-weight: normal; font-size: 1.1em; }
+:root:not([data-theme="xuanzhi"]) .btn-retreat { color: #ef7262; border-color: #ef7262; }
+/* 浅色主题：法则圆章与修炼书法字的颜色压暗一些（亮金 / 亮蓝在宣纸色上发虚） */
+:root[data-theme="xuanzhi"] .law-medal { color: color-mix(in srgb, var(--c) 62%, #1a120a); }
+:root[data-theme="xuanzhi"] .rc-glyph { color: color-mix(in srgb, var(--rc-c) 72%, #0e0c09); }
+/* 悟道卡片：「灵根相合」以前和法则名、等级挤一行，被压成竖排还把等级挤出卡片；改成名字下面单独一行 */
+.law-card .recipe-header { position: relative; }
+.law-card .recipe-header:has(.law-resonant) { padding-bottom: 12px; }
+.law-card .law-resonant { position: absolute; left: 52px; bottom: -2px; margin: 0; white-space: nowrap; font-size: 0.75em; }
