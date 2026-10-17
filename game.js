@@ -3836,14 +3836,17 @@
             if (!isCloneUnlocked()) { bar.style.display = 'none'; return; }
             bar.style.display = 'block';
             const factor = getCloneFactor();
+            const root = gameState.player.spiritRoot;
+            const ghost = busy => typeof BattleArt === 'undefined' ? ''
+                : `<div class="cl-art cl-ghost${busy ? '' : ' idle'}" style="--c:${BattleArt.colorOf(root)}">${busy ? BattleArt.player(root, { sword: false }) : BattleArt.meditator(root)}</div>`;
             const rows = activeClones().map((c, slot) => {
                 const action = c.action ? getAction(c.action.skill, c.action.action) : null;
                 if (action) {
-                    return `<div class="clone-row"><div class="clone-bar-top"><span>🌀 分身${slot + 1}：<b>${action.name}</b></span><span id="cloneRemain${slot}"></span>
+                    return `<div class="clone-row has-art">${ghost(true)}<div class="cl-main"><div class="clone-bar-top"><span>🌀 分身${slot + 1}：<b>${action.name}</b></span><span id="cloneRemain${slot}"></span>
                         <button class="btn btn-secondary clone-stop" onclick="stopClone(${slot})">停止</button></div>
-                        <div class="progress-bar" style="height: 6px;"><div id="cloneFill${slot}" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div>`;
+                        <div class="progress-bar" style="height: 6px;"><div id="cloneFill${slot}" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div></div>`;
                 }
-                return `<div class="clone-row"><div class="clone-bar-top"><span>🌀 分身${slot + 1}空闲</span>${slot === 0 ? `<span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span>` : ''}</div></div>`;
+                return `<div class="clone-row has-art">${ghost(false)}<div class="cl-main"><div class="clone-bar-top"><span>🌀 分身${slot + 1}空闲</span>${slot === 0 ? `<span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span>` : ''}</div></div></div>`;
             });
             bar.innerHTML = rows.join('');
         }
@@ -3975,11 +3978,28 @@
             bar.style.display = 'block';
             const f = getFarmPlot();
             const action = f.action ? getAction('farming', f.action.action) : null;
+            const art = `<div class="cl-art pf-field" id="plotArt" data-stage="${action ? 0 : 'empty'}">${plotFieldSvg()}</div>`;
             bar.innerHTML = action
-                ? `<div class="clone-row"><div class="clone-bar-top"><span>🌾 第二块田：<b>${action.name}</b></span><span id="plotRemain"></span>
+                ? `<div class="clone-row has-art">${art}<div class="cl-main"><div class="clone-bar-top"><span>🌾 第二块田：<b>${action.name}</b></span><span id="plotRemain"></span>
                     <button class="btn btn-secondary clone-stop" onclick="stopFarmPlot()">停止</button></div>
-                    <div class="progress-bar" style="height: 6px;"><div id="plotFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div>`
-                : `<div class="clone-row"><div class="clone-bar-top"><span>🌾 第二块田空闲</span><span class="clone-hint">在灵田面板的配方卡片上点「种到第二块田」</span></div></div>`;
+                    <div class="progress-bar" style="height: 6px;"><div id="plotFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div></div>`
+                : `<div class="clone-row has-art">${art}<div class="cl-main"><div class="clone-bar-top"><span>🌾 第二块田空闲</span><span class="clone-hint">在灵田面板的配方卡片上点「种到第二块田」</span></div></div></div>`;
+        }
+        // v7.29 第二块田的小画：三条田垄，每条四株苗；苗按本轮进度分四个阶段长高，最后一段结出金穗（阶段由 tickPlotBar 写进 data-stage）
+        function plotFieldSvg() {
+            const rows = [{ y: 17, s: 0.85, x0: 14, dx: 11 }, { y: 28, s: 1.05, x0: 9, dx: 14 }, { y: 41, s: 1.3, x0: 5, dx: 17 }];
+            let body = '';
+            rows.forEach((r, ri) => {
+                body += `<path d="M1 ${r.y + 1} Q32 ${r.y - 3} 63 ${r.y + 1} L63 ${r.y + 4} Q32 ${r.y + 1} 1 ${r.y + 4} Z" fill="#5a3a1e"/>`;
+                for (let i = 0; i < 4; i++) {
+                    const x = r.x0 + i * r.dx;
+                    body += `<g class="pf-plant" style="--i:${ri * 4 + i}" transform="translate(${x} ${r.y + 0.5}) scale(${r.s})"><g class="pf-grow">
+                        <path d="M0 0 Q-0.6 -6 0.4 -12" stroke="#5f9a3a" stroke-width="1.3" fill="none"/>
+                        <path d="M0 -3 Q-4.5 -5 -5.5 -8.5 Q-1.5 -7 0 -4.5Z M0.2 -6 Q4.5 -7.5 5.5 -11 Q1.5 -9.5 0.2 -7.5Z" fill="#79b84e"/>
+                        <ellipse class="pf-ear" cx="0.6" cy="-14" rx="1.9" ry="3.4"/></g></g>`;
+                }
+            });
+            return `<svg viewBox="0 0 64 46" aria-hidden="true">${body}</svg>`;
         }
 
         function tickPlotBar(duration) {
@@ -3987,6 +4007,8 @@
             const pct = Math.min(100, (f.progress / duration) * 100);
             const fill = document.getElementById('plotFill');
             if (fill) fill.style.width = pct + '%';
+            const plotArt = document.getElementById('plotArt');
+            if (plotArt) { const st = String(pct < 25 ? 0 : pct < 55 ? 1 : pct < 85 ? 2 : 3); if (plotArt.dataset.stage !== st) plotArt.dataset.stage = st; }
             const remain = document.getElementById('plotRemain');
             if (remain) remain.textContent = Math.max(0, duration - f.progress).toFixed(1) + 's';
         }
@@ -8354,6 +8376,9 @@
             document.getElementById('itemName').textContent = itemConfig.name;
             document.getElementById('itemType').textContent = ITEM_TYPE_NAMES[itemConfig.type] || itemConfig.type;
             document.getElementById('itemQty').textContent = qty;
+            const typeSeal = document.getElementById('itemTypeSeal');
+            if (typeSeal) typeSeal.textContent = ITEM_TYPE_NAMES[itemConfig.type] || '';
+            document.querySelector('#itemDetailModal .modal-content').style.setProperty('--c', ITEM_TYPE_COLORS[itemConfig.type] || '#b89a5b');
 
             // 获取物品用途（根据物品类型和配方）
             let usageText = '暂无已知用途';
@@ -9752,6 +9777,11 @@
         }
 
         // 物品类型的中文名与背包里的显示顺序（背包分类标题、物品详情都用它，不再露出英文的类型名）
+        // v7.29 物品类型的点缀色：背包格子底边、图鉴光盘、类型标题笔触都用它
+        const ITEM_TYPE_COLORS = {
+            food: '#d9894a', material: '#8aa0b8', ore: '#9aa3ad', seed: '#79b84e', breakthrough_material: '#e0b54a', weapon: '#e0574a',
+            armor: '#5aa8ef', jewelry: '#d877b6', daoze: '#a283f0', consumable: '#36b383', special: '#d8b445', currency: '#b89a5b'
+        };
         const ITEM_TYPE_NAMES = {
             food: '食物', material: '材料', ore: '矿石', seed: '种子', breakthrough_material: '突破丹药',
             weapon: '武器', armor: '护甲', jewelry: '饰品', daoze: '道则', consumable: '丹药', special: '特殊', currency: '货币'
@@ -9783,6 +9813,8 @@
             orderedTypes.map(type => [type, byType[type]]).forEach(([type, items]) => {
                 const typeLabel = document.createElement('div');
                 typeLabel.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: var(--jade); margin-top: 10px; margin-bottom: 5px;';
+                typeLabel.className = 'inv-type-label';
+                typeLabel.style.setProperty('--c', ITEM_TYPE_COLORS[type] || '#b89a5b');
                 typeLabel.textContent = typeNames[type] || type;
                 grid.appendChild(typeLabel);
 
@@ -9791,6 +9823,7 @@
                     const slot = document.createElement('div');
                     slot.className = 'item-slot';
                     slot.style.cursor = 'pointer';
+                    slot.style.setProperty('--c', ITEM_TYPE_COLORS[itemConfig.type] || '#b89a5b');   // v7.29 多宝阁格子底边按类型着色
                     slot.innerHTML = `
                         <div class="item-icon">${itemConfig.icon}</div>
                         <div class="item-name">${itemConfig.name}</div>
@@ -9848,6 +9881,8 @@
             modal.dataset.itemId = itemId;
             document.getElementById('buyIcon').innerHTML = item.icon;
             document.getElementById('buyName').textContent = item.name;
+            const buyCfg = GAME_CONFIG.items[itemId];
+            modal.querySelector('.modal-content').style.setProperty('--c', (buyCfg && ITEM_TYPE_COLORS[buyCfg.type]) || '#b89a5b');
             document.getElementById('buyDesc').textContent = item.desc || '';
             const cur = item.currency || 'coins';
             document.getElementById('buyUnitPrice').textContent = `${item.price} ${SHOP_CURRENCIES[cur].name}`;
@@ -10410,6 +10445,7 @@
 
         function showBreakthroughModal() {
             const realmIndex = gameState.player.realmIndex;
+            let sealRate = null;   // v7.29 大境界有成功率时，符纸右边盖一枚成功率大印
             const currentRealm = GAME_CONFIG.realms[realmIndex];
             const nextRealm = GAME_CONFIG.realms[realmIndex + 1];
 
@@ -10439,6 +10475,7 @@
                 document.getElementById('btModalTitle').textContent = realmIndex === ASCEND_REALM ? `✨ 飞升上界（${nextRealm.name}）✨` : `✨ 突破${nextRealm ? nextRealm.name : '大道尽头'} ✨`;
                 const rate = getMajorBreakthroughRate(realmIndex);
                 const fails = (gameState.player.btFails || {})[realmIndex] || 0;
+                sealRate = rate;
                 let typeText = '需丹药辅助';
                 if (rate !== null) {
                     const basis = realmIndex === 21 ? `${getCoreGradeName()} ${getCoreQuality().toFixed(1)}`
@@ -10510,6 +10547,13 @@
                 document.getElementById('btButton').textContent = '🌟 开始突破 🌟';
             }
 
+            const sealEl = document.getElementById('btRateSeal');
+            if (sealEl) {
+                sealEl.hidden = sealRate === null;
+                if (sealRate !== null) sealEl.innerHTML = `<b>${Math.round(sealRate * 100)}%</b><small>成功率</small>`;
+            }
+            // 符纸上标题和按钮用毛笔字，去掉两边的星星
+            ['btModalTitle', 'btButton'].forEach(id => { const e = document.getElementById(id); e.textContent = e.textContent.replace(/✨|🌟/g, '').trim(); });
             renderTribulationGate();
             document.getElementById('breakthroughModal').classList.add('show');
         }

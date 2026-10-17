@@ -2599,3 +2599,77 @@ body[data-panel="shop"] .nav-mini[data-nav="shop"]::before, body[data-panel="set
 @media (prefers-reduced-motion: reduce) {
     .quick-celebration.qc-art.show .qc-swash, .quick-celebration.qc-art.show .qc-title, .quick-celebration.qc-art.show .qc-seal, .quest-stamp { animation: none !important; }
 }
+
+/* ==========================================================================
+   v7.29 漫画风第二批（二）：突破符纸 / 物品图鉴 / 多宝阁背包 / 第二块田与分身小画
+   ========================================================================== */
+/* 突破弹窗：一张黄纸朱砂的渡劫符，双线朱框，底下淡淡一个「敕」字；境界对照是两枚印，中间一笔箭头，成功率是一枚圆印 */
+.modal-content.talisman-modal { position: relative; isolation: isolate; --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; --patina: #3f7f6a; --cinnabar: #a8322a; --cinnabar-2: #a8322a; --border-l1: #7d4f22; --border-l2: #8a6420; color: #231f19; border: none; border-radius: 2px;
+    background: radial-gradient(ellipse at 50% 35%, #f3dc92, #e8c66a 65%, #d9b052); box-shadow: inset 0 0 30px rgba(140, 90, 20, 0.35), 0 10px 30px rgba(0, 0, 0, 0.55); }
+.modal-content.talisman-modal::before { content: ''; position: absolute; inset: 9px; z-index: -1; pointer-events: none; border: 2px solid #a8322a; box-shadow: inset 0 0 0 3px #ecd07a, inset 0 0 0 4px #a8322a; }
+.modal-content.talisman-modal::after { content: '敕'; position: absolute; left: 50%; top: 52%; z-index: -1; transform: translate(-50%, -50%); pointer-events: none;
+    font-family: var(--font-brush); font-size: 220px; line-height: 1; color: #a8322a; opacity: 0.08; }
+.talisman-modal .modal-title { font-family: var(--font-brush); font-size: 2.1em; color: #8a1f18; letter-spacing: 0.2em; text-shadow: none; }
+.talisman-modal .modal-close { color: #8a1f18; }
+.talisman-modal .stat-panel { background: rgba(255, 248, 225, 0.4); border: 1px solid rgba(168, 50, 42, 0.3); }
+.talisman-modal #btButton { background: #a8322a; color: #fff3e6; border-color: #7a1f18; font-family: var(--font-brush); font-size: 1.35em; letter-spacing: 0.15em; box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.3); }
+.talisman-modal #btButton:hover { background: #b93a30; }
+.bt-realms { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin: 0 0 16px; }
+.bt-realm { font-family: var(--font-brush); font-size: 1.25em; color: #8a1f18; border: 2px solid #8a1f18; border-radius: 3px; padding: 2px 10px 1px; background: rgba(255, 248, 225, 0.35); }
+.bt-realm.next { font-size: 1.55em; font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); padding: 3px 12px 2px; transform: rotate(-2deg); }
+.bt-arrow { width: 54px; height: 16px; background: #8a1f18; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 18' preserveAspectRatio='none'><path d='M2 10 Q30 6 72 8 L70 2 L99 9.5 L70 16.5 L72 11.5 Q30 13 2 10 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 18' preserveAspectRatio='none'><path d='M2 10 Q30 6 72 8 L70 2 L99 9.5 L70 16.5 L72 11.5 Q30 13 2 10 Z'/></svg>") center / 100% 100% no-repeat; }
+.bt-rate { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 66px; height: 66px; margin-left: 6px; border-radius: 50%; transform: rotate(-10deg);
+    color: #a8322a; border: 3px solid #a8322a; box-shadow: inset 0 0 0 2px rgba(168, 50, 42, 0.3); line-height: 1; }
+.bt-rate[hidden] { display: none; }
+.bt-rate b { font-family: var(--font-brush); font-size: 1.45em; font-weight: normal; }
+.bt-rate small { font-family: var(--font-brush); font-size: 0.8em; margin-top: 2px; }
+.modal.show .bt-rate { animation: btRateStamp 0.5s cubic-bezier(.2, 1.4, .3, 1) 0.25s both; }
+@keyframes btRateStamp { from { opacity: 0; transform: rotate(-10deg) scale(2); } to { opacity: 1; transform: rotate(-10deg) scale(1); } }
+
+/* 物品详情 / 购买：一页图鉴——宣纸、细金框，图标放进按类型着色的圆相光盘，名字毛笔字，类型是一枚小印 */
+.modal-content.codex-modal { --c: #b89a5b; --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; --patina: #3f7f6a; --cinnabar: #a8322a; --cinnabar-2: #a8322a; --border-l1: #7d4f22; --border-l2: #8a6420; color: #231f19; border: none; background: linear-gradient(180deg, #f5ecd4, #e9dbb6);
+    box-shadow: inset 0 0 0 1px rgba(90, 60, 25, 0.4), inset 0 0 0 6px #f3e9cf, inset 0 0 0 7px rgba(138, 100, 32, 0.55), inset 0 0 28px rgba(120, 90, 40, 0.28), 0 10px 30px rgba(0, 0, 0, 0.55); }
+.codex-modal .modal-close { color: #675f4e; }
+.codex-icon { position: relative; width: 96px; height: 96px; margin: 0 auto 8px !important; display: flex; align-items: center; justify-content: center; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--c) 42%, transparent) 0%, color-mix(in srgb, var(--c) 12%, transparent) 55%, transparent 70%); }
+.codex-icon::before { content: ''; position: absolute; inset: 2px; background: var(--c); opacity: 0.8; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M52 6 C79 6 95 27 93 52 C91 77 70 95 47 94 C25 93 6 75 7 50 C8 32 19 16 34 10 L36 15 C23 21 13 34 13 50 C13 71 29 87 48 88 C68 89 85 73 87 52 C89 31 74 12 52 12 Z'/><circle cx='35' cy='12' r='3.2'/></svg>") center / contain no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M52 6 C79 6 95 27 93 52 C91 77 70 95 47 94 C25 93 6 75 7 50 C8 32 19 16 34 10 L36 15 C23 21 13 34 13 50 C13 71 29 87 48 88 C68 89 85 73 87 52 C89 31 74 12 52 12 Z'/><circle cx='35' cy='12' r='3.2'/></svg>") center / contain no-repeat; }
+.codex-icon .ico { position: relative; width: 56px; height: 56px; }
+.codex-name { font-family: var(--font-brush); font-size: 2em !important; font-weight: normal !important; color: #1a140c !important; letter-spacing: 0.06em; line-height: 1.2; }
+.codex-name::after { content: ''; display: block; width: 60%; height: 6px; margin: 2px auto 0; background: var(--c); opacity: 0.65; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+.codex-type { display: inline-block; margin-top: 8px; font-size: 1em; padding: 2px 9px 1px; transform: rotate(-3deg); font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); }
+.codex-type:empty { display: none; }
+.codex-modal .btn { font-family: var(--font-brush); font-size: 1.1em; }
+
+/* 背包：多宝阁——每格一个木格子，底边按物品类型着色；分类标题毛笔字配同色笔触 */
+.inv-type-label { font-family: var(--font-brush); font-size: 1.4em; font-weight: normal !important; color: var(--text-l1) !important; letter-spacing: 0.08em; margin-top: 14px !important; }
+.inv-type-label::after { content: ''; display: block; width: 90px; height: 6px; margin-top: 1px; background: var(--c); opacity: 0.7; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+#inventoryGrid .item-slot { --c: #b89a5b; background: linear-gradient(180deg, #2c1e11, #1e150c); border: 2px solid #5a3a1e; border-top-color: #7a5230; border-bottom-color: #3a2412; border-radius: 2px;
+    box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.65), inset 0 -3px 0 var(--c); color: #e8dcc0; }
+#inventoryGrid .item-slot:hover { border-color: var(--c); background: linear-gradient(180deg, #34240f, #22180c); }
+#inventoryGrid .item-slot .item-name { color: #f0e2c0; font-weight: normal; }
+#inventoryGrid .item-slot .item-qty { color: #c9b994; }
+#inventoryGrid .item-slot .item-stats { color: #9fd0b8; }
+#inventoryGrid .item-slot .item-icon .ico { filter: drop-shadow(0 0 5px color-mix(in srgb, var(--c) 60%, transparent)); }
+
+/* 第二块田 / 分身：左边一幅小画 */
+.clone-row.has-art { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; }
+.cl-main { min-width: 0; }
+.cl-art { width: 64px; height: 46px; position: relative; display: flex; align-items: flex-end; justify-content: center; }
+.pf-field svg { width: 64px; height: 46px; overflow: visible; }
+.pf-grow { transform-box: fill-box; transform-origin: 50% 100%; transition: transform 0.8s ease-out; }
+.pf-field[data-stage="empty"] .pf-plant { display: none; }
+.pf-field[data-stage="0"] .pf-grow { transform: scale(0.25); }
+.pf-field[data-stage="1"] .pf-grow { transform: scale(0.55); }
+.pf-field[data-stage="2"] .pf-grow { transform: scale(0.85); }
+.pf-ear { fill: #8cc45a; opacity: 0; transition: opacity 0.6s, fill 0.6s; }
+.pf-field[data-stage="2"] .pf-ear { opacity: 1; }
+.pf-field[data-stage="3"] .pf-ear { opacity: 1; fill: #f0c24a; filter: drop-shadow(0 0 2px #ffd86b); }
+.cl-ghost .bs-art { height: 52px; width: auto; overflow: visible; opacity: 0.6; filter: drop-shadow(0 0 4px var(--c)); animation: clFloat 3.2s ease-in-out infinite; }
+.cl-ghost::after { content: ''; position: absolute; left: 50%; bottom: 0; width: 34px; height: 5px; margin-left: -17px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 55%, transparent), transparent); }
+.cl-ghost.idle .bs-art { height: 44px; opacity: 0.35; filter: grayscale(0.5); animation: none; }
+@keyframes clFloat { 50% { transform: translateY(-4px); } }
+
+@media (prefers-reduced-motion: reduce) { .modal.show .bt-rate, .cl-ghost .bs-art { animation: none !important; } .pf-grow, .pf-ear { transition: none; } }
+/* 在背包 / 装备 / 商城 / 设置页时，侧栏上一个技能的墨痕淡下去，免得和下面的入口同时高亮 */
+body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"], [data-panel="settings"]) .sidebar .skill-item.active::before { opacity: 0.1; }
+body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"], [data-panel="settings"]) .sidebar .skill-item.active::after { opacity: 0.35; }

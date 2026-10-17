@@ -16,7 +16,7 @@
             var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', THEMES[t]);
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=13.73">
+    <link rel="stylesheet" href="style.css?v=13.75">
 
 </head>
 <body data-panel="cultivation">
@@ -674,11 +674,11 @@
     <!-- 物品详情弹窗（P1功能）-->
     <!-- 购买数量对话框 -->
     <div id="buyModal" class="modal" style="display: none;">
-        <div class="modal-content" role="dialog" aria-modal="true" style="max-width: 380px; padding: 30px;">
+        <div class="modal-content codex-modal" role="dialog" aria-modal="true" style="max-width: 380px; padding: 30px;">
             <button type="button" class="modal-close" onclick="closeBuyDialog()" aria-label="关闭">&times;</button>
             <div style="text-align: center; margin-bottom: 16px;">
-                <div style="font-size: 44px; margin-bottom: 8px;" id="buyIcon">📦</div>
-                <div style="font-size: 1.2em; color: var(--jade); font-weight: bold;" id="buyName">商品</div>
+                <div class="codex-icon" style="font-size: 44px; margin-bottom: 8px;" id="buyIcon">📦</div>
+                <div class="codex-name" style="font-size: 1.2em; color: var(--jade); font-weight: bold;" id="buyName">商品</div>
                 <div style="color: var(--text-l4); font-size: 0.85em; margin-top: 4px;" id="buyDesc"></div>
             </div>
             <div style="background: var(--bg-sunken); padding: 12px 15px; border-radius: 4px; margin-bottom: 14px; line-height: 1.8em;">
@@ -699,11 +699,12 @@
     </div>
 
     <div id="itemDetailModal" class="modal" style="display: none;">
-        <div class="modal-content" role="dialog" aria-modal="true" style="max-width: 400px; padding: 30px;">
+        <div class="modal-content codex-modal" role="dialog" aria-modal="true" style="max-width: 400px; padding: 30px;">
             <button type="button" class="modal-close" onclick="closeItemDetail()" aria-label="关闭">&times;</button>
             <div style="text-align: center; margin-bottom: 20px;">
-                <div style="font-size: 48px; margin-bottom: 10px;" id="itemIcon">📦</div>
-                <div style="font-size: 1.2em; color: var(--jade); font-weight: bold;" id="itemName">物品名称</div>
+                <div class="codex-icon" style="font-size: 48px; margin-bottom: 10px;" id="itemIcon">📦</div>
+                <div class="codex-name" style="font-size: 1.2em; color: var(--jade); font-weight: bold;" id="itemName">物品名称</div>
+                <div class="codex-type" id="itemTypeSeal"></div>
             </div>
             <div style="background: var(--bg-sunken); padding: 15px; border-radius: 4px; margin-bottom: 15px;">
                 <div style="color: var(--text-l4); font-size: 0.9em; margin-bottom: 8px;">📝 物品信息</div>
@@ -734,18 +735,16 @@
 
     <!-- 突破模态框 -->
     <div id="breakthroughModal" class="modal">
-        <div class="modal-content" role="dialog" aria-modal="true">
+        <div class="modal-content talisman-modal" role="dialog" aria-modal="true">
             <button type="button" class="modal-close" onclick="closeBreakthroughModal()" aria-label="关闭">&times;</button>
-            <div class="modal-title" id="btModalTitle">✨ 突破修为 ✨</div>
+            <div class="modal-title" id="btModalTitle">突破修为</div>
+            <div class="bt-realms">
+                <span class="bt-realm" id="btCurrentRealm" title="当前境界">-</span>
+                <span class="bt-arrow" aria-hidden="true"></span>
+                <span class="bt-realm next" id="btNextRealm" title="下一境界">-</span>
+                <span class="bt-rate" id="btRateSeal" hidden></span>
+            </div>
             <div class="stat-panel" style="margin-bottom: 20px;">
-                <div class="stat-row">
-                    <span class="stat-label">当前境界:</span>
-                    <span class="stat-value" id="btCurrentRealm">-</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">下一境界:</span>
-                    <span class="stat-value" id="btNextRealm">-</span>
-                </div>
                 <div class="stat-row">
                     <span class="stat-label">突破方式:</span>
                     <span class="stat-value" id="btBreakthroughType">自然突破</span>
@@ -865,7 +864,7 @@
     </div>
 
     <script src="art.js?v=1.4"></script>
-    <script src="game.js?v=14.36"></script>
+    <script src="game.js?v=14.38"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">
