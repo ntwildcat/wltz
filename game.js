@@ -7646,9 +7646,10 @@
             getVisibleSkills().forEach(skillName => {
                 const skill = gameState.skills[skillName];
                 const btn = document.createElement('button');
-                btn.className = 'mobile-skill-btn' + (skillName === current ? ' active' : '');
+                btn.className = 'mobile-skill-btn sk-' + skillName + (skillName === current ? ' active' : '');
                 const info = getSkillExpInfo(skillName);
-                btn.textContent = `${skill.icon} ${skill.name} Lv.${info.level} · ${Math.floor(info.percent)}%`;
+                // v7.35 技能名毛笔字，等级与进度小字（以前整串是系统字体）
+                btn.innerHTML = `${skill.icon} <b class="msb-name">${skill.name}</b><small class="msb-lv">Lv.${info.level} · ${Math.floor(info.percent)}%</small>`;
                 btn.title = `经验 ${info.exp} / ${info.need}，还差 ${info.remain} 升级`;
                 btn.onclick = () => switchPanel(skillName);
                 bar.appendChild(btn);
@@ -7656,7 +7657,7 @@
             // 手机顶部栏最前面的「装备」入口（放在最前，免得被挤到横向滚动的看不见处）
             const eqBtn = document.createElement('button');
             eqBtn.className = 'mobile-skill-btn' + (current === 'equipment' ? ' active' : '');
-            eqBtn.textContent = '🎽 装备';
+            eqBtn.innerHTML = '🎽 <b class="msb-name">装备</b>';
             eqBtn.onclick = () => switchPanel('equipment');
             bar.insertBefore(eqBtn, bar.firstChild);
         }
