@@ -3587,6 +3587,7 @@
             { id: 'ACH_DAO_HEART',   glyph: '心', name: '道心自守',   desc: '身为道祖而自降修为，不被天道吞噬',           check: () => !!gameState.player.daoHeart },
             { id: 'ACH_LIFE_SWORD_72', glyph: '阵', name: '周天剑阵',  desc: '七十二口青冥剑齐聚，结成周天剑阵',          check: () => getLifeSwords() >= LIFE_SWORD.zhoutian },
             { id: 'ACH_SKILL_99',    glyph: '巅', name: '登峰造极',   get desc() { return `任一生活技能达到 ${WORK_SKILL_MAX_LEVEL} 级（满级）`; }, check: () => anyWorkSkillAt(WORK_SKILL_MAX_LEVEL) },
+            { id: 'ACH_RELIC_ALL',   glyph: '匣', name: '奇物满匣',   get desc() { return `集齐全部 ${QIYU_RELICS.length} 件奇物`; }, check: () => ((gameState.qiyu && gameState.qiyu.relics) || []).length >= QIYU_RELICS.length },
         ];
         function getAchievementStore() {
             if (!gameState.achievements || typeof gameState.achievements !== 'object') gameState.achievements = {};
@@ -5838,19 +5839,59 @@
         const QIYU_MEAN_ONLINE = 5400, QIYU_MEAN_OFFLINE = 7200;
         const QIYU_LOOSEN_STEP = 0.15, QIYU_RISK_MAX = 0.9;
         const QIYU_DEFAULT_FIGHT_SEC = 3;
+        const QIYU_SHARD_CHANCE = 0.2, QIYU_SHARDS_PER_RELIC = 5;
+        const QIYU_CAT_NAMES = { gather: '采集', craft: '炼制', cult: '修炼', cur: '凝练', battle: '战斗' };
+        const QIYU_CAT_HINT = { gather: '采矿 / 灵田', craft: '炼丹 / 炼器', cult: '修炼 / 悟道', cur: '丹火 / 神识 / 道果', battle: '普通战斗' };
+        // 奇物（v7.46）：同类奇物残片攒满 5 枚，合成该类一件还没有的奇物；每件永久生效（走 getMod），全部叠满约等于几个百分点
+        const QIYU_RELICS = [
+            { id: 'shanjun',  cat: 'gather', icon: '🪨', name: '山君石印', effects: { 'double:mining': 0.03 } },
+            { id: 'baigu',    cat: 'gather', icon: '🌾', name: '百谷穗',   effects: { 'double:farming': 0.03 } },
+            { id: 'xunmai',   cat: 'gather', icon: '🧭', name: '寻脉罗盘', effects: { 'time:mining': -0.03, 'time:farming': -0.03 } },
+            { id: 'douli',    cat: 'gather', icon: '👒', name: '老农斗笠', effects: { 'exp:mining': 0.05, 'exp:farming': 0.05 } },
+            { id: 'lugai',    cat: 'craft',  icon: '⚱️', name: '九转炉盖', effects: { 'save:alchemy': 0.03 } },
+            { id: 'tiezhen',  cat: 'craft',  icon: '🔨', name: '千锤铁砧', effects: { 'save:forging': 0.03 } },
+            { id: 'huozhong', cat: 'craft',  icon: '🔥', name: '地火种',   effects: { 'time:alchemy': -0.03, 'time:forging': -0.03 } },
+            { id: 'kedao',    cat: 'craft',  icon: '🗡️', name: '灵纹刻刀', effects: { gearPct: 0.02 } },
+            { id: 'putuan',   cat: 'cult',   icon: '🧘', name: '静心蒲团', effects: { cultSpeed: 0.03 } },
+            { id: 'xisui',    cat: 'cult',   icon: '💧', name: '洗髓玉',   effects: { hpPct: 0.02 } },
+            { id: 'shouyi',   cat: 'cult',   icon: '🔔', name: '守一铃',   effects: { spdPct: 0.02 } },
+            { id: 'guanxing', cat: 'cult',   icon: '🌌', name: '观星图',   effects: { crit: 0.01 } },
+            { id: 'juhuo',    cat: 'cur',    icon: '🏺', name: '聚火瓶',   effects: { 'out:danhuo': 0.04 } },
+            { id: 'shehun',   cat: 'cur',    icon: '🔮', name: '摄魂珠',   effects: { 'out:shenshi': 0.04 } },
+            { id: 'guoxia',   cat: 'cur',    icon: '📦', name: '道果木匣', effects: { 'out:daoguo': 0.04 } },
+            { id: 'xindeng',  cat: 'cur',    icon: '🪔', name: '心灯',     effects: { 'time:danhuo': -0.03, 'time:shenshi': -0.03, 'time:daoguo': -0.03 } },
+            { id: 'canjian',  cat: 'battle', icon: '⚔️', name: '无名残剑', effects: { atkPct: 0.02 } },
+            { id: 'canjia',   cat: 'battle', icon: '🛡️', name: '百战残甲', effects: { defPct: 0.02 } },
+            { id: 'zhanqi',   cat: 'battle', icon: '🚩', name: '褪色战旗', effects: { battleReward: 0.03 } },
+            { id: 'xueyu',    cat: 'battle', icon: '🩸', name: '温血玉',   effects: { foodPct: 0.04 } }
+        ];
+        let qiyuRelicCache = { ref: null, len: -1, totals: {} };
         let qiyuSettleWindow = null;
         let qiyuTickCount = 0;
 
         function qiyuDrawNeed() { return Math.max(0.02, -Math.log(1 - Math.random())); }
         function getQiyu() {
             if (!gameState.qiyu) gameState.qiyu = { pending: [], buffs: [], loosen: {}, acc: 0, need: qiyuDrawNeed(), last: null, total: 0 };
-            return gameState.qiyu;
+            const q = gameState.qiyu;
+            if (!q.shards) q.shards = {};
+            if (!q.relics) q.relics = [];
+            return q;
         }
 
+        function qiyuRelicTotals() {
+            const list = (gameState.qiyu && gameState.qiyu.relics) || [];
+            if (qiyuRelicCache.ref !== list || qiyuRelicCache.len !== list.length) {
+                const totals = {};
+                list.forEach(id => { const r = QIYU_RELICS.find(x => x.id === id); if (r) Object.entries(r.effects).forEach(([k, v]) => { totals[k] = (totals[k] || 0) + v; }); });
+                qiyuRelicCache = { ref: list, len: list.length, totals };
+            }
+            return qiyuRelicCache.totals;
+        }
         function getQiyuMod(key) {
             const q = gameState.qiyu;
-            if (!q || !q.buffs || !q.buffs.length) return 0;
-            let total = 0;
+            if (!q) return 0;
+            let total = q.relics && q.relics.length ? (qiyuRelicTotals()[key] || 0) : 0;
+            if (!q.buffs || !q.buffs.length) return total;
             const now = Date.now(), win = qiyuSettleWindow;
             for (const b of q.buffs) {
                 if (b.key !== key) continue;
@@ -5950,6 +5991,40 @@
             return n > 0 ? { t: 'skillexp', skill: action.output.skill || c.skill, n } : null;
         }
         function qiyuBuff(key, value, hours, label) { return { t: 'buff', key, value, hours, label }; }
+        function qiyuCatDone(cat) { const own = getQiyu().relics; return QIYU_RELICS.filter(r => r.cat === cat).every(r => own.includes(r.id)); }
+        // 这一类已集齐时，残片计入还差得最多的一类；全部集齐返回 null
+        function qiyuShardCat(cat) {
+            if (!qiyuCatDone(cat)) return cat;
+            const own = getQiyu().relics;
+            const left = Object.keys(QIYU_CAT_NAMES).filter(c => !qiyuCatDone(c));
+            if (!left.length) return null;
+            return left.sort((a, b) => QIYU_RELICS.filter(r => r.cat === b && !own.includes(r.id)).length - QIYU_RELICS.filter(r => r.cat === a && !own.includes(r.id)).length)[0];
+        }
+        function qiyuShard(cat) { const c = qiyuShardCat(cat); return c ? { t: 'shard', cat: c } : null; }
+        function qiyuMulti(...list) { const l = list.filter(Boolean); return l.length ? { t: 'multi', list: l } : null; }
+        function relicEffectText(effects) {
+            const kinds = { double: '翻倍概率', save: '节省材料概率', time: '耗时', out: '产出', exp: '经验' };
+            const sign = v => (v > 0 ? '+' : '') + parseFloat((v * 100).toFixed(1)) + '%';
+            return Object.entries(effects).map(([k, v]) => {
+                const [kind, sk] = k.split(':');
+                if (sk) return `${qiyuSkillName(sk)}${kinds[kind] || kind} ${sign(v)}`;
+                return describeEffects({ [k]: v })[0] || `${k} ${sign(v)}`;
+            }).join('、');
+        }
+        function qiyuAddShard(cat) {
+            const c = qiyuShardCat(cat);
+            if (!c) return '';
+            const q = getQiyu();
+            q.shards[c] = (q.shards[c] || 0) + 1;
+            if (q.shards[c] < QIYU_SHARDS_PER_RELIC) return `得到 1 枚「${QIYU_CAT_NAMES[c]}」奇物残片（${q.shards[c]}/${QIYU_SHARDS_PER_RELIC}）`;
+            q.shards[c] -= QIYU_SHARDS_PER_RELIC;
+            const pool = QIYU_RELICS.filter(r => r.cat === c && !q.relics.includes(r.id));
+            const relic = pool[Math.floor(Math.random() * pool.length)];
+            q.relics.push(relic.id);
+            calculateStats();
+            if (typeof showQuickCelebration === 'function') showQuickCelebration(`${relic.icon} 奇物：${relic.name}`, { title: relic.name, sub: '奇物', seal: '缘' });
+            return `${QIYU_SHARDS_PER_RELIC} 枚「${QIYU_CAT_NAMES[c]}」残片合而为一：得到奇物 ${relic.icon}${relic.name}（${relicEffectText(relic.effects)}，永久）`;
+        }
         function qiyuRisk(eventId, base, win, fail) {
             if (!win) return null;
             const loosen = (getQiyu().loosen[eventId] || 0);
@@ -6001,7 +6076,54 @@
                 qiyuOpt('借势', qiyuBuff(`out:${c.skill}`, 0.25, 2, `${qiyuSkillName(c.skill)}产出 +25%`))] },
             lingji: { cat: 'cur', icon: '💡', name: '灵机一闪', build: c => [
                 qiyuOpt('趁热打铁', qiyuBuff(`time:${c.skill}`, -0.20, 1, `${qiyuSkillName(c.skill)}耗时 -20%`)),
-                qiyuOpt('记下心得', qiyuMastery(c, 45)) || qiyuOpt('记下心得', qiyuYield(c, 15))] }
+                qiyuOpt('记下心得', qiyuMastery(c, 45)) || qiyuOpt('记下心得', qiyuYield(c, 15))] },
+            // —— v7.46 新增 ——
+            lingyu: { cat: 'gather', icon: '🌧️', name: '灵雨', build: c => [
+                qiyuOpt('冒雨劳作', qiyuBuff(`time:${c.skill}`, -0.15, 2, `${qiyuSkillName(c.skill)}耗时 -15%`)),
+                qiyuOpt('接取雨露', qiyuYield(c, 25))] },
+            shouzong: { cat: 'gather', icon: '🐾', name: '灵兽踪迹', build: c => [
+                qiyuOpt('循迹而去', qiyuRisk('shouzong', 0.55, qiyuMulti(qiyuYield(c, 60), qiyuShard('gather')), null)),
+                qiyuOpt('不去惊扰', qiyuSkillExp(c, 30))] },
+            yikuang: { cat: 'gather', icon: '⛺', name: '前人遗留', build: c => [
+                qiyuOpt('收起残片', qiyuShard('gather')),
+                qiyuOpt('就地取材', qiyuYield(c, 30))] },
+            qiling: { cat: 'craft', icon: '✨', name: '器灵低吟', build: c => [
+                qiyuOpt('凝神倾听', qiyuBuff(`exp:${c.skill}`, 0.30, 2, `${qiyuSkillName(c.skill)}经验 +30%`)),
+                qiyuOpt('借灵入器', qiyuYield(c, 25)) || qiyuOpt('借灵入器', qiyuSkillExp(c, 25))] },
+            canzha: { cat: 'craft', icon: '🪨', name: '炉底残渣', build: c => [
+                qiyuOpt('重新熔炼', qiyuMulti(qiyuYield(c, 15), qiyuSkillExp(c, 15))),
+                qiyuOpt('收起残片', qiyuShard('craft'))] },
+            qiecuo: { cat: 'craft', icon: '🤝', name: '同道切磋', build: c => [
+                qiyuOpt('切磋技艺', qiyuRisk('qiecuo', 0.6, qiyuMastery(c, 90) || qiyuSkillExp(c, 90), qiyuBuff(`time:${c.skill}`, 0.10, 0.5, `${qiyuSkillName(c.skill)}耗时 +10%`))),
+                qiyuOpt('在旁观摩', qiyuSkillExp(c, 30))] },
+            lingyan: { cat: 'cult', icon: '👁️‍🗨️', name: '天地灵眼', build: c => [
+                qiyuOpt('坐镇灵眼', qiyuBuff('cultSpeed', 0.30, 1.5, '修炼速度 +30%')),
+                qiyuOpt('收起残片', qiyuShard('cult'))] },
+            yitui: { cat: 'cult', icon: '🦴', name: '前辈遗蜕', build: c => [
+                qiyuOpt('参悟遗蜕', qiyuCult(c, 30)) || qiyuOpt('参悟遗蜕', qiyuBuff('cultSpeed', 0.30, 1, '修炼速度 +30%')),
+                qiyuOpt('收敛遗物', qiyuShard('cult'))] },
+            zouhuo: { cat: 'cult', icon: '🌀', name: '走火之兆', build: c => [
+                qiyuOpt('强行运转', qiyuRisk('zouhuo', 0.55, qiyuCult(c, 75) || qiyuBuff('cultSpeed', 0.50, 2, '修炼速度 +50%'),
+                    qiyuBuff('cultSpeed', -0.15, 1, '修炼速度 -15%'))),
+                qiyuOpt('散功调息', qiyuBuff('cultSpeed', 0.08, 3, '修炼速度 +8%'))] },
+            dimai: { cat: 'cur', icon: '🌐', name: '地脉回响', build: c => [
+                qiyuOpt('循声凝练', qiyuBuff(`out:${c.skill}`, 0.15, 3, `${qiyuSkillName(c.skill)}产出 +15%`)),
+                qiyuOpt('收起残片', qiyuShard('cur'))] },
+            yujin: { cat: 'cur', icon: '🕯️', name: '余烬未冷', build: c => [
+                qiyuOpt('拨火再凝', qiyuYield(c, 25)),
+                qiyuOpt('积攒心得', qiyuSkillExp(c, 40))] },
+            tianji: { cat: 'cur', icon: '🪐', name: '天机一线', build: c => [
+                qiyuOpt('逆势强凝', qiyuRisk('tianji', 0.6, qiyuYield(c, 100), null)),
+                qiyuOpt('顺势而为', qiyuBuff(`time:${c.skill}`, -0.12, 2, `${qiyuSkillName(c.skill)}耗时 -12%`))] },
+            yiwu: { cat: 'battle', icon: '🎒', name: '败兵遗物', build: c => [
+                qiyuOpt('打扫战场', qiyuFights(c, 15)),
+                qiyuOpt('收起残片', qiyuShard('battle'))] },
+            jiaozhen: { cat: 'battle', icon: '📣', name: '强敌叫阵', build: c => [
+                qiyuOpt('应战', qiyuRisk('jiaozhen', 0.55, qiyuMulti(qiyuFights(c, 50), qiyuShard('battle')), { t: 'food', rate: 0.2 })),
+                qiyuOpt('避其锋芒', qiyuBuff('battleReward', 0.08, 3, '战斗灵石与经验 +8%'))] },
+            zhanyi: { cat: 'battle', icon: '🔥', name: '战意激荡', build: c => [
+                qiyuOpt('乘胜追击', qiyuBuff('battleReward', 0.30, 1, '战斗灵石与经验 +30%')),
+                qiyuOpt('调息养伤', qiyuBuff('foodPct', 0.20, 3, '战斗食物回复 +20%'))] }
         };
 
         function qiyuGenerate(act) {
@@ -6074,6 +6196,8 @@
                 case 'skillexp': return `${qiyuSkillName(s.skill)}经验 +${fmtXP(s.n)}`;
                 case 'buff': return `${s.label}，持续 ${s.hours >= 1 ? s.hours + ' 小时' : Math.round(s.hours * 60) + ' 分钟'}`;
                 case 'food': return `丢失 ${Math.round(s.rate * 100)}% 的战斗食物（每种至少留 1 份）`;
+                case 'shard': return `得到 1 枚「${QIYU_CAT_NAMES[s.cat]}」奇物残片（攒满 ${QIYU_SHARDS_PER_RELIC} 枚合成一件奇物）`;
+                case 'multi': return s.list.map(qiyuSpecText).join('，并');
                 case 'risk': return `${Math.round(s.p * 100)}% 成功${s.loosened ? '（上次失败，已提高）' : ''}：${qiyuSpecText(s.win)}。失败：${s.fail ? qiyuSpecText(s.fail) : '无损失'}，下次遇到成功率 +${Math.round(QIYU_LOOSEN_STEP * 100)}%`;
             }
             return '';
@@ -6113,6 +6237,8 @@
                         (Object.keys(drops).length ? `\n🎁 ${formatDropList(dropMapToList(drops))}` : '') +
                         (Object.keys(lostDrops).length ? `\n❌ 背包已满，${formatDropList(dropMapToList(lostDrops))} 未能获得` : '');
                 }
+                case 'shard': return qiyuAddShard(s.cat) || '奇物已全部集齐';
+                case 'multi': return s.list.map(x => qiyuApply(x, eventId)).filter(Boolean).join('\n');
                 case 'mastery': addMasteryExp(s.skill, s.key, s.n); return qiyuSpecText(s);
                 case 'skillexp': addSkillExp(s.skill, s.n); return qiyuSpecText(s);
                 case 'buff': {
@@ -6155,7 +6281,11 @@
             } else {
                 const opt = ev.opts[optIndex];
                 if (!opt) return;
-                const result = qiyuApply(opt.spec, ev.id);
+                let result = qiyuApply(opt.spec, ev.id);
+                if (def && Math.random() < QIYU_SHARD_CHANCE) {
+                    const got = qiyuAddShard(def.cat);
+                    if (got) result += `\n🧩 意外收获：${got}`;
+                }
                 calculateStats();
                 showNotification(`${def ? def.icon + ' ' + def.name : '奇遇'} · ${opt.label}\n${result}`, '#c2a25f', 'rare');
             }
@@ -6172,8 +6302,10 @@
                 const def = QIYU_EVENTS[ev.id] || { icon: '❔', name: '奇遇', cat: 'cult' };
                 const where = ev.skill === 'battle' ? `在「${qiyuAreaName(ev.action)}」战斗时` : `${qiyuSkillName(ev.skill)}时`;
                 const opts = ev.opts.map((o, j) => `<button type="button" class="qiyu-opt" onclick="chooseQiyu(${i}, ${j})"><span class="qiyu-opt-label">${o.label}</span><span class="qiyu-opt-desc">${qiyuSpecText(o.spec)}</span></button>`).join('');
+                const sc = qiyuShardCat(def.cat);
+                const foot = sc ? `<div class="qiyu-foot">选任一选项（离开除外）另有 ${Math.round(QIYU_SHARD_CHANCE * 100)}% 概率得到 1 枚「${QIYU_CAT_NAMES[sc]}」奇物残片${sc !== def.cat ? `（${QIYU_CAT_NAMES[def.cat]}类奇物已集齐）` : ''}</div>` : '';
                 return `<div class="qiyu-card"><div class="qiyu-head"><span class="qiyu-ico">${def.icon}</span><span class="qiyu-name">${def.name}</span><span class="qiyu-where">${where}遇到</span></div>
-                    <div class="qiyu-opts">${opts}<button type="button" class="qiyu-opt qiyu-leave" onclick="chooseQiyu(${i}, -1)"><span class="qiyu-opt-label">离开</span><span class="qiyu-opt-desc">无事发生，这桩奇遇就此消失</span></button></div></div>`;
+                    <div class="qiyu-opts">${opts}<button type="button" class="qiyu-opt qiyu-leave" onclick="chooseQiyu(${i}, -1)"><span class="qiyu-opt-label">离开</span><span class="qiyu-opt-desc">无事发生，这桩奇遇就此消失</span></button></div>${foot}</div>`;
             }).join('');
         }
         function qiyuBuffsHtml() {
@@ -6184,12 +6316,23 @@
             return `<div class="qiyu-sub">生效中的机缘</div><div class="qiyu-buffs">` +
                 list.map(b => `<div class="qiyu-buff${b.value < 0 ? ' neg' : ''}"><span>${b.label}</span><span class="qiyu-buff-left">剩 ${fmt(b.until - now)}</span></div>`).join('') + `</div>`;
         }
+        function qiyuRelicsHtml() {
+            const q = getQiyu();
+            const cats = Object.keys(QIYU_CAT_NAMES).map(cat => {
+                const items = QIYU_RELICS.filter(r => r.cat === cat).map(r => q.relics.includes(r.id)
+                    ? `<div class="relic owned" title="${r.name}：${relicEffectText(r.effects)}"><span class="relic-ico">${r.icon}</span><span class="relic-name">${r.name}</span><span class="relic-eff">${relicEffectText(r.effects)}</span></div>`
+                    : `<div class="relic"><span class="relic-ico">？</span><span class="relic-name">未得</span><span class="relic-eff">${QIYU_CAT_HINT[cat]}时的奇遇</span></div>`).join('');
+                const done = qiyuCatDone(cat);
+                return `<div class="relic-cat"><div class="relic-cat-head"><b>${QIYU_CAT_NAMES[cat]}</b><span>${done ? '已集齐' : `残片 ${q.shards[cat] || 0}/${QIYU_SHARDS_PER_RELIC}`}</span></div><div class="relic-grid">${items}</div></div>`;
+            }).join('');
+            return `<div class="qiyu-sub">奇物匣（${q.relics.length}/${QIYU_RELICS.length}）</div>${cats}`;
+        }
         function renderQiyuModal() {
             const el = document.getElementById('qiyuContent');
             if (!el) return;
             const q = getQiyu();
-            el.innerHTML = `<div class="qiyu-sub">待处理（${q.pending.length}/${QIYU_MAX_PENDING}）</div>${qiyuCardsHtml()}${qiyuBuffsHtml()}
-                <div class="qiyu-note">修炼、做生活技能或战斗时会遇到奇遇：在线平均每 1.5 小时一桩，离线平均每 2 小时一桩，最多积攒 ${QIYU_MAX_PENDING} 桩，攒满后不再遇到新的。限时机缘按现实时间计时，离线期间照常生效。</div>`;
+            el.innerHTML = `<div class="qiyu-sub">待处理（${q.pending.length}/${QIYU_MAX_PENDING}）</div>${qiyuCardsHtml()}${qiyuBuffsHtml()}${qiyuRelicsHtml()}
+                <div class="qiyu-note">修炼、做生活技能或战斗时会遇到奇遇：在线平均每 1.5 小时一桩，离线平均每 2 小时一桩，最多积攒 ${QIYU_MAX_PENDING} 桩，攒满后不再遇到新的。限时机缘按现实时间计时，离线期间照常生效。奇遇分五类，残片按奇遇的类别归类，同类攒满 ${QIYU_SHARDS_PER_RELIC} 枚合成该类一件还没有的奇物，奇物永久生效。</div>`;
         }
         function isQiyuModalOpen() { const m = document.getElementById('qiyuModal'); return !!(m && m.classList.contains('show')); }
         function openQiyuModal() {
@@ -6204,14 +6347,14 @@
             if (!seal) return;
             const q = gameState && gameState.qiyu;
             const n = q ? q.pending.length : 0;
-            const show = gameRunning && !!q && (n > 0 || qiyuActiveBuffs().length > 0);
+            const show = gameRunning && !!q && (n > 0 || (q.total || 0) > 0 || qiyuActiveBuffs().length > 0);
             seal.hidden = !show;
             if (!show) return;
             const cnt = document.getElementById('qiyuSealCount');
             cnt.textContent = n || '';
             cnt.hidden = !n;
             seal.classList.toggle('has-new', n > 0);
-            seal.title = n ? `奇遇：${n} 桩待处理` : '奇遇：查看生效中的机缘';
+            seal.title = n ? `奇遇：${n} 桩待处理` : '奇遇：机缘与奇物匣';
         }
         function refreshQiyuViews() {
             renderQiyuSeal();
@@ -7331,7 +7474,7 @@
                 foodPct: v => `食物恢复 ${sign(v)}`, gearPct: v => `装备属性 ${sign(v)}`, dropPct: v => `秘境掉落 ${sign(v)}`,
                 cultSpeed: v => `修炼速度 ${sign(v)}`,
                 orificeTime: v => `开辟仙穴耗时 ${sign(v)}`, nascentTemperRate: v => `淬炼元婴成功率 ${sign(v)}`, worldOut: v => `小世界产出 ${sign(v)}`,
-                lawOriginPer: v => `法则本源每道攻击 / 生命 / 防御 ${sign(v)}`, erosionDecay: v => `天道侵蚀消退速度 ${sign(v)}`, cloneSpeed: v => `分身速度 ${sign(v)}${isFused() ? '（已并入本体）' : ''}`, autoOffline: v => `离线自动战斗效率 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
+                lawOriginPer: v => `法则本源每道攻击 / 生命 / 防御 ${sign(v)}`, erosionDecay: v => `天道侵蚀消退速度 ${sign(v)}`, cloneSpeed: v => `分身速度 ${sign(v)}${isFused() ? '（已并入本体）' : ''}`, autoOffline: v => `离线自动战斗效率 ${sign(v)}`, battleReward: v => `战斗灵石与经验 ${sign(v)}`, regen: v => `战斗回复 ${parseFloat((v * 100).toFixed(2))}%生命/秒`
             };
             return Object.entries(effects).map(([key, v]) => {
                 if (fixed[key]) return fixed[key](v);
@@ -12628,12 +12771,38 @@
 
         // quietUnder：离开时间小于该秒数且无特殊情况时，只结算收益、不弹结算窗（用于切换标签页）
         // 离线结算外层：结算期间让奇遇机缘按与离线时段的重叠比例生效，结算完按离线时长补遇奇遇
+        // 离线前的快照，给结算窗「本次亮点」比对用
+        let offlineSnap = null;
+        function takeOfflineSnap() {
+            const P = gameState.player, a = gameState.currentAction;
+            const levels = {};
+            Object.keys(gameState.skills || {}).forEach(k => { if (gameState.skills[k] && gameState.skills[k].level) levels[k] = gameState.skills[k].level; });
+            const mastery = a && !a.isBattle && !a.isDungeon && getMasteryStore(a.skill) ? { skill: a.skill, key: a.action, level: getMasteryInfo(a.skill, a.action).level } : null;
+            return { realm: P.realmIndex, levels, inv: new Set(P.inventory.map(i => i.id)), mastery };
+        }
+        function offlineHighlights(exceedsLimit, wastedHours) {
+            const s = offlineSnap, out = [];
+            if (exceedsLimit) out.push(`⚠️ 离开超过离线上限，超出的 ${wastedHours} 小时没有收益（设置里可调上限，最多 24 小时）`);
+            if (!s) return out;
+            const P = gameState.player;
+            if (P.realmIndex > s.realm) out.push(`🌟 境界：${getRealmName(s.realm)} → ${getRealmName(P.realmIndex)}`);
+            const ups = Object.keys(s.levels).filter(k => (gameState.skills[k] || {}).level > s.levels[k]).map(k => `${qiyuSkillName(k)} Lv.${s.levels[k]} → Lv.${gameState.skills[k].level}`);
+            if (ups.length) out.push(`📈 ${ups.join('、')}`);
+            if (s.mastery) {
+                const lv = getMasteryInfo(s.mastery.skill, s.mastery.key).level;
+                if (lv > s.mastery.level) out.push(`🎓 「${(getAction(s.mastery.skill, s.mastery.key) || {}).name || s.mastery.key}」精通 Lv.${s.mastery.level} → Lv.${lv}`);
+            }
+            const fresh = P.inventory.filter(i => !s.inv.has(i.id) && GAME_CONFIG.items[i.id]).map(i => `${GAME_CONFIG.items[i.id].icon}${GAME_CONFIG.items[i.id].name}`);
+            if (fresh.length) out.push(`🎒 背包里新出现：${fresh.slice(0, 6).join('、')}${fresh.length > 6 ? ` 等 ${fresh.length} 种` : ''}`);
+            return out;
+        }
         function handleOfflineTime(quietUnder = 0) {
+            offlineSnap = takeOfflineSnap();
             const from = gameState.lastActiveTime, act = qiyuActivity();
             const secs = Math.min(Math.max(0, (Date.now() - from) / 1000), (gameState.settings?.maxOfflineHours || 24) * 3600);
             const before = getQiyu().pending.length;
             qiyuSettleWindow = secs > 0 ? { from, to: from + secs * 1000 } : null;
-            try { handleOfflineTimeInner(quietUnder); } finally { qiyuSettleWindow = null; }
+            try { handleOfflineTimeInner(quietUnder); } finally { qiyuSettleWindow = null; offlineSnap = null; }
             if (act && secs >= 1) qiyuOfflineRoll(act, secs);
             const gained = getQiyu().pending.length - before;
             if (gained > 0) qiyuAnnounceOffline(gained);
@@ -13071,6 +13240,13 @@
             }
 
             content += `</div>`;
+
+            // v7.46 本次亮点：放在最上面，账单折叠成「收益明细」
+            const hl = offlineHighlights(exceedsLimit, wastedHours);
+            if (hl.length) {
+                content = `<div class="offline-hl"><div class="qiyu-sub">本次亮点</div>${hl.map(h => `<div class="offline-hl-row">${h}</div>`).join('')}</div>
+                    <details class="offline-bill"><summary>收益明细</summary>${content}</details>`;
+            }
 
             // 检测是否满足突破条件（P1功能）
             const realm = GAME_CONFIG.realms[gameState.player.realmIndex];

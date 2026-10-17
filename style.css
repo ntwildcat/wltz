@@ -2992,3 +2992,20 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 .qiyu-buff-left { color: var(--text-l4); white-space: nowrap; }
 .qiyu-note { margin-top: 8px; font-size: 0.8em; color: var(--text-l4); line-height: 1.6; }
 .offline-qiyu { margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px dashed var(--border-l3); }
+/* v7.46 奇物匣 / 本次亮点 */
+.qiyu-foot { margin-top: 8px; font-size: 0.78em; color: var(--text-l4); }
+.relic-cat { margin-bottom: 10px; }
+.relic-cat-head { display: flex; justify-content: space-between; font-size: 0.85em; color: var(--text-l2); margin-bottom: 4px; }
+.relic-cat-head span { color: var(--text-l4); }
+.relic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.relic { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; border: 1px dashed var(--border-l4); border-radius: 2px; background: var(--bg-l2); text-align: center; min-width: 0; }
+.relic.owned { border-style: solid; border-color: var(--bronze-dim); background: var(--bg-l3); }
+.relic-ico { font-size: 1.4em; line-height: 1.2; color: var(--text-l4); }
+.relic-name { font-size: 0.8em; color: var(--text-l1); }
+.relic:not(.owned) .relic-name { color: var(--text-l4); }
+.relic-eff { font-size: 0.7em; color: var(--text-l4); line-height: 1.35; word-break: break-all; }
+.relic.owned .relic-eff { color: var(--jade); }
+@media (max-width: 480px) { .relic-grid { grid-template-columns: repeat(2, 1fr); } }
+.offline-hl { margin-bottom: 12px; }
+.offline-hl-row { padding: 6px 10px; margin-bottom: 4px; border-left: 3px solid var(--bronze-dim); background: var(--bg-l2); font-size: 0.9em; color: var(--text-l3); line-height: 1.6; }
+.offline-bill summary { cursor: pointer; color: var(--text-l2); font-size: 0.9em; padding: 4px 0; }
