@@ -1841,12 +1841,52 @@
         }
 
         // 合道：收回分身（不可逆）。二次确认后生效
-        function startFusion() {
+        // v7.32 游戏内确认 / 提示框：替代浏览器自带的 confirm / alert（系统灰色对话框和画风不搭，桌面版里更像 Windows 报错框）。
+        // 外观是宣纸卷轴（同离线收益），危险操作的确认键是朱红色。返回 Promise：确认 true / 取消 false；Esc 取消、Enter 确认、点遮罩取消。
+        // 调用方要 await，等待期间游戏照常运行，所以确认之后要重新检查一遍条件
+        function uiDialog({ title = '', message = '', okText = '确定', cancelText = '取消', danger = false, alertOnly = false }) {
+            return new Promise(resolve => {
+                const old = document.getElementById('uiDialog');
+                if (old) old.remove();
+                const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const wrap = document.createElement('div');
+                wrap.id = 'uiDialog';
+                wrap.className = 'modal show ui-dialog';
+                wrap.innerHTML = `<div class="modal-content scroll-modal ui-dialog-box" role="${alertOnly ? 'alertdialog' : 'dialog'}" aria-modal="true">
+                    ${title ? `<div class="modal-title">${esc(title)}</div>` : ''}
+                    <div class="ui-dialog-msg">${esc(message).replace(/\n/g, '<br/>')}</div>
+                    <div class="ui-dialog-actions">${alertOnly ? '' : `<button type="button" class="btn btn-secondary ui-cancel">${esc(cancelText)}</button>`}<button type="button" class="btn ui-ok${danger ? ' danger' : ''}">${esc(okText)}</button></div>
+                </div>`;
+                let settled = false;
+                const done = v => {
+                    if (settled) return;
+                    settled = true;
+                    document.removeEventListener('keydown', onKey, true);
+                    wrap.remove();
+                    resolve(v);
+                };
+                const onKey = e => {
+                    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); done(alertOnly); }
+                    else if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); done(true); }
+                };
+                wrap.querySelector('.ui-ok').onclick = () => done(true);
+                const cancel = wrap.querySelector('.ui-cancel');
+                if (cancel) cancel.onclick = () => done(false);
+                wrap.addEventListener('click', e => { if (e.target === wrap) done(alertOnly); });
+                document.addEventListener('keydown', onKey, true);
+                document.body.appendChild(wrap);
+                wrap.querySelector('.ui-ok').focus();
+            });
+        }
+        const uiConfirm = (message, opts = {}) => uiDialog({ ...opts, message });
+        const uiAlert = (message, opts = {}) => uiDialog({ okText: '知道了', ...opts, message, alertOnly: true });
+
+        async function startFusion() {
             const P = ensureCurrencyState();
             if (!isDaoguoUnlocked()) { showNotification('合体初期才能合道', '#c98a3e'); return; }
             if (isFused()) { showNotification('你已经合道了', '#c98a3e'); return; }
-            const ok = confirm('确定要合道吗？\n\n合道后元婴分身与身外化身都归于本体：分身永久消失，且不可逆（无法再召回分身，神识里的「分身强化」也会失效）。\n\n换来的是（法力成倍增长）：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・身外化身的攻击 / 防御加成翻倍\n・神识产出 +50%、道果产出 +30%\n\n注意：合体初期突破中期之前必须合道。');
-            if (!ok) return;
+            const ok = await uiConfirm('合道后元婴分身与身外化身都归于本体：分身永久消失，且不可逆（无法再召回分身，神识里的「分身强化」也会失效）。\n\n换来的是（法力成倍增长）：\n・所有主行动速度 +100%（修炼、生活技能、悟道）\n・生命 / 攻击 / 防御 / 速度 +15%\n・身外化身的攻击 / 防御加成翻倍\n・神识产出 +50%、道果产出 +30%\n\n注意：合体初期突破中期之前必须合道。', { title: '确定要合道吗？', okText: '合道（不可逆）', danger: true });
+            if (!ok || isFused()) return;
             P.fusion = { active: true, at: Date.now() };
             getClones().forEach(c => { c.action = null; c.progress = 0; });
             calculateStats();
@@ -1962,7 +2002,7 @@
         function isDachengUnlocked() { return gameState.player.realmIndex >= 38; }   // v6.89：原索引29 → +9
 
         // 化虚：把某个法则的 n 级（对应 tier 0-4，第 5 品「本源品」需大乘初期）兑成一枚道则，扣道果 + 虚晶
-        function huaxuLaw(lawId, tier) {
+        async function huaxuLaw(lawId, tier) {
             if (!isVoidUnlocked()) { showNotification('炼虚初期才能化虚', '#c98a3e'); return; }
             if (tier >= 4 && !isDachengUnlocked()) { showNotification('本源品要到大乘初期才能化虚', '#c98a3e'); return; }
             const def = LAW_EFFECTS[lawId];
@@ -1981,8 +2021,15 @@
                 return;
             }
             const tierName = DAOZE_TIER_NAMES[tier];
-            const ok = confirm(`确定要化虚吗？\n\n消耗 ${def.name} ${levelCost} 级（Lv.${info.level} → Lv.${info.level - levelCost}）+ 道果 ${daoguoCost} + 虚晶 ${voidCost}\n\n获得：${tierName}${daoze.name} ×1（可在「装备」界面的道基槽镶嵌）\n\n法则等级可以再参悟回来，不是不可逆。`);
+            const ok = await uiConfirm(`消耗 ${def.name} ${levelCost} 级（Lv.${info.level} → Lv.${info.level - levelCost}）+ 道果 ${daoguoCost} + 虚晶 ${voidCost}\n\n获得：${tierName}${daoze.name} ×1（可在「装备」界面的道基槽镶嵌）\n\n法则等级可以再参悟回来，不是不可逆。`, { title: '确定要化虚吗？', okText: '化虚' });
             if (!ok) return;
+            // 等待确认期间游戏照常运行：再核一遍资源和背包
+            const voidNow = (gameState.player.inventory.find(i => i.id === 'voidcrystal') || { qty: 0 }).qty;
+            if (getLawInfo(lawId).level < levelCost || P.daoguo < daoguoCost || voidNow < voidCost
+                || !inventoryCanHold([daozeId], voidNow === voidCost ? ['voidcrystal'] : [])) {
+                showNotification('化虚条件已变化（资源不足或背包已满），请重新确认', '#c98a3e', 'warning');
+                return;
+            }
             consumeLawLevels(lawId, levelCost);
             P.daoguo -= daoguoCost;
             consumeItem('voidcrystal', voidCost);
@@ -2388,10 +2435,10 @@
             showNotification(P.lawRestraint ? '🧘 收敛法则：不再动用法则之力（法则之击、灵域），天道侵蚀不再上涨' : '☯️ 放开法则之力：法则之击、灵域恢复，每次动用都会加深天道侵蚀', '#b39ddb');
             renderRealmLore();
         }
-        function selfDemote() {
+        async function selfDemote() {
             if (!isDaozu()) return;
             const first = !gameState.player.daoHeart;
-            if (!confirm(`自降修为，退回大罗后期？\n\n· 天道侵蚀清零，不再有被同化之虞\n· ${first ? `首次自降：永久得到「道心」，攻击 / 生命 / 防御 +${DAO_HEART_BONUS * 100}%` : '道心已有，不再重复获得'}\n· 证道法则的加成与道祖之力失去；想再成道祖，须重新打一场证道之战\n· 三尸已斩、法则本源、其他进度都保留`)) return;
+            if (!(await uiConfirm(`· 天道侵蚀清零，不再有被同化之虞\n· ${first ? `首次自降：永久得到「道心」，攻击 / 生命 / 防御 +${DAO_HEART_BONUS * 100}%` : '道心已有，不再重复获得'}\n· 证道法则的加成与道祖之力失去；想再成道祖，须重新打一场证道之战\n· 三尸已斩、法则本源、其他进度都保留`, { title: '自降修为，退回大罗后期？', okText: '自降修为', danger: true })) || !isDaozu()) return;
             const P = gameState.player;
             P.realmIndex = DAOZU_REALM - 1;
             P.erosion = 0; P.assimilated = false; P.lawRestraint = false;
@@ -3606,11 +3653,11 @@
         }
 
         // 老玩家跳过新手任务：之后不再有任务条，也拿不到任何任务奖励（包括已完成但没领取的、桃木剑和最终奖励）
-        function skipQuests() {
+        async function skipQuests() {
             const state = getQuestState();
             if (state.done) return;
-            const ok = confirm('确定跳过新手任务吗？\n\n跳过后不会再有任务提示，也拿不到任何任务奖励（灵石、桃木剑等），包括已经完成但还没领取的。\n之后仍可以在「设置 → 玩法介绍」里查看任务列表和游戏目标。');
-            if (!ok) return;
+            const ok = await uiConfirm('跳过后不会再有任务提示，也拿不到任何任务奖励（灵石、桃木剑等），包括已经完成但还没领取的。\n之后仍可以在「设置 → 玩法介绍」里查看任务列表和游戏目标。', { title: '确定跳过新手任务吗？', okText: '跳过任务', danger: true });
+            if (!ok || state.done) return;
             state.done = true;
             state.skipped = true;
             state.index = NEWBIE_QUESTS.length;
@@ -3667,7 +3714,7 @@
             const rootGrade = document.getElementById('playerRootGrade').value;
 
             if (!name || !origin || !spiritRoot || !rootGrade) {
-                alert('请完整填写所有必填项！');
+                uiAlert('名字、出身、灵根和资质都要选好才能开始。', { title: '还没填完' });
                 return;
             }
 
@@ -4685,6 +4732,8 @@
             const key = ctx.tier + '|' + ctx.root;
             if (!force && key === lastStageKey) return;
             lastStageKey = key;
+            const plate = document.querySelector('.combatant.player');
+            if (plate) plate.style.setProperty('--c', BattleArt.colorOf(ctx.root));   // v7.33 名牌点缀色随灵根
             const bg = document.getElementById('battleBg'), pl = document.getElementById('playerSprite');
             if (bg) bg.innerHTML = BattleArt.scene(ctx.tier);
             if (pl) pl.innerHTML = BattleArt.player(ctx.root);
@@ -7597,9 +7646,10 @@
             getVisibleSkills().forEach(skillName => {
                 const skill = gameState.skills[skillName];
                 const btn = document.createElement('button');
-                btn.className = 'mobile-skill-btn' + (skillName === current ? ' active' : '');
+                btn.className = 'mobile-skill-btn sk-' + skillName + (skillName === current ? ' active' : '');
                 const info = getSkillExpInfo(skillName);
-                btn.textContent = `${skill.icon} ${skill.name} Lv.${info.level} · ${Math.floor(info.percent)}%`;
+                // v7.35 技能名毛笔字，等级与进度小字（以前整串是系统字体）
+                btn.innerHTML = `${skill.icon} <b class="msb-name">${skill.name}</b><small class="msb-lv">Lv.${info.level} · ${Math.floor(info.percent)}%</small>`;
                 btn.title = `经验 ${info.exp} / ${info.need}，还差 ${info.remain} 升级`;
                 btn.onclick = () => switchPanel(skillName);
                 bar.appendChild(btn);
@@ -7607,7 +7657,7 @@
             // 手机顶部栏最前面的「装备」入口（放在最前，免得被挤到横向滚动的看不见处）
             const eqBtn = document.createElement('button');
             eqBtn.className = 'mobile-skill-btn' + (current === 'equipment' ? ' active' : '');
-            eqBtn.textContent = '🎽 装备';
+            eqBtn.innerHTML = '🎽 <b class="msb-name">装备</b>';
             eqBtn.onclick = () => switchPanel('equipment');
             bar.insertBefore(eqBtn, bar.firstChild);
         }
@@ -8120,6 +8170,13 @@
                 </div>`;
         }
 
+        // v7.33 战斗区域 / 秘境卡片顶部的小画：按境界分档的山水 + 敌人剪影（区域最多 3 个，秘境画 Boss）
+        function areaArtHtml(realmIndex, enemies) {
+            if (typeof BattleArt === 'undefined') return '';
+            const foes = (enemies || []).filter(Boolean).slice(0, 3).map((e, i) => `<span class="aa-foe" style="--i:${i}">${BattleArt.enemy(e, {})}</span>`).join('');
+            return `<div class="area-art">${BattleArt.scene(BattleArt.tierOf(realmIndex))}<div class="aa-foes">${foes}</div></div>`;
+        }
+
         function generateBattleList() {
             const skill = gameState.skills.battle;
             const actionList = document.getElementById('battleActions');
@@ -8170,7 +8227,7 @@
                 if (isActive) className += ' active';
                 if (isDisabled) className += ' disabled';
 
-                div.className = className;
+                div.className = className + ' area-card';
                 div.id = 'action-battle-' + key;
 
                 // 不可用提示
@@ -8180,6 +8237,7 @@
                 }
 
                 div.innerHTML = `
+                    ${areaArtHtml(action.areaData.minLevel, BATTLE_ENEMY_CONFIGS[key])}
                     <div>
                         <div class="action-name">${action.name}</div>
                         <div class="action-desc">${action.desc}</div>
@@ -9002,22 +9060,21 @@
                 const requiredRealmName = getRealmName(dungeon.minRealmIndex);
 
                 const actionDiv = document.createElement('div');
-                actionDiv.className = 'action-row';
-                actionDiv.style.opacity = meetsRequirement ? '1' : '0.5';
+                actionDiv.className = 'action-row dungeon-row' + (record.completed ? ' cleared' : '') + (meetsRequirement ? '' : ' locked');
                 actionDiv.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="maybeSelectDomainThenEnter(() => enterDungeon('${dungeonId}'))">
-                        <span style="font-size: 24px;">${dungeon.icon}</span>
-                        <div style="flex: 1;">
-                            <div style="font-weight: bold; color: var(--gold);">${dungeon.name}</div>
-                            <div style="font-size: 0.85em; color: var(--text-l4);">${dungeon.desc}</div>
-                            <div style="font-size: 0.75em; color: ${statusColor}; margin-top: 4px;">${statusText} · 入口：${requiredRealmName}</div>
-                            ${dungeonDropHtml(dungeon)}
-                        </div>
+                    ${areaArtHtml(dungeon.minRealmIndex, [dungeon.monsters[dungeon.monsters.length - 1]])}
+                    <div class="dg-body">
+                        <div class="dg-name">${dungeon.name}</div>
+                        <div class="dg-desc">${dungeon.desc}</div>
+                        <div class="dg-status" style="color: ${statusColor};">${statusText} · 入口：${requiredRealmName}</div>
+                        ${dungeonDropHtml(dungeon)}
                     </div>
+                    ${record.completed ? '<span class="dg-seal">已通关</span>' : ''}
                 `;
+                // v7.33：以前卡片里外各有一个点击处理，点一次会进两次秘境；第一次选灵域时外层还会不等选完就直接进
                 actionDiv.onclick = () => {
                     if (meetsRequirement) {
-                        enterDungeon(dungeonId);
+                        maybeSelectDomainThenEnter(() => enterDungeon(dungeonId));
                     } else {
                         showNotification(`需要达到 ${requiredRealmName} 才能进入`, '#c4483a', 'error');
                     }
@@ -10188,6 +10245,7 @@
 
                 const title = document.createElement('div');
                 title.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: var(--jade); margin-top: 10px; margin-bottom: 5px;';
+                title.className = 'shop-cat-label';   // v7.31 商城分类标题：毛笔字 + 笔触（同背包分类）
                 title.textContent = categoryNames[category] || category;
                 shopContainer.appendChild(title);
 
@@ -10197,23 +10255,11 @@
                     const isOwnedArt = item.type === 'art' && (gameState.player.ownedArts || []).includes(item.id);
                     const isLocked = !isOwnedArt && currentRealmIdx < (item.minRealmIndex || 0);
 
+                    // v7.34 商品卡片改成货架上的一格：图标放进按类型着色的光盘，名字毛笔字，价格是一枚价签；已拥有 / 未解锁换状态样式
                     const card = document.createElement('div');
-                    card.className = 'shop-item';
-
-                    let cardStyle = 'padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #555; border-radius: 4px; transition: all 0.3s; text-align: center;';
-                    if (isBought) {
-                        cardStyle += 'opacity: 0.5; background: rgba(0,0,0,0.5); border-color: #888; cursor: not-allowed;';
-                    } else if (isLocked) {
-                        cardStyle += 'opacity: 0.55; border-style: dashed; cursor: not-allowed;';
-                    } else {
-                        cardStyle += 'cursor: pointer;';
-                    }
-                    card.style.cssText = cardStyle;
-
-                    if (!isBought && !isLocked) {
-                        card.onmouseover = () => card.style.borderColor = 'var(--jade)';
-                        card.onmouseout = () => card.style.borderColor = 'var(--border-l3)';
-                    }
+                    card.className = 'shop-item' + (isBought ? ' sh-bought' : isLocked ? ' sh-locked' : '');
+                    const itemCfg = GAME_CONFIG.items[item.id];
+                    card.style.setProperty('--c', item.type === 'art' ? '#5aa8ef' : item.type === 'upgrade' ? '#d8b445' : (itemCfg && ITEM_TYPE_COLORS[itemCfg.type]) || '#b89a5b');
 
                     const priceDisplay = isBought ? '✓ 已拥有'
                         : isOwnedArt ? (gameState.player.currentArt === item.id ? '✓ 当前功法' : '已拥有 · 点击装备')
@@ -10226,10 +10272,10 @@
                         : '';
 
                     card.innerHTML = `
-                        <div style="font-size: 24px; margin-bottom: 5px;">${item.icon}</div>
-                        <div style="font-weight: bold; color: var(--jade); margin-bottom: 3px;">${item.name}</div>
-                        <div style="font-size: 0.8em; color: var(--text-l4); margin-bottom: 8px;">${item.type === 'art' ? getArtShopDesc(item) : item.desc}</div>
-                        <div style="color: ${priceColor}; font-weight: bold;">${priceDisplay}</div>
+                        <div class="sh-icon">${item.icon}</div>
+                        <div class="sh-name">${item.name}</div>
+                        <div class="sh-desc">${item.type === 'art' ? getArtShopDesc(item) : item.desc}</div>
+                        <div class="sh-price" style="color: ${priceColor};">${priceDisplay}</div>
                         ${artExtra}
                     `;
 
@@ -11798,8 +11844,8 @@
             renderSlotSelect();
         }
 
-        function deleteSlot(n) {
-            if (!confirm(`确定要删除存档 ${n} 吗？此存档的所有进度将永久丢失！`)) return;
+        async function deleteSlot(n) {
+            if (!(await uiConfirm('此存档的所有进度将永久丢失，无法恢复。', { title: `确定要删除存档 ${n} 吗？`, okText: '删除', danger: true }))) return;
             try { saveStore.remove(slotKey(n)); if (!window.desktopSaves) localStorage.removeItem(ownerKey(n)); } catch (e) { /* 忽略 */ }
             renderSlotSelect();
         }
@@ -11830,7 +11876,7 @@
             try {
                 loaded = JSON.parse(raw);
             } catch (e) {
-                alert('存档已损坏，无法读取');
+                uiAlert('这个存档的数据已损坏，无法读取。可以在存档列表里删除它后重新创建。', { title: '存档已损坏' });
                 currentSlot = null;
                 return;
             }
@@ -12507,7 +12553,7 @@
             if (!file) return;
             const reader = new FileReader();
             reader.onload = () => importSaveText(String(reader.result || ''));
-            reader.onerror = () => alert('读取存档文件失败！');
+            reader.onerror = () => uiAlert('读取存档文件失败，请确认选的是导出的存档文件。', { title: '导入失败' });
             reader.readAsText(file);
         }
 
@@ -12518,11 +12564,11 @@
             try {
                 loaded = JSON.parse(decodeSave(text));
             } catch (e) {
-                alert('存档文件无效！');
+                uiAlert('这不是有效的存档文件。', { title: '导入失败' });
                 return;
             }
             if (!loaded || !loaded.player || !loaded.skills || !loaded.player.name) {
-                alert('存档文件无效：缺少角色数据！');
+                uiAlert('存档文件里缺少角色数据。', { title: '导入失败' });
                 return;
             }
 
@@ -12542,13 +12588,13 @@
             updateStatsDisplay();
             saveGame();
             updateSlotLabel();
-            alert('存档导入成功！（已覆盖当前存档）');   // 导入的存档文件会覆盖当前槽位
+            uiAlert('导入的存档已覆盖当前存档槽位。', { title: '导入成功' });   // 导入的存档文件会覆盖当前槽位
         }
 
         // 删除当前存档并回到存档选择界面
-        function resetGame() {
+        async function resetGame() {
             if (!currentSlot) return;
-            if (confirm(`确定要删除当前存档（存档 ${currentSlot}）吗？此存档的所有进度将永久丢失！`)) {
+            if (await uiConfirm('此存档的所有进度将永久丢失，无法恢复。', { title: `确定要删除当前存档（存档 ${currentSlot}）吗？`, okText: '删除', danger: true })) {
                 try { saveStore.remove(slotKey(currentSlot)); if (!window.desktopSaves) localStorage.removeItem(ownerKey(currentSlot)); } catch (e) { /* 忽略 */ }
                 gameRunning = false;   // 避免 beforeunload 把存档又写回去
                 clearInterval(tickInterval);
