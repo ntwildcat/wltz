@@ -3058,3 +3058,6 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 .invade-dom select { max-width: 100%; margin-left: 4px; padding: 3px 6px; background: var(--bg-l1); color: var(--text-l1); border: 1px solid var(--border-l3); font: inherit; }
 .invade-down { margin-top: 6px; font-size: 0.85em; color: var(--cinnabar-2); }
 .invade-last { margin-top: 6px; font-size: 0.82em; color: var(--text-l4); }
+/* v7.52 道途 */
+.dao-kind { margin-left: 6px; font-weight: normal; font-size: 0.8em; color: var(--text-l4); }
+.dao-sub { margin-top: 14px; }

@@ -16,7 +16,7 @@
             var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', THEMES[t]);
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=13.98">
+    <link rel="stylesheet" href="style.css?v=13.99">
 
 </head>
 <body data-panel="cultivation">
@@ -813,6 +813,15 @@
         </div>
     </div>
 
+    <!-- 道途（v7.52） -->
+    <div id="daoPathModal" class="modal">
+        <div class="modal-content scroll-modal qiyu-modal" role="dialog" aria-modal="true">
+            <button type="button" class="modal-close" onclick="closeDaoPathModal()" aria-label="关闭">&times;</button>
+            <div class="modal-title">道途抉择</div>
+            <div id="daoPathContent"></div>
+        </div>
+    </div>
+
     <!-- 功法切换模态框 -->
     <div id="artSwitchModal" class="modal">
         <div class="modal-content art-switch-modal" role="dialog" aria-modal="true" style="max-width: 500px;">
@@ -881,7 +890,7 @@
     </div>
 
     <script src="art.js?v=1.5"></script>
-    <script src="game.js?v=14.66"></script>
+    <script src="game.js?v=14.68"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

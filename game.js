@@ -2503,7 +2503,11 @@
         function getLawOriginPer() { return LAW_ORIGIN.per + getMod('lawOriginPer'); }   // 罗天本源经：每道 +1%
         // 极难被彻底灭杀：大罗起秘境夺舍重生次数与复活生命提高
         const DALUO_REVIVES = 6, DALUO_REVIVE_HP = 0.7;
-        function getReviveHp() { return gameState.player.realmIndex >= DALUO_REALM ? DALUO_REVIVE_HP : NASCENT_REVIVE_HP; }
+        function getReviveHp() {
+            const base = gameState.player.realmIndex >= DALUO_REALM ? DALUO_REVIVE_HP : NASCENT_REVIVE_HP;
+            const po = getDaoPathMod('reviveHp');   // 道途·婴魄：只在普通秘境
+            return po && !inTribulationFight() ? Math.max(base, po) : base;
+        }
 
         // ---- 道祖（v7.24，最终境界） ----
         // 证道：斩尽三尸后，选一条练到 50 级的法则，打赢「证道之战」（灭杀这条法则的现任道祖）即成道祖。
@@ -3289,7 +3293,7 @@
         }
         function getLifeSwordQualityMult() { return 0.8 + 0.4 * getCoreQuality() / 100; }
         function getLifeSwordFormation(n = getLifeSwords()) { return n >= LIFE_SWORD.zhoutian ? '周天剑阵' : n >= LIFE_SWORD.liangyi ? '两仪剑阵' : ''; }
-        function getLifeSwordInterval() { return getLifeSwords() >= LIFE_SWORD.liangyi ? LIFE_SWORD.liangyiInterval : LIFE_SWORD.interval; }
+        function getLifeSwordInterval() { return (getLifeSwords() >= LIFE_SWORD.liangyi ? LIFE_SWORD.liangyiInterval : LIFE_SWORD.interval) * (1 + getDaoPathMod('swordInterval')); }   // 道途·剑心
         // 当前对手是不是邪祟（心魔 / 衰相 / 三尸）：周天剑阵的破邪雷对它们加伤
         function isEvilFoe() {
             const a = gameState.currentAction;
@@ -3401,10 +3405,10 @@
             15: ['⚱️ 古老遗迹秘境开放'],
             16: ['⚔️ 魔窟深渊战斗区域开放', `⚱️ 修炼页解锁「凝立丹鼎」：一次性操作（灵矿石×8 + 玄晶×2），为结丹强化根基，结丹成功率 +${DANDING_BONUS * 100}%`],
             17: ['⚡ 天劫之地秘境开放（有几率掉落「万年雷击木」，结丹后炼本命法宝要用，可以先攒着）', '💊 金丹秘药配方解锁，每次冲击结丹服一颗，多备几颗', `⚡ 结丹比筑基更难：成功率看灵根资质（天灵根 ${ROOT_GRADES.tian.jiedan * 100}% / 真灵根 ${ROOT_GRADES.zhen.jiedan * 100}% / 伪灵根 ${ROOT_GRADES.wei.jiedan * 100}%），失败耗掉丹药但不掉境界，可以重试`],
-            18: [`⚠ 境界未稳：刚结金丹，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%，之后境界稳固恢复正常`, '⚔️ 结丹对筑基期敌人有大境界压制（命中、伤害更高）', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🗡️ 本命法宝：凑齐「万年雷击木」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青冥剑」。它不占武器栏，炼成即有 2 口飞剑，战斗中每隔几秒「飞剑斩」一击（无视防御）；之后每个大境界都能在炼器页「祭炼」添剑，一路养到道祖 72 口（36 口结两仪剑阵、72 口结周天剑阵）。金丹品质决定飞剑威力（×0.8～×1.2），不限制能养几口', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放'],
+            18: [`⚠ 境界未稳：刚结金丹，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%，之后境界稳固恢复正常`, '⚔️ 结丹对筑基期敌人有大境界压制（命中、伤害更高）', '🟡 金丹品质：结丹时按灵根资质凝成下品/中品/上品/极品金丹（侧栏「境界感悟」可查看）。修炼页「金丹淬炼」可以持续打磨品质，修为满了也能继续做——金丹品质决定日后突破元婴的成功率，也决定本命法宝的威力', '🗡️ 本命法宝：凑齐「万年雷击木」×2（天劫之地秘境掉落）后，炼器页可炼制本命法宝「青冥剑」。它不占武器栏，炼成即有 2 口飞剑，战斗中每隔几秒「飞剑斩」一击（无视防御）；之后每个大境界都能在炼器页「祭炼」添剑，一路养到道祖 72 口（36 口结两仪剑阵、72 口结周天剑阵）。金丹品质决定飞剑威力（×0.8～×1.2），不限制能养几口', '🔥 丹火系统解锁：新增「丹火」技能页，这个技能页的配方产出的不是物品、是货币「丹火」；丹火花在同页顶部的「丹火商城」——淬炼装备（武器/护甲/饰品分别加属性，最多10级）、强化灵根（把灵根自带的全部特效按百分比放大）', '⚔️ 结丹平原战斗区域开放', '☯️ 道途·结丹道心：在剑心（战斗）/ 丹心（生存）/ 匠心（生活）里三选一，之后可在装备页重选'],
             19: ['⚔️ 天劫之地战斗区域开放'],
             21: ['🌌 元婴秘境开放', '👹 结婴心魔：修为满后，突破弹窗里要先「斩心魔」才能冲击元婴。心魔是照着你此刻的实力生出来的——生命、防御、速度与你相同，每次出手比你重两成，换装备它也跟着变；满血、装备好战斗食物再打基本能赢，空手去多半会输。战败损失一半食物，可以重来，打赢一次即可', '💊 元婴丹配方解锁，每次冲击元婴服一颗', '⚡ 元婴突破成功率由金丹品质决定（下品 35%～56%、中品 56%～74%、上品 74%～89%、极品最高 95%）；现在多做「金丹淬炼」提高品质再冲击更稳。失败耗掉丹药但不掉境界', '🟡 金丹品质会变成元婴品质，决定婴火强度、化神成功率和本命法宝能祭炼到第几重。现在用「金丹淬炼」打磨最快；突破元婴后只能靠「元婴温养」慢慢补（速度是四分之一），化神后彻底定型'],
-            22: ['⚡ 小天劫：元婴、化神期共三道——元婴后期、化神初期、化神后期修为满后，要先在突破弹窗里「渡劫」打赢才能突破。天劫照着你此刻的实力降下，满血、带足食物再渡；渡过一次生命 / 防御永久 +2%', '🌟 修为里程碑：从元婴期起，每个小境界的修为到 25% / 50% / 75% 各得一份感悟奖励（约十分钟打怪的灵石，外加神识；合体期起改给道果），离线也照算', `🛡️ 元婴不灭：秘境战败不再损失修为（食物照常损失一半）；每次进入秘境，第一次被击败时元婴夺舍重生，以 ${NASCENT_REVIVE_HP * 100}% 生命继续战斗`, `🔥 婴火：炼丹、炼器耗时 −${YINGHUO_TIME[0] * 100}%～−${YINGHUO_TIME[1] * 100}%，炼丹翻倍、炼器省料概率 +${YINGHUO_BONUS[0] * 100}%～+${YINGHUO_BONUS[1] * 100}%，元婴品质越高越强（侧栏「境界感悟」显示你的实际数值）`, `⚠ 境界未稳：刚结元婴，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%`, '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放', '🏯 可以开宗立派：左侧栏（手机在上方技能栏）出现「宗门」，立派后接宗门任务攒宗门经验与贡献'],
+            22: ['⚡ 小天劫：元婴、化神期共三道——元婴后期、化神初期、化神后期修为满后，要先在突破弹窗里「渡劫」打赢才能突破。天劫照着你此刻的实力降下，满血、带足食物再渡；渡过一次生命 / 防御永久 +2%', '🌟 修为里程碑：从元婴期起，每个小境界的修为到 25% / 50% / 75% 各得一份感悟奖励（约十分钟打怪的灵石，外加神识；合体期起改给道果），离线也照算', `🛡️ 元婴不灭：秘境战败不再损失修为（食物照常损失一半）；每次进入秘境，第一次被击败时元婴夺舍重生，以 ${NASCENT_REVIVE_HP * 100}% 生命继续战斗`, `🔥 婴火：炼丹、炼器耗时 −${YINGHUO_TIME[0] * 100}%～−${YINGHUO_TIME[1] * 100}%，炼丹翻倍、炼器省料概率 +${YINGHUO_BONUS[0] * 100}%～+${YINGHUO_BONUS[1] * 100}%，元婴品质越高越强（侧栏「境界感悟」显示你的实际数值）`, `⚠ 境界未稳：刚结元婴，修为达到本境界 ${UNSTABLE_UNTIL * 100}% 之前攻击 / 防御 −${UNSTABLE_PENALTY * 100}%`, '👁️ 神识系统解锁：新增「神识」技能页，玩法跟丹火一样——配方产出货币「神识」，花在本页顶部的神识商城', '🌀 第一个分身解锁：去任意生活技能（炼丹/炼器/灵田/采矿）的配方卡片，点「交给分身」，分身会独立并行做这个配方，不占用你自己当前在做的事', '⚔️ 虚空之海战斗区域开放', '🏯 可以开宗立派：左侧栏（手机在上方技能栏）出现「宗门」，立派后接宗门任务攒宗门经验与贡献', '☯️ 道途·元婴道心：在婴锋（战斗）/ 婴魄（生存）/ 婴化（生活）里三选一，之后可在装备页重选'],
             23: [`💨 瞬移神通：元婴稳固，闪避 +${TELEPORT_DODGE * 100}%`],
             24: ['⚔️ 深渊遗迹战斗区域开放', `📜 化神需要特殊功法：拥有「太虚元神诀」（商城）可让化神成功率 +${HUASHEN_RATE.art * 100}%，可以先攒灵石`],
             25: ['🌠 太虚幻境秘境开放：通关一次即得化神机缘', '💊 化神丹配方解锁，每次冲击化神服一颗', `⚡ 化神成功率极低：基础 ${HUASHEN_RATE.base * 100}% + 元婴品质最多 +${HUASHEN_RATE.quality * 100}% + 拥有「太虚元神诀」+${HUASHEN_RATE.art * 100}% + 通关太虚幻境（机缘）+${HUASHEN_RATE.chance * 100}%；失败耗掉丹药但不掉境界`],
@@ -4707,7 +4711,7 @@
             }
 
             // 检查冷却时间
-            if (gameState.player.foodUseTimer < foodConfig.cooldown) {
+            if (gameState.player.foodUseTimer < foodConfig.cooldown + getDaoPathMod('foodCd')) {   // 道途·丹心
                 return false; // 仍在冷却中
             }
 
@@ -6090,6 +6094,95 @@
                 ${sectShopHtml()}`;
         }
 
+        // ==================== 道途（v7.52） ====================
+        // 原来的质变机制都是到境界自动获得。道途在大境界节点三选一一条「道心」：战斗 / 生存 / 生活各一，给机制不给大数值。
+        // 第一版只做结丹、元婴两个节点。首次选择免费；之后可以重选，花约 15 分钟打怪收入的灵石（当前最高区域每场灵石 × 600），选完 24 小时内不能再改。
+        // 标定：新系统不计入标准玩家；三个选项各自约等于 +3%～5% 的对应收益（剑心约 +3% 输出、匠心生活技能耗时 -5%），选生活向的人战斗不会卡住。
+        const DAO_PATHS = {
+            jiedan: { realm: 18, name: '结丹·道心', options: {
+                jian:  { name: '剑心', kind: '战斗', desc: '本命法宝飞剑斩的出手间隔 -33%（3 秒 → 2 秒；需要已祭炼本命法宝）', effects: { swordInterval: -1 / 3 } },
+                dan:   { name: '丹心', kind: '生存', desc: '战斗食物回复 +15%，进食冷却 -0.5 秒', effects: { foodPct: 0.15, foodCd: -0.5 } },
+                jiang: { name: '匠心', kind: '生活', desc: '炼丹、炼器、灵田、采矿耗时 -5%', effects: { 'time:alchemy': -0.05, 'time:forging': -0.05, 'time:farming': -0.05, 'time:mining': -0.05 } } } },
+            yuanying: { realm: 22, name: '元婴·道心', options: {
+                feng: { name: '婴锋', kind: '战斗', desc: '暴击率 +8%、暴击伤害 +20%', effects: { crit: 0.08, critDmg: 0.20 } },
+                po:   { name: '婴魄', kind: '生存', desc: '普通秘境里夺舍重生后的生命 40% → 70%（天劫等渡劫类不变）', effects: { reviveHp: 0.70 } },
+                hua:  { name: '婴化', kind: '生活', desc: '分身速度 +15%', effects: { cloneSpeed: 0.15 } } } }
+        };
+        const DAO_PATH_COOLDOWN_MS = 24 * 3600e3, DAO_PATH_COST_FIGHTS = 600;
+        const daoPathPrompted = new Set();   // 本次进游戏已经提示过的节点
+
+        function getDaoPath() { return gameState.player.daoPath || (gameState.player.daoPath = { picks: {}, changedAt: {} }); }
+        function daoPathPick(node) {
+            const cfg = DAO_PATHS[node], dp = gameState.player.daoPath;
+            if (!cfg || !dp || gameState.player.realmIndex < cfg.realm) return null;
+            return cfg.options[dp.picks[node]] || null;
+        }
+        function getDaoPathMod(key) {
+            const dp = gameState.player && gameState.player.daoPath;
+            if (!dp || !dp.picks) return 0;
+            let t = 0;
+            for (const node in DAO_PATHS) { const o = daoPathPick(node); if (o && o.effects[key]) t += o.effects[key]; }
+            return t;
+        }
+        function daoPathCost() {
+            const area = bestBattleArea(), a = area && getAction('battle', area);
+            return a ? Math.round(a.areaData.coins * DAO_PATH_COST_FIGHTS) : 0;
+        }
+        async function chooseDaoPath(node, optId) {
+            const cfg = DAO_PATHS[node], P = gameState.player;
+            if (!cfg || !cfg.options[optId] || P.realmIndex < cfg.realm) return;
+            const dp = getDaoPath();
+            if (dp.picks[node] === optId) return;
+            const first = !dp.picks[node];
+            if (!first) {
+                const left = (dp.changedAt[node] || 0) + DAO_PATH_COOLDOWN_MS - Date.now();
+                if (left > 0) { showNotification(`${cfg.name}刚改过，${fmtLeft(left)}后才能再改`, '#c98a3e'); return; }
+                const cost = daoPathCost();
+                if (P.coins < cost) { showNotification(`灵石不够（重选要 ${fmtXP(cost)}）`, '#c98a3e'); return; }
+                if (!await uiConfirm(`把${cfg.name}改为「${cfg.options[optId].name}」？花 ${fmtXP(cost)} 灵石，24 小时内不能再改。`, { title: '重选道心' })) return;
+                if (P.coins < cost) return;
+                P.coins -= cost;
+            }
+            dp.picks[node] = optId;
+            dp.changedAt[node] = Date.now();
+            calculateStats();
+            showNotification(`☯️ ${cfg.name}：${first ? '立下' : '改修'}「${cfg.options[optId].name}」——${cfg.options[optId].desc}`, '#c2a25f', 'rare');
+            renderDaoPathModal();
+            if (document.body.dataset.panel === 'equipment') renderEquipmentPanel();
+            updateUI(); saveGame();
+        }
+        function daoPathNodeHtml(node) {
+            const cfg = DAO_PATHS[node], dp = getDaoPath(), cur = dp.picks[node];
+            const left = cur ? (dp.changedAt[node] || 0) + DAO_PATH_COOLDOWN_MS - Date.now() : 0;
+            const note = !cur ? '首次选择免费' : left > 0 ? `${fmtLeft(left)}后可重选` : `重选花 ${fmtXP(daoPathCost())} 灵石`;
+            const opts = Object.entries(cfg.options).map(([id, o]) => `<button type="button" class="hall-form${cur === id ? ' on' : ''}" onclick="chooseDaoPath('${node}', '${id}')"><b>${o.name}<small class="dao-kind">${o.kind}</small></b><span>${o.desc}</span></button>`).join('');
+            return `<div class="hall"><div class="hall-head">☯️ ${cfg.name}<span>${note}</span></div><div class="hall-forms">${opts}</div></div>`;
+        }
+        function daoPathHtml() {
+            const nodes = Object.keys(DAO_PATHS).filter(n => gameState.player.realmIndex >= DAO_PATHS[n].realm);
+            if (!nodes.length) return '';
+            return `<div class="qiyu-sub dao-sub">道途</div>${nodes.map(daoPathNodeHtml).join('')}<div class="qiyu-note">大境界节点三选一一条道心（战斗 / 生存 / 生活各一），永久生效；可以重选，花约 15 分钟打怪的灵石，选完 24 小时内不能再改。</div>`;
+        }
+        function renderDaoPathModal() {
+            const el = document.getElementById('daoPathContent');
+            if (el && document.getElementById('daoPathModal').classList.contains('show')) el.innerHTML = daoPathHtml();
+        }
+        function openDaoPathModal() {
+            document.getElementById('daoPathContent').innerHTML = daoPathHtml();
+            document.getElementById('daoPathModal').classList.add('show');
+        }
+        function closeDaoPathModal() { document.getElementById('daoPathModal').classList.remove('show'); }
+        // 到了节点还没选：提示一次（每次进游戏最多一次），老存档也会被提示
+        function tickDaoPathPrompt() {
+            if (!gameRunning) return;
+            const dp = getDaoPath();
+            const pending = Object.keys(DAO_PATHS).filter(n => gameState.player.realmIndex >= DAO_PATHS[n].realm && !dp.picks[n] && !daoPathPrompted.has(n));
+            if (!pending.length) return;
+            if (document.querySelector('.modal.show') || document.querySelector('.fx-overlay')) return;   // 别的弹窗 / 突破特效还在时先不弹
+            pending.forEach(n => daoPathPrompted.add(n));
+            openDaoPathModal();
+        }
+
         // ==================== 敌人词缀、地气与精英（v7.47） ====================
         // 筑基起的普通战斗区域各有「地气」，每 6 小时（现实时间，所有区域同一时刻换，各区域的词缀按区域错开）轮换一次，决定这段时间该区域敌人带哪个词缀（也可能是平地气，没有词缀）。
         // 每个词缀都对应玩家已有的应对手段（灵域、周期攻击、防御、命中、闪避、回复），对症打得快，不对症也能打只是慢；带词缀的敌人奖励 ×1.1。
@@ -6657,6 +6750,7 @@
 
         function tickQiyu(dt) {
             if (++qiyuTickCount % 10 === 0) { qiyuPruneBuffs(); renderQiyuSeal(); if (isQiyuModalOpen()) renderQiyuModal(); tickInjury();
+                tickDaoPathPrompt();
                 if (getSect()) {
                     const sc = getSect(), refilled = tickSectBoard();
                     tickInvasion();
@@ -8212,6 +8306,7 @@
             total += getEndlessMod(key);   // 大乘以后的无上限修炼：器灵温养 / 神魂参悟 / 本源温养
             total += getQiyuMod(key);   // 奇遇的限时机缘与奇物
             total += getSectMod(key);   // 宗门殿阁
+            total += getDaoPathMod(key);   // 道途
             return total;
         }
 
@@ -10485,7 +10580,7 @@
             // v7.28 顶部立绘：随境界变化（气焰 / 金丹 / 元婴 / 光环 / 法则环），装了武器才持剑
             const hero = typeof BattleArt !== 'undefined'
                 ? `<div class="equip-hero">${BattleArt.portrait(gameState.player.spiritRoot, gameState.player.realmIndex, { sword: !!eq.weapon, caption: `${gameState.player.name || '散修'} · ${getRealmName(gameState.player.realmIndex)}` })}</div>` : '';
-            box.innerHTML = `${hero}<div class="equip-slots">${slots}</div>${lifeCard}${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（可以在炼器里打造）</div>'}`;
+            box.innerHTML = `${hero}<div class="equip-slots">${slots}</div>${lifeCard}${daoPathHtml()}${summary}${bag || '<div class="equip-empty-hint">背包里没有可更换的装备（可以在炼器里打造）</div>'}`;
         }
 
         // 旧存档迁移：装备曾同时保留在背包里，现在装备栏与背包分开。每件已装备的物品从背包扣掉 1 件；
