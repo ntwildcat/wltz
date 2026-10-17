@@ -4285,6 +4285,7 @@
                     return;
                 }
                 lastTickWall = wall;
+                tickQiyu(0.1);
                 tickFarmPlot();
                 tickClone();
                 tickSmallWorld();
@@ -5696,6 +5697,9 @@
             battleLogEntries.push(won ? `🎉 战胜${battle.currentEnemy.name}` : (battle.playerHP.current <= 0 ? `💀 被${battle.currentEnemy.name}击败` : `⚔️ 未能击败${battle.currentEnemy.name}（超时）`));
             trimBattleLog();
             if (won) {
+                const qy = getQiyu(), winAt = Date.now();
+                if (qy.lastWinAt) qiyuNoteFightSec((winAt - qy.lastWinAt) / 1000);
+                qy.lastWinAt = winAt;
                 const { coins, exp, items, lost, danhuo, shenshi, daoguo } = grantNormalBattleWin(areaKey);
                 auto.wins++; auto.coins += coins; auto.exp += exp;
                 battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验${danhuo ? `、${danhuo} 丹火` : ''}${shenshi ? `、${shenshi} 神识` : ''}${daoguo ? `、${daoguo} 道果` : ''}`);
@@ -5803,7 +5807,7 @@
         // 一场普通战斗取胜的奖励：精通加成后的灵石 / 经验 / 物品掉落，并获得该区域精通经验（每胜一场 10）
         function grantNormalBattleWin(areaKey) {
             const areaData = getAction('battle', areaKey).areaData;
-            const reward = 1 + getMasteryBonus('battle', areaKey).reward;
+            const reward = 1 + getMasteryBonus('battle', areaKey).reward + getMod('battleReward');   // battleReward：奇遇机缘
             const coins = Math.round(areaData.coins * reward);
             const exp = Math.round(areaData.exp * reward);
             gameState.player.coins += coins;
@@ -5822,6 +5826,414 @@
         }
         function dropMapToList(map) {
             return Object.entries(map).map(([id, qty]) => ({ id, qty }));
+        }
+
+        // ==================== 奇遇（v7.45） ====================
+        // 做事时（修炼 / 生活技能 / 战斗，在线离线都算；秘境与空闲不算）随机遇到奇遇，每桩 2～3 个选项。
+        // 奖励在遇到的那一刻按当时的配方算好写进卡片，选的时候照单发放，卡片上的数字就是实际结算的数字。
+        // 触发：在线平均每 1.5 小时、离线平均每 2 小时一桩（指数分布），最多积攒 3 桩，满了不再累积，待处理的不过期。
+        // 风险选项：成功率写在选项上；失败只有写明的代价，并让同一奇遇下次的成功率 +15%（最高 90%），成功后清零。
+        // 限时机缘（增益）按现实时间计时，经 getMod 生效；离线结算时按机缘与离线时段的重叠比例折算（qiyuSettleWindow）。
+        const QIYU_MAX_PENDING = 3;
+        const QIYU_MEAN_ONLINE = 5400, QIYU_MEAN_OFFLINE = 7200;
+        const QIYU_LOOSEN_STEP = 0.15, QIYU_RISK_MAX = 0.9;
+        const QIYU_DEFAULT_FIGHT_SEC = 3;
+        let qiyuSettleWindow = null;
+        let qiyuTickCount = 0;
+
+        function qiyuDrawNeed() { return Math.max(0.02, -Math.log(1 - Math.random())); }
+        function getQiyu() {
+            if (!gameState.qiyu) gameState.qiyu = { pending: [], buffs: [], loosen: {}, acc: 0, need: qiyuDrawNeed(), last: null, total: 0 };
+            return gameState.qiyu;
+        }
+
+        function getQiyuMod(key) {
+            const q = gameState.qiyu;
+            if (!q || !q.buffs || !q.buffs.length) return 0;
+            let total = 0;
+            const now = Date.now(), win = qiyuSettleWindow;
+            for (const b of q.buffs) {
+                if (b.key !== key) continue;
+                if (win) {
+                    const span = win.to - win.from;
+                    if (span > 0) total += b.value * Math.max(0, Math.min(win.to, b.until) - Math.max(win.from, b.from)) / span;
+                } else if (now < b.until) total += b.value;
+            }
+            return total;
+        }
+        function qiyuActiveBuffs() {
+            const now = Date.now();
+            return (gameState.qiyu && gameState.qiyu.buffs || []).filter(b => b.until > now);
+        }
+        function qiyuPruneBuffs() {
+            const q = gameState.qiyu;
+            if (q && q.buffs && q.buffs.some(b => b.until <= Date.now())) q.buffs = qiyuActiveBuffs();
+        }
+
+        function qiyuActivity() {
+            const a = gameState.currentAction;
+            if (!a || a.isDungeon) return null;
+            if (a.isBattle) return { skill: 'battle', action: a.action };
+            return { skill: a.skill, action: a.action };
+        }
+        function qiyuCategory(skill) {
+            if (skill === 'battle') return 'battle';
+            if (skill === 'mining' || skill === 'farming') return 'gather';
+            if (skill === 'alchemy' || skill === 'forging') return 'craft';
+            if (CURRENCY_NAMES[skill]) return 'cur';
+            return 'cult';
+        }
+        function qiyuSkillName(skill) {
+            return (gameState.skills[skill] || {}).name || (GAME_CONFIG.skills[skill] || {}).name || skill;
+        }
+        function qiyuAreaName(area) {
+            const a = getAction('battle', area);
+            return a ? ((a.areaData && a.areaData.name) || a.name) : area;
+        }
+
+        // —— 奖励换算：都按「当前配方 / 战斗区域 N 分钟」折算 ——
+        function qiyuYield(c, minutes) {
+            const action = getAction(c.skill, c.action);
+            if (!action || !action.output || c.skill === 'battle') return null;
+            const o = action.output;
+            if (o.xianqiao || o.lifeRefine || o.marrowCleanse || o.danDing || o.fiveRoots || action.unique) return null;
+            const dur = getAdjustedDuration(c.skill, action.duration, c.action);
+            if (!(dur > 0)) return null;
+            const k = minutes * 60 / dur;
+            const per = JSON.parse(JSON.stringify(o));
+            applySkillLevelBonus(c.skill, per, 'raw');
+            const dbl = getSkillMod('double', c.skill) + getMasteryBonus(c.skill, c.action).double;
+            const y = { items: [] };
+            (per.items || []).forEach(it => {
+                if (GAME_CONFIG.items[it.id] && it.qty > 0) y.items.push({ id: it.id, qty: Math.max(1, Math.floor(it.qty * k * (1 + dbl))) });
+            });
+            ['coins', 'danhuo', 'shenshi', 'daoguo'].forEach(cur => { if (per[cur]) y[cur] = Math.max(1, Math.round(per[cur] * k)); });
+            return (y.items.length || y.coins || y.danhuo || y.shenshi || y.daoguo) ? { t: 'yield', y } : null;
+        }
+        function qiyuCult(c, minutes) {
+            if (c.skill !== 'cultivation') return null;
+            const action = getAction(c.skill, c.action);
+            if (!action || !action.output || !action.output.cultivation || action.output.xianqiao) return null;
+            const P = gameState.player, cap = GAME_CONFIG.realms[P.realmIndex].nextReq;
+            if (isGateRealm(GAME_CONFIG.realms[P.realmIndex + 1]) || P.cultivationXP >= cap) return null;
+            const per = { ...action.output };
+            applySkillLevelBonus(c.skill, per, 'raw');
+            const dur = getAdjustedDuration(c.skill, action.duration, c.action);
+            const n = dur > 0 ? Math.round(per.cultivation * minutes * 60 / dur) : 0;
+            return n > 0 ? { t: 'cult', n } : null;
+        }
+        function qiyuFightSec() { return (gameState.qiyu && gameState.qiyu.fightSec) || QIYU_DEFAULT_FIGHT_SEC; }
+        function qiyuFights(c, minutes) {
+            if (c.skill !== 'battle') return null;
+            const a = getAction('battle', c.action);
+            if (!a || !isBattleAreaUnlocked(a)) return null;
+            return { t: 'fights', area: c.action, n: Math.max(5, Math.min(3000, Math.round(minutes * 60 / qiyuFightSec()))) };
+        }
+        function qiyuMastery(c, minutes) {
+            const isBattle = c.skill === 'battle';
+            if (!isBattle && !LIFE_SKILLS.includes(c.skill)) return null;
+            if (getMasteryInfo(c.skill, c.action).maxed) return null;
+            let n;
+            if (isBattle) n = Math.round(minutes * 60 / qiyuFightSec()) * 10;
+            else {
+                const action = getAction(c.skill, c.action);
+                const dur = action ? getAdjustedDuration(c.skill, action.duration, c.action) : 0;
+                n = dur > 0 ? Math.round(minutes * 60 / dur * action.duration) : 0;
+            }
+            return n > 0 ? { t: 'mastery', skill: c.skill, key: c.action, n } : null;
+        }
+        function qiyuSkillExp(c, minutes) {
+            const action = getAction(c.skill, c.action);
+            if (!action || !action.output || !action.output.exp || c.skill === 'battle') return null;
+            const dur = getAdjustedDuration(c.skill, action.duration, c.action);
+            const n = dur > 0 ? Math.round(action.output.exp * minutes * 60 / dur) : 0;
+            return n > 0 ? { t: 'skillexp', skill: action.output.skill || c.skill, n } : null;
+        }
+        function qiyuBuff(key, value, hours, label) { return { t: 'buff', key, value, hours, label }; }
+        function qiyuRisk(eventId, base, win, fail) {
+            if (!win) return null;
+            const loosen = (getQiyu().loosen[eventId] || 0);
+            return { t: 'risk', p: Math.min(QIYU_RISK_MAX, base + loosen * QIYU_LOOSEN_STEP), loosened: loosen > 0, win, fail: fail || null };
+        }
+        function qiyuOpt(label, spec) { return spec ? { label, spec } : null; }
+
+        // —— 奇遇表：build(c) 返回选项（null 表示这个选项此时不成立）；至少要有一个成立，否则换一个奇遇 ——
+        const QIYU_EVENTS = {
+            lingmai: { cat: 'gather', icon: '⛏️', name: '灵脉异动', build: c => [
+                qiyuOpt('深挖', qiyuYield(c, 30)),
+                qiyuOpt('标记灵脉', qiyuBuff(`double:${c.skill}`, 0.20, 2, `${qiyuSkillName(c.skill)}翻倍概率 +20%`))] },
+            dixue: { cat: 'gather', icon: '🕳️', name: '地底空洞', build: c => [
+                qiyuOpt('下探', qiyuRisk('dixue', 0.6, qiyuYield(c, 90), null)),
+                qiyuOpt('绕行', qiyuYield(c, 20))] },
+            zhidian: { cat: 'gather', icon: '👴', name: '老把式指点', build: c => [
+                qiyuOpt('请教手法', qiyuMastery(c, 45)),
+                qiyuOpt('讨教门道', qiyuSkillExp(c, 45))] },
+            canfang: { cat: 'craft', icon: '📜', name: '残方一页', build: c => [
+                qiyuOpt('研读', qiyuBuff(`save:${c.skill}`, 0.15, 2, `${qiyuSkillName(c.skill)}节省材料概率 +15%`)),
+                qiyuOpt('照方试做', qiyuYield(c, 30)) || qiyuOpt('照方试做', qiyuSkillExp(c, 30))] },
+            dihuo: { cat: 'craft', icon: '🌋', name: '地火喷涌', build: c => [
+                qiyuOpt('借火炼制', qiyuBuff(`time:${c.skill}`, -0.20, 1.5, `${qiyuSkillName(c.skill)}耗时 -20%`)),
+                qiyuOpt('引火淬手', qiyuRisk('dihuo', 0.65, qiyuMastery(c, 90), null)) || qiyuOpt('引火淬手', qiyuSkillExp(c, 40))] },
+            luding: { cat: 'craft', icon: '🔔', name: '炉鼎嗡鸣', build: c => [
+                qiyuOpt('猛催炉火', qiyuRisk('luding', 0.6, qiyuYield(c, 90) || qiyuSkillExp(c, 90), null)),
+                qiyuOpt('稳住火候', qiyuMastery(c, 45)) || qiyuOpt('稳住火候', qiyuSkillExp(c, 45))] },
+            yougan: { cat: 'cult', icon: '🧘', name: '心有所感', build: c => [
+                qiyuOpt('顺势冲关', qiyuCult(c, 20)) || qiyuOpt('内视经脉', qiyuBuff('cultSpeed', 0.40, 1, '修炼速度 +40%')),
+                qiyuOpt('静坐体悟', qiyuBuff('cultSpeed', 0.20, 2, '修炼速度 +20%'))] },
+            chaoxi: { cat: 'cult', icon: '🌊', name: '灵气潮汐', build: c => [
+                qiyuOpt('引潮入体', qiyuBuff('cultSpeed', 0.50, 1, '修炼速度 +50%')),
+                qiyuOpt('分流蓄养', qiyuBuff('cultSpeed', 0.12, 4, '修炼速度 +12%'))] },
+            xinmo: { cat: 'cult', icon: '👁️', name: '心魔低语', build: c => [
+                qiyuOpt('斩之', qiyuRisk('xinmo', 0.65, qiyuCult(c, 60) || qiyuBuff('cultSpeed', 0.40, 2, '修炼速度 +40%'),
+                    qiyuBuff('cultSpeed', -0.10, 0.5, '修炼速度 -10%'))),
+                qiyuOpt('守心', qiyuBuff('cultSpeed', 0.10, 1, '修炼速度 +10%'))] },
+            yifu: { cat: 'battle', icon: '🏚️', name: '古修遗府', build: c => [
+                qiyuOpt('强破禁制', qiyuRisk('yifu', 0.6, qiyuFights(c, 60), { t: 'food', rate: 0.2 })),
+                qiyuOpt('慢慢参悟', qiyuMastery(c, 45)) || qiyuOpt('慢慢参悟', qiyuBuff('battleReward', 0.15, 2, '战斗灵石与经验 +15%'))] },
+            chaoxue: { cat: 'battle', icon: '🐺', name: '妖兽巢穴', build: c => [
+                qiyuOpt('清剿', qiyuFights(c, 20)),
+                qiyuOpt('设伏', qiyuBuff('battleReward', 0.20, 2, '战斗灵石与经验 +20%'))] },
+            luonan: { cat: 'battle', icon: '🆘', name: '落难同道', build: c => [
+                qiyuOpt('出手相助', qiyuRisk('luonan', 0.7, qiyuFights(c, 40), { t: 'food', rate: 0.1 })),
+                qiyuOpt('指点去处', qiyuBuff('battleReward', 0.10, 4, '战斗灵石与经验 +10%'))] },
+            yihuo: { cat: 'cur', icon: '🔥', name: '异象临身', build: c => [
+                qiyuOpt('收为己用', qiyuYield(c, 40)),
+                qiyuOpt('借势', qiyuBuff(`out:${c.skill}`, 0.25, 2, `${qiyuSkillName(c.skill)}产出 +25%`))] },
+            lingji: { cat: 'cur', icon: '💡', name: '灵机一闪', build: c => [
+                qiyuOpt('趁热打铁', qiyuBuff(`time:${c.skill}`, -0.20, 1, `${qiyuSkillName(c.skill)}耗时 -20%`)),
+                qiyuOpt('记下心得', qiyuMastery(c, 45)) || qiyuOpt('记下心得', qiyuYield(c, 15))] }
+        };
+
+        function qiyuGenerate(act) {
+            const q = getQiyu();
+            if (q.pending.length >= QIYU_MAX_PENDING) return null;
+            const cat = qiyuCategory(act.skill);
+            let pool = Object.keys(QIYU_EVENTS).filter(id => QIYU_EVENTS[id].cat === cat);
+            if (pool.length > 1) pool = pool.filter(id => id !== q.last);
+            pool.sort(() => Math.random() - 0.5);
+            for (const id of pool) {
+                const opts = QIYU_EVENTS[id].build({ skill: act.skill, action: act.action }).filter(Boolean);
+                if (!opts.length) continue;
+                const ev = { id, skill: act.skill, action: act.action, at: Date.now(), opts };
+                q.pending.push(ev);
+                q.last = id;
+                q.total = (q.total || 0) + 1;
+                return ev;
+            }
+            return null;
+        }
+
+        function tickQiyu(dt) {
+            if (++qiyuTickCount % 10 === 0) { qiyuPruneBuffs(); renderQiyuSeal(); if (isQiyuModalOpen()) renderQiyuModal(); }
+            const act = qiyuActivity();
+            if (!act) return;
+            const q = getQiyu();
+            if (q.pending.length >= QIYU_MAX_PENDING) return;
+            q.acc += dt / QIYU_MEAN_ONLINE;
+            if (q.acc < q.need) return;
+            q.acc = 0;
+            q.need = qiyuDrawNeed();
+            const ev = qiyuGenerate(act);
+            if (ev) {
+                showNotification(`${QIYU_EVENTS[ev.id].icon} 奇遇：${QIYU_EVENTS[ev.id].name}（点右下角的「缘」处理）`, '#c2a25f', 'rare');
+                renderQiyuSeal();
+            }
+        }
+        function qiyuOfflineRoll(act, secs) {
+            const q = getQiyu();
+            let t = secs / QIYU_MEAN_OFFLINE;
+            for (let guard = 0; guard < 20 && q.pending.length < QIYU_MAX_PENDING; guard++) {
+                const left = q.need - q.acc;
+                if (t < left) { q.acc += t; return; }
+                t -= left;
+                q.acc = 0;
+                q.need = qiyuDrawNeed();
+                qiyuGenerate(act);
+            }
+        }
+        // 普通战斗每场耗时（现实秒），用来把「战斗 N 分钟」折算成场次：在线按相邻两场胜利的间隔、离线按托管结果平滑
+        function qiyuNoteFightSec(sec) {
+            if (!(sec > 0) || sec > 120) return;
+            const q = getQiyu();
+            q.fightSec = q.fightSec ? q.fightSec * 0.9 + sec * 0.1 : sec;
+        }
+
+        // —— 文字 ——
+        function qiyuYieldText(y) {
+            const parts = (y.items || []).map(it => `${GAME_CONFIG.items[it.id].icon}${GAME_CONFIG.items[it.id].name} ×${fmtXP(it.qty)}`);
+            if (y.coins) parts.push(`${fmtXP(y.coins)} 灵石`);
+            ['danhuo', 'shenshi', 'daoguo'].forEach(cur => { if (y[cur]) parts.push(`${fmtXP(y[cur])} ${CURRENCY_NAMES[cur]}`); });
+            return parts.join('、');
+        }
+        function qiyuSpecText(s) {
+            switch (s.t) {
+                case 'yield': return `获得 ${qiyuYieldText(s.y)}`;
+                case 'cult': return `获得 ${fmtXP(s.n)} 修为（最多到本境界上限）`;
+                case 'fights': return `立即获得在「${qiyuAreaName(s.area)}」打赢 ${s.n} 场的灵石、经验与掉落`;
+                case 'mastery': return `「${(getAction(s.skill, s.key) || {}).name || qiyuAreaName(s.key)}」精通经验 +${fmtXP(s.n)}`;
+                case 'skillexp': return `${qiyuSkillName(s.skill)}经验 +${fmtXP(s.n)}`;
+                case 'buff': return `${s.label}，持续 ${s.hours >= 1 ? s.hours + ' 小时' : Math.round(s.hours * 60) + ' 分钟'}`;
+                case 'food': return `丢失 ${Math.round(s.rate * 100)}% 的战斗食物（每种至少留 1 份）`;
+                case 'risk': return `${Math.round(s.p * 100)}% 成功${s.loosened ? '（上次失败，已提高）' : ''}：${qiyuSpecText(s.win)}。失败：${s.fail ? qiyuSpecText(s.fail) : '无损失'}，下次遇到成功率 +${Math.round(QIYU_LOOSEN_STEP * 100)}%`;
+            }
+            return '';
+        }
+
+        // —— 结算 ——
+        function qiyuApply(s, eventId) {
+            const P = gameState.player;
+            switch (s.t) {
+                case 'yield': {
+                    const lost = [];
+                    s.y.items.forEach(it => { if (addToInventory(it.id, it.qty, true) === false) lost.push(it); });
+                    if (s.y.coins) P.coins += s.y.coins;
+                    addCurrency(s.y);
+                    return `获得 ${qiyuYieldText(s.y)}` + (lost.length ? `\n❌ 背包已满，${qiyuYieldText({ items: lost })} 未能获得` : '');
+                }
+                case 'cult': {
+                    const cap = GAME_CONFIG.realms[P.realmIndex].nextReq;
+                    const before = P.cultivationXP;
+                    P.cultivationXP = Math.min(cap, before + s.n);
+                    checkRealmStability();
+                    return `获得 ${fmtXP(P.cultivationXP - before)} 修为` + (P.cultivationXP >= cap ? '（已到本境界上限）' : '');
+                }
+                case 'fights': {
+                    const a = getAction('battle', s.area);
+                    if (!a || !isBattleAreaUnlocked(a)) return `「${qiyuAreaName(s.area)}」现在进不去，这桩机缘落空了`;
+                    const sum = { coins: 0, exp: 0, danhuo: 0, shenshi: 0, daoguo: 0 }, drops = {}, lostDrops = {};
+                    for (let i = 0; i < s.n; i++) {
+                        const g = grantNormalBattleWin(s.area);
+                        sum.coins += g.coins; sum.exp += g.exp;
+                        sum.danhuo += g.danhuo || 0; sum.shenshi += g.shenshi || 0; sum.daoguo += g.daoguo || 0;
+                        mergeDrops(drops, g.items); mergeDrops(lostDrops, g.lost || []);
+                    }
+                    addCurrency(sum);
+                    const curText = ['danhuo', 'shenshi', 'daoguo'].filter(k => sum[k]).map(k => ` +${fmtXP(sum[k])}${CURRENCY_NAMES[k]}`).join('');
+                    return `+${fmtXP(sum.coins)}灵石 +${fmtXP(sum.exp)}战斗经验${curText}` +
+                        (Object.keys(drops).length ? `\n🎁 ${formatDropList(dropMapToList(drops))}` : '') +
+                        (Object.keys(lostDrops).length ? `\n❌ 背包已满，${formatDropList(dropMapToList(lostDrops))} 未能获得` : '');
+                }
+                case 'mastery': addMasteryExp(s.skill, s.key, s.n); return qiyuSpecText(s);
+                case 'skillexp': addSkillExp(s.skill, s.n); return qiyuSpecText(s);
+                case 'buff': {
+                    const q = getQiyu(), now = Date.now(), ms = s.hours * 3600 * 1000;
+                    const same = q.buffs.find(b => b.key === s.key && b.value === s.value && b.until > now);
+                    if (same) same.until += ms;
+                    else q.buffs.push({ key: s.key, value: s.value, from: now, until: now + ms, label: s.label });
+                    return qiyuSpecText(s);
+                }
+                case 'food': {
+                    let n = 0;
+                    P.inventory.forEach(it => {
+                        if ((GAME_CONFIG.items[it.id] || {}).type !== 'food' || it.qty <= 1) return;
+                        const lose = Math.min(it.qty - 1, Math.floor(it.qty * s.rate));
+                        it.qty -= lose; n += lose;
+                    });
+                    return n ? `丢失 ${n} 份战斗食物` : '没有丢失食物';
+                }
+                case 'risk': {
+                    const q = getQiyu();
+                    if (Math.random() < s.p) {
+                        delete q.loosen[eventId];
+                        return `✓ 成功！${qiyuApply(s.win, eventId)}`;
+                    }
+                    q.loosen[eventId] = (q.loosen[eventId] || 0) + 1;
+                    return `✗ 失败。${s.fail ? qiyuApply(s.fail, eventId) : '没有损失'}；下次遇到成功率 +${Math.round(QIYU_LOOSEN_STEP * 100)}%`;
+                }
+            }
+            return '';
+        }
+
+        function chooseQiyu(index, optIndex) {
+            const q = getQiyu();
+            const ev = q.pending[index];
+            if (!ev) return;
+            const def = QIYU_EVENTS[ev.id];
+            q.pending.splice(index, 1);
+            if (optIndex < 0) {
+                showNotification(`${def ? def.icon + ' ' + def.name : '奇遇'}：已离开，这桩奇遇就此消失`, '#b89a5b');
+            } else {
+                const opt = ev.opts[optIndex];
+                if (!opt) return;
+                const result = qiyuApply(opt.spec, ev.id);
+                calculateStats();
+                showNotification(`${def ? def.icon + ' ' + def.name : '奇遇'} · ${opt.label}\n${result}`, '#c2a25f', 'rare');
+            }
+            refreshQiyuViews();
+            updateUI();
+            saveGame();
+        }
+
+        // —— 界面 ——
+        function qiyuCardsHtml() {
+            const q = getQiyu();
+            if (!q.pending.length) return '<div class="qiyu-empty">眼下没有待处理的奇遇。</div>';
+            return q.pending.map((ev, i) => {
+                const def = QIYU_EVENTS[ev.id] || { icon: '❔', name: '奇遇', cat: 'cult' };
+                const where = ev.skill === 'battle' ? `在「${qiyuAreaName(ev.action)}」战斗时` : `${qiyuSkillName(ev.skill)}时`;
+                const opts = ev.opts.map((o, j) => `<button type="button" class="qiyu-opt" onclick="chooseQiyu(${i}, ${j})"><span class="qiyu-opt-label">${o.label}</span><span class="qiyu-opt-desc">${qiyuSpecText(o.spec)}</span></button>`).join('');
+                return `<div class="qiyu-card"><div class="qiyu-head"><span class="qiyu-ico">${def.icon}</span><span class="qiyu-name">${def.name}</span><span class="qiyu-where">${where}遇到</span></div>
+                    <div class="qiyu-opts">${opts}<button type="button" class="qiyu-opt qiyu-leave" onclick="chooseQiyu(${i}, -1)"><span class="qiyu-opt-label">离开</span><span class="qiyu-opt-desc">无事发生，这桩奇遇就此消失</span></button></div></div>`;
+            }).join('');
+        }
+        function qiyuBuffsHtml() {
+            const list = qiyuActiveBuffs();
+            if (!list.length) return '';
+            const now = Date.now();
+            const fmt = ms => { const m = Math.ceil(ms / 60000); return m >= 60 ? `${Math.floor(m / 60)} 小时 ${m % 60} 分` : `${m} 分钟`; };
+            return `<div class="qiyu-sub">生效中的机缘</div><div class="qiyu-buffs">` +
+                list.map(b => `<div class="qiyu-buff${b.value < 0 ? ' neg' : ''}"><span>${b.label}</span><span class="qiyu-buff-left">剩 ${fmt(b.until - now)}</span></div>`).join('') + `</div>`;
+        }
+        function renderQiyuModal() {
+            const el = document.getElementById('qiyuContent');
+            if (!el) return;
+            const q = getQiyu();
+            el.innerHTML = `<div class="qiyu-sub">待处理（${q.pending.length}/${QIYU_MAX_PENDING}）</div>${qiyuCardsHtml()}${qiyuBuffsHtml()}
+                <div class="qiyu-note">修炼、做生活技能或战斗时会遇到奇遇：在线平均每 1.5 小时一桩，离线平均每 2 小时一桩，最多积攒 ${QIYU_MAX_PENDING} 桩，攒满后不再遇到新的。限时机缘按现实时间计时，离线期间照常生效。</div>`;
+        }
+        function isQiyuModalOpen() { const m = document.getElementById('qiyuModal'); return !!(m && m.classList.contains('show')); }
+        function openQiyuModal() {
+            renderQiyuModal();
+            document.getElementById('qiyuModal').classList.add('show');
+        }
+        function closeQiyuModal() {
+            document.getElementById('qiyuModal').classList.remove('show');
+        }
+        function renderQiyuSeal() {
+            const seal = document.getElementById('qiyuSeal');
+            if (!seal) return;
+            const q = gameState && gameState.qiyu;
+            const n = q ? q.pending.length : 0;
+            const show = gameRunning && !!q && (n > 0 || qiyuActiveBuffs().length > 0);
+            seal.hidden = !show;
+            if (!show) return;
+            const cnt = document.getElementById('qiyuSealCount');
+            cnt.textContent = n || '';
+            cnt.hidden = !n;
+            seal.classList.toggle('has-new', n > 0);
+            seal.title = n ? `奇遇：${n} 桩待处理` : '奇遇：查看生效中的机缘';
+        }
+        function refreshQiyuViews() {
+            renderQiyuSeal();
+            if (isQiyuModalOpen()) renderQiyuModal();
+            const off = document.getElementById('offlineQiyu');
+            if (off) {
+                if (getQiyu().pending.length) off.querySelector('.qiyu-list').innerHTML = qiyuCardsHtml();
+                else off.remove();
+            }
+        }
+        // 离线回来：结算窗开着就把奇遇卡片放在结算窗最上面，否则单独弹出奇遇窗
+        function qiyuAnnounceOffline(gained) {
+            renderQiyuSeal();
+            const modal = document.getElementById('offlineModal');
+            const content = document.getElementById('offlineContent');
+            if (modal && content && modal.classList.contains('show')) {
+                const old = document.getElementById('offlineQiyu');
+                if (old) old.remove();
+                content.insertAdjacentHTML('afterbegin', `<div id="offlineQiyu" class="offline-qiyu"><div class="qiyu-sub">途中遇到 ${gained} 桩奇遇（可以现在选，也可以稍后点右下角的「缘」）</div><div class="qiyu-list">${qiyuCardsHtml()}</div></div>`);
+            } else {
+                openQiyuModal();
+            }
         }
 
         // ==================== 自动战斗托管 ====================
@@ -5888,6 +6300,7 @@
                 gameState.player.foodUseTimer = savedTimer;
             }
             auto.wins += r.wins; auto.losses += r.losses; auto.coins += r.coins; auto.exp += r.exp; auto.streak = streak;
+            if (r.wins > 0) qiyuNoteFightSec(elapsed / r.wins);
             r.elapsed = Math.round(elapsed);
             return r;
         }
@@ -6879,6 +7292,7 @@
             total += getAvatarMod(key);   // 化神期身外化身：永久小幅 +攻击/防御
             total += getXianMod(key);   // 真仙：道体（每个亮着的仙窍生命 / 防御 +1%）与三衰
             total += getEndlessMod(key);   // 大乘以后的无上限修炼：器灵温养 / 神魂参悟 / 本源温养
+            total += getQiyuMod(key);   // 奇遇的限时机缘
             return total;
         }
 
@@ -12213,7 +12627,19 @@
         }
 
         // quietUnder：离开时间小于该秒数且无特殊情况时，只结算收益、不弹结算窗（用于切换标签页）
+        // 离线结算外层：结算期间让奇遇机缘按与离线时段的重叠比例生效，结算完按离线时长补遇奇遇
         function handleOfflineTime(quietUnder = 0) {
+            const from = gameState.lastActiveTime, act = qiyuActivity();
+            const secs = Math.min(Math.max(0, (Date.now() - from) / 1000), (gameState.settings?.maxOfflineHours || 24) * 3600);
+            const before = getQiyu().pending.length;
+            qiyuSettleWindow = secs > 0 ? { from, to: from + secs * 1000 } : null;
+            try { handleOfflineTimeInner(quietUnder); } finally { qiyuSettleWindow = null; }
+            if (act && secs >= 1) qiyuOfflineRoll(act, secs);
+            const gained = getQiyu().pending.length - before;
+            if (gained > 0) qiyuAnnounceOffline(gained);
+            else renderQiyuSeal();
+        }
+        function handleOfflineTimeInner(quietUnder = 0) {
             const now = Date.now();
             const lastActive = gameState.lastActiveTime;
             const offlineSeconds = (now - lastActive) / 1000;
@@ -13085,10 +13511,13 @@
                 handleOfflineTime(60);   // 循环战斗：后台期间按离线规则模拟战斗
             } else if (action && (action.isBattle || action.isDungeon)) {
                 const awaySecs = (Date.now() - gameState.lastActiveTime) / 1000;
-                settleCloneOffline(awaySecs);   // 主角在战斗时，分身与第二块田仍按离线结算
-                settleFarmPlotOffline(awaySecs);
-                settleSmallWorldOffline(awaySecs);
-                decayErosion(awaySecs);
+                qiyuSettleWindow = awaySecs > 0 ? { from: gameState.lastActiveTime, to: Date.now() } : null;
+                try {
+                    settleCloneOffline(awaySecs);   // 主角在战斗时，分身与第二块田仍按离线结算
+                    settleFarmPlotOffline(awaySecs);
+                    settleSmallWorldOffline(awaySecs);
+                    decayErosion(awaySecs);
+                } finally { qiyuSettleWindow = null; }
                 gameState.lastActiveTime = Date.now();
             } else {
                 handleOfflineTime(60);
