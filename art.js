@@ -326,12 +326,39 @@ const BattleArt = (() => {
         return `<svg class="fx-burst-lines" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><g stroke="${color}">${lines}</g></svg>`;
     }
     // ---------------- 开始界面主视觉：山水 + 立于崖上的修士 + 毛笔大字标题 ----------------
+    // opts.title / opts.sub 换掉标题和副标题（试玩结束页用）
     function startHero(root = 'wood', opts = {}) {
         return `<div class="start-hero">
             <div class="sh-bg">${scene(opts.tier || 'cultist')}</div>
             <div class="sh-figure">${player(root)}</div>
-            <div class="sh-text"><div class="sh-title">散修长生录${opts.demo ? '<small>试玩版</small>' : ''}</div><div class="sh-sub">一介散修　问道长生</div></div>
+            <div class="sh-text"><div class="sh-title">${opts.title || '散修长生录'}${opts.demo ? '<small>试玩版</small>' : ''}</div><div class="sh-sub">${opts.sub || '一介散修　问道长生'}</div></div>
         </div>`;
+    }
+    // ---------------- 新手教程的引路老者：白发白须、拄杖挂葫芦，和玩家同一套墨色剪影 + 淡金描边 ----------------
+    function elder() {
+        const u = ++uid, c = '#e8d9a8', W = '#f3eee2';
+        return svg('0 0 124 160', `${defs(u, c)}
+            ${aura(u, 60, 100, 44, 58, 152, 34)}
+            <g filter="url(#rim${u})" fill="url(#ink${u})">
+                <path d="M47 46 L71 46 Q80 68 84 98 Q88 128 99 151 L22 151 Q33 128 37 98 Q41 68 47 46 Z"/>
+                <path d="M47 50 Q31 60 25 84 Q21 98 27 108 Q33 100 41 98 Q45 80 51 66 Z"/>
+                <path d="M70 52 Q83 57 90 68 L87 75 Q79 67 70 64 Z"/>
+                <path d="M52 30 Q52 18 61 17 Q70 17 71 26 Q74 30 72 34 Q70 42 61 43 Q54 42 52 30 Z"/>
+                <path d="M93.5 20 L96.5 20 L99 157 L95.5 157 Z"/>
+            </g>
+            <ellipse cx="60" cy="15" rx="8" ry="6" fill="${W}"/>
+            <path d="M52 15 L70 12" stroke="${c}" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M53 25 Q50 34 52 40 Q54 34 56 30 Z" fill="${W}"/>
+            <path d="M57 37 Q55 54 60 76 Q62 60 64 50 Q66 58 66 66 Q70 52 67 37 Q62 41 57 37 Z" fill="${W}"/>
+            <path d="M61 27 Q65 25.5 69 27.5" stroke="${W}" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            <path d="M62.5 30.5 Q65 31.6 67.5 30.6" stroke="${W}" stroke-width="1.1" stroke-linecap="round" fill="none" opacity=".85"/>
+            <circle cx="91" cy="73" r="3.6" fill="${INK2}"/>
+            <g fill="#b8862a" stroke="${INK}" stroke-width="1.2"><circle cx="91" cy="31" r="5.2"/><circle cx="91" cy="22.5" r="3.6"/></g>
+            <path d="M94 26 Q90 28 91 31" stroke="#a8322a" stroke-width="1.4" fill="none"/>
+            <g stroke="${FOLD}" stroke-width="1.3" fill="none" stroke-linecap="round">
+                <path d="M55 70 Q56 100 51 128"/><path d="M68 72 Q71 104 79 134"/><path d="M40 118 Q35 134 30 146"/><path d="M33 80 Q30 92 29 102"/>
+            </g>
+            <path d="M44 88 Q60 92 77 88" stroke="${c}" stroke-width="2.2" fill="none" opacity=".85"/>`, 'bs-elder-art');
     }
     // ---------------- Boss 登场：左右斜切的两格分镜对峙，中间 VS，Boss 一侧配名字与一句台词 ----------------
     function versus(o) {
@@ -361,5 +388,5 @@ const BattleArt = (() => {
             ${opts.caption ? `<div class="pt-caption">${opts.caption}</div>` : ''}
         </div>`;
     }
-    return { player, enemy, scene, tierOf, meditator, burstLines, startHero, versus, portrait, archetypeOf, colorOf, slash, speedLines, stamp, claw, lightning, nascent, inkBurst, ELEMENT, ROOT };
+    return { player, enemy, scene, tierOf, meditator, burstLines, startHero, elder, versus, portrait, archetypeOf, colorOf, slash, speedLines, stamp, claw, lightning, nascent, inkBurst, ELEMENT, ROOT };
 })();

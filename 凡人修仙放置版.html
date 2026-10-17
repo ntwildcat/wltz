@@ -16,7 +16,7 @@
             var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', THEMES[t]);
         })();
     </script>
-    <link rel="stylesheet" href="style.css?v=13.72">
+    <link rel="stylesheet" href="style.css?v=13.77">
 
 </head>
 <body data-panel="cultivation">
@@ -416,7 +416,7 @@
                             </div>
 
                             <!-- 战斗日志 -->
-                            <div class="battle-log-hint">战斗日志（保留最近 30 条，可上下滚动查看）</div>
+                            <div class="battle-log-hint"><span class="blh-title">战报</span>保留最近 30 条，可上下滚动查看</div>
                             <div id="battleLog" class="battle-log" tabindex="0" aria-label="战斗日志，可上下滚动"></div>
 
                             <!-- 食物快捷栏与速度控制 -->
@@ -600,7 +600,7 @@
                         </div>
 
                         <!-- 境界感悟：原著境界描述、寿元、神通、资质与金丹品质 -->
-                        <div class="stat-panel">
+                        <div class="stat-panel lore-journal">
                             <div class="stat-title">📜 境界感悟</div>
                             <div id="realmLoreBox" style="font-size: 0.85em; line-height: 1.7; color: var(--text-l3);"></div>
                         </div>
@@ -674,11 +674,11 @@
     <!-- 物品详情弹窗（P1功能）-->
     <!-- 购买数量对话框 -->
     <div id="buyModal" class="modal" style="display: none;">
-        <div class="modal-content" role="dialog" aria-modal="true" style="max-width: 380px; padding: 30px;">
+        <div class="modal-content codex-modal" role="dialog" aria-modal="true" style="max-width: 380px; padding: 30px;">
             <button type="button" class="modal-close" onclick="closeBuyDialog()" aria-label="关闭">&times;</button>
             <div style="text-align: center; margin-bottom: 16px;">
-                <div style="font-size: 44px; margin-bottom: 8px;" id="buyIcon">📦</div>
-                <div style="font-size: 1.2em; color: var(--jade); font-weight: bold;" id="buyName">商品</div>
+                <div class="codex-icon" style="font-size: 44px; margin-bottom: 8px;" id="buyIcon">📦</div>
+                <div class="codex-name" style="font-size: 1.2em; color: var(--jade); font-weight: bold;" id="buyName">商品</div>
                 <div style="color: var(--text-l4); font-size: 0.85em; margin-top: 4px;" id="buyDesc"></div>
             </div>
             <div style="background: var(--bg-sunken); padding: 12px 15px; border-radius: 4px; margin-bottom: 14px; line-height: 1.8em;">
@@ -699,11 +699,12 @@
     </div>
 
     <div id="itemDetailModal" class="modal" style="display: none;">
-        <div class="modal-content" role="dialog" aria-modal="true" style="max-width: 400px; padding: 30px;">
+        <div class="modal-content codex-modal" role="dialog" aria-modal="true" style="max-width: 400px; padding: 30px;">
             <button type="button" class="modal-close" onclick="closeItemDetail()" aria-label="关闭">&times;</button>
             <div style="text-align: center; margin-bottom: 20px;">
-                <div style="font-size: 48px; margin-bottom: 10px;" id="itemIcon">📦</div>
-                <div style="font-size: 1.2em; color: var(--jade); font-weight: bold;" id="itemName">物品名称</div>
+                <div class="codex-icon" style="font-size: 48px; margin-bottom: 10px;" id="itemIcon">📦</div>
+                <div class="codex-name" style="font-size: 1.2em; color: var(--jade); font-weight: bold;" id="itemName">物品名称</div>
+                <div class="codex-type" id="itemTypeSeal"></div>
             </div>
             <div style="background: var(--bg-sunken); padding: 15px; border-radius: 4px; margin-bottom: 15px;">
                 <div style="color: var(--text-l4); font-size: 0.9em; margin-bottom: 8px;">📝 物品信息</div>
@@ -734,18 +735,16 @@
 
     <!-- 突破模态框 -->
     <div id="breakthroughModal" class="modal">
-        <div class="modal-content" role="dialog" aria-modal="true">
+        <div class="modal-content talisman-modal" role="dialog" aria-modal="true">
             <button type="button" class="modal-close" onclick="closeBreakthroughModal()" aria-label="关闭">&times;</button>
-            <div class="modal-title" id="btModalTitle">✨ 突破修为 ✨</div>
+            <div class="modal-title" id="btModalTitle">突破修为</div>
+            <div class="bt-realms">
+                <span class="bt-realm" id="btCurrentRealm" title="当前境界">-</span>
+                <span class="bt-arrow" aria-hidden="true"></span>
+                <span class="bt-realm next" id="btNextRealm" title="下一境界">-</span>
+                <span class="bt-rate" id="btRateSeal" hidden></span>
+            </div>
             <div class="stat-panel" style="margin-bottom: 20px;">
-                <div class="stat-row">
-                    <span class="stat-label">当前境界:</span>
-                    <span class="stat-value" id="btCurrentRealm">-</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">下一境界:</span>
-                    <span class="stat-value" id="btNextRealm">-</span>
-                </div>
                 <div class="stat-row">
                     <span class="stat-label">突破方式:</span>
                     <span class="stat-value" id="btBreakthroughType">自然突破</span>
@@ -800,9 +799,9 @@
 
     <!-- 功法切换模态框 -->
     <div id="artSwitchModal" class="modal">
-        <div class="modal-content" role="dialog" aria-modal="true" style="max-width: 500px;">
+        <div class="modal-content art-switch-modal" role="dialog" aria-modal="true" style="max-width: 500px;">
             <button type="button" class="modal-close" onclick="closeArtSwitchModal()" aria-label="关闭">&times;</button>
-            <div class="modal-title">📜 选择功法</div>
+            <div class="modal-title">选择功法</div>
             <div id="artSwitchList" style="max-height: 400px; overflow-y: auto;"></div>
             <button class="btn" onclick="closeArtSwitchModal()" style="width: 100%; margin-top: 15px;">关闭</button>
         </div>
@@ -826,9 +825,10 @@
     </div>
 
     <div id="counterSystemModal" class="modal">
-        <div class="modal-content" role="dialog" aria-modal="true" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+        <div class="modal-content counter-modal" role="dialog" aria-modal="true" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
             <button type="button" class="modal-close" onclick="closeCounterSystemModal()" aria-label="关闭">&times;</button>
-            <div class="modal-title">⚡ 灵根克制系统 ⚡</div>
+            <div class="modal-title">灵根克制</div>
+            <div id="counterRing" class="counter-ring"></div>
 
             <div class="stat-panel">
                 <div class="stat-row" style="background: rgba(111,156,138,0.1); padding: 15px; margin-bottom: 15px; border-radius: 4px;">
@@ -864,8 +864,8 @@
         </div>
     </div>
 
-    <script src="art.js?v=1.4"></script>
-    <script src="game.js?v=14.35"></script>
+    <script src="art.js?v=1.5"></script>
+    <script src="game.js?v=14.41"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

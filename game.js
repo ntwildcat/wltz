@@ -502,52 +502,55 @@
                     monsters: [{ name: '心魔', type: '无', hp: 1000, atk: 100, spd: 50, def: 30, attackSpeed: 2.5, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { skillExp: 300 }
                 },
+                // 天劫 / 三衰 / 三尸 / 证道的出手间隔 interval（v7.30 由 1.0 改 1.1）：以前秘境计时到点清零，0.1 秒累加的浮点误差让「1.0 秒」实际是 1.1 秒出手一次，
+                // 这些关卡的 hitFrac / hpMult 都是在 1.1 秒的节奏下标定的。修好计时后按原来实际的节奏写成 1.1，难度不变。
+                // 玩家自己的出手以前也被向上取到 0.1 秒的整数倍，修好后标准玩家在各劫的出手快了 1%～9%，hpMult 按同样比例补回（同一标准玩家新旧各跑 100 次核对过胜率）
                 tribulation24: {
                     id: 'tribulation24', name: '第一次小天劫', desc: '元婴初成，第一道小天劫便已降下——照着你此刻的实力，备足食物再渡', icon: '⚡',
                     isTribulation: true, kind: 'small', tribulationRealm: 24, minRealmIndex: 24, baseRealmIndex: 24,
-                    mirror: { hpMult: 1.5, hitFrac: 0.14, interval: 1.0 },
+                    mirror: { hpMult: 1.59, hitFrac: 0.14, interval: 1.1 },
                     monsters: [{ name: '劫云傀儡', type: '无', hp: 5000, atk: 500, spd: 60, def: 80, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [30000, 50000], shenshi: [60, 100], skillExp: 400 }
                 },
                 tribulation26: {
                     id: 'tribulation26', name: '第二次小天劫', desc: '劫云再聚，比上一次更重', icon: '⚡',
                     isTribulation: true, kind: 'small', tribulationRealm: 26, minRealmIndex: 26, baseRealmIndex: 26,
-                    mirror: { hpMult: 1.75, hitFrac: 0.15, interval: 1.0 },
+                    mirror: { hpMult: 1.89, hitFrac: 0.15, interval: 1.1 },
                     monsters: [{ name: '雷劫化身', type: '无', hp: 5000, atk: 500, spd: 60, def: 80, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [100000, 150000], shenshi: [100, 160], skillExp: 600 }
                 },
                 tribulation28: {
                     id: 'tribulation28', name: '第三次小天劫', desc: '凡界最后一道小天劫，渡过之后便是飞升上界', icon: '🌩️',
                     isTribulation: true, kind: 'small', tribulationRealm: 28, minRealmIndex: 28, baseRealmIndex: 28,
-                    mirror: { hpMult: 2, hitFrac: 0.17, interval: 1.0 },
+                    mirror: { hpMult: 2.02, hitFrac: 0.17, interval: 1.1 },
                     monsters: [{ name: '雷劫化身', type: '无', hp: 5000, atk: 500, spd: 60, def: 80, attackSpeed: 2.2, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [250000, 350000], shenshi: [150, 240], skillExp: 800 }
                 },
                 tribulation33: {
                     id: 'tribulation33', name: '第一次大天劫', desc: '炼虚之后的大天劫，威能远胜小天劫；寿元再长，也躲不过劫数', icon: '☄️',
                     isTribulation: true, kind: 'big', tribulationRealm: 33, minRealmIndex: 33, baseRealmIndex: 33,
-                    mirror: { hpMult: 2, hitFrac: 0.195, interval: 1.0 },
+                    mirror: { hpMult: 2.1, hitFrac: 0.195, interval: 1.1 },
                     monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [800000, 1200000], shenshi: [250, 400], skillExp: 1300 }
                 },
                 tribulation37: {
                     id: 'tribulation37', name: '第二次大天劫', desc: '大劫再临，劫数更凶', icon: '☄️',
                     isTribulation: true, kind: 'big', tribulationRealm: 37, minRealmIndex: 37, baseRealmIndex: 37,
-                    mirror: { hpMult: 2.25, hitFrac: 0.25, interval: 1.0 },
+                    mirror: { hpMult: 2.43, hitFrac: 0.25, interval: 1.1 },
                     monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [4000000, 6000000], daoguo: [150, 250], skillExp: 2000 }
                 },
                 tribulation39: {
                     id: 'tribulation39', name: '第三次大天劫', desc: '大乘修士也躲不过的大天劫', icon: '☄️',
                     isTribulation: true, kind: 'big', tribulationRealm: 39, minRealmIndex: 39, baseRealmIndex: 39,
-                    mirror: { hpMult: 2.5, hitFrac: 0.29, interval: 1.0 },
+                    mirror: { hpMult: 2.73, hitFrac: 0.29, interval: 1.1 },
                     monsters: [{ name: '大天劫化身', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [15000000, 22000000], daoguo: [250, 400], skillExp: 3000 }
                 },
                 tribulation41: {
                     id: 'tribulation41', name: '飞升天劫', desc: '飞升之劫，九死一生——渡过之后体内灵气才能化为仙元', icon: '🌌',
                     isTribulation: true, kind: 'big', tribulationRealm: 41, minRealmIndex: 41, baseRealmIndex: 41,
-                    mirror: { hpMult: 2.5, hitFrac: 0.32, interval: 1.0 },
+                    mirror: { hpMult: 2.53, hitFrac: 0.32, interval: 1.1 },
                     monsters: [{ name: '飞升劫雷', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [40000000, 60000000], daoguo: [400, 600], skillExp: 5000 }
                 },
@@ -557,21 +560,21 @@
                 shuaiXian: {
                     id: 'shuaiXian', name: '元衰', desc: '仙元自行外泄，打通仙穴越来越慢', icon: '🥀',
                     isTribulation: true, isShuai: true, minRealmIndex: 42, baseRealmIndex: 42,
-                    mirror: { hpMult: 2.5, hitFrac: 0.24, interval: 1.0 },
+                    mirror: { hpMult: 2.7, hitFrac: 0.24, interval: 1.1 },
                     monsters: [{ name: '元衰之气', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [20000000, 30000000], daoguo: [200, 300], skillExp: 3000 }
                 },
                 shuaiQiao: {
                     id: 'shuaiQiao', name: '穴衰', desc: '新开的仙穴黯淡无光，道体失去支撑', icon: '🕳️',
                     isTribulation: true, isShuai: true, minRealmIndex: 42, baseRealmIndex: 42,
-                    mirror: { hpMult: 2.5, hitFrac: 0.24, interval: 1.0 },
+                    mirror: { hpMult: 2.7, hitFrac: 0.24, interval: 1.1 },
                     monsters: [{ name: '穴衰之影', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [20000000, 30000000], daoguo: [200, 300], skillExp: 3000 }
                 },
                 shuaiShen: {
                     id: 'shuaiShen', name: '体衰', desc: '道体衰败，生命、攻击、防御一齐下滑', icon: '🍂',
                     isTribulation: true, isShuai: true, minRealmIndex: 42, baseRealmIndex: 42,
-                    mirror: { hpMult: 2.5, hitFrac: 0.24, interval: 1.0 },
+                    mirror: { hpMult: 2.7, hitFrac: 0.24, interval: 1.1 },
                     monsters: [{ name: '体衰之相', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [20000000, 30000000], daoguo: [200, 300], skillExp: 3000 }
                 },
@@ -582,14 +585,14 @@
                 shuaiHun: {
                     id: 'shuaiHun', name: '神衰', desc: '元神黯淡，元婴离体与法则之击一齐停摆', icon: '🌑',
                     isTribulation: true, isShuai: true, minRealmIndex: 44, baseRealmIndex: 44,
-                    mirror: { hpMult: 2.5, hitFrac: 0.25, interval: 1.0 },
+                    mirror: { hpMult: 2.65, hitFrac: 0.25, interval: 1.1 },
                     monsters: [{ name: '神衰之魇', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [40000000, 60000000], daoguo: [400, 600], skillExp: 5000 }
                 },
                 shuaiSha: {
                     id: 'shuaiSha', name: '戾衰', desc: '戾气自体内反噬，战斗中生命不断流失；渡衰失败还会折损仙穴', icon: '🩸',
                     isTribulation: true, isShuai: true, minRealmIndex: 44, baseRealmIndex: 44,
-                    mirror: { hpMult: 2.5, hitFrac: 0.33, interval: 1.0 },
+                    mirror: { hpMult: 2.65, hitFrac: 0.33, interval: 1.1 },
                     monsters: [{ name: '戾衰凶煞', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [40000000, 60000000], daoguo: [400, 600], skillExp: 5000 }
                 },
@@ -599,21 +602,21 @@
                 corpseShan: {
                     id: 'corpseShan', name: '善尸', desc: '执念于善的分身，以善念牵绊本体、欲取而代之', icon: '🕊️',
                     isTribulation: true, isShuai: true, minRealmIndex: 49, baseRealmIndex: 49,
-                    mirror: { hpMult: 2.5, hitFrac: 0.3, interval: 1.0 },
+                    mirror: { hpMult: 2.6, hitFrac: 0.3, interval: 1.1 },
                     monsters: [{ name: '善尸', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [80000000, 120000000], daoguo: [700, 1000], skillExp: 7000 }
                 },
                 corpseE: {
                     id: 'corpseE', name: '恶尸', desc: '执念于恶的分身，噬心夺魄，一心夺舍本体', icon: '👹',
                     isTribulation: true, isShuai: true, minRealmIndex: 49, baseRealmIndex: 49,
-                    mirror: { hpMult: 2.5, hitFrac: 0.33, interval: 1.0 },
+                    mirror: { hpMult: 2.6, hitFrac: 0.33, interval: 1.1 },
                     monsters: [{ name: '恶尸', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [80000000, 120000000], daoguo: [700, 1000], skillExp: 7000 }
                 },
                 corpseWo: {
                     id: 'corpseWo', name: '自我尸', desc: '执念于自我的分身，与本体最像、也最想成为本体', icon: '🪞',
                     isTribulation: true, isShuai: true, minRealmIndex: 49, baseRealmIndex: 49,
-                    mirror: { hpMult: 2.5, hitFrac: 0.40, interval: 1.0 },
+                    mirror: { hpMult: 2.6, hitFrac: 0.40, interval: 1.1 },
                     monsters: [{ name: '自我尸', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [80000000, 120000000], daoguo: [700, 1000], skillExp: 7000 }
                 },
@@ -623,7 +626,7 @@
                 zhengdao: {
                     id: 'zhengdao', name: '证道之战', desc: '灭杀这条法则的现任道祖，取而代之', icon: '⚖️',
                     isTribulation: true, minRealmIndex: 49, baseRealmIndex: 50,
-                    mirror: { hpMult: 12, hitFrac: 0.42, interval: 1.0 },
+                    mirror: { hpMult: 12.5, hitFrac: 0.42, interval: 1.1 },
                     monsters: [{ name: '道祖', type: '无', hp: 5800, atk: 660, spd: 88, def: 140, attackSpeed: 2.6, isBoss: true, drop: 'coins', dropQty: 0 }],
                     rewards: { coins: [200000000, 300000000], daoguo: [1500, 2200], skillExp: 10000 }
                 }
@@ -1972,13 +1975,18 @@
             const voidHave = (gameState.player.inventory.find(i => i.id === 'voidcrystal') || { qty: 0 }).qty;
             if (P.daoguo < daoguoCost) { spendNotify('daoguo', daoguoCost); return; }
             if (voidHave < voidCost) { showNotification(`虚晶不足：需要 ${voidCost}，现有 ${voidHave}`, '#c4483a', 'error'); return; }
+            const daozeId = daozeItemId(lawId, tier + 1);
+            if (!inventoryCanHold([daozeId], voidHave === voidCost ? ['voidcrystal'] : [])) {
+                showNotification('❌ 背包已满，化出的道则放不下：先出售或整理出一格再化虚', '#c4483a', 'error');
+                return;
+            }
             const tierName = DAOZE_TIER_NAMES[tier];
             const ok = confirm(`确定要化虚吗？\n\n消耗 ${def.name} ${levelCost} 级（Lv.${info.level} → Lv.${info.level - levelCost}）+ 道果 ${daoguoCost} + 虚晶 ${voidCost}\n\n获得：${tierName}${daoze.name} ×1（可在「装备」界面的道基槽镶嵌）\n\n法则等级可以再参悟回来，不是不可逆。`);
             if (!ok) return;
             consumeLawLevels(lawId, levelCost);
             P.daoguo -= daoguoCost;
             consumeItem('voidcrystal', voidCost);
-            addToInventory(daozeItemId(lawId, tier + 1), 1, true);
+            addToInventory(daozeId, 1, true);
             showNotification(`☯️ 化虚成功：获得${tierName}${daoze.name} ×1`, '#6f9c8a');
             calculateStats();
             updateUI();
@@ -2463,6 +2471,7 @@
         function tickSmallWorld() { if (gameState.player.realmIndex >= TAIYI_REALM) settleSmallWorld(0.1); }
         function settleSmallWorldOffline(seconds) {
             if (gameState.player.realmIndex < TAIYI_REALM) return;
+            seconds = Math.min(seconds, (gameState.settings?.maxOfflineHours || 24) * 3600);   // 与主角 / 分身一样受离线上限（v7.30，以前离开多久算多久）
             const got = settleSmallWorld(seconds);
             if (!got || !Object.keys(got).length) return;
             const parts = [];
@@ -2809,9 +2818,12 @@
             tutorialStep = Math.max(0, Math.min(TUTORIAL_STEPS.length - 1, step));
             const t = TUTORIAL_STEPS[tutorialStep];
             const last = tutorialStep === TUTORIAL_STEPS.length - 1;
+            const elder = typeof BattleArt !== 'undefined';
+            skinModal('tutorialModal', elder ? 'guide' : '');
+            const talk = `<div class="tutorial-title">${t.title}</div>
+                <div class="tutorial-body">${t.body}</div>`;
             document.getElementById('tutorialContent').innerHTML = `
-                <div class="tutorial-title">${t.title}</div>
-                <div class="tutorial-body">${t.body}</div>
+                ${elder ? `<div class="guide-wrap"><div class="guide-elder">${BattleArt.elder()}<div class="guide-name">引路人</div></div><div class="guide-bubble">${talk}</div></div>` : talk}
                 <div class="tutorial-dots">${TUTORIAL_STEPS.map((_, i) => `<i class="${i === tutorialStep ? 'on' : ''}"></i>`).join('')}</div>
                 <div class="tutorial-actions">
                     ${tutorialStep > 0 ? '<button class="btn" onclick="showTutorial(tutorialStep - 1)">上一步</button>' : '<button class="btn tutorial-skip" onclick="closeTutorial()">跳过</button>'}
@@ -3241,11 +3253,18 @@
             (REALM_UNLOCKS[r] = REALM_UNLOCKS[r] || []).unshift(`${d.icon} 本境界修为满后，须先渡「${d.name}」才能突破（突破弹窗里进入）：${d.desc}`);
         });
 
+        // v7.29 弹窗换皮：境界解锁 / 教程 / 试玩结束共用两个弹窗，按内容在 .modal-content 上写 data-skin（journal 札记 / guide 引路 / demo-end），CSS 据此换外观
+        function skinModal(modalId, skin) {
+            const box = document.querySelector('#' + modalId + ' .modal-content');
+            if (!box) return;
+            if (skin) box.dataset.skin = skin; else delete box.dataset.skin;
+        }
         function showRealmUnlockModal(realmIndex) {
             const unlocks = REALM_UNLOCKS[realmIndex];
             if (!unlocks || !unlocks.length) return;
+            skinModal('realmUnlockModal', 'journal');
             document.getElementById('realmUnlockContent').innerHTML = `
-                <div class="tutorial-title">✨ ${getRealmName(realmIndex)} ✨</div>
+                <div class="tutorial-title">${getRealmName(realmIndex)}</div>
                 <div class="tutorial-body">新解锁：<br/><br/>${unlocks.map(u => `• ${u}`).join('<br/>')}</div>
                 <div class="tutorial-actions">
                     <button class="btn" onclick="closeRealmUnlockModal()">知道了</button>
@@ -3265,8 +3284,9 @@
                     <div class="use-effect">${REALM_UNLOCKS[idx].join('<br/>')}</div></div>
                 </div>`;
             }).join('');
+            skinModal('realmUnlockModal', 'journal');
             document.getElementById('realmUnlockContent').innerHTML = `
-                <div class="tutorial-title">📜 境界解锁一览</div>
+                <div class="tutorial-title">境界解锁一览</div>
                 <div style="max-height:55vh;overflow-y:auto;margin:12px 0;">${rows}</div>
                 <div class="tutorial-actions">
                     <button class="btn" onclick="closeRealmUnlockModal()">关闭</button>
@@ -3284,8 +3304,13 @@
         function isDemoCapped(realmIndex = gameState.player.realmIndex) { return isDemoEdition() && realmIndex >= DEMO_REALM_CAP; }
         function showDemoEndModal() {
             const canOpenStore = !!(DESKTOP && DESKTOP.openStore);
-            document.getElementById('realmUnlockContent').innerHTML = `
-                <div class="tutorial-title">🌄 试玩到此为止</div>
+            skinModal('realmUnlockModal', 'demo-end');
+            const ahead = ['化神', '炼虚', '合体', '大乘', '真仙', '金仙', '太乙', '大罗', '道祖'];
+            const hero = typeof BattleArt === 'undefined' ? ''
+                : `<div class="demo-hero">${BattleArt.startHero(gameState.player.spiritRoot, { tier: 'immortal', title: '前路未完', sub: `化神而上　尚有${cnNum(ahead.length)}境` })}</div>
+                   <div class="demo-seals">${ahead.map(n => `<span>${n}</span>`).join('')}</div>`;
+            document.getElementById('realmUnlockContent').innerHTML = `${hero}
+                <div class="tutorial-title">试玩到此为止</div>
                 <div class="tutorial-body">试玩版的内容到<b>${getRealmName(DEMO_REALM_CAP)}</b>为止。<br/><br/>
                     完整版还有化神、炼虚、合体、大乘、真仙、金仙、太乙、大罗直到道祖的全部境界，以及天劫、悟道法则、道则、合道、元婴离体、仙穴与衰相等后期玩法。<br/><br/>
                     <b>存档与完整版通用</b>：购买完整版后打开游戏，选择同一个存档即可接着修炼，试玩期间达成的成就也会一并记入。</div>
@@ -3529,9 +3554,10 @@
             el.style.display = '';
             el.className = 'quest-banner' + (complete ? ' complete' : '');
             el.innerHTML = `
+                <span class="quest-seal" aria-hidden="true">令</span>
                 <div class="quest-head">
-                    <span class="quest-tag">📜 新手任务 ${state.index + 1}/${NEWBIE_QUESTS.length}</span>
-                    <b class="quest-title">${quest.title}</b>
+                    <span class="quest-tag">新手任务 ${state.index + 1}/${NEWBIE_QUESTS.length}</span>
+                    <b class="quest-title">${quest.title}</b>${complete ? '<span class="quest-stamp" aria-hidden="true">成</span>' : ''}
                     <button type="button" class="quest-list-link" onclick="showQuestList()">全部任务</button>
                     <button type="button" class="quest-list-link quest-skip-link" onclick="skipQuests()">我是老玩家，跳过</button>
                 </div>
@@ -3558,6 +3584,10 @@
             if (!quest || !isQuestComplete(quest)) return;
             const state = getQuestState();
             const reward = quest.reward;
+            if (!inventoryCanHold((reward.items || []).map(i => i.id))) {
+                showNotification('❌ 背包已满，任务奖励放不下：先出售或整理出空格再领取', '#c4483a', 'error');
+                return;
+            }
             if (reward.coins) gameState.player.coins += reward.coins;
             (reward.items || []).forEach(i => addToInventory(i.id, i.qty));
             showNotification(`📜 任务完成：${quest.title}\n奖励 ${questRewardText(reward)}`, '#b89a5b');
@@ -3598,8 +3628,9 @@
                 const mark = state.skipped ? '⏭' : (i < state.index || state.done ? '✅' : (i === state.index ? '👉' : '⚪'));
                 return `<div class="quest-row${i === state.index && !state.done ? ' current' : ''}"><span>${mark} ${i + 1}. ${q.title}</span><small>${questRewardText(q.reward)}</small></div>`;
             }).join('');
+            skinModal('tutorialModal', 'journal');
             document.getElementById('tutorialContent').innerHTML = `
-                <div class="tutorial-title">📜 新手任务</div>
+                <div class="tutorial-title">新手任务</div>
                 <div class="tutorial-body quest-list">${rows}
                     <div class="quest-row final"><span>🎁 全部完成</span><small>${state.skipped ? '已跳过，没有奖励' : `${COIN_ICON} ${NEWBIE_FINAL_REWARD} 灵石 + 游戏目标介绍`}</small></div></div>
                 <div class="tutorial-actions"><button class="btn" onclick="closeTutorial()">关闭</button>${state.done ? '<button class="btn btn-secondary" onclick="showQuestGoal(false)">查看游戏目标</button>' : '<button class="btn btn-secondary quest-skip-btn" onclick="skipQuests()">我是老玩家，跳过任务</button>'}</div>`;
@@ -3611,8 +3642,9 @@
             const state = getQuestState();
             state.goalShown = true;
             const maxName = GAME_CONFIG.realms[GAME_CONFIG.realms.length - 1].name;
+            skinModal('tutorialModal', 'journal');
             document.getElementById('tutorialContent').innerHTML = `
-                <div class="tutorial-title">🎉 新手任务全部完成！</div>
+                <div class="tutorial-title">新手任务全部完成！</div>
                 <div class="tutorial-body">
                     ${justFinished ? `额外奖励 ${COIN_ICON} ${NEWBIE_FINAL_REWARD} 灵石已到账。<br/><br/>` : ''}
                     你已经把基础玩法都试过一遍了。接下来，这个游戏的目标是——<br/>
@@ -3681,6 +3713,7 @@
                 updateStatsDisplay();
             }, 50);
             gameRunning = true;
+            claimSlotOwnership();
 
             // 立即保存游戏（确保新创建的角色不会丢失）
             gameState.tutorialSeen = false;
@@ -3817,12 +3850,14 @@
                 }
                 c.progress += 0.1;
                 const duration = getCloneDuration(c.action.skill, action.duration, c.action.action);
-                if (c.progress >= duration) {
+                if (c.progress >= duration - PROGRESS_EPS) {
                     const fast = duration < FAST_ACTION_SECONDS;
+                    let ok;
                     if (fast) notifyMuted = true;
-                    try { completeAction(c.action, { double: getCloneDoubleBonus(), batch: fast }); } finally { notifyMuted = false; }
+                    try { ok = completeAction(c.action, { double: getCloneDoubleBonus(), batch: fast }); } finally { notifyMuted = false; }
                     if (fast) flushFastUI();
-                    c.progress = 0;
+                    if (ok === false) { stopClone(slot, true); return; }
+                    c.progress = Math.min(Math.max(0, c.progress - duration), duration);   // 保留零头（同主角）
                 }
                 tickCloneBar(slot, duration);
             });
@@ -3835,14 +3870,17 @@
             if (!isCloneUnlocked()) { bar.style.display = 'none'; return; }
             bar.style.display = 'block';
             const factor = getCloneFactor();
+            const root = gameState.player.spiritRoot;
+            const ghost = busy => typeof BattleArt === 'undefined' ? ''
+                : `<div class="cl-art cl-ghost${busy ? '' : ' idle'}" style="--c:${BattleArt.colorOf(root)}">${busy ? BattleArt.player(root, { sword: false }) : BattleArt.meditator(root)}</div>`;
             const rows = activeClones().map((c, slot) => {
                 const action = c.action ? getAction(c.action.skill, c.action.action) : null;
                 if (action) {
-                    return `<div class="clone-row"><div class="clone-bar-top"><span>🌀 分身${slot + 1}：<b>${action.name}</b></span><span id="cloneRemain${slot}"></span>
+                    return `<div class="clone-row has-art">${ghost(true)}<div class="cl-main"><div class="clone-bar-top"><span>🌀 分身${slot + 1}：<b>${action.name}</b></span><span id="cloneRemain${slot}"></span>
                         <button class="btn btn-secondary clone-stop" onclick="stopClone(${slot})">停止</button></div>
-                        <div class="progress-bar" style="height: 6px;"><div id="cloneFill${slot}" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div>`;
+                        <div class="progress-bar" style="height: 6px;"><div id="cloneFill${slot}" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div></div>`;
                 }
-                return `<div class="clone-row"><div class="clone-bar-top"><span>🌀 分身${slot + 1}空闲</span>${slot === 0 ? `<span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span>` : ''}</div></div>`;
+                return `<div class="clone-row has-art">${ghost(false)}<div class="cl-main"><div class="clone-bar-top"><span>🌀 分身${slot + 1}空闲</span>${slot === 0 ? `<span class="clone-hint">在生活技能的配方卡片上点「交给分身」（耗时 ×${factor.toFixed(2)}）</span>` : ''}</div></div></div>`;
             });
             bar.innerHTML = rows.join('');
         }
@@ -3877,17 +3915,23 @@
             if (!(duration > 0)) return;
             let n = Math.floor(budget / duration);
             let ranOut = false;
+            const owned = id => (gameState.player.inventory.find(i => i.id === id) || { qty: 0 }).qty;
+            let use = {};
             if (action.requires) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    const owned = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
-                    const affordable = Math.floor(owned / qty);
+                    const affordable = Math.floor(owned(itemId) / qty);
                     if (affordable < n) { n = affordable; ranOut = true; }
                 });
                 const saveRate = Math.min(0.9, getSkillMod('save', skill) + getMasteryBonus(skill, key).save);
-                Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    if (n > 0) consumeItem(itemId, Math.round(qty * n * (1 - saveRate)));
-                });
+                use = Object.fromEntries(Object.entries(action.requires).map(([itemId, qty]) => [itemId, Math.round(qty * n * (1 - saveRate))]));
             }
+            // 背包放不下产出：这段离线不结算、不扣材料，并停下
+            if (n > 0 && !inventoryCanHold(outputIdsOf(action), Object.keys(use).filter(id => use[id] >= owned(id)))) {
+                showNotification(`❌ ${label}：背包已满，${action.name}的产出放不下，离开期间没有结算（材料没有消耗），已停止`, '#c4483a', 'warning');
+                c.action = null; c.progress = 0; generateRecipeList(skill);
+                return;
+            }
+            if (n > 0) Object.entries(use).forEach(([itemId, q]) => consumeItem(itemId, q));
             if (n > 0) {
                 const per = JSON.parse(JSON.stringify(action.output));
                 applySkillLevelBonus(skill, per, 'raw');
@@ -3957,12 +4001,14 @@
             }
             f.progress += 0.1;
             const duration = getAdjustedDuration('farming', action.duration, f.action.action);
-            if (f.progress >= duration) {
+            if (f.progress >= duration - PROGRESS_EPS) {
                 const fast = duration < FAST_ACTION_SECONDS;
+                let ok;
                 if (fast) notifyMuted = true;
-                try { completeAction(f.action, { batch: fast }); } finally { notifyMuted = false; }
+                try { ok = completeAction(f.action, { batch: fast }); } finally { notifyMuted = false; }
                 if (fast) flushFastUI();
-                f.progress = 0;
+                if (ok === false) { stopFarmPlot(true); return; }
+                f.progress = Math.min(Math.max(0, f.progress - duration), duration);   // 保留零头（同主角）
             }
             tickPlotBar(duration);
         }
@@ -3974,11 +4020,28 @@
             bar.style.display = 'block';
             const f = getFarmPlot();
             const action = f.action ? getAction('farming', f.action.action) : null;
+            const art = `<div class="cl-art pf-field" id="plotArt" data-stage="${action ? 0 : 'empty'}">${plotFieldSvg()}</div>`;
             bar.innerHTML = action
-                ? `<div class="clone-row"><div class="clone-bar-top"><span>🌾 第二块田：<b>${action.name}</b></span><span id="plotRemain"></span>
+                ? `<div class="clone-row has-art">${art}<div class="cl-main"><div class="clone-bar-top"><span>🌾 第二块田：<b>${action.name}</b></span><span id="plotRemain"></span>
                     <button class="btn btn-secondary clone-stop" onclick="stopFarmPlot()">停止</button></div>
-                    <div class="progress-bar" style="height: 6px;"><div id="plotFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div>`
-                : `<div class="clone-row"><div class="clone-bar-top"><span>🌾 第二块田空闲</span><span class="clone-hint">在灵田面板的配方卡片上点「种到第二块田」</span></div></div>`;
+                    <div class="progress-bar" style="height: 6px;"><div id="plotFill" class="progress-fill" style="width: 0%; height: 100%;"></div></div></div></div>`
+                : `<div class="clone-row has-art">${art}<div class="cl-main"><div class="clone-bar-top"><span>🌾 第二块田空闲</span><span class="clone-hint">在灵田面板的配方卡片上点「种到第二块田」</span></div></div></div>`;
+        }
+        // v7.29 第二块田的小画：三条田垄，每条四株苗；苗按本轮进度分四个阶段长高，最后一段结出金穗（阶段由 tickPlotBar 写进 data-stage）
+        function plotFieldSvg() {
+            const rows = [{ y: 17, s: 0.85, x0: 14, dx: 11 }, { y: 28, s: 1.05, x0: 9, dx: 14 }, { y: 41, s: 1.3, x0: 5, dx: 17 }];
+            let body = '';
+            rows.forEach((r, ri) => {
+                body += `<path d="M1 ${r.y + 1} Q32 ${r.y - 3} 63 ${r.y + 1} L63 ${r.y + 4} Q32 ${r.y + 1} 1 ${r.y + 4} Z" fill="#5a3a1e"/>`;
+                for (let i = 0; i < 4; i++) {
+                    const x = r.x0 + i * r.dx;
+                    body += `<g class="pf-plant" style="--i:${ri * 4 + i}" transform="translate(${x} ${r.y + 0.5}) scale(${r.s})"><g class="pf-grow">
+                        <path d="M0 0 Q-0.6 -6 0.4 -12" stroke="#5f9a3a" stroke-width="1.3" fill="none"/>
+                        <path d="M0 -3 Q-4.5 -5 -5.5 -8.5 Q-1.5 -7 0 -4.5Z M0.2 -6 Q4.5 -7.5 5.5 -11 Q1.5 -9.5 0.2 -7.5Z" fill="#79b84e"/>
+                        <ellipse class="pf-ear" cx="0.6" cy="-14" rx="1.9" ry="3.4"/></g></g>`;
+                }
+            });
+            return `<svg viewBox="0 0 64 46" aria-hidden="true">${body}</svg>`;
         }
 
         function tickPlotBar(duration) {
@@ -3986,6 +4049,8 @@
             const pct = Math.min(100, (f.progress / duration) * 100);
             const fill = document.getElementById('plotFill');
             if (fill) fill.style.width = pct + '%';
+            const plotArt = document.getElementById('plotArt');
+            if (plotArt) { const st = String(pct < 25 ? 0 : pct < 55 ? 1 : pct < 85 ? 2 : 3); if (plotArt.dataset.stage !== st) plotArt.dataset.stage = st; }
             const remain = document.getElementById('plotRemain');
             if (remain) remain.textContent = Math.max(0, duration - f.progress).toFixed(1) + 's';
         }
@@ -4063,11 +4128,15 @@
                 let guard = 0, did = 0;
                 if (fast) notifyMuted = true;
                 try {
-                    while (gameState.currentAction && adjustedDuration > 0 && gameState.currentActionProgress >= adjustedDuration && guard++ < 60) {
-                        completeAction(gameState.currentAction, { batch: fast });
+                    while (gameState.currentAction && adjustedDuration > 0 && gameState.currentActionProgress >= adjustedDuration - PROGRESS_EPS && guard++ < 60) {
+                        if (completeAction(gameState.currentAction, { batch: fast }) === false) {   // 背包放不下产出
+                            gameState.currentAction = null;
+                            updateUI();
+                        }
                         did++;
                         if (!gameState.currentAction) { gameState.currentActionProgress = 0; break; }
-                        gameState.currentActionProgress = adjustedDuration < 0.1 ? gameState.currentActionProgress - adjustedDuration : 0;
+                        // 保留零头：每 0.1 秒累加的进度很少正好等于耗时，清零会让在线比离线慢（耗时 1 秒实际要 1.1 秒）
+                        gameState.currentActionProgress = Math.max(0, gameState.currentActionProgress - adjustedDuration);
                     }
                 } finally {
                     notifyMuted = false;
@@ -4774,6 +4843,7 @@
             if (/落空/.test(entry)) return 'miss';
             if (/^玩家/.test(entry)) return 'player-hit';
             if (/使用|恢复/.test(entry)) return 'heal';
+            if (/被\S*击败|未能击败/.test(entry)) return 'death';   // 战败 / 超时：以前也被「击败」二字归成了胜利
             if (/击败|战胜|遭遇|——/.test(entry)) return /遭遇|——/.test(entry) ? 'info' : 'victory';
             return 'monster-hit';
         }
@@ -4788,7 +4858,11 @@
             battleLogRendered = key;
             const stick = el.scrollHeight - el.scrollTop - el.clientHeight < 28;
             const prev = el.scrollTop;
-            el.innerHTML = battleLogEntries.map(e => `<div class="log-entry log-${battleLogClass(e)}">${typeof e === 'string' ? e : e.text}</div>`).join('');
+            el.innerHTML = battleLogEntries.map(e => {
+                const text = typeof e === 'string' ? e : e.text;
+                const crit = /暴击/.test(text) ? ' log-crit' : '';
+                return `<div class="log-entry log-${battleLogClass(e)}${crit}">${text.replace(/^\[(\d\d:\d\d:\d\d)\]\s*/, '<span class="log-time">$1</span>')}</div>`;
+            }).join('');
             el.scrollTop = stick ? el.scrollHeight : prev;
         }
 
@@ -5130,10 +5204,12 @@
             const monsterAttackInterval = Math.max(MIN_ATTACK_INTERVAL, (monster.attackSpeed || 2.5) + domainSideInterval('foe'));
 
             // 1. 玩家攻击计时
+            // v7.30：到点后减去间隔而不是清零（同普通战斗）。清零会把多出来的时间扔掉，出手间隔变成 0.1 × 倍速的整数倍，
+            // 4 倍速下 0.6 秒的出手实际要 0.8 秒——同一个秘境开不开倍速胜负都不一样
             gameState.player.attackTimer += timeDelta;
-            if (gameState.player.attackTimer >= playerAttackInterval) {
+            if (gameState.player.attackTimer >= playerAttackInterval - PROGRESS_EPS) {
                 performPlayerAttack(monster);
-                gameState.player.attackTimer = 0;
+                gameState.player.attackTimer = Math.min(gameState.player.attackTimer - playerAttackInterval, playerAttackInterval);
             }
             // 合体起元气化形、大乘起元婴离体 / 法则之击：定时额外攻击（无视防御）
             tickPeriodicStrikes(gameState.dungeons, timeDelta).forEach(h => {
@@ -5144,9 +5220,9 @@
 
             // 2. 怪物攻击计时
             gameState.dungeons.monsterAttackTimer += timeDelta;
-            if (gameState.dungeons.monsterAttackTimer >= monsterAttackInterval) {
+            if (gameState.dungeons.monsterAttackTimer >= monsterAttackInterval - PROGRESS_EPS) {
                 performMonsterAttack(monster);
-                gameState.dungeons.monsterAttackTimer = 0;
+                gameState.dungeons.monsterAttackTimer = Math.min(gameState.dungeons.monsterAttackTimer - monsterAttackInterval, monsterAttackInterval);
             }
 
             // 3. 检查怪物状态
@@ -6329,7 +6405,7 @@
                 const isMs = LAW_MILESTONE_LEVELS.includes(after);
                 const msText = isMs ? '（里程碑：' + describeEffects(def.milestones[after]).join('、') + '）' : '';
                 showNotification(`${def.icon} ${def.name} 领悟到 Lv.${after}${msText}`, '#b89a5b');
-                if (isMs) showQuickCelebration(`${def.icon} ${def.name} 里程碑 Lv.${after}`);
+                if (isMs) showQuickCelebration(`${def.icon} ${def.name} 里程碑 Lv.${after}`, { title: def.name, sub: '里程碑', seal: cnNum(after) + '级' });
             }
             if (document.body.dataset.panel === 'wudao') generateLawList();
             return after >= cap;
@@ -6910,7 +6986,7 @@
                 const name = (getAction(skillName, key) || {}).name || key;
                 const milestone = MASTERY_MILESTONES.includes(after) ? '（里程碑！）' : '';
                 showNotification(`🎓 ${name} 精通 Lv.${after}${milestone}`, '#b89a5b');
-                showQuickCelebration(`🎓 ${name} 精通 Lv.${after}`);
+                showQuickCelebration(`🎓 ${name} 精通 Lv.${after}`, { title: name, sub: '精通', seal: cnNum(after) + '级' });
             }
         }
 
@@ -6999,7 +7075,7 @@
                 skill.level++;
                 const effect = calculateSkillLevelEffect(skillName, skill.level);
                 showNotification(`${skill.name}升到${skill.level}级 ${effect}`, '#6f9c8a', 'normal');
-                if (!document.hidden) showQuickCelebration(`${skill.name} 升至 Lv.${skill.level}`);
+                if (!document.hidden) showQuickCelebration(`${skill.name} 升至 Lv.${skill.level}`, { title: skill.name, seal: cnNum(skill.level) + '级' });
                 const ms = LIFE_SKILLS.includes(skillName) && milestonesOf(skillName).find(m => m.level === skill.level);
                 if (ms) showNotification(`🏅 ${skill.name}达到 Lv.${ms.level} 里程碑：${ms.desc}`, '#b89a5b');
             }
@@ -7032,6 +7108,7 @@
 
         // 极速行动（如礼包饰品 ×100 速度）：连续完成时静音通知，界面每 0.4 秒刷新一次、存档每 5 秒一次
         const FAST_ACTION_SECONDS = 0.5;
+        const PROGRESS_EPS = 1e-9;   // 进度 / 计时每 0.1 秒累加，0.1 加十次是 0.9999999999999999，比较时留这点容差
         let notifyMuted = false, fastUiTs = 0, fastSaveTs = 0;
         function flushFastUI() {
             const now = Date.now();
@@ -7063,6 +7140,19 @@
                 return;
             }
 
+            // 消耗所需的材料（P2功能 - 材料消耗）；灵根/功法的「节省材料」特效有概率整次不消耗
+            const actionKey = act.action;
+            const mastery = getMasteryBonus(act.skill, actionKey);
+            const saveMaterials = action.requires && Math.random() < getSkillMod('save', act.skill) + mastery.save;
+            // 背包放不下产出：什么都不扣，返回 false 让调用方（主角 / 分身 / 第二块田）停下
+            const freedSlots = action.requires && !saveMaterials
+                ? Object.entries(action.requires).filter(([id, q]) => (gameState.player.inventory.find(i => i.id === id) || { qty: 0 }).qty <= q).map(([id]) => id) : [];
+            if (!inventoryCanHold(outputIdsOf(action), freedSlots)) {
+                showNotification(`❌ 背包已满，${action.name}的产出放不下，已停止（材料没有消耗）`, '#c4483a', 'error');
+                return false;
+            }
+            if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980', 'rare');
+
             // 丹火助炼：炼丹时消耗丹火，提高翻倍产出概率（丹火不够时自动不助炼）
             let boostDouble = 0;
             if (act.skill === 'alchemy' && gameState.player.alchemyBoost) {
@@ -7072,12 +7162,6 @@
                     boostDouble = DANHUO_BOOST_DOUBLE;
                 }
             }
-
-            // 消耗所需的材料（P2功能 - 材料消耗）；灵根/功法的「节省材料」特效有概率整次不消耗
-            const actionKey = act.action;
-            const mastery = getMasteryBonus(act.skill, actionKey);
-            const saveMaterials = action.requires && Math.random() < getSkillMod('save', act.skill) + mastery.save;
-            if (saveMaterials) showNotification('✨ 材料节省：本次未消耗材料', '#6fa980', 'rare');
             if (action.requires && !saveMaterials) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
                     const invIndex = gameState.player.inventory.findIndex(i => i.id === itemId);
@@ -7557,7 +7641,7 @@
                 names.forEach(skillName => {
                     const skill = gameState.skills[skillName];
                     const item = document.createElement('div');
-                    item.className = 'skill-item' + (skillName === activePanel ? ' active' : '');
+                    item.className = 'skill-item sk-' + skillName + (skillName === activePanel ? ' active' : '');   // v7.29 sk-*：选中时的墨痕和经验条按技能着色
                     item.id = 'skill-' + skillName;
                     item.setAttribute('role', 'button');
                     item.tabIndex = 0;
@@ -8297,6 +8381,18 @@
             return null;
         }
 
+        // 背包放不放得下这些物品（v7.30）：已有的同名物品直接叠加，新物品各占一格；freed = 这次会被用光、腾出格子的材料 id。
+        // 制作 / 化虚 / 领任务奖励都先问这里，放不下就不扣材料、不发放——以前是先扣材料再放，放不下的产出直接消失
+        function inventoryCanHold(ids, freed = []) {
+            const inv = gameState.player.inventory;
+            const cap = gameState.player.inventoryCapacity || 50;
+            const has = id => inv.some(i => i.id === id);
+            const need = new Set(ids.filter(id => !has(id)));
+            const free = cap - inv.length + new Set(freed.filter(has)).size;
+            return need.size <= free;
+        }
+        function outputIdsOf(action) { return ((action && action.output && action.output.items) || []).map(i => i.id); }
+
         function addToInventory(itemId, qty = 1, silent = false) {
             // 检查背包容量
             const inventoryCount = gameState.player.inventory.length;
@@ -8348,6 +8444,9 @@
             document.getElementById('itemName').textContent = itemConfig.name;
             document.getElementById('itemType').textContent = ITEM_TYPE_NAMES[itemConfig.type] || itemConfig.type;
             document.getElementById('itemQty').textContent = qty;
+            const typeSeal = document.getElementById('itemTypeSeal');
+            if (typeSeal) typeSeal.textContent = ITEM_TYPE_NAMES[itemConfig.type] || '';
+            document.querySelector('#itemDetailModal .modal-content').style.setProperty('--c', ITEM_TYPE_COLORS[itemConfig.type] || '#b89a5b');
 
             // 获取物品用途（根据物品类型和配方）
             let usageText = '暂无已知用途';
@@ -9406,22 +9505,46 @@
         // 精通升级 / 法则里程碑这类数值跃迁太频繁，不适合用需要点确认的重弹窗（境界解锁提示那种），
         // 但完全静默（只有一条会被刷掉的 toast）又感知不到——加一个屏幕中央短暂浮现、自动消失、不挡手的小庆祝，
         // 复用同一个 DOM 节点：连续触发时只重置文字和计时器，不会叠好几个气泡（正反馈诊断 C-5）
+        // v7.29 传了 art（{ title, sub, seal }）就画成国漫风：一道墨痕上写毛笔大字，旁边盖一枚朱红印；不传仍是一行字
         let quickCelebrationTimer = null;
-        function showQuickCelebration(text) {
+        function showQuickCelebration(text, art = null) {
             if (gameState.settings && gameState.settings.enableNotifications === false) return;
             let el = document.getElementById('quickCelebration');
             if (!el) {
                 el = document.createElement('div');
                 el.id = 'quickCelebration';
-                el.className = 'quick-celebration';
                 document.body.appendChild(el);
             }
-            el.textContent = text;
+            if (art) {
+                el.className = 'quick-celebration qc-art';
+                el.innerHTML = `<span class="qc-swash"></span><span class="qc-title">${art.title}</span>`
+                    + (art.sub ? `<span class="qc-sub">${art.sub}</span>` : '')
+                    + (art.seal ? `<span class="qc-seal">${art.seal}</span>` : '');
+            } else {
+                el.className = 'quick-celebration';
+                el.textContent = text;
+            }
             el.classList.remove('show');
             void el.offsetWidth;   // 强制重排，确保连续触发时动画能重新播放一次
             el.classList.add('show');
             clearTimeout(quickCelebrationTimer);
-            quickCelebrationTimer = setTimeout(() => el.classList.remove('show'), 800);
+            quickCelebrationTimer = setTimeout(() => el.classList.remove('show'), art ? 1400 : 800);
+        }
+        // 阿拉伯数字 → 中文数字（1–9999），印章上用
+        function cnNum(n) {
+            n = Math.floor(n);
+            if (n <= 0) return '零';
+            const D = '零一二三四五六七八九', U = ['', '十', '百', '千'];
+            const s = String(n).slice(-4);
+            let out = '', zero = false;
+            for (let i = 0; i < s.length; i++) {
+                const d = +s[i], u = U[s.length - 1 - i];
+                if (d === 0) { zero = true; continue; }
+                if (zero && out) out += '零';
+                zero = false;
+                out += D[d] + u;
+            }
+            return out.replace(/^一十/, '十');
         }
 
         // 通知类型系统（P1功能）
@@ -9439,6 +9562,10 @@
             // 跟"材料不足"这种日常提示拉开视觉层级（正反馈诊断 C-1），不影响静音/常驻等既有逻辑
             notification.className = 'notification' + (type === 'rare' ? ' notification-rare' : '');
             notification.style.setProperty('--accent', color);   // 颜色只用作左侧色条，底色由样式统一
+            // v7.29 纸条右上角的小印：稀有触发「喜」，错误 / 危险「危」，警示「警」，普通通知不盖
+            const seal = type === 'rare' ? '喜' : ['error', 'danger'].includes(type) ? '危'
+                : (type === 'warning' || IMPORTANT_NOTIFICATION_COLORS.includes(String(color).toLowerCase())) ? '警' : '';
+            if (seal) notification.dataset.seal = seal;
             notification.style.minWidth = '300px';
 
             // 统一UI：所有通知都显示关闭按钮
@@ -9718,6 +9845,11 @@
         }
 
         // 物品类型的中文名与背包里的显示顺序（背包分类标题、物品详情都用它，不再露出英文的类型名）
+        // v7.29 物品类型的点缀色：背包格子底边、图鉴光盘、类型标题笔触都用它
+        const ITEM_TYPE_COLORS = {
+            food: '#d9894a', material: '#8aa0b8', ore: '#9aa3ad', seed: '#79b84e', breakthrough_material: '#e0b54a', weapon: '#e0574a',
+            armor: '#5aa8ef', jewelry: '#d877b6', daoze: '#a283f0', consumable: '#36b383', special: '#d8b445', currency: '#b89a5b'
+        };
         const ITEM_TYPE_NAMES = {
             food: '食物', material: '材料', ore: '矿石', seed: '种子', breakthrough_material: '突破丹药',
             weapon: '武器', armor: '护甲', jewelry: '饰品', daoze: '道则', consumable: '丹药', special: '特殊', currency: '货币'
@@ -9749,6 +9881,8 @@
             orderedTypes.map(type => [type, byType[type]]).forEach(([type, items]) => {
                 const typeLabel = document.createElement('div');
                 typeLabel.style.cssText = 'grid-column: 1/-1; font-weight: bold; color: var(--jade); margin-top: 10px; margin-bottom: 5px;';
+                typeLabel.className = 'inv-type-label';
+                typeLabel.style.setProperty('--c', ITEM_TYPE_COLORS[type] || '#b89a5b');
                 typeLabel.textContent = typeNames[type] || type;
                 grid.appendChild(typeLabel);
 
@@ -9757,6 +9891,7 @@
                     const slot = document.createElement('div');
                     slot.className = 'item-slot';
                     slot.style.cursor = 'pointer';
+                    slot.style.setProperty('--c', ITEM_TYPE_COLORS[itemConfig.type] || '#b89a5b');   // v7.29 多宝阁格子底边按类型着色
                     slot.innerHTML = `
                         <div class="item-icon">${itemConfig.icon}</div>
                         <div class="item-name">${itemConfig.name}</div>
@@ -9814,6 +9949,8 @@
             modal.dataset.itemId = itemId;
             document.getElementById('buyIcon').innerHTML = item.icon;
             document.getElementById('buyName').textContent = item.name;
+            const buyCfg = GAME_CONFIG.items[itemId];
+            modal.querySelector('.modal-content').style.setProperty('--c', (buyCfg && ITEM_TYPE_COLORS[buyCfg.type]) || '#b89a5b');
             document.getElementById('buyDesc').textContent = item.desc || '';
             const cur = item.currency || 'coins';
             document.getElementById('buyUnitPrice').textContent = `${item.price} ${SHOP_CURRENCIES[cur].name}`;
@@ -10376,6 +10513,7 @@
 
         function showBreakthroughModal() {
             const realmIndex = gameState.player.realmIndex;
+            let sealRate = null;   // v7.29 大境界有成功率时，符纸右边盖一枚成功率大印
             const currentRealm = GAME_CONFIG.realms[realmIndex];
             const nextRealm = GAME_CONFIG.realms[realmIndex + 1];
 
@@ -10405,6 +10543,7 @@
                 document.getElementById('btModalTitle').textContent = realmIndex === ASCEND_REALM ? `✨ 飞升上界（${nextRealm.name}）✨` : `✨ 突破${nextRealm ? nextRealm.name : '大道尽头'} ✨`;
                 const rate = getMajorBreakthroughRate(realmIndex);
                 const fails = (gameState.player.btFails || {})[realmIndex] || 0;
+                sealRate = rate;
                 let typeText = '需丹药辅助';
                 if (rate !== null) {
                     const basis = realmIndex === 21 ? `${getCoreGradeName()} ${getCoreQuality().toFixed(1)}`
@@ -10476,6 +10615,13 @@
                 document.getElementById('btButton').textContent = '🌟 开始突破 🌟';
             }
 
+            const sealEl = document.getElementById('btRateSeal');
+            if (sealEl) {
+                sealEl.hidden = sealRate === null;
+                if (sealRate !== null) sealEl.innerHTML = `<b>${Math.round(sealRate * 100)}%</b><small>成功率</small>`;
+            }
+            // 符纸上标题和按钮用毛笔字，去掉两边的星星
+            ['btModalTitle', 'btButton'].forEach(id => { const e = document.getElementById(id); e.textContent = e.textContent.replace(/✨|🌟/g, '').trim(); });
             renderTribulationGate();
             document.getElementById('breakthroughModal').classList.add('show');
         }
@@ -11354,6 +11500,7 @@
         // ==================== 存档系统 ====================
         function saveGame() {
             if (!currentSlot) return;   // 还没选择存档槽位（存档选择界面）时不保存
+            if (tabSuperseded) return;   // 同一存档已在别的标签页打开：这一页不再写，免得覆盖那边的进度
             gameState.lastSaveTime = Date.now();
             // 页面在后台时，后台的自动存档不能刷新「最后活跃时间」，否则回来时只按最后一次自动存档算离线，离线收益几乎为 0
             // （切到后台那一刻的时间由 visibilitychange 显式记录）
@@ -11549,6 +11696,31 @@
             remove: key => localStorage.removeItem(key)
         };
 
+        // 同一存档在两个标签页同时打开会互相覆盖（v7.30）：进入存档时写一个「占用者」标记；别的标签页发现标记换了人，
+        // 就暂停游戏、不再存档，提示到新打开的那页继续。只管网页版（localStorage 的 storage 事件），桌面版只有一个窗口
+        const TAB_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        let tabSuperseded = false;
+        const ownerKey = n => slotKey(n) + '_owner';
+        function claimSlotOwnership() {
+            if (window.desktopSaves || !currentSlot) return;
+            try { localStorage.setItem(ownerKey(currentSlot), TAB_ID + '|' + Date.now()); } catch (e) { /* 存储不可用时不做检测 */ }
+        }
+        window.addEventListener('storage', e => {
+            if (window.desktopSaves || !currentSlot || tabSuperseded || !e.newValue || e.key !== ownerKey(currentSlot)) return;
+            if (e.newValue.split('|')[0] === TAB_ID) return;
+            tabSuperseded = true;
+            gameRunning = false;
+            clearInterval(tickInterval);
+            const box = document.createElement('div');
+            box.className = 'modal show';
+            box.id = 'supersededModal';
+            box.innerHTML = `<div class="modal-content" role="alertdialog" aria-modal="true" style="max-width: 420px; text-align: center;">
+                <div class="modal-title">存档已在别处打开</div>
+                <p style="line-height: 1.8; color: var(--text-l3);">存档 ${currentSlot} 刚在另一个标签页（或窗口）里打开了。为免两边互相覆盖进度，这一页已暂停，不会再存档。<br/>请到新打开的那一页继续；想在这一页继续，就刷新本页重新选择存档。</p>
+                <button class="btn" onclick="location.reload()" style="width: 100%; margin-top: 10px;">刷新本页</button></div>`;
+            document.body.appendChild(box);
+        });
+
         function readSlot(n) {
             try {
                 const raw = saveStore.get(slotKey(n));
@@ -11628,7 +11800,7 @@
 
         function deleteSlot(n) {
             if (!confirm(`确定要删除存档 ${n} 吗？此存档的所有进度将永久丢失！`)) return;
-            try { saveStore.remove(slotKey(n)); } catch (e) { /* 忽略 */ }
+            try { saveStore.remove(slotKey(n)); if (!window.desktopSaves) localStorage.removeItem(ownerKey(n)); } catch (e) { /* 忽略 */ }
             renderSlotSelect();
         }
 
@@ -11679,6 +11851,7 @@
             calculateStats();
             updateStatsDisplay();
             gameRunning = true;
+            claimSlotOwnership();
             updateSlotLabel();
             applyDisplaySettings();
 
@@ -11834,10 +12007,11 @@
 
             // 需要材料的配方：完成次数受材料库存限制，并扣除离线消耗
             let materialsRanOut = false;
+            const ownedQty = id => (gameState.player.inventory.find(i => i.id === id) || { qty: 0 }).qty;
+            let use = {};
             if (action.requires) {
                 Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    const owned = (gameState.player.inventory.find(i => i.id === itemId) || { qty: 0 }).qty;
-                    const affordable = Math.floor(owned / qty);
+                    const affordable = Math.floor(ownedQty(itemId) / qty);
                     if (affordable < completions) {
                         completions = affordable;
                         materialsRanOut = true;
@@ -11845,11 +12019,16 @@
                 });
                 // 「节省材料」特效：按概率折算实际消耗（库存判断仍按全额，偏保守）
                 const saveRate = Math.min(0.9, getSkillMod('save', savedAction.skill) + getMasteryBonus(savedAction.skill, savedAction.action).save);
-                Object.entries(action.requires).forEach(([itemId, qty]) => {
-                    if (completions > 0) consumeItem(itemId, Math.round(qty * completions * (1 - saveRate)));
-                });
-                if (materialsRanOut) gameState.currentAction = null;
+                use = Object.fromEntries(Object.entries(action.requires).map(([itemId, qty]) => [itemId, Math.round(qty * completions * (1 - saveRate))]));
             }
+            // 背包放不下产出：这段离线不结算、不扣材料，并停下（v7.30，以前材料照扣、产出丢失）
+            if (completions > 0 && !inventoryCanHold(outputIdsOf(action), Object.keys(use).filter(id => use[id] >= ownedQty(id)))) {
+                showNotification(`❌ 背包已满，${action.name}的产出放不下，离开期间没有结算（材料没有消耗），已停止。请先出售或整理背包`, '#c4483a', 'warning');
+                completions = 0;
+                gameState.currentAction = null;
+            }
+            if (completions > 0) Object.entries(use).forEach(([itemId, q]) => consumeItem(itemId, q));
+            if (materialsRanOut) gameState.currentAction = null;
 
             let offlineRewards = {
                 coins: 0,
@@ -12162,31 +12341,15 @@
 
                 const isCurrentArt = gameState.player.currentArt === artKey;
                 const itemDiv = document.createElement('div');
-                itemDiv.style.cssText = `
-                    background: ${isCurrentArt ? 'color-mix(in srgb, var(--jade) 16%, var(--bg-l2))' : 'var(--bg-l2)'};
-                    border: 1px solid ${isCurrentArt ? 'var(--jade)' : 'var(--border-l3)'};
-                    border-radius: 4px;
-                    padding: 12px;
-                    margin-bottom: 10px;
-                    cursor: ${isCurrentArt ? 'default' : 'pointer'};
-                `;
-
-                const statusText = isCurrentArt ? '✓ 当前功法' : '点击切换';
-
+                // v7.29 每部功法是一卷展开的宣纸（同修炼页功法卡），正在修习的盖朱红「修习中」印
+                itemDiv.className = 'art-scroll' + (isCurrentArt ? ' current' : '');
+                const icon = art.icon && String(art.icon).startsWith('<svg') ? `<span class="art-icon">${art.icon}</span>` : '';
+                const effects = describeEffects(art.effects);
                 itemDiv.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 10px;">
-                        <div style="flex: 1;">
-                            <div style="font-weight: bold; color: var(--gold); font-size: 1em;">${art.icon || ''} ${art.name}</div>
-                            <div style="font-size: 0.85em; color: var(--text-l4); margin-top: 4px;">${art.description}</div>
-                            <div style="font-size: 0.8em; color: var(--text-l4); margin-top: 6px;">
-                                修炼速度倍率：<span style="color: var(--azure);">${art.speedMultiplier.toFixed(2)}x</span>
-                            </div>
-                            ${describeEffects(art.effects).length ? `<div style="font-size: 0.8em; color: var(--jade); margin-top: 4px;">特效：${describeEffects(art.effects).join(' · ')}</div>` : ''}
-                        </div>
-                        <div style="text-align: right; color: ${isCurrentArt ? 'var(--jade)' : 'var(--text-l4)'}; font-size: 0.9em;">
-                            ${statusText}
-                        </div>
-                    </div>
+                    <div class="as-head">${icon}<b class="as-name">${art.name}</b><span class="as-speed">修炼速度 ×${art.speedMultiplier.toFixed(2)}</span>
+                        <span class="${isCurrentArt ? 'as-seal' : 'as-hint'}">${isCurrentArt ? '修习中' : '点击切换'}</span></div>
+                    <div class="as-desc">${art.description}</div>
+                    ${effects.length ? `<div class="as-effects">特效：${effects.join(' · ')}</div>` : ''}
                 `;
 
                 if (!isCurrentArt) {
@@ -12207,8 +12370,54 @@
         }
 
         // P3优化：克制系统教程函数
+        // v7.29 灵根克制环：五行按「金→木→土→水→火→金」围成五边形，箭头指向被克的一方；雷冰在右边互克；风居中，不克也不被克。
+        // 关系全部从 COUNTER_SYSTEM.relations 生成，改表这里跟着变；你的灵根外面多一圈并标「你」
+        const ROOT_GLYPH = { metal: '金', wood: '木', water: '水', fire: '火', earth: '土', thunder: '雷', ice: '冰', wind: '风' };
+        function renderCounterRing() {
+            const box = document.getElementById('counterRing');
+            if (!box) return;
+            const rel = COUNTER_SYSTEM.relations, me = gameState.player.spiritRoot;
+            const color = k => typeof BattleArt !== 'undefined' ? BattleArt.colorOf(k) : 'var(--gold)';
+            const pos = {}, cx = 112, cy = 112, R = 80;
+            const cycle = [];
+            for (let k = 'metal'; k && !cycle.includes(k) && cycle.length < 5; k = rel[k].counters) cycle.push(k);
+            cycle.forEach((k, i) => { const a = -Math.PI / 2 + i * 2 * Math.PI / cycle.length; pos[k] = [cx + R * Math.cos(a), cy + R * Math.sin(a)]; });
+            const rest = Object.keys(rel).filter(k => !pos[k]);
+            const pair = rest.filter(k => rel[k].counters && rel[rel[k].counters].counters === k);
+            pair.forEach((k, i) => { pos[k] = [262, i ? 170 : 54]; });
+            rest.filter(k => !pos[k]).forEach(k => { pos[k] = [cx, cy]; });
+            const r = 19, drawn = new Set();
+            let arrows = '';
+            Object.entries(rel).forEach(([k, v]) => {
+                const t = v.counters;
+                if (!t || !pos[t] || drawn.has(t + k)) return;
+                drawn.add(k + t);
+                const mutual = rel[t].counters === k;
+                const [x1, y1] = pos[k], [x2, y2] = pos[t];
+                const d = Math.hypot(x2 - x1, y2 - y1), ux = (x2 - x1) / d, uy = (y2 - y1) / d;
+                const a = [x1 + ux * (r + 4), y1 + uy * (r + 4)], b = [x2 - ux * (r + 6), y2 - uy * (r + 6)];
+                const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+                const lx = mutual ? mx + 16 : mx + (mx - cx) * 0.22, ly = mutual ? my : my + (my - cy) * 0.22;
+                arrows += `<path d="M${a[0].toFixed(1)} ${a[1].toFixed(1)} L${b[0].toFixed(1)} ${b[1].toFixed(1)}" class="cr-arrow" marker-end="url(#crHead)"${mutual ? ' marker-start="url(#crTail)"' : ''}/>
+                    <text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" class="cr-ke">${mutual ? '互克' : '克'}</text>`;
+            });
+            const nodes = Object.keys(pos).map(k => {
+                const [x, y] = pos[k], c = color(k), mine = k === me;
+                return `<g class="cr-node${mine ? ' mine' : ''}" style="--c:${c}">
+                    ${mine ? `<circle cx="${x}" cy="${y}" r="${r + 6}" class="cr-mine"/>` : ''}
+                    <circle cx="${x}" cy="${y}" r="${r}" class="${rel[k].counters ? 'cr-disc' : 'cr-disc free'}"/>
+                    <text x="${x}" y="${y + 7}" class="cr-glyph">${ROOT_GLYPH[k] || k}</text>
+                    ${mine ? `<text x="${x + r + 4}" y="${y - r + 2}" class="cr-you">你</text>` : ''}
+                </g>`;
+            }).join('');
+            box.innerHTML = `<svg viewBox="0 0 300 224" role="img" aria-label="灵根克制关系图：金克木、木克土、土克水、水克火、火克金；雷冰互克；风不克也不被克">
+                <defs><marker id="crHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" class="cr-tip"/></marker>
+                <marker id="crTail" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M10 0 L0 5 L10 10 Z" class="cr-tip"/></marker></defs>
+                ${arrows}${nodes}</svg>`;
+        }
         function showCounterSystemModal() {
             fillRootEffectList();
+            renderCounterRing();
             document.getElementById('counterSystemModal').classList.add('show');
         }
 
@@ -12340,7 +12549,7 @@
         function resetGame() {
             if (!currentSlot) return;
             if (confirm(`确定要删除当前存档（存档 ${currentSlot}）吗？此存档的所有进度将永久丢失！`)) {
-                try { saveStore.remove(slotKey(currentSlot)); } catch (e) { /* 忽略 */ }
+                try { saveStore.remove(slotKey(currentSlot)); if (!window.desktopSaves) localStorage.removeItem(ownerKey(currentSlot)); } catch (e) { /* 忽略 */ }
                 gameRunning = false;   // 避免 beforeunload 把存档又写回去
                 clearInterval(tickInterval);
                 location.reload();
