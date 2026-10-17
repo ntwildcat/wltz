@@ -345,6 +345,7 @@
                             <div style="display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid var(--border-l3);">
                                 <button id="battleTab-areas" class="panel-tab active" onclick="switchBattleTab('areas')" style="flex: 1; padding: 10px; background: none; border: none; color: var(--gold); cursor: pointer; font-weight: bold; border-bottom: 3px solid var(--gold);">战斗区域</button>
                                 <button id="battleTab-dungeons" class="panel-tab" onclick="switchBattleTab('dungeons')" style="flex: 1; padding: 10px; background: none; border: none; color: var(--text-l4); cursor: pointer; font-weight: bold;">秘境</button>
+                                <button id="battleTab-tower" class="panel-tab" onclick="switchBattleTab('tower')" style="flex: 1; padding: 10px; background: none; border: none; color: var(--text-l4); cursor: pointer; font-weight: bold; display: none;">问道塔</button>
                             </div>
                             <!-- 战斗区域内容 -->
                             <div id="battleContent-areas">
@@ -364,6 +365,10 @@
                             <!-- 秘境内容 -->
                             <div id="battleContent-dungeons" style="display: none;">
                                 <div class="action-list" id="dungeonActions"></div>
+                            </div>
+                            <!-- 问道塔（v7.57） -->
+                            <div id="battleContent-tower" style="display: none;">
+                                <div id="towerContent"></div>
                             </div>
                         </div>
 
@@ -898,7 +903,7 @@
     </div>
 
     <script src="art.js?v=1.5"></script>
-    <script src="game.js?v=14.72"></script>
+    <script src="game.js?v=14.74"></script>
 
     <!-- 手机底部Tab栏 -->
     <div class="mobile-bottom-tabs" id="mobileTabBar">

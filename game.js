@@ -3412,7 +3412,7 @@
             23: [`💨 瞬移神通：元婴稳固，闪避 +${TELEPORT_DODGE * 100}%`],
             24: ['⚔️ 深渊遗迹战斗区域开放', `📜 化神需要特殊功法：拥有「太虚元神诀」（商城）可让化神成功率 +${HUASHEN_RATE.art * 100}%，可以先攒灵石`],
             25: ['🌠 太虚幻境秘境开放：通关一次即得化神机缘', '💊 化神丹配方解锁，每次冲击化神服一颗', `⚡ 化神成功率极低：基础 ${HUASHEN_RATE.base * 100}% + 元婴品质最多 +${HUASHEN_RATE.quality * 100}% + 拥有「太虚元神诀」+${HUASHEN_RATE.art * 100}% + 通关太虚幻境（机缘）+${HUASHEN_RATE.chance * 100}%；失败耗掉丹药但不掉境界`],
-            26: [`🌊 调动天地灵气：从此每次出手伤害 +${JINGYUAN.dmg[0] * 100}%（化神中期起 +${JINGYUAN.dmg[1] * 100}%）。只是凡界灵气稀薄，每次出手耗 ${JINGYUAN.perAttack} 点精元（上限 ${JINGYUAN.max}，每分钟自然恢复 ${JINGYUAN.regenPerMin}）：精元耗尽就没有这份加成，而且精元越低修炼越慢（最多 −${JINGYUAN.cultPenalty * 100}%）——想专心修炼就少出手。侧栏「境界感悟」随时显示精元`, `💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%`, '☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）。到了合体期，法则就是斗法的核心：战斗效果翻倍，还决定元气化形的威力和之后几次大天劫的难度，可以早点开始参悟', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放', '☯️ 道途·化神·道心：御气（战斗）/ 固元（生存）/ 神游（生活），三选一，之后可在装备页重选'],
+            26: [`🌊 调动天地灵气：从此每次出手伤害 +${JINGYUAN.dmg[0] * 100}%（化神中期起 +${JINGYUAN.dmg[1] * 100}%）。只是凡界灵气稀薄，每次出手耗 ${JINGYUAN.perAttack} 点精元（上限 ${JINGYUAN.max}，每分钟自然恢复 ${JINGYUAN.regenPerMin}）：精元耗尽就没有这份加成，而且精元越低修炼越慢（最多 −${JINGYUAN.cultPenalty * 100}%）——想专心修炼就少出手。侧栏「境界感悟」随时显示精元`, `💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%`, '☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）。到了合体期，法则就是斗法的核心：战斗效果翻倍，还决定元气化形的威力和之后几次大天劫的难度，可以早点开始参悟', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放', '☯️ 道途·化神·道心：御气（战斗）/ 固元（生存）/ 神游（生活），三选一，之后可在装备页重选', '🗼 问道塔开放：战斗页第三个标签，无尽层数，难度随境界走，首通有灵石、奇物残片与宗门贡献'],
             27: [`🌊 天地灵气运用纯熟：出手伤害加成 +${JINGYUAN.dmg[0] * 100}% → +${JINGYUAN.dmg[1] * 100}%`],
             28: ['⚔️ 九幽冥渊战斗区域开放'],
             29: ['🌫️ 虚界秘境开放：通关一次即找到通往上界的界壁裂隙——这是飞升上界（突破炼虚）的前提', '🌈 补灵根：突破炼虚须身具金木水火土五行灵根。虚界秘境会掉落五行之精，每缺一行要 2 个（你本身就是的那一行不用；雷 / 冰 / 风异灵根五行都要补），凑齐后在修炼页「补全五行灵根」', '💊 化虚丹配方解锁，飞升时服一颗'],
@@ -3592,6 +3592,7 @@
             { id: 'ACH_DAO_HEART',   glyph: '心', name: '道心自守',   desc: '身为道祖而自降修为，不被天道吞噬',           check: () => !!gameState.player.daoHeart },
             { id: 'ACH_LIFE_SWORD_72', glyph: '阵', name: '周天剑阵',  desc: '七十二口青冥剑齐聚，结成周天剑阵',          check: () => getLifeSwords() >= LIFE_SWORD.zhoutian },
             { id: 'ACH_SKILL_99',    glyph: '巅', name: '登峰造极',   get desc() { return `任一生活技能达到 ${WORK_SKILL_MAX_LEVEL} 级（满级）`; }, check: () => anyWorkSkillAt(WORK_SKILL_MAX_LEVEL) },
+            { id: 'ACH_TOWER_30',    glyph: '塔', name: '问道三十',   desc: '问道塔通过第 30 层', check: () => ((gameState.tower && gameState.tower.best) || 0) >= 30 },
             { id: 'ACH_RELIC_ALL',   glyph: '匣', name: '奇物满匣',   get desc() { return `集齐全部 ${QIYU_RELICS.length} 件奇物`; }, check: () => ((gameState.qiyu && gameState.qiyu.relics) || []).length >= QIYU_RELICS.length },
         ];
         function getAchievementStore() {
@@ -6096,6 +6097,98 @@
                 ${sectShopHtml()}`;
         }
 
+        // ==================== 问道塔（v7.57） ====================
+        // 化神起开放的无尽挑战（战斗页第三个标签）。每层一个守关者：以当前最高战斗区域的最后一种敌人为底，生命 ×3 × 1.12^(层-1)、攻击 ×1.03^(层-1)，
+        // 挂固定词缀（1～9 层 1 个、10～29 层 2 个、30 层起 3 个，按层号固定，可以提前看、按它选灵域）。难度跟着境界走，层数记录始终有意义。
+        // 挑战不限次数，只消耗战斗中吃掉的食物；用你当时的属性、食物和选好的迎战灵域；宗门 / 道途的战斗加成照常生效（不是渡劫类）。
+        // 首通奖励：灵石（当前最高区域每场灵石 × (40 + 4 × 层)）；每 5 层 1 枚战斗类奇物残片；每 10 层若有宗门再给 100 贡献。
+        const TOWER_REALM = 26, TOWER_TUNE = { hp: 3, atk: 1.0, hpGrow: 1.12, atkGrow: 1.03, timeout: 120 };
+        function towerRng(seed) {
+            let a = seed >>> 0;
+            return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+        }
+        function towerAffixes(floor) {
+            const n = floor >= 30 ? 3 : floor >= 10 ? 2 : 1, rnd = towerRng(floor * 7919 + 13), keys = Object.keys(AFFIXES), out = [];
+            while (out.length < n) { const k = keys[Math.floor(rnd() * keys.length)]; if (!out.includes(k)) out.push(k); }
+            return out;
+        }
+        function getTower() { return gameState.tower || (gameState.tower = { best: 0, domain: null }); }
+        function towerUnlocked() { return gameState.player.realmIndex >= TOWER_REALM; }
+        function buildTowerGuard(floor) {
+            const area = bestBattleArea();
+            if (!area) return null;
+            const tpl = (BATTLE_ENEMY_CONFIGS[area] || BATTLE_ENEMY_CONFIGS.forest).slice(-1)[0];
+            const sc = P4_AREA_SCALE[area] || { hp: 1, atk: 1 };
+            const hp = Math.max(1, Math.round(tpl.hp * sc.hp * TOWER_TUNE.hp * Math.pow(TOWER_TUNE.hpGrow, floor - 1)));
+            const affixes = towerAffixes(floor);
+            const e = { ...tpl, name: `第 ${floor} 层·${tpl.name}`, hp, currentHP: hp, atk: Math.max(1, Math.round(tpl.atk * sc.atk * TOWER_TUNE.atk * Math.pow(TOWER_TUNE.atkGrow, floor - 1))), affixes, towerGuard: true };
+            if (affixes.includes('tiebi')) e.def = Math.round(e.def * AFFIX_TUNE.tiebiDef);
+            if (affixes.includes('jifeng')) e.spd = Math.round(e.spd * AFFIX_TUNE.jifengSpd);
+            if (affixes.includes('gangqi')) { e.shieldMax = Math.round(e.hp * AFFIX_TUNE.gangqiShield); e.shield = e.shieldMax; e.noHit = 0; }
+            return { e, area };
+        }
+        function fightTowerFloor(floor) {
+            const P = gameState.player, T = getTower(), g = buildTowerGuard(floor);
+            if (!g) return null;
+            const saved = { speed: gameState.battleSpeed, d1: P.activeDomain, d2: P.activeDomain2, food: P.foodUseTimer };
+            gameState.battleSpeed = 5;
+            P.activeDomain = isDomainUnlocked() && T.domain && SPIRIT_DOMAINS[T.domain] ? T.domain : null;
+            P.activeDomain2 = null;
+            const battle = { currentArea: g.area, playerHP: { current: P.stats.hp.max, max: P.stats.hp.max }, currentEnemy: g.e, log: [], turnCount: 0 };
+            try {
+                P.foodUseTimer = FOOD_CONFIG.autoEatConfig.cooldown;
+                pickBestFood();
+                do { stepNormalBattle(battle); } while (g.e.currentHP > 0 && battle.playerHP.current > 0 && battle.turnCount < TOWER_TUNE.timeout);
+            } finally {
+                gameState.battleSpeed = saved.speed; P.activeDomain = saved.d1; P.activeDomain2 = saved.d2; P.foodUseTimer = saved.food;
+            }
+            return { won: g.e.currentHP <= 0, battle, timeout: g.e.currentHP > 0 && battle.playerHP.current > 0 };
+        }
+        function towerReward(floor) {
+            const area = bestBattleArea(), a = area && getAction('battle', area);
+            return { coins: a ? Math.round(a.areaData.coins * (40 + 4 * floor)) : 0, shard: floor % 5 === 0, contrib: floor % 10 === 0 && !!getSect() ? 100 : 0 };
+        }
+        function challengeTower() {
+            if (!towerUnlocked()) return;
+            if (gameState.currentAction && (gameState.currentAction.isDungeon || gameState.currentAction.isBattle)) { showNotification('正在战斗中，先撤出战斗再来闯塔', '#c98a3e'); return; }
+            const T = getTower(), floor = T.best + 1;
+            const r = fightTowerFloor(floor);
+            if (!r) return;
+            const sec = r.battle.turnCount.toFixed(1);
+            if (r.won) {
+                const rw = towerReward(floor);
+                T.best = floor;
+                gameState.player.coins += rw.coins;
+                const extra = [];
+                if (rw.shard) { const got = qiyuAddShard('battle'); if (got) extra.push('🧩 ' + got); }
+                if (rw.contrib) { getSect().contrib += rw.contrib; extra.push(`贡献 +${rw.contrib}`); }
+                showNotification(`🗼 问道塔第 ${floor} 层通过（${sec} 秒，剩余生命 ${Math.round(r.battle.playerHP.current / r.battle.playerHP.max * 100)}%）\n+${fmtXP(rw.coins)} 灵石${extra.length ? '\n' + extra.join('\n') : ''}`, '#c2a25f', 'rare');
+            } else {
+                showNotification(`🗼 问道塔第 ${floor} 层未过：${r.timeout ? `${TOWER_TUNE.timeout} 秒内没能打倒守关者` : '被守关者击败'}（不丢任何东西）`, '#c4483a');
+                const review = battleReviewText(r.battle, null) + (r.timeout ? `\n· ${TOWER_TUNE.timeout} 秒内没打完：输出不够，优先提高攻击与无视防御的周期攻击` : '') + '\n· 问道塔每层的词缀是固定的，可以先在下面选好迎战灵域再来';
+                setTimeout(() => uiAlert(review, { title: `问道塔第 ${floor} 层 · 复盘` }), 300);
+            }
+            calculateStats();
+            renderTower(); updateUI(); saveGame();
+        }
+        function setTowerDomain(k) { getTower().domain = SPIRIT_DOMAINS[k] ? k : null; renderTower(); saveGame(); }
+        function renderTower() {
+            const box = document.getElementById('towerContent');
+            if (!box) return;
+            if (!towerUnlocked()) { box.innerHTML = `<div class="qiyu-empty">化神（${getRealmName(TOWER_REALM)}）后开放。</div>`; return; }
+            const T = getTower(), floor = T.best + 1, g = buildTowerGuard(floor), rw = towerReward(floor);
+            if (!g) { box.innerHTML = '<div class="qiyu-empty">还没有可用的战斗区域。</div>'; return; }
+            const next3 = [floor + 1, floor + 2, floor + 3].map(f => `第 ${f} 层 ${affixTagsHtml(towerAffixes(f))}`).join('<br/>');
+            box.innerHTML = `<div class="sect-head"><div class="sect-name">问道塔</div><div class="sect-meta">最高通过 <b>${T.best}</b> 层 · 下一层第 <b>${floor}</b> 层</div>
+                    <div class="sect-xp-text">守关者按你当前最高战斗区域生成，难度随境界一起涨，每层生命 ×1.12、攻击 ×1.03；词缀 1～9 层 1 个、10～29 层 2 个、30 层起 3 个，按层号固定。</div></div>
+                <div class="hall"><div class="invade-foe">守关者：${g.e.name}（生命 ${fmtXP(g.e.hp)}、攻击 ${fmtXP(g.e.atk)}）${affixTagsHtml(g.e.affixes)}<br/>应对：${g.e.affixes.map(k => AFFIXES[k].counter).join('；')}</div>
+                    ${isDomainUnlocked() ? `<div class="invade-dom">迎战灵域：<select onchange="setTowerDomain(this.value)"><option value="">不用灵域</option>${Object.entries(SPIRIT_DOMAINS).map(([k, d]) => `<option value="${k}"${T.domain === k ? ' selected' : ''}>${d.name}（${d.desc}）</option>`).join('')}</select></div>` : ''}
+                    <div class="invade-last">首通奖励：${fmtXP(rw.coins)} 灵石${rw.shard ? ' · 1 枚战斗类奇物残片' : ''}${rw.contrib ? ' · 100 贡献' : ''}</div>
+                    <button type="button" class="btn" style="width:100%;margin-top:10px;" onclick="challengeTower()">🗼 挑战第 ${floor} 层</button></div>
+                <div class="qiyu-sub">后面几层</div><div class="hall"><div class="invade-foe">${next3}</div></div>
+                <div class="qiyu-note">挑战不限次数，输了不丢任何东西，只消耗战斗中吃掉的食物；${TOWER_TUNE.timeout} 秒内没打倒守关者也算没过。用你当时的属性、食物和迎战灵域，宗门与道途的战斗加成照常生效。首通奖励只发一次：灵石按当前最高区域每场灵石 ×（40 + 4 × 层数），每 5 层 1 枚战斗类奇物残片，每 10 层有宗门再给 100 贡献。</div>`;
+        }
+
         // ==================== 通关与结局（v7.56） ====================
         // 证道之后突破到道祖（最终境界）即算通关：突破特效与境界说明关掉后弹一次「大道终成」结局卷轴（生涯总结 + 通关印），
         // 设置页「突破特效回放」里可以回看。通关后游戏照常继续，道祖之后的成长见结局卷轴最后一段。
@@ -6124,7 +6217,7 @@
                 <div class="ending-sub">${P.name || '无名散修'}${P.provenLaw && LAW_EFFECTS[P.provenLaw] ? `以${LAW_EFFECTS[P.provenLaw].name}` : ''}证道，成就道祖。自一介凡人起，至此已走到这条路的尽头。</div>
                 <div class="ending-seal">通关</div>
                 <div class="ending-stats">${endingStatsHtml()}</div>
-                <div class="ending-after"><b>之后</b>：游戏照常继续。道祖之后仍可变强——器灵温养、神魂参悟、本源温养没有上限，法则本源可以一直凝结；天道侵蚀与自守道心仍要照看。</div>`;
+                <div class="ending-after"><b>之后</b>：游戏照常继续。道祖之后仍可变强——器灵温养、神魂参悟、本源温养没有上限，法则本源可以一直凝结；战斗页的问道塔没有顶层，看你能登到第几层（你现在最高第 ${(gameState.tower && gameState.tower.best) || 0} 层）；天道侵蚀与自守道心仍要照看。</div>`;
             document.getElementById('endingModal').classList.add('show');
         }
         function closeEnding() { document.getElementById('endingModal').classList.remove('show'); }
@@ -10081,6 +10174,8 @@
             const skill = gameState.skills.battle;
             const actionList = document.getElementById('battleActions');
             actionList.innerHTML = '';
+            const towerTab = document.getElementById('battleTab-tower');
+            if (towerTab) towerTab.style.display = towerUnlocked() ? '' : 'none';
             const oldInjury = document.getElementById('injuryBar');
             if (oldInjury) oldInjury.remove();
             if (isInjured()) actionList.insertAdjacentHTML('beforebegin', injuryBarHtml());
@@ -10948,27 +11043,19 @@
         // 切换战斗/秘境标签页
         function switchBattleTab(tab) {
             renderAutoBattleBar();
-            const areaBtn = document.getElementById('battleTab-areas');
-            const dungeonBtn = document.getElementById('battleTab-dungeons');
-            const areaContent = document.getElementById('battleContent-areas');
-            const dungeonContent = document.getElementById('battleContent-dungeons');
-
-            if (tab === 'areas') {
-                areaBtn.style.color = 'var(--gold)';
-                areaBtn.style.borderBottomColor = 'var(--gold)';
-                dungeonBtn.style.color = 'var(--text-l4)';
-                dungeonBtn.style.borderBottomColor = 'transparent';
-                areaContent.style.display = 'block';
-                dungeonContent.style.display = 'none';
-            } else {
-                areaBtn.style.color = 'var(--text-l4)';
-                areaBtn.style.borderBottomColor = 'transparent';
-                dungeonBtn.style.color = 'var(--gold)';
-                dungeonBtn.style.borderBottomColor = 'var(--gold)';
-                areaContent.style.display = 'none';
-                dungeonContent.style.display = 'block';
-                updateDungeonDisplay();
-            }
+            const tb = document.getElementById('battleTab-tower');
+            if (tb) tb.style.display = towerUnlocked() ? '' : 'none';
+            if (tab === 'tower' && !towerUnlocked()) tab = 'areas';
+            ['areas', 'dungeons', 'tower'].forEach(k => {
+                const btn = document.getElementById('battleTab-' + k), content = document.getElementById('battleContent-' + k);
+                if (!btn || !content) return;
+                const on = k === tab;
+                btn.style.color = on ? 'var(--gold)' : 'var(--text-l4)';
+                btn.style.borderBottomColor = on ? 'var(--gold)' : 'transparent';
+                content.style.display = on ? 'block' : 'none';
+            });
+            if (tab === 'dungeons') updateDungeonDisplay();
+            if (tab === 'tower') renderTower();
         }
 
         // 更新秘境显示
