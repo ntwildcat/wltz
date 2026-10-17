@@ -4564,7 +4564,10 @@
             // 1. 损失修为（10%）；元婴期起「元婴不灭」——肉身战败元婴无损，不掉修为
             // 心魔战败也不掉修为：否则修为不满进不了突破弹窗，要先补修为才能重试
             const nascentSafe = gameState.player.realmIndex >= NASCENT_SAFE_REALM || !!dungeon.isHeartDemon;
-            const lostCultivation = nascentSafe ? 0 : Math.floor(gameState.player.cultivationXP * 0.1);
+            // v7.47：元婴前普通秘境战败改为伤势（不丢修为）；天劫仍掉 10% 修为
+            const injured = !nascentSafe && !dungeon.isTribulation;
+            if (injured) applyInjury();
+            const lostCultivation = nascentSafe || injured ? 0 : Math.floor(gameState.player.cultivationXP * 0.1);
             gameState.player.cultivationXP = Math.max(0, gameState.player.cultivationXP - lostCultivation);
             deathRecord.cultivationLost = lostCultivation;
             checkRealmStability();
@@ -4592,7 +4595,7 @@
             let foodLost = 0;
             gameState.player.inventory.forEach(item => {
                 if (GAME_CONFIG.items[item.id] && GAME_CONFIG.items[item.id].type === 'food') {
-                    const lose = Math.ceil(item.qty * foodLossRate);
+                    const lose = Math.min(item.qty - 1, Math.floor(item.qty * foodLossRate));   // v7.47：向下取整，每种至少留 1 份
                     item.qty -= lose;
                     foodLost += lose;
                 }
@@ -4617,7 +4620,7 @@
             // === P2修复：生成更详细的死亡通知 ===
             const damagePercent = ((hpBefore - gameState.player.stats.hp.current) / gameState.player.stats.hp.max * 100).toFixed(0);
             const notificationText = `✗ 被${monster.name}击败！\n\n` +
-                                    (nascentSafe ? `${dungeon.isHeartDemon ? '心魔未除' : '元婴不灭'}：修为无损\n` : `丢失修为: ${lostCultivation} (10%)\n`) +
+                                    (nascentSafe ? `${dungeon.isHeartDemon ? '心魔未除' : '元婴不灭'}：修为无损\n` : injured ? `身受伤势：${INJURY_MS / 60000} 分钟内攻击 / 防御 / 生命（含装备）-${Math.round(INJURY_PCT * 100)}%（修为无损，战斗页可服食疗伤）\n` : `丢失修为: ${lostCultivation} (10%)\n`) +
                                     `丢失食物: ${foodLost}份 (${Math.round(foodLossRate * 100)}%)\n` +
                                     (orificeLost ? `戾气反噬：折损 ${orificeLost} 个仙穴（现 ${getXianqiao()} 穴）\n` : '') +
                                     (originLost ? `${GAME_CONFIG.dungeons[dungeonId].name}夺舍未遂：折损 ${originLost} 道法则本源（现 ${getLawOrigin()} 道）\n` : '') +
@@ -5524,9 +5527,9 @@
                 const toEnemy = rollNormalAttack(playerStats, { ...enemy, def: enemyEff.def, spd: enemyEff.spd }, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm),
                     { hit: getMod('hit'), crit: BASE_CRIT.rate + getMod('crit'), critMult: BASE_CRIT.dmg + getMod('critDmg'),
                       dmgMult: (1 + getMasteryBonus('battle', battle.currentArea).dmg) * getBattleSkillDmgMult() * drawHeavenQi(),
-                      dodge: domainSideDodgeVoid('foe') ? 0 : domainSideEffect('foe', 'dodge') });   // 水域：敌方那一半的闪避（只对敌时为 0）
+                      dodge: domainSideDodgeVoid('foe') ? 0 : domainSideEffect('foe', 'dodge') + (hasAffix(enemy, 'huanshen') ? AFFIX_TUNE.huanshenDodge : 0) });   // 水域：敌方那一半的闪避（只对敌时为 0）；幻身词缀，雷域下同样失效
                 if (toEnemy.hit) {
-                    enemy.currentHP -= toEnemy.dmg;
+                    damageAreaEnemy(battle, enemy, toEnemy.dmg);
                     battle.log.push(`玩家${toEnemy.crit ? '暴击！' : ''}造成${toEnemy.dmg}点伤害`);
                     battle._lastPlayerAttack = { dmg: toEnemy.dmg, crit: toEnemy.crit };
                 } else {
@@ -5537,22 +5540,32 @@
             // 合体起元气化形、大乘起元婴离体 / 法则之击：定时额外攻击（无视防御）。普通战斗一场只有两三秒，计时跨场累积
             if (enemy.currentHP > 0) {
                 tickPeriodicStrikes(areaStrikeClock, timeDelta).forEach(h => {
-                    enemy.currentHP -= h.dmg;
+                    damageAreaEnemy(battle, enemy, h.dmg);
                     (battle._lastStrikes = battle._lastStrikes || []).push(h);
                     battle.log.push(`${h.label}造成${h.dmg}点伤害（无视防御）`);
                 });
                 trimBattleLog(battle.log);
             }
 
+            if (enemy.shieldMax && enemy.currentHP > 0) {
+                enemy.noHit = (enemy.noHit || 0) + timeDelta;
+                if (enemy.noHit >= AFFIX_TUNE.gangqiReset) enemy.shield = enemy.shieldMax;   // 罡气：2 秒没挨打就回满
+            }
             if (enemy.currentHP > 0) {
                 battle.enemyAttackTimer = (battle.enemyAttackTimer || 0) + timeDelta;
                 if (battle.enemyAttackTimer >= enemyInterval) {
                     battle.enemyAttackTimer -= enemyInterval;
-                    const toPlayer = rollNormalAttack({ ...enemy, atk: enemyEff.atk, spd: enemyEff.spd }, playerStats, REALM_SUPPRESSION.calculate(areaRealm, gameState.player.realmIndex),
+                    const rage = hasAffix(enemy, 'kuangbao') && enemy.currentHP < enemy.hp * AFFIX_TUNE.kuangbaoAt ? AFFIX_TUNE.kuangbaoAtk : 1;
+                    const toPlayer = rollNormalAttack({ ...enemy, atk: Math.round(enemyEff.atk * rage), spd: enemyEff.spd }, playerStats, REALM_SUPPRESSION.calculate(areaRealm, gameState.player.realmIndex),
                         { dodge: domainSideDodgeVoid('self') ? 0 : getMod('dodge'),
                           hit: domainSideEffect('foe', 'hit'), crit: domainSideEffect('foe', 'crit'), critMult: BASE_CRIT.dmg + domainSideEffect('foe', 'critDmg') });   // 金域：敌方也可能暴击，平时 crit=0 不会触发
                     if (toPlayer.hit) {
                         battle.playerHP.current -= toPlayer.dmg;
+                        battleStats(battle)[toPlayer.crit ? 'crit' : 'normal'] += toPlayer.dmg;
+                        if (hasAffix(enemy, 'shixue')) {
+                            const heal = Math.min(enemy.hp - enemy.currentHP, Math.floor(toPlayer.dmg * AFFIX_TUNE.shixueHeal));
+                            if (heal > 0) { enemy.currentHP += heal; battleStats(battle).healed += heal; }
+                        }
                         battle.log.push(`${enemy.name}${toPlayer.crit ? '暴击！' : ''}造成${toPlayer.dmg}点伤害`);
                         battle._lastEnemyAttack = { dmg: toPlayer.dmg, crit: toPlayer.crit };
                     } else {
@@ -5617,7 +5630,7 @@
 
             // 更新敌人信息
             const monsterName = document.getElementById('monsterNameBattle');
-            if (monsterName) monsterName.innerHTML = `${battle.currentEnemy.icon || '👹'} ${battle.currentEnemy.name}`;
+            if (monsterName) monsterName.innerHTML = `${battle.currentEnemy.icon || '👹'} ${battle.currentEnemy.name}${affixTagsHtml(battle.currentEnemy.affixes)}${battle.currentEnemy.shield > 0 ? `<span class="affix-shield">护盾 ${fmtXP(battle.currentEnemy.shield)}</span>` : ''}`;
 
             // 更新玩家HP
             const playerHPBar = document.querySelector('.combatant.player .hp-fill');
@@ -5701,7 +5714,8 @@
                 const qy = getQiyu(), winAt = Date.now();
                 if (qy.lastWinAt) qiyuNoteFightSec((winAt - qy.lastWinAt) / 1000);
                 qy.lastWinAt = winAt;
-                const { coins, exp, items, lost, danhuo, shenshi, daoguo } = grantNormalBattleWin(areaKey);
+                const { coins, exp, items, lost, danhuo, shenshi, daoguo } = grantNormalBattleWin(areaKey, battle.currentEnemy.rewardMult || 1);
+                if (battle.currentEnemy.elite && Math.random() < ELITE_SHARD_CHANCE) { const got = qiyuAddShard('battle'); if (got) { battleLogEntries.push(`🧩 ${got}`); showNotification(`🧩 击败精英：${got}`, '#c2a25f', 'rare'); } }
                 auto.wins++; auto.coins += coins; auto.exp += exp;
                 battleLogEntries.push(`获得 ${coins} 灵石、${exp} 经验${danhuo ? `、${danhuo} 丹火` : ''}${shenshi ? `、${shenshi} 神识` : ''}${daoguo ? `、${daoguo} 道果` : ''}`);
                 if (items.length) battleLogEntries.push(`🎁 掉落：${formatDropList(items)}`);
@@ -5743,6 +5757,8 @@
             const undying = gameState.player.realmIndex >= VOID_UNDYING_REALM;
             if ((died && !undying) || (undying && auto.streak >= AUTO_BATTLE_MAX_LOSS_STREAK)) {
                 showNotification(undying ? `💀 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，本轮循环战斗结束（请检查装备与食物）` : '💀 你被击败了，本轮循环战斗结束', '#c4483a');
+                const review = battleReviewText(battle, areaKey);
+                setTimeout(() => uiAlert(review, { title: '战败复盘' }), 300);
                 syncBattleMode();
                 clearActiveDomain('died');
                 switchPanel('battle');
@@ -5806,9 +5822,9 @@
         }
 
         // 一场普通战斗取胜的奖励：精通加成后的灵石 / 经验 / 物品掉落，并获得该区域精通经验（每胜一场 10）
-        function grantNormalBattleWin(areaKey) {
+        function grantNormalBattleWin(areaKey, enemyMult = 1) {
             const areaData = getAction('battle', areaKey).areaData;
-            const reward = 1 + getMasteryBonus('battle', areaKey).reward + getMod('battleReward');   // battleReward：奇遇机缘
+            const reward = (1 + getMasteryBonus('battle', areaKey).reward + getMod('battleReward')) * enemyMult;   // battleReward：奇遇机缘；enemyMult：词缀敌人 ×1.2、精英 ×3
             const coins = Math.round(areaData.coins * reward);
             const exp = Math.round(areaData.exp * reward);
             gameState.player.coins += coins;
@@ -5827,6 +5843,182 @@
         }
         function dropMapToList(map) {
             return Object.entries(map).map(([id, qty]) => ({ id, qty }));
+        }
+
+        // ==================== 敌人词缀、地气与精英（v7.47） ====================
+        // 筑基起的普通战斗区域各有「地气」，每 6 小时（现实时间，所有区域同一时刻换，各区域的词缀按区域错开）轮换一次，决定这段时间该区域敌人带哪个词缀（也可能是平地气，没有词缀）。
+        // 每个词缀都对应玩家已有的应对手段（灵域、周期攻击、防御、命中、闪避、回复），对症打得快，不对症也能打只是慢；带词缀的敌人奖励 ×1.1。
+        // 精英：5% 概率刷出，带 2 个词缀、生命 ×1.5，奖励 ×2，并有 0.1% 概率掉 1 枚「战斗」奇物残片（每小时约 2600 场、130 只精英）。
+        // 标定（筑基 / 结丹 / 元婴标准玩家）：普通区域一两下打死敌人，七种地气平均慢 5%～8%（幻身 +28%、元婴罡气 +40%，其余几乎无影响），0 败；
+        // 精英 0 败。综合战斗收入不对症约 +7%、对症约 +14%（方案约束：新系统叠满不超过 +15%）。
+        const AFFIXES = {
+            tiebi:    { name: '铁壁', icon: '🛡️', desc: '防御 ×2', counter: '无视防御的周期攻击、火域（双方防御 -30%）' },
+            jifeng:   { name: '疾风', icon: '💨', desc: '速度 +50%', counter: '冰域（双方速度 -30%）、命中加成' },
+            huanshen: { name: '幻身', icon: '👥', desc: '闪避 +30%', counter: '雷域（闪避失效）、命中加成' },
+            shixue:   { name: '嗜血', icon: '🩸', desc: '造成伤害的 30% 化为自身生命', counter: '闪避（水域）、高防御' },
+            gangqi:   { name: '罡气', icon: '🔆', desc: '开场护盾 = 30% 最大生命，2 秒没挨打就回满', counter: '攻速（风域）、多段周期攻击' },
+            fanzhen:  { name: '反震', icon: '🪞', desc: '受到伤害的 20% 反弹给你（按你的防御减免）', counter: '高防御、回复（木域）' },
+            kuangbao: { name: '狂暴', icon: '😡', desc: '生命低于 50% 时攻击 +50%', counter: '爆发速杀（金域暴击）、高防御' }
+        };
+        const AFFIX_TUNE = { tiebiDef: 2, jifengSpd: 1.5, huanshenDodge: 0.3, shixueHeal: 0.3, gangqiShield: 0.3, gangqiReset: 2, fanzhenRate: 0.2, kuangbaoAtk: 1.5, kuangbaoAt: 0.5 };
+        const DIQI_FROM_REALM = 14;   // 筑基初期起的区域才有地气与精英（新手期不打扰）
+        const DIQI_PERIOD_MS = 6 * 3600 * 1000;
+        const DIQI_ROTATION = ['tiebi', 'jifeng', 'huanshen', 'shixue', null, 'gangqi', 'fanzhen', 'kuangbao'];
+        const AFFIX_REWARD = 1.1, ELITE_REWARD = 2, ELITE_CHANCE = 0.05, ELITE_HP = 1.5, ELITE_SHARD_CHANCE = 0.001;
+
+        function areaHasDiqi(areaKey) {
+            const a = getAction('battle', areaKey);
+            return !!(a && a.areaData && a.areaData.minLevel >= DIQI_FROM_REALM);
+        }
+        function areaDiqi(areaKey, t = Date.now()) {
+            if (!areaHasDiqi(areaKey)) return null;
+            let h = 0;
+            for (const ch of areaKey) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+            return DIQI_ROTATION[(Math.floor(t / DIQI_PERIOD_MS) + h) % DIQI_ROTATION.length];
+        }
+        function diqiLeftMs(t = Date.now()) { return DIQI_PERIOD_MS - (t % DIQI_PERIOD_MS); }
+        function fmtLeft(ms) { const m = Math.max(1, Math.ceil(ms / 60000)); return m >= 60 ? `${Math.floor(m / 60)} 小时 ${m % 60} 分` : `${m} 分钟`; }
+        function affixTagsHtml(list) {
+            return (list || []).map(k => AFFIXES[k] ? `<span class="affix-tag" title="${AFFIXES[k].desc}；应对：${AFFIXES[k].counter}">${AFFIXES[k].icon}${AFFIXES[k].name}</span>` : '').join('');
+        }
+
+        // 给新生成的敌人挂词缀（createAreaEnemy 调用）
+        function applyAreaAffixes(enemy, areaKey, t) {
+            if (!areaHasDiqi(areaKey)) return enemy;
+            const diqi = areaDiqi(areaKey, t);
+            const affixes = diqi ? [diqi] : [];
+            let rewardMult = diqi ? AFFIX_REWARD : 1;
+            if (Math.random() < ELITE_CHANCE) {
+                const pool = Object.keys(AFFIXES).filter(k => !affixes.includes(k));
+                while (affixes.length < 2) affixes.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+                enemy.elite = true;
+                enemy.name = '精英·' + enemy.name;
+                enemy.hp = Math.round(enemy.hp * ELITE_HP);
+                enemy.currentHP = enemy.hp;
+                rewardMult = ELITE_REWARD;
+            }
+            enemy.affixes = affixes;
+            enemy.rewardMult = rewardMult;
+            if (affixes.includes('tiebi')) enemy.def = Math.round(enemy.def * AFFIX_TUNE.tiebiDef);
+            if (affixes.includes('jifeng')) enemy.spd = Math.round(enemy.spd * AFFIX_TUNE.jifengSpd);
+            if (affixes.includes('gangqi')) { enemy.shieldMax = Math.round(enemy.hp * AFFIX_TUNE.gangqiShield); enemy.shield = enemy.shieldMax; enemy.noHit = 0; }
+            return enemy;
+        }
+        function hasAffix(enemy, k) { return !!(enemy && enemy.affixes && enemy.affixes.includes(k)); }
+
+        // 战斗记录：给战败复盘用
+        function battleStats(battle) { return battle.stats || (battle.stats = { normal: 0, crit: 0, reflect: 0, dealt: 0, absorbed: 0, healed: 0 }); }
+        // 玩家对敌人造成伤害：罡气先吸收，反震按玩家防御减免后反弹
+        function damageAreaEnemy(battle, enemy, dmg) {
+            const st = battleStats(battle);
+            let left = dmg;
+            if (enemy.shield > 0) {
+                const ab = Math.min(enemy.shield, left);
+                enemy.shield -= ab; left -= ab; st.absorbed += ab;
+            }
+            enemy.noHit = 0;
+            enemy.currentHP -= left;
+            st.dealt += left;
+            if (hasAffix(enemy, 'fanzhen') && dmg > 0) {
+                const back = Math.floor(BATTLE_FORMULAS.calculateDamage({ atk: dmg * AFFIX_TUNE.fanzhenRate }, { def: gameState.player.stats.def || 0 }));
+                if (back > 0) { battle.playerHP.current -= back; st.reflect += back; }
+            }
+        }
+
+        // 区域卡片上的地气说明
+        function diqiCardHtml(areaKey) {
+            if (!areaHasDiqi(areaKey)) return '';
+            const k = areaDiqi(areaKey), left = fmtLeft(diqiLeftMs());
+            if (!k) return `<div class="diqi-line">🌫️ 地气平和：敌人没有词缀 · ${left}后轮换 · 精英 ${Math.round(ELITE_CHANCE * 100)}%</div>`;
+            const a = AFFIXES[k];
+            return `<div class="diqi-line" title="应对：${a.counter}">${a.icon} 地气·${a.name}：敌人${a.desc}，奖励 ×${AFFIX_REWARD} · ${left}后轮换<br/><span class="diqi-counter">应对：${a.counter}</span></div>`;
+        }
+
+        // 战败复盘：伤害来源 + 从玩家已有的手段里挑对策
+        function affixCounterTips(enemy) {
+            const tips = [];
+            const dom = isDomainUnlocked();
+            const strikes = PERIODIC_STRIKES.filter(s => s.mult() > 0).map(s => s.label.replace(/^\S+\s/, ''));
+            const domTip = (k, why) => { if (dom) tips.push(`灵域选「${SPIRIT_DOMAINS[k].name}」（${why}）`); };
+            (enemy.affixes || []).forEach(k => {
+                if (k === 'tiebi') { if (strikes.length) tips.push(`铁壁挡不住无视防御的周期攻击：你有${strikes.join('、')}`); domTip('fire', '双方防御 -30%'); }
+                if (k === 'jifeng') { domTip('ice', '双方速度 -30%'); tips.push('命中看双方速度差：提高速度（饰品 / 淬炼饰品）能抵消它的速度'); }
+                if (k === 'huanshen') { domTip('thunder', '闪避失效'); tips.push('幻身让你更难打中：提高速度能拉高命中率'); }
+                if (k === 'shixue') { domTip('water', '闪避 +15%，挨打少它回血就少'); tips.push('嗜血按它打中你的伤害回血：提高防御（换装备 / 淬炼）能同时压低它的回血'); }
+                if (k === 'gangqi') { domTip('wind', '攻击间隔 -0.5 秒，护盾来不及回满'); tips.push('罡气 2 秒没挨打才回满：提高速度缩短出手间隔，就能一直压着它的护盾'); if (strikes.length) tips.push(`周期攻击能持续压住罡气：你有${strikes.join('、')}`); }
+                if (k === 'fanzhen') { tips.push('反震按你的防御减免：提高防御最直接'); domTip('wood', '每秒回复 1.5% 生命'); }
+                if (k === 'kuangbao') { domTip('metal', '暴击率 +20%，在它狂暴前打完'); tips.push('狂暴只在它生命低于一半时发作：输出越高，它狂暴的时间越短'); }
+            });
+            return tips;
+        }
+        function battleReviewText(battle, areaKey) {
+            const e = battle.currentEnemy, st = battleStats(battle);
+            const lines = [`对手：${e.name}${(e.affixes || []).length ? '（' + e.affixes.map(k => `${AFFIXES[k].name}：${AFFIXES[k].desc}`).join('；') + '）' : '（无词缀）'}`];
+            const taken = st.normal + st.crit + st.reflect;
+            if (taken > 0) {
+                const pct = v => Math.round(v / taken * 100) + '%';
+                lines.push(`你承受的伤害：普通攻击 ${pct(st.normal)}${st.crit ? `、暴击 ${pct(st.crit)}` : ''}${st.reflect ? `、反震 ${pct(st.reflect)}` : ''}`);
+            }
+            lines.push(`你造成 ${fmtXP(st.dealt)} 伤害，敌人还剩 ${Math.max(0, Math.round(e.currentHP / e.hp * 100))}% 生命` +
+                (st.absorbed ? `；罡气吸收了 ${fmtXP(st.absorbed)}` : '') + (st.healed ? `；嗜血回复了 ${fmtXP(st.healed)}` : ''));
+            const tips = affixCounterTips(e);
+            if (!getFoodCount()) tips.push('身上没有可用的战斗食物了');
+            const diqi = areaDiqi(areaKey);
+            if (diqi && (e.affixes || []).includes(diqi)) tips.push(`这里现在是「${AFFIXES[diqi].name}」地气，${fmtLeft(diqiLeftMs())}后轮换，也可以先去别的区域`);
+            if (e.elite) tips.push('这是精英（生命 ×1.5、两个词缀），普通敌人会好打得多');
+            if (tips.length) lines.push('\n你可以试：\n' + tips.map(t => '· ' + t).join('\n'));
+            return lines.join('\n');
+        }
+
+        // 离线托管战败：退到上一个已解锁的区域继续
+        function prevBattleArea(areaKey) {
+            const list = Object.entries(gameState.skills.battle.actions).filter(([, a]) => isBattleAreaUnlocked(a))
+                .sort(([, a], [, b]) => a.areaData.minLevel - b.areaData.minLevel).map(([k]) => k);
+            const i = list.indexOf(areaKey);
+            return i > 0 ? list[i - 1] : null;
+        }
+
+        // ==================== 伤势（v7.47） ====================
+        // 元婴前秘境战败不再丢 10% 修为，改为 10 分钟伤势：最终攻击 / 防御 / 生命（含装备）-10%（在 calculateStats 末尾乘，不影响生活技能），不叠加，再败只刷新时长；
+        // 现实时间计时（离线也在恢复）；服食一份战斗食物可缩短 5 分钟。元婴起「元婴不灭」不受伤势；天劫仍按原规则掉修为。
+        const INJURY_MS = 10 * 60 * 1000, INJURY_PCT = 0.10, INJURY_FOOD_MS = 5 * 60 * 1000;
+        let injuryWasActive = false;
+        function isInjured() { return ((gameState.player && gameState.player.injuredUntil) || 0) > Date.now(); }
+        function applyInjury() {
+            gameState.player.injuredUntil = Date.now() + INJURY_MS;
+            injuryWasActive = true;
+            calculateStats();
+        }
+        function tickInjury() {
+            const now = isInjured();
+            if (injuryWasActive && !now) { injuryWasActive = false; calculateStats(); showNotification('🩹 伤势已经痊愈', '#6fa980'); refreshInjuryBar(); }
+            else if (now) { injuryWasActive = true; refreshInjuryBar(); }
+        }
+        function healInjuryWithFood() {
+            if (!isInjured()) return;
+            pickBestFood();
+            const id = gameState.player.foodSlot;
+            if (!id || !getFoodCount()) { showNotification('身上没有可用的战斗食物', '#c98a3e'); return; }
+            consumeItem(id, 1);
+            gameState.player.injuredUntil -= INJURY_FOOD_MS;
+            showNotification(`🩹 服食${GAME_CONFIG.items[id].name}，伤势缩短 5 分钟`, '#6fa980');
+            tickInjury();
+            updateUI();
+            saveGame();
+        }
+        function injuryBarHtml() {
+            if (!isInjured()) return '';
+            return `<div class="injury-bar" id="injuryBar"><span>🩹 伤势：攻击 / 防御 / 生命（含装备）-${Math.round(INJURY_PCT * 100)}%，还剩 <b id="injuryLeft">${fmtLeft(gameState.player.injuredUntil - Date.now())}</b></span><button type="button" class="btn btn-small" onclick="healInjuryWithFood()">服食疗伤（-5 分钟）</button></div>`;
+        }
+        function refreshInjuryBar() {
+            const bar = document.getElementById('injuryBar');
+            if (!isInjured()) { if (bar) bar.remove(); return; }
+            const left = document.getElementById('injuryLeft');
+            if (left) left.textContent = fmtLeft(gameState.player.injuredUntil - Date.now());
+            else {
+                const list = document.getElementById('battleActions');
+                if (list && list.parentNode) list.insertAdjacentHTML('beforebegin', injuryBarHtml());
+            }
         }
 
         // ==================== 奇遇（v7.45） ====================
@@ -6146,7 +6338,7 @@
         }
 
         function tickQiyu(dt) {
-            if (++qiyuTickCount % 10 === 0) { qiyuPruneBuffs(); renderQiyuSeal(); if (isQiyuModalOpen()) renderQiyuModal(); }
+            if (++qiyuTickCount % 10 === 0) { qiyuPruneBuffs(); renderQiyuSeal(); if (isQiyuModalOpen()) renderQiyuModal(); tickInjury(); }
             const act = qiyuActivity();
             if (!act) return;
             const q = getQiyu();
@@ -6413,10 +6605,12 @@
             gameState.battleSpeed = 5;
             const r = { fights: 0, wins: 0, losses: 0, coins: 0, exp: 0, stopped: false, drops: {}, lostDrops: {}, danhuo: 0, shenshi: 0, daoguo: 0 };
             let elapsed = 0, streak = 0;
+            const t0 = Date.now() - budgetSeconds * 1000;   // 地气按离线期间的时间轮换
+            r.retreats = [];
             try {
                 while (elapsed < budgetSeconds && r.fights < 20000) {
                     const battle = { currentArea: areaKey, playerHP: { current: hp.current, max: hp.max },
-                        currentEnemy: createAreaEnemy(areaKey), log: [], turnCount: 0 };
+                        currentEnemy: createAreaEnemy(areaKey, t0 + elapsed * 1000), log: [], turnCount: 0 };
                     gameState.player.foodUseTimer = FOOD_CONFIG.autoEatConfig.cooldown;
                     pickBestFood();
                     do {
@@ -6427,14 +6621,22 @@
                     const won = battle.currentEnemy.currentHP <= 0;
                     hp.current = battle.playerHP.current <= 0 ? Math.floor(hp.max * 0.5) : Math.min(hp.max, battle.playerHP.current);
                     if (won) {
-                        const g = grantNormalBattleWin(areaKey);
+                        const g = grantNormalBattleWin(areaKey, battle.currentEnemy.rewardMult || 1);
+                        if (battle.currentEnemy.elite && Math.random() < ELITE_SHARD_CHANCE) { if (qiyuAddShard('battle')) r.shards = (r.shards || 0) + 1; }
                         r.wins++; r.coins += g.coins; r.exp += g.exp; streak = 0;
                         mergeDrops(r.drops, g.items); mergeDrops(r.lostDrops, g.lost);
                         r.danhuo += g.danhuo; r.shenshi += g.shenshi; r.daoguo += g.daoguo;
                     } else {
                         r.losses++;
                         // 被击败：与在线一致，循环结束；炼虚起身融天地，元气重凝后接着打，只受连败上限约束
-                        if (battle.playerHP.current <= 0 && gameState.player.realmIndex < VOID_UNDYING_REALM) { r.died = true; break; }
+                        // v7.47：被击败后退到上一个区域接着打（最弱的区域也打不过才结束）
+                        if (battle.playerHP.current <= 0 && gameState.player.realmIndex < VOID_UNDYING_REALM) {
+                            const prev = prevBattleArea(areaKey);
+                            if (!prev) { r.died = true; r.review = battleReviewText(battle, areaKey); break; }
+                            r.retreats.push({ from: areaKey, to: prev, review: battleReviewText(battle, areaKey) });
+                            areaKey = prev; streak = 0;
+                            continue;
+                        }
                         if (++streak >= AUTO_BATTLE_MAX_LOSS_STREAK) { r.stopped = true; break; }
                     }
                 }
@@ -6445,6 +6647,7 @@
             auto.wins += r.wins; auto.losses += r.losses; auto.coins += r.coins; auto.exp += r.exp; auto.streak = streak;
             if (r.wins > 0) qiyuNoteFightSec(elapsed / r.wins);
             r.elapsed = Math.round(elapsed);
+            r.area = areaKey;
             return r;
         }
 
@@ -7435,7 +7638,7 @@
             total += getAvatarMod(key);   // 化神期身外化身：永久小幅 +攻击/防御
             total += getXianMod(key);   // 真仙：道体（每个亮着的仙窍生命 / 防御 +1%）与三衰
             total += getEndlessMod(key);   // 大乘以后的无上限修炼：器灵温养 / 神魂参悟 / 本源温养
-            total += getQiyuMod(key);   // 奇遇的限时机缘
+            total += getQiyuMod(key);   // 奇遇的限时机缘与奇物
             return total;
         }
 
@@ -8966,6 +9169,9 @@
             const skill = gameState.skills.battle;
             const actionList = document.getElementById('battleActions');
             actionList.innerHTML = '';
+            const oldInjury = document.getElementById('injuryBar');
+            if (oldInjury) oldInjury.remove();
+            if (isInjured()) actionList.insertAdjacentHTML('beforebegin', injuryBarHtml());
 
             const spiritRootNames = {
                 metal: '金灵根', wood: '木灵根', water: '水灵根', fire: '火灵根',
@@ -9027,6 +9233,7 @@
                         <div class="action-name">${action.name}</div>
                         <div class="action-desc">${action.desc}</div>
                         ${areaRewardHtml(key, action)}
+                        ${isDisabled ? '' : diqiCardHtml(key)}
                         <div class="recipe-req ${isDisabled ? 'unmet' : 'met'}">${isDisabled ? '✗' : '✓'} 境界要求：${getRealmName(action.areaData.minLevel)}</div>
                         ${isDisabled ? '' : (() => { const m = getMasteryInfo('battle', key); return `<div class="recipe-mastery" title="${describeMastery('battle', key)}">🎓 精通 <b>Lv.${m.level}</b>${m.maxed ? ' ✦满级' : ` · ${m.exp}/${m.need}`}<div class="mastery-track"><div class="mastery-fill" style="width: ${m.percent}%"></div></div></div>`; })()}
                         ${statusHint}
@@ -10172,18 +10379,18 @@
         })();
 
         // 按区域随机生成一个敌人（在线战斗与离线自动战斗共用）
-        function createAreaEnemy(areaKey) {
+        function createAreaEnemy(areaKey, t = Date.now()) {
             const areaEnemies = BATTLE_ENEMY_CONFIGS[areaKey] || BATTLE_ENEMY_CONFIGS.forest;
             const enemyTemplate = areaEnemies[Math.floor(Math.random() * areaEnemies.length)];
             // P4 平衡层：按区域系数缩放敌人血量与攻击（见 P4_AREA_SCALE）
             const areaScale = P4_AREA_SCALE[areaKey] || { hp: 1, atk: 1 };
             const scaledHP = Math.max(1, Math.round(enemyTemplate.hp * areaScale.hp));
-            return {
+            return applyAreaAffixes({
                 ...enemyTemplate,
                 hp: scaledHP,
                 atk: Math.max(1, Math.round(enemyTemplate.atk * areaScale.atk)),
                 currentHP: scaledHP
-            };
+            }, areaKey, t);
         }
 
         function enterBattleArea(areaKey, auto = false) {
@@ -11282,6 +11489,9 @@
                     });
                 }
             });
+
+            // 伤势（v7.47）：最终攻击 / 防御 / 生命（含装备）-10%
+            if (isInjured()) ['atk', 'def', 'hp'].forEach(k => { totalStats[k] = Math.floor(totalStats[k] * (1 - INJURY_PCT)); });
 
             // P8 修改：HP改为 {current, max} 结构
             const oldMaxHP = gameState.player.stats?.hp?.max || gameState.player.stats?.hp || baseStats.hp;
@@ -12846,9 +13056,12 @@
                     const lostText = Object.keys(res.lostDrops).length ? `\n❌ 背包已满，${formatDropList(dropMapToList(res.lostDrops))} 未能获得` : '';
                     const msg = `🤖 自动战斗 ${mins} 分钟：共 ${res.fights} 场，胜 ${res.wins} 负 ${res.losses}\n+${res.coins}灵石 +${res.exp}战斗经验${res.danhuo ? ` +${res.danhuo}丹火` : ''}${res.shenshi ? ` +${res.shenshi}神识` : ''}${res.daoguo ? ` +${res.daoguo}道果` : ''}${dropText}${lostText}` +
                         (res.stopped ? `\n⚠️ 连续 ${AUTO_BATTLE_MAX_LOSS_STREAK} 场未能取胜，已停止（请检查装备与食物）` : '');
-                    showNotification(msg + (res.died ? `
+                    const retreatText = res.retreats.map(x => `\n💀 在${qiyuAreaName(x.from)}被击败，退到${qiyuAreaName(x.to)}继续`).join('') + (res.shards ? `\n🧩 击败精英得到 ${res.shards} 枚奇物残片` : '');
+                    showNotification(msg + retreatText + (res.died ? `
 💀 第 ${res.fights} 场被击败，循环战斗已结束（生命恢复至50%，请检查装备与食物）` : ''), (res.stopped || res.died) ? '#c98a3e' : '#6fa980');
-                    if (!res.stopped && !res.died) enterBattleArea(savedAction.action, true);
+                    const lastReview = res.review || (res.retreats.length ? res.retreats[res.retreats.length - 1].review : '');
+                    if (lastReview) setTimeout(() => uiAlert(lastReview, { title: '战败复盘（离线托管）' }), 600);
+                    if (!res.stopped && !res.died) enterBattleArea(res.area || savedAction.action, true);
                     renderAutoBattleBar();
                     saveGame();
                     return;

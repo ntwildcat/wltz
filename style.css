@@ -3009,3 +3009,9 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 .offline-hl { margin-bottom: 12px; }
 .offline-hl-row { padding: 6px 10px; margin-bottom: 4px; border-left: 3px solid var(--bronze-dim); background: var(--bg-l2); font-size: 0.9em; color: var(--text-l3); line-height: 1.6; }
 .offline-bill summary { cursor: pointer; color: var(--text-l2); font-size: 0.9em; padding: 4px 0; }
+/* v7.47 词缀 / 地气 / 伤势 */
+.affix-tag { display: inline-block; margin-left: 6px; padding: 0 5px; font-size: 0.72em; line-height: 1.6; border: 1px solid var(--cinnabar-2); color: var(--cinnabar-2); border-radius: 2px; vertical-align: middle; white-space: nowrap; }
+.affix-shield { display: inline-block; margin-left: 6px; font-size: 0.72em; color: var(--jade); vertical-align: middle; }
+.diqi-line { margin: 4px 0; font-size: 0.8em; color: var(--text-l2); line-height: 1.5; }
+.diqi-counter { color: var(--text-l4); }
+.injury-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 0 0 10px; padding: 8px 12px; border-left: 3px solid var(--cinnabar-2); background: var(--bg-l2); font-size: 0.88em; color: var(--text-l2); }
