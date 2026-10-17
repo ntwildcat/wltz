@@ -3056,7 +3056,7 @@
         function getMaxDungeonRevives(dungeon) {
             const r = gameState.player.realmIndex;
             if (r < NASCENT_SAFE_REALM) return 0;
-            return dungeon && dungeon.isTribulation ? 1 : (r >= DALUO_REALM ? DALUO_REVIVES : r >= VOID_UNDYING_REALM ? VOID_DUNGEON_REVIVES : 1);
+            return dungeon && dungeon.isTribulation ? 1 : (r >= DALUO_REALM ? DALUO_REVIVES : r >= VOID_UNDYING_REALM ? VOID_DUNGEON_REVIVES : 1) + getDaoPathMod('revives');   // 道途·不灭（只在普通秘境）
         }
         // 结婴心魔（原著"需要充分准备应对结婴心魔"）：结丹圆满冲击元婴前必须先斩心魔——一场镜像战（tribulation21，见 buildMirrorBoss），
         // 复用天劫的「突破前必须通关」机制。"充分准备"就是备好食物、满血再进
@@ -3114,7 +3114,7 @@
         }
         function getHeavenQiBonus() {
             const r = gameState.player.realmIndex;
-            return r < JINGYUAN.from ? 0 : JINGYUAN.dmg[r >= JINGYUAN.skilledRealm ? 1 : 0];
+            return r < JINGYUAN.from ? 0 : JINGYUAN.dmg[r >= JINGYUAN.skilledRealm ? 1 : 0] * (1 + getDaoPathMod('heavenQi'));   // 道途·御气
         }
         // 人界化神期可以选择不调动天地灵气（v7.05）：没有伤害加成，也不耗精元——挂机刷怪又想专心修炼时关掉。
         // 灵界不耗精元，开关不起作用。
@@ -3151,7 +3151,7 @@
         const QI_FORM = { realm: 34, interval: 3, base: 0.1, perAvgLevel: 0.025 };   // 法则平均 0 / 10 / 20 / 30 级：攻击 ×0.10 / 0.35 / 0.60 / 0.85
         function getLawAvgLevel() { return LAW_IDS.reduce((sum, id) => sum + getLawInfo(id).level, 0) / LAW_IDS.length; }
         function getQiFormMult() {
-            return gameState.player.realmIndex < QI_FORM.realm ? 0 : QI_FORM.base + QI_FORM.perAvgLevel * getLawAvgLevel();
+            return gameState.player.realmIndex < QI_FORM.realm ? 0 : (QI_FORM.base + QI_FORM.perAvgLevel * getLawAvgLevel()) * (1 + getDaoPathMod('qiForm'));   // 道途·化形
         }
         // ---- 大乘期（v7.08） ----
         // 原著"修士需将灵力不断注入元婴，使其从婴儿形态蜕变为青年形态。大乘期可令元婴离体助战，并初步掌握使用法则之力——
@@ -3176,12 +3176,12 @@
         function getLawSuppression() { return getMasteredLaws().length * LAW_MASTER_SUPPRESS; }
         function getNascentStrikeMult() {
             if (gameState.player.realmIndex < DACHENG_REALM || isStrikeBlockedByShuai()) return 0;   // 神衰：元婴离体停摆
-            return NASCENT_STRIKE.base + NASCENT_STRIKE.perLevel * getNascentSoul() + NASCENT_TEMPER.strikePerLevel * getNascentTemper();
+            return (NASCENT_STRIKE.base + NASCENT_STRIKE.perLevel * getNascentSoul() + NASCENT_TEMPER.strikePerLevel * getNascentTemper()) * (1 + getDaoPathMod('nascentStrike'));   // 道途·离体
         }
         function getLawStrikeMult() {
             const n = getMasteredLaws().length;
             if (!n || isStrikeBlockedByShuai() || isAssimilated() || isLawRestrained()) return 0;   // 神衰停摆 / 天道同化 / 收敛法则
-            return (1 + n) * (1 + DAO_SI_STRIKE * getDaoSi()) * (isDaozu() ? DAOZU.strikeMult : 1);
+            return (1 + n) * (1 + DAO_SI_STRIKE * getDaoSi()) * (isDaozu() ? DAOZU.strikeMult : 1) * (1 + getDaoPathMod('lawStrike'));   // 道途·本源
         }
         // 道丝（v7.23）：金仙起法则可练过 30 级，每条法则超出 30 的每一级凝成一缕道丝，每缕道丝让法则之击伤害 +DAO_SI_STRIKE
         const DAO_SI_STRIKE = 0.02;
@@ -3412,20 +3412,20 @@
             23: [`💨 瞬移神通：元婴稳固，闪避 +${TELEPORT_DODGE * 100}%`],
             24: ['⚔️ 深渊遗迹战斗区域开放', `📜 化神需要特殊功法：拥有「太虚元神诀」（商城）可让化神成功率 +${HUASHEN_RATE.art * 100}%，可以先攒灵石`],
             25: ['🌠 太虚幻境秘境开放：通关一次即得化神机缘', '💊 化神丹配方解锁，每次冲击化神服一颗', `⚡ 化神成功率极低：基础 ${HUASHEN_RATE.base * 100}% + 元婴品质最多 +${HUASHEN_RATE.quality * 100}% + 拥有「太虚元神诀」+${HUASHEN_RATE.art * 100}% + 通关太虚幻境（机缘）+${HUASHEN_RATE.chance * 100}%；失败耗掉丹药但不掉境界`],
-            26: [`🌊 调动天地灵气：从此每次出手伤害 +${JINGYUAN.dmg[0] * 100}%（化神中期起 +${JINGYUAN.dmg[1] * 100}%）。只是凡界灵气稀薄，每次出手耗 ${JINGYUAN.perAttack} 点精元（上限 ${JINGYUAN.max}，每分钟自然恢复 ${JINGYUAN.regenPerMin}）：精元耗尽就没有这份加成，而且精元越低修炼越慢（最多 −${JINGYUAN.cultPenalty * 100}%）——想专心修炼就少出手。侧栏「境界感悟」随时显示精元`, `💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%`, '☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）。到了合体期，法则就是斗法的核心：战斗效果翻倍，还决定元气化形的威力和之后几次大天劫的难度，可以早点开始参悟', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放'],
+            26: [`🌊 调动天地灵气：从此每次出手伤害 +${JINGYUAN.dmg[0] * 100}%（化神中期起 +${JINGYUAN.dmg[1] * 100}%）。只是凡界灵气稀薄，每次出手耗 ${JINGYUAN.perAttack} 点精元（上限 ${JINGYUAN.max}，每分钟自然恢复 ${JINGYUAN.regenPerMin}）：精元耗尽就没有这份加成，而且精元越低修炼越慢（最多 −${JINGYUAN.cultPenalty * 100}%）——想专心修炼就少出手。侧栏「境界感悟」随时显示精元`, `💪 肉身极限：生命 +${HUASHEN_BODY_HP * 100}%；神识质变：神识产出 +${HUASHEN_SHENSHI_OUT * 100}%`, '☯️ 悟道系统解锁：新增「悟道」技能页，八种法则对应八种灵根属性，花时间"参悟"涨等级，每级给对应的被动加成，没有等级上限（只受当前境界的领悟上限约束，突破后上限会提高）。到了合体期，法则就是斗法的核心：战斗效果翻倍，还决定元气化形的威力和之后几次大天劫的难度，可以早点开始参悟', '🌀 第二个分身解锁（用法同第一个，配方卡片点「交给分身」）', '🌀 灵域解锁：进入秘境/战斗区域/渡劫前会先弹窗选一个灵域（8 种，选完整场战斗持续生效、中途不能换），激活要花 15 点神识，效果对你和敌人双方同时生效', '👤 身外化身解锁：神识商城里花神识升级（最多10级），被动加攻击和防御，不用战斗前手动选，一直生效，跟灵域是两个独立系统', '⚔️ 混沌荒原战斗区域开放', '☯️ 道途·化神·道心：御气（战斗）/ 固元（生存）/ 神游（生活），三选一，之后可在装备页重选'],
             27: [`🌊 天地灵气运用纯熟：出手伤害加成 +${JINGYUAN.dmg[0] * 100}% → +${JINGYUAN.dmg[1] * 100}%`],
             28: ['⚔️ 九幽冥渊战斗区域开放'],
             29: ['🌫️ 虚界秘境开放：通关一次即找到通往上界的界壁裂隙——这是飞升上界（突破炼虚）的前提', '🌈 补灵根：突破炼虚须身具金木水火土五行灵根。虚界秘境会掉落五行之精，每缺一行要 2 个（你本身就是的那一行不用；雷 / 冰 / 风异灵根五行都要补），凑齐后在修炼页「补全五行灵根」', '💊 化虚丹配方解锁，飞升时服一颗'],
-            30: [`🌌 飞升上界：这里灵气充沛，出手不再损耗精元，天地灵气的伤害加成（+${JINGYUAN.dmg[1] * 100}%）从此常驻，修炼也不再受精元拖累`, '🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', `🌌 身融天地，不死不灭：战斗区域被击败不再退出循环（元气重凝，生命回到一半继续打，连败 3 场才停），秘境里可夺舍重生 ${VOID_DUNGEON_REVIVES} 次——但天劫例外，寿元再长，也躲不过劫数`, '☄️ 大天劫：炼虚以上共四道，比小天劫凶得多——炼虚圆满、合体圆满、大乘中期、大乘圆满（飞升天劫）各一次，一劫重过一劫，后两次往往要试几次。渡过一次生命 / 防御永久 +3%'],
+            30: [`🌌 飞升上界：这里灵气充沛，出手不再损耗精元，天地灵气的伤害加成（+${JINGYUAN.dmg[1] * 100}%）从此常驻，修炼也不再受精元拖累`, '🌀 化虚 / 道则系统解锁：悟道页每个法则卡片上多一个「化虚」按钮——花掉这个法则的一部分等级（不是白扣，等级可以再参悟练回来）+ 道果 + 虚晶，换一枚实体「道则」道具，镶嵌进装备页新增的「道基」槽，比单纯留着法则等级更集中地生效；道则分下品/中品/上品/极品/本源品五个品阶，品阶越高效果越强、消耗也越多，可以后续再花代价升级品阶', '⚔️ 虚渊战斗区域开放', `🌌 身融天地，不死不灭：战斗区域被击败不再退出循环（元气重凝，生命回到一半继续打，连败 3 场才停），秘境里可夺舍重生 ${VOID_DUNGEON_REVIVES} 次——但天劫例外，寿元再长，也躲不过劫数`, '☄️ 大天劫：炼虚以上共四道，比小天劫凶得多——炼虚圆满、合体圆满、大乘中期、大乘圆满（飞升天劫）各一次，一劫重过一劫，后两次往往要试几次。渡过一次生命 / 防御永久 +3%', '☯️ 道途·炼虚·道心：破虚（战斗）/ 不灭（生存）/ 化火（生活），三选一，之后可在装备页重选'],
             32: ['⚔️ 化实之界战斗区域开放'],
             33: ['🌌 天道秘境开放', '💊 合体丹配方解锁，突破炼虚圆满前记得炼够'],
-            34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 合体期以融合为本：道果页「合道」——元婴分身与身外化身归于本体（不可逆，之后不能再用分身），法力成倍增长：所有主行动速度 +100%、生命/攻击/防御/速度 +15%、身外化身加成翻倍、神识与道果产出提升。合体初期突破中期之前必须合道', `☯️ 借用法则之力：从此斗法的核心不再是法力多寡，而是天地之力——悟道法则里与战斗有关的效果（攻击、生命、防御、速度、暴击、闪避、命中、回复、食物）全部 ×${LAW_POWER_MULT}`, `🌀 元气化形：战斗中每 ${QI_FORM.interval} 秒额外打出一击，无视防御，伤害 = 攻击 × (${QI_FORM.base * 100}% + 八种法则平均等级 × ${QI_FORM.perAvgLevel * 100}%)——法则悟得越深，化形越强`, '⚔️ 道痕荒原战斗区域开放'],
+            34: ['🍎 道果系统解锁：新增「道果」技能页，玩法跟丹火/神识一样是货币技能', '🌟 合体期以融合为本：道果页「合道」——元婴分身与身外化身归于本体（不可逆，之后不能再用分身），法力成倍增长：所有主行动速度 +100%、生命/攻击/防御/速度 +15%、身外化身加成翻倍、神识与道果产出提升。合体初期突破中期之前必须合道', `☯️ 借用法则之力：从此斗法的核心不再是法力多寡，而是天地之力——悟道法则里与战斗有关的效果（攻击、生命、防御、速度、暴击、闪避、命中、回复、食物）全部 ×${LAW_POWER_MULT}`, `🌀 元气化形：战斗中每 ${QI_FORM.interval} 秒额外打出一击，无视防御，伤害 = 攻击 × (${QI_FORM.base * 100}% + 八种法则平均等级 × ${QI_FORM.perAvgLevel * 100}%)——法则悟得越深，化形越强`, '⚔️ 道痕荒原战斗区域开放', '☯️ 道途·合体·道心：化形（战斗）/ 合一（生存）/ 悟真（生活），三选一，之后可在装备页重选'],
             36: ['⚔️ 合一虚境战斗区域开放'],
             37: ['🌟 鸿蒙圣域秘境开放', '💊 大乘丹配方解锁，突破大乘时服一颗'],
-            38: [`👶 元婴离体助战：从此战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次（无视防御），威力随蜕变等级提高`, `👶 元婴蜕变：修炼页「元婴注灵」把灵力注入元婴——修为只得一半，每次积 1 点灵力，攒够就自动蜕变一级（另耗元婴精魄，大乘级战斗区域 / 秘境掉落），从婴儿形态练到青年形态共 10 级；修为满了也能继续注灵`, `☯️ 法则入门：大乘期起，任何一条法则练满 ${LAW_MASTER_LEVEL} 级就算「入门」——每入门一条，敌人攻击、防御 −${LAW_MASTER_SUPPRESS * 100}%（以法则压制群敌），并且每 ${LAW_STRIKE_INTERVAL} 秒打出一记法则之击（攻击 ×(1 + 入门条数)，无视防御）。法则之力极难领悟，练满一条要十几个小时`, '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放', `♾️ 三条无上限修炼（费用每级 ×${ENDLESS_GROWTH}）：丹火页「器灵温养」全部装备属性每级 +1%，神识页「神魂参悟」悟道参悟经验每级 +3%，道果页「本源温养」生命 / 防御每级 +1%——原有用途加满以后，丹火 / 神识 / 道果仍有去处`],
+            38: [`👶 元婴离体助战：从此战斗中元婴每 ${NASCENT_STRIKE.interval} 秒离体出手一次（无视防御），威力随蜕变等级提高`, `👶 元婴蜕变：修炼页「元婴注灵」把灵力注入元婴——修为只得一半，每次积 1 点灵力，攒够就自动蜕变一级（另耗元婴精魄，大乘级战斗区域 / 秘境掉落），从婴儿形态练到青年形态共 10 级；修为满了也能继续注灵`, `☯️ 法则入门：大乘期起，任何一条法则练满 ${LAW_MASTER_LEVEL} 级就算「入门」——每入门一条，敌人攻击、防御 −${LAW_MASTER_SUPPRESS * 100}%（以法则压制群敌），并且每 ${LAW_STRIKE_INTERVAL} 秒打出一记法则之击（攻击 ×(1 + 入门条数)，无视防御）。法则之力极难领悟，练满一条要十几个小时`, '☯️ 道则新增「本源品」第五品阶，比极品更强一档，需要更多法则等级 + 道果 + 虚晶', '⚔️ 太虚战场战斗区域开放', `♾️ 三条无上限修炼（费用每级 ×${ENDLESS_GROWTH}）：丹火页「器灵温养」全部装备属性每级 +1%，神识页「神魂参悟」悟道参悟经验每级 +3%，道果页「本源温养」生命 / 防御每级 +1%——原有用途加满以后，丹火 / 神识 / 道果仍有去处`, '☯️ 道途·大乘·道心：离体（战斗）/ 护婴（生存）/ 参悟（生活），三选一，之后可在装备页重选'],
             40: ['⚔️ 上界绝境战斗区域开放'],
             41: [`🌌 飞升天劫：一进大乘圆满就可以渡「飞升天劫」（境界感悟面板或突破弹窗进入）。渡过之后体内灵气才开始化为仙元——「修炼」页「开辟仙穴」：不产出修为，每次花鸿蒙精华×5 冲开一穴，大乘圆满最多开到 ${XIAN_CONVERT_ORIFICES} 穴，开满即灵气全部转化，可以突破真仙初期（之前攒的修为不影响这次突破）`],
-            42: [`🌟 成就真仙，身体化为道体：每个亮着的仙穴生命 / 防御 +${DAO_BODY_PER_ORIFICE * 100}%（现在 ${XIAN_CONVERT_ORIFICES} 穴 +${XIAN_CONVERT_ORIFICES}%，开满 24 穴 +24%）`, `☯️ 运用法则之力：法则之击的间隔从 ${LAW_STRIKE_INTERVAL} 秒缩短到 ${LAW_STRIKE_INTERVAL_XIAN} 秒`, `🥀 天人衰相：仙穴开到 ${XIAN_SHUAI.filter(sh => sh.realm === 42).map(sh => sh.at).join(' / ')} 穴时，元衰（${XIAN_SHUAI[0].effect}）、穴衰（${XIAN_SHUAI[1].effect}）、体衰（${XIAN_SHUAI[2].effect}）依次降临，一直生效到渡过为止（各是一场天劫式的单挑，境界感悟面板「渡衰」）。衰相渡尽、打满 24 穴才能突破真仙后期`, '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放', '💠 仙灵晶：九霄战场 / 太清仙域掉落，采矿页「采仙灵晶」也能采；炼器页可炼真仙剑 / 真仙法衣 / 真仙佩（约为大乘装备的 1.35 倍），炼丹页可炼仙灵玉露（恢复 9500 生命）'],
+            42: [`🌟 成就真仙，身体化为道体：每个亮着的仙穴生命 / 防御 +${DAO_BODY_PER_ORIFICE * 100}%（现在 ${XIAN_CONVERT_ORIFICES} 穴 +${XIAN_CONVERT_ORIFICES}%，开满 24 穴 +24%）`, `☯️ 运用法则之力：法则之击的间隔从 ${LAW_STRIKE_INTERVAL} 秒缩短到 ${LAW_STRIKE_INTERVAL_XIAN} 秒`, `🥀 天人衰相：仙穴开到 ${XIAN_SHUAI.filter(sh => sh.realm === 42).map(sh => sh.at).join(' / ')} 穴时，元衰（${XIAN_SHUAI[0].effect}）、穴衰（${XIAN_SHUAI[1].effect}）、体衰（${XIAN_SHUAI[2].effect}）依次降临，一直生效到渡过为止（各是一场天劫式的单挑，境界感悟面板「渡衰」）。衰相渡尽、打满 24 穴才能突破真仙后期`, '⚔️ 九霄战场战斗区域开放', '🌌 太清仙域秘境开放', '💠 仙灵晶：九霄战场 / 太清仙域掉落，采矿页「采仙灵晶」也能采；炼器页可炼真仙剑 / 真仙法衣 / 真仙佩（约为大乘装备的 1.35 倍），炼丹页可炼仙灵玉露（恢复 9500 生命）', '☯️ 道途·真仙·道心：仙锋（战斗）/ 仙体（生存）/ 丰收（生活），三选一，之后可在装备页重选'],
             43: ['🏁 真仙后期：二十四穴尽开、衰相已渡，道体生命 / 防御 +24%',
                 `🔥 淬炼元婴：修炼页新配方，每次耗仙灵晶 ×3 + 元婴精魄 ×2，按成功率淬炼一次（${Math.round(NASCENT_TEMPER.base * 100)}% + 元婴品质 × ${NASCENT_TEMPER.perQuality}，失败只损材料）；九次功成、且仙穴开到 36 穴，即可进阶金仙。每成一次，元婴离体伤害 +${NASCENT_TEMPER.strikePerLevel} × 攻击`],
             44: [`🌟 成就金仙，完全掌握法则之力：法则可练到 40 级，每条法则超出 30 级的每一级凝成一缕道丝，每缕道丝让法则之击伤害 +${DAO_SI_STRIKE * 100}%`,
@@ -3445,7 +3445,7 @@
             48: [`🌟 成就大罗，与界面共存：修炼页「凝结法则本源」，每道本源攻击 / 生命 / 防御 +${LAW_ORIGIN.per * 100}%，不设上限；凝结 10 道即可突破大罗后期`,
                 `🛡️ 极难灭杀：秘境夺舍重生 ${VOID_DUNGEON_REVIVES} → ${DALUO_REVIVES} 次，每次恢复 ${DALUO_REVIVE_HP * 100}% 生命（天劫类仍只有一次）`,
                 '⚔️ 罗天战场战斗区域开放', '🌠 罗天仙域秘境开放',
-                '🟫 玄黄精：罗天战场 / 罗天仙域掉落，采矿页「采玄黄精」也能采；炼器页可炼大罗剑 / 大罗法衣 / 大罗佩（约为太乙装备的 1.35 倍），炼丹页可炼玄黄玉液（恢复 24000 生命）'],
+                '🟫 玄黄精：罗天战场 / 罗天仙域掉落，采矿页「采玄黄精」也能采；炼器页可炼大罗剑 / 大罗法衣 / 大罗佩（约为太乙装备的 1.35 倍），炼丹页可炼玄黄玉液（恢复 24000 生命）', '☯️ 道途·大罗·道心：本源（战斗）/ 斩厄（生存）/ 造化（生活），三选一，之后可在装备页重选'],
             49: [`👥 三尸附身：善尸（${XIAN_SHUAI.find(sh => sh.id === 'corpseShan').effect}）、恶尸（${XIAN_SHUAI.find(sh => sh.id === 'corpseE').effect}）、自我尸（${XIAN_SHUAI.find(sh => sh.id === 'corpseWo').effect}），皆欲夺舍本体。境界感悟面板逐一「斩尸」：三尸不可灭，赢了即分离为化身，各留一项永久加成；输了被夺舍，折损一道法则本源`,
                 `⚖️ 证道：斩尽三尸后，选一条练到 ${PROVE_LAW_LEVEL} 级的法则，打赢「证道之战」灭杀它的现任道祖，即可突破道祖`],
             50: [`🌟 成就道祖：证道法则的效果 ×${DAOZU.provenMult}，法则之击每 ${DAOZU.strikeInterval} 秒一击、威力 ×${DAOZU.strikeMult}——在这条法则之下无敌`,
@@ -4372,7 +4372,7 @@
         // 计算玩家对怪物的伤害
         // 战斗技能等级带来的伤害倍率（每级 +0.5%）
         function getBattleSkillDmgMult() {
-            return SKILL_LEVEL_EFFECTS.battle.formula((gameState.skills.battle || {}).level || 1) * (1 + getSectMod('battleDmg'));   // 宗门护山大阵（渡劫类战斗为 0）
+            return SKILL_LEVEL_EFFECTS.battle.formula((gameState.skills.battle || {}).level || 1) * (1 + getSectMod('battleDmg') + getDaoPathMod('battleDmg'));   // 宗门护山大阵 / 道途·破虚（渡劫类战斗为 0）
         }
 
         // 秘境：玩家命中怪物的概率（含境界压制、灵根克制、灵根 / 功法命中特效）
@@ -4452,7 +4452,7 @@
                 monsterDmg *= (1 - damageReduction);
 
                 // 怪物攻击也受境界压制；宗门护山大阵（渡劫类战斗为 0）
-                monsterDmg = Math.floor(monsterDmg * realmSuppression.dmgMod * (1 + getSectMod('dmgTaken')));
+                monsterDmg = Math.floor(monsterDmg * realmSuppression.dmgMod * Math.max(0.3, 1 + getSectMod('dmgTaken') + getDaoPathMod('dmgTaken')));
 
                 // 克制修正
                 monsterDmg = Math.floor(monsterDmg * counterModifier.damage);
@@ -5570,7 +5570,7 @@
                         { dodge: domainSideDodgeVoid('self') ? 0 : getMod('dodge'),
                           hit: domainSideEffect('foe', 'hit'), crit: domainSideEffect('foe', 'crit'), critMult: BASE_CRIT.dmg + domainSideEffect('foe', 'critDmg') });   // 金域：敌方也可能暴击，平时 crit=0 不会触发
                     if (toPlayer.hit) {
-                        const taken = getSectMod('dmgTaken');   // 宗门护山大阵
+                        const taken = getSectMod('dmgTaken') + getDaoPathMod('dmgTaken');   // 宗门护山大阵 / 道途
                         if (taken) toPlayer.dmg = Math.max(1, Math.round(toPlayer.dmg * (1 + taken)));
                         battle.playerHP.current -= toPlayer.dmg;
                         battleStats(battle)[toPlayer.crit ? 'crit' : 'normal'] += toPlayer.dmg;
@@ -6096,7 +6096,7 @@
 
         // ==================== 道途（v7.52） ====================
         // 原来的质变机制都是到境界自动获得。道途在大境界节点三选一一条「道心」：战斗 / 生存 / 生活各一，给机制不给大数值。
-        // 第一版只做结丹、元婴两个节点。首次选择免费；之后可以重选，花约 15 分钟打怪收入的灵石（当前最高区域每场灵石 × 600），选完 24 小时内不能再改。
+        // v7.52 结丹、元婴；v7.53 化神、炼虚、合体、大乘、真仙、大罗；战斗加成在渡劫类战斗里不生效。首次选择免费；之后可以重选，花约 15 分钟打怪收入的灵石（当前最高区域每场灵石 × 600），选完 24 小时内不能再改。
         // 标定：新系统不计入标准玩家；三个选项各自约等于 +3%～5% 的对应收益（剑心约 +3% 输出、匠心生活技能耗时 -5%），选生活向的人战斗不会卡住。
         const DAO_PATHS = {
             jiedan: { realm: 18, name: '结丹·道心', options: {
@@ -6106,8 +6106,35 @@
             yuanying: { realm: 22, name: '元婴·道心', options: {
                 feng: { name: '婴锋', kind: '战斗', desc: '暴击率 +8%、暴击伤害 +20%', effects: { crit: 0.08, critDmg: 0.20 } },
                 po:   { name: '婴魄', kind: '生存', desc: '普通秘境里夺舍重生后的生命 40% → 70%（天劫等渡劫类不变）', effects: { reviveHp: 0.70 } },
-                hua:  { name: '婴化', kind: '生活', desc: '分身速度 +15%', effects: { cloneSpeed: 0.15 } } } }
+                hua:  { name: '婴化', kind: '生活', desc: '分身速度 +15%', effects: { cloneSpeed: 0.15 } } } },
+            // v7.53 化神以后：战斗选项挂本境界的标志机制，生存 / 生活各一
+            huashen: { realm: 26, name: '化神·道心', options: {
+                yuqi:   { name: '御气', kind: '战斗', desc: '出手调动天地灵气的伤害加成 ×1.25（化神 +20% → +25%，飞升后 +30% → +37.5%）', effects: { heavenQi: 0.25 } },
+                guyuan: { name: '固元', kind: '生存', desc: '受到的伤害 -6%', effects: { dmgTaken: -0.06 } },
+                shenyou:{ name: '神游', kind: '生活', desc: '神识产出 +15%', effects: { 'out:shenshi': 0.15 } } } },
+            lianxu: { realm: 30, name: '炼虚·道心', options: {
+                poxu:   { name: '破虚', kind: '战斗', desc: '战斗伤害 +5%', effects: { battleDmg: 0.05 } },
+                bumie:  { name: '不灭', kind: '生存', desc: '普通秘境里可复活的次数 +1', effects: { revives: 1 } },
+                huahuo: { name: '化火', kind: '生活', desc: '丹火产出 +15%', effects: { 'out:danhuo': 0.15 } } } },
+            heti: { realm: 34, name: '合体·道心', options: {
+                huaxing:{ name: '化形', kind: '战斗', desc: '元气化形的伤害 +30%', effects: { qiForm: 0.30 } },
+                heyi:   { name: '合一', kind: '生存', desc: '最终生命（含装备）+6%', effects: { hpFinal: 0.06 } },
+                wuzhen: { name: '悟真', kind: '生活', desc: '道果产出 +15%', effects: { 'out:daoguo': 0.15 } } } },
+            dacheng: { realm: 38, name: '大乘·道心', options: {
+                liti:   { name: '离体', kind: '战斗', desc: '元婴离体的伤害 +25%', effects: { nascentStrike: 0.25 } },
+                huying: { name: '护婴', kind: '生存', desc: '受到的伤害 -6%', effects: { dmgTaken: -0.06 } },
+                canwu:  { name: '参悟', kind: '生活', desc: '悟道（参悟法则）经验 +15%', effects: { 'exp:wudao': 0.15 } } } },
+            zhenxian: { realm: 42, name: '真仙·道心', options: {
+                xianfeng:{ name: '仙锋', kind: '战斗', desc: '暴击伤害 +30%', effects: { critDmg: 0.30 } },
+                xianti: { name: '仙体', kind: '生存', desc: '最终生命（含装备）+6%', effects: { hpFinal: 0.06 } },
+                fengshou:{ name: '丰收', kind: '生活', desc: '采矿、灵田翻倍概率 +6%', effects: { 'double:mining': 0.06, 'double:farming': 0.06 } } } },
+            daluo: { realm: 48, name: '大罗·道心', options: {
+                benyuan:{ name: '本源', kind: '战斗', desc: '法则之击的伤害 +25%', effects: { lawStrike: 0.25 } },
+                zhane:  { name: '斩厄', kind: '生存', desc: '受到的伤害 -8%', effects: { dmgTaken: -0.08 } },
+                zaohua: { name: '造化', kind: '生活', desc: '推演小世界的产出 +20%', effects: { worldOut: 0.20 } } } }
         };
+        // 道途的战斗加成在渡劫类战斗里不生效（同宗门殿阁），不动渡劫的通过率标定；生命类是常驻属性，渡劫按生命比例掉血，不受影响
+        const DAO_PATH_COMBAT_KEYS = new Set(['swordInterval', 'crit', 'critDmg', 'heavenQi', 'battleDmg', 'dmgTaken', 'qiForm', 'nascentStrike', 'lawStrike', 'reviveHp']);
         const DAO_PATH_COOLDOWN_MS = 24 * 3600e3, DAO_PATH_COST_FIGHTS = 600;
         const daoPathPrompted = new Set();   // 本次进游戏已经提示过的节点
 
@@ -6120,6 +6147,7 @@
         function getDaoPathMod(key) {
             const dp = gameState.player && gameState.player.daoPath;
             if (!dp || !dp.picks) return 0;
+            if (DAO_PATH_COMBAT_KEYS.has(key) && inTribulationFight()) return 0;
             let t = 0;
             for (const node in DAO_PATHS) { const o = daoPathPick(node); if (o && o.effects[key]) t += o.effects[key]; }
             return t;
@@ -6161,7 +6189,7 @@
         function daoPathHtml() {
             const nodes = Object.keys(DAO_PATHS).filter(n => gameState.player.realmIndex >= DAO_PATHS[n].realm);
             if (!nodes.length) return '';
-            return `<div class="qiyu-sub dao-sub">道途</div>${nodes.map(daoPathNodeHtml).join('')}<div class="qiyu-note">大境界节点三选一一条道心（战斗 / 生存 / 生活各一），永久生效；可以重选，花约 15 分钟打怪的灵石，选完 24 小时内不能再改。</div>`;
+            return `<div class="qiyu-sub dao-sub">道途</div>${nodes.map(daoPathNodeHtml).join('')}<div class="qiyu-note">大境界节点三选一一条道心（战斗 / 生存 / 生活各一），永久生效；可以重选，花约 15 分钟打怪的灵石，选完 24 小时内不能再改。战斗类道心在渡劫类战斗（天劫、心魔、衰相、三尸、证道）里不生效。</div>`;
         }
         function renderDaoPathModal() {
             const el = document.getElementById('daoPathContent');
@@ -12191,6 +12219,8 @@
 
             // 伤势（v7.47）：最终攻击 / 防御 / 生命（含装备）-10%
             if (isInjured()) ['atk', 'def', 'hp'].forEach(k => { totalStats[k] = Math.floor(totalStats[k] * (1 - INJURY_PCT)); });
+            const hpFinal = getDaoPathMod('hpFinal');   // 道途·合一 / 仙体
+            if (hpFinal) totalStats.hp = Math.floor(totalStats.hp * (1 + hpFinal));
 
             // P8 修改：HP改为 {current, max} 结构
             const oldMaxHP = gameState.player.stats?.hp?.max || gameState.player.stats?.hp || baseStats.hp;
