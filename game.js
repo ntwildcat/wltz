@@ -361,7 +361,7 @@
                 taiqingRealm: {
                     id: 'taiqingRealm',
                     name: '太清仙域',
-                    desc: '真仙修士的试炼场·通关掉落更多鸿蒙精华，是打通仙穴的主要材料来源',
+                    desc: '真仙修士的试炼场·通关掉落更多鸿蒙精华，是打通仙穴的主要材料来源；另有仙灵稻种',
                     icon: '🌌',
                     minRealmIndex: 42,                      // v6.89：原索引33 → +9，最低真仙初期
                     baseRealmIndex: 42,                     // 怪物境界为真仙初期
@@ -375,7 +375,8 @@
                     ],
                     rewards: {
                         fixed: [
-                            { id: 'nascentsoul_essence', qty: [4, 8] }
+                            { id: 'nascentsoul_essence', qty: [4, 8] },
+                            { id: 'seed_xianrice', qty: [2, 4] }
                         ],
                         random: [
                             { id: 'taiyiessence', qty: [5, 9], probability: 1 },
@@ -436,7 +437,7 @@
                 yuqingRealm: {
                     id: 'yuqingRealm',
                     name: '玉清仙域',
-                    desc: '太乙修士的试炼场·通关掉落玉魄与鸿蒙精华（太乙装备、推演小世界的材料）',
+                    desc: '太乙修士的试炼场·通关掉落玉魄与鸿蒙精华（太乙装备、推演小世界的材料）；另有造化果种',
                     icon: '🌐',
                     minRealmIndex: 46,
                     baseRealmIndex: 46,
@@ -450,7 +451,8 @@
                     ],
                     rewards: {
                         fixed: [
-                            { id: 'nascentsoul_essence', qty: [6, 10] }
+                            { id: 'nascentsoul_essence', qty: [6, 10] },
+                            { id: 'seed_zaohua', qty: [2, 4] }
                         ],
                         random: [
                             { id: 'taiyiessence', qty: [7, 12], probability: 1 },
@@ -724,10 +726,10 @@
                         // 大乘期炼丹（索引70/74解锁）
                         dacheng_pill_alchemy: { name: '大乘丹', desc: '九叶莲 ×12 + 悟道茶 ×14 + 鸿蒙精华 ×3（合体圆满突破必需）', duration: 210, output: { items: [{ id: 'dachengpill', qty: 1 }], skill: 'alchemy', exp: 2600 }, requiredLevel: 70, requires: { lotus: 12, tea: 14, taiyiessence: 3 }, unlocked: false },
                         taiyi_nectar: { name: '鸿蒙琼浆', desc: '悟道果 ×5 + 悟道茶 ×6 + 鸿蒙精华 ×1（战斗食物：恢复6500生命）', duration: 150, output: { items: [{ id: 'taiyi_nectar', qty: 2 }], skill: 'alchemy', exp: 3000 }, requiredLevel: 74, requires: { daofruit: 5, tea: 6, taiyiessence: 1 }, unlocked: false },
-                        xian_dew: { name: '仙灵玉露', desc: '悟道果 ×5 + 悟道茶 ×6 + 仙灵晶 ×1（战斗食物：恢复9500生命）', duration: 170, output: { items: [{ id: 'xian_dew', qty: 2 }], skill: 'alchemy', exp: 3600 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { daofruit: 5, tea: 6, xianlingjing: 1 }, unlocked: false },
-                        jinsui_nectar: { name: '金髓仙浆', desc: '悟道果 ×5 + 悟道茶 ×6 + 仙金 ×1（战斗食物：恢复13000生命）', duration: 190, output: { items: [{ id: 'jinsui_nectar', qty: 2 }], skill: 'alchemy', exp: 4200 }, requiredLevel: 80, requiredRealmIndex: 44, requires: { daofruit: 5, tea: 6, xianjin: 1 }, unlocked: false },
-                        yupo_jelly: { name: '玉魄琼脂', desc: '悟道果 ×5 + 悟道茶 ×6 + 玉魄 ×1（战斗食物：恢复18000生命）', duration: 210, output: { items: [{ id: 'yupo_jelly', qty: 2 }], skill: 'alchemy', exp: 4800 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { daofruit: 5, tea: 6, yupo: 1 }, unlocked: false },
-                        xuanhuang_dew: { name: '玄黄玉液', desc: '悟道果 ×5 + 悟道茶 ×6 + 玄黄精 ×1（战斗食物：恢复24000生命）', duration: 230, output: { items: [{ id: 'xuanhuang_dew', qty: 2 }], skill: 'alchemy', exp: 5400 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { daofruit: 5, tea: 6, xuanhuang: 1 }, unlocked: false },
+                        xian_dew: { name: '仙灵玉露', desc: '悟道果 ×3 + 仙灵稻 ×2 + 仙灵晶 ×1（战斗食物：恢复9500生命）', duration: 170, output: { items: [{ id: 'xian_dew', qty: 2 }], skill: 'alchemy', exp: 3600 }, requiredLevel: 84, requiredRealmIndex: 42, requires: { daofruit: 3, xian_rice: 2, xianlingjing: 1 }, unlocked: false },
+                        jinsui_nectar: { name: '金髓仙浆', desc: '悟道果 ×3 + 仙灵稻 ×3 + 仙金 ×1（战斗食物：恢复13000生命）', duration: 190, output: { items: [{ id: 'jinsui_nectar', qty: 2 }], skill: 'alchemy', exp: 4200 }, requiredLevel: 88, requiredRealmIndex: 44, requires: { daofruit: 3, xian_rice: 3, xianjin: 1 }, unlocked: false },
+                        yupo_jelly: { name: '玉魄琼脂', desc: '悟道果 ×3 + 造化果 ×2 + 玉魄 ×1（战斗食物：恢复18000生命）', duration: 210, output: { items: [{ id: 'yupo_jelly', qty: 2 }], skill: 'alchemy', exp: 4800 }, requiredLevel: 92, requiredRealmIndex: 46, requires: { daofruit: 3, zaohua: 2, yupo: 1 }, unlocked: false },
+                        xuanhuang_dew: { name: '玄黄玉液', desc: '悟道果 ×3 + 造化果 ×3 + 玄黄精 ×1（战斗食物：恢复24000生命）', duration: 230, output: { items: [{ id: 'xuanhuang_dew', qty: 2 }], skill: 'alchemy', exp: 5400 }, requiredLevel: 96, requiredRealmIndex: 48, requires: { daofruit: 3, zaohua: 3, xuanhuang: 1 }, unlocked: false },
                     },
                     actions: {}
                 },
@@ -771,24 +773,24 @@
                         dacheng_armor: { name: '大乘法衣', desc: '鸿蒙精华 ×5 + 混沌石 ×4', duration: 180, output: { items: [{ id: 'dachengarmor', qty: 1 }], skill: 'forging', exp: 3600 }, requiredLevel: 78, requires: { taiyiessence: 5, chaosstone: 4 }, unlocked: false },
                         dacheng_pendant: { name: '大乘佩', desc: '鸿蒙精华 ×3 + 灵晶 ×5', duration: 170, output: { items: [{ id: 'dachengpendant', qty: 1 }], skill: 'forging', exp: 3800 }, requiredLevel: 80, requires: { taiyiessence: 3, spiritcrystal: 5 }, unlocked: false },
                         // 真仙装备（v7.17）：炼器已满级，改由境界解锁；属性约为大乘装备的 1.35 倍
-                        xian_sword: { name: '真仙剑', desc: '仙灵晶 ×4 + 鸿蒙精华 ×3', duration: 200, output: { items: [{ id: 'xiansword', qty: 1 }], skill: 'forging', exp: 4200 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 4, taiyiessence: 3 }, unlocked: false },
-                        life_refine_xian: { name: '祭炼青冥剑·真仙', desc: '仙灵晶 ×4 + 鸿蒙精华 ×3｜每次添 2 口飞剑，这一档从 36 口祭到 42 口', duration: 200, output: { lifeRefine: 7, skill: 'forging', exp: 4200 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 4, taiyiessence: 3 }, unlocked: false },
-                        xian_armor: { name: '真仙法衣', desc: '仙灵晶 ×5 + 混沌石 ×4', duration: 200, output: { items: [{ id: 'xianarmor', qty: 1 }], skill: 'forging', exp: 4400 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 5, chaosstone: 4 }, unlocked: false },
-                        xian_pendant: { name: '真仙佩', desc: '仙灵晶 ×3 + 灵晶 ×5', duration: 190, output: { items: [{ id: 'xianpendant', qty: 1 }], skill: 'forging', exp: 4600 }, requiredLevel: 80, requiredRealmIndex: 42, requires: { xianlingjing: 3, spiritcrystal: 5 }, unlocked: false },
+                        xian_sword: { name: '真仙剑', desc: '仙灵晶 ×4 + 鸿蒙精华 ×3', duration: 200, output: { items: [{ id: 'xiansword', qty: 1 }], skill: 'forging', exp: 4200 }, requiredLevel: 83, requiredRealmIndex: 42, requires: { xianlingjing: 4, taiyiessence: 3 }, unlocked: false },
+                        life_refine_xian: { name: '祭炼青冥剑·真仙', desc: '仙灵晶 ×4 + 鸿蒙精华 ×3｜每次添 2 口飞剑，这一档从 36 口祭到 42 口', duration: 200, output: { lifeRefine: 7, skill: 'forging', exp: 4200 }, requiredLevel: 83, requiredRealmIndex: 42, requires: { xianlingjing: 4, taiyiessence: 3 }, unlocked: false },
+                        xian_armor: { name: '真仙法衣', desc: '仙灵晶 ×5 + 混沌石 ×4', duration: 200, output: { items: [{ id: 'xianarmor', qty: 1 }], skill: 'forging', exp: 4400 }, requiredLevel: 84, requiredRealmIndex: 42, requires: { xianlingjing: 5, chaosstone: 4 }, unlocked: false },
+                        xian_pendant: { name: '真仙佩', desc: '仙灵晶 ×3 + 灵晶 ×5', duration: 190, output: { items: [{ id: 'xianpendant', qty: 1 }], skill: 'forging', exp: 4600 }, requiredLevel: 85, requiredRealmIndex: 42, requires: { xianlingjing: 3, spiritcrystal: 5 }, unlocked: false },
                         // 金仙 / 太乙装备（v7.23）：各约为上一境界装备的 1.35 倍
-                        jinxian_sword: { name: '金仙剑', desc: '仙金 ×4 + 仙灵晶 ×3', duration: 215, output: { items: [{ id: 'jinxiansword', qty: 1 }], skill: 'forging', exp: 5000 }, requiredLevel: 80, requiredRealmIndex: 44, requires: { xianjin: 4, xianlingjing: 3 }, unlocked: false },
-                        life_refine_jinxian: { name: '祭炼青冥剑·金仙', desc: '仙金 ×4 + 仙灵晶 ×3｜每次添 2 口飞剑，这一档从 42 口祭到 48 口', duration: 215, output: { lifeRefine: 8, skill: 'forging', exp: 5000 }, requiredLevel: 80, requiredRealmIndex: 44, requires: { xianjin: 4, xianlingjing: 3 }, unlocked: false },
-                        jinxian_armor: { name: '金仙法衣', desc: '仙金 ×5 + 混沌石 ×4', duration: 215, output: { items: [{ id: 'jinxianarmor', qty: 1 }], skill: 'forging', exp: 5200 }, requiredLevel: 80, requiredRealmIndex: 44, requires: { xianjin: 5, chaosstone: 4 }, unlocked: false },
-                        jinxian_pendant: { name: '金仙佩', desc: '仙金 ×3 + 灵晶 ×5', duration: 205, output: { items: [{ id: 'jinxianpendant', qty: 1 }], skill: 'forging', exp: 5400 }, requiredLevel: 80, requiredRealmIndex: 44, requires: { xianjin: 3, spiritcrystal: 5 }, unlocked: false },
-                        taiyi_sword: { name: '太乙剑', desc: '玉魄 ×4 + 仙金 ×3', duration: 230, output: { items: [{ id: 'taiyisword', qty: 1 }], skill: 'forging', exp: 6000 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 4, xianjin: 3 }, unlocked: false },
-                        life_refine_taiyi: { name: '祭炼青冥剑·太乙', desc: '玉魄 ×4 + 仙金 ×3｜每次添 2 口飞剑，这一档从 48 口祭到 56 口', duration: 230, output: { lifeRefine: 9, skill: 'forging', exp: 6000 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 4, xianjin: 3 }, unlocked: false },
-                        taiyi_armor: { name: '太乙法衣', desc: '玉魄 ×5 + 仙灵晶 ×4', duration: 230, output: { items: [{ id: 'taiyiarmor', qty: 1 }], skill: 'forging', exp: 6200 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 5, xianlingjing: 4 }, unlocked: false },
-                        taiyi_pendant: { name: '太乙佩', desc: '玉魄 ×3 + 灵晶 ×6', duration: 220, output: { items: [{ id: 'taiyipendant', qty: 1 }], skill: 'forging', exp: 6400 }, requiredLevel: 80, requiredRealmIndex: 46, requires: { yupo: 3, spiritcrystal: 6 }, unlocked: false },
-                        daluo_sword: { name: '大罗剑', desc: '玄黄精 ×4 + 玉魄 ×3', duration: 245, output: { items: [{ id: 'daluosword', qty: 1 }], skill: 'forging', exp: 7000 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 4, yupo: 3 }, unlocked: false },
-                        life_refine_daluo: { name: '祭炼青冥剑·大罗', desc: '玄黄精 ×4 + 玉魄 ×3｜每次添 2 口飞剑，这一档从 56 口祭到 64 口', duration: 245, output: { lifeRefine: 10, skill: 'forging', exp: 7000 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 4, yupo: 3 }, unlocked: false },
-                        daluo_armor: { name: '大罗法衣', desc: '玄黄精 ×5 + 仙金 ×4', duration: 245, output: { items: [{ id: 'daluoarmor', qty: 1 }], skill: 'forging', exp: 7200 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 5, xianjin: 4 }, unlocked: false },
-                        daluo_pendant: { name: '大罗佩', desc: '玄黄精 ×3 + 灵晶 ×7', duration: 235, output: { items: [{ id: 'daluopendant', qty: 1 }], skill: 'forging', exp: 7400 }, requiredLevel: 80, requiredRealmIndex: 48, requires: { xuanhuang: 3, spiritcrystal: 7 }, unlocked: false },
-                        life_refine_daozu: { name: '祭炼青冥剑·道祖', desc: '玄黄精 ×6 + 玉魄 ×4｜每次添 2 口飞剑，这一档从 64 口祭到 72 口（满 72 口结成周天剑阵）', duration: 260, output: { lifeRefine: 11, skill: 'forging', exp: 8000 }, requiredLevel: 80, requiredRealmIndex: 50, requires: { xuanhuang: 6, yupo: 4 }, unlocked: false },
+                        jinxian_sword: { name: '金仙剑', desc: '仙金 ×4 + 仙灵晶 ×3', duration: 215, output: { items: [{ id: 'jinxiansword', qty: 1 }], skill: 'forging', exp: 5000 }, requiredLevel: 87, requiredRealmIndex: 44, requires: { xianjin: 4, xianlingjing: 3 }, unlocked: false },
+                        life_refine_jinxian: { name: '祭炼青冥剑·金仙', desc: '仙金 ×4 + 仙灵晶 ×3｜每次添 2 口飞剑，这一档从 42 口祭到 48 口', duration: 215, output: { lifeRefine: 8, skill: 'forging', exp: 5000 }, requiredLevel: 87, requiredRealmIndex: 44, requires: { xianjin: 4, xianlingjing: 3 }, unlocked: false },
+                        jinxian_armor: { name: '金仙法衣', desc: '仙金 ×5 + 混沌石 ×4', duration: 215, output: { items: [{ id: 'jinxianarmor', qty: 1 }], skill: 'forging', exp: 5200 }, requiredLevel: 88, requiredRealmIndex: 44, requires: { xianjin: 5, chaosstone: 4 }, unlocked: false },
+                        jinxian_pendant: { name: '金仙佩', desc: '仙金 ×3 + 灵晶 ×5', duration: 205, output: { items: [{ id: 'jinxianpendant', qty: 1 }], skill: 'forging', exp: 5400 }, requiredLevel: 89, requiredRealmIndex: 44, requires: { xianjin: 3, spiritcrystal: 5 }, unlocked: false },
+                        taiyi_sword: { name: '太乙剑', desc: '玉魄 ×4 + 仙金 ×3', duration: 230, output: { items: [{ id: 'taiyisword', qty: 1 }], skill: 'forging', exp: 6000 }, requiredLevel: 91, requiredRealmIndex: 46, requires: { yupo: 4, xianjin: 3 }, unlocked: false },
+                        life_refine_taiyi: { name: '祭炼青冥剑·太乙', desc: '玉魄 ×4 + 仙金 ×3｜每次添 2 口飞剑，这一档从 48 口祭到 56 口', duration: 230, output: { lifeRefine: 9, skill: 'forging', exp: 6000 }, requiredLevel: 91, requiredRealmIndex: 46, requires: { yupo: 4, xianjin: 3 }, unlocked: false },
+                        taiyi_armor: { name: '太乙法衣', desc: '玉魄 ×5 + 仙灵晶 ×4', duration: 230, output: { items: [{ id: 'taiyiarmor', qty: 1 }], skill: 'forging', exp: 6200 }, requiredLevel: 92, requiredRealmIndex: 46, requires: { yupo: 5, xianlingjing: 4 }, unlocked: false },
+                        taiyi_pendant: { name: '太乙佩', desc: '玉魄 ×3 + 灵晶 ×6', duration: 220, output: { items: [{ id: 'taiyipendant', qty: 1 }], skill: 'forging', exp: 6400 }, requiredLevel: 93, requiredRealmIndex: 46, requires: { yupo: 3, spiritcrystal: 6 }, unlocked: false },
+                        daluo_sword: { name: '大罗剑', desc: '玄黄精 ×4 + 玉魄 ×3', duration: 245, output: { items: [{ id: 'daluosword', qty: 1 }], skill: 'forging', exp: 7000 }, requiredLevel: 95, requiredRealmIndex: 48, requires: { xuanhuang: 4, yupo: 3 }, unlocked: false },
+                        life_refine_daluo: { name: '祭炼青冥剑·大罗', desc: '玄黄精 ×4 + 玉魄 ×3｜每次添 2 口飞剑，这一档从 56 口祭到 64 口', duration: 245, output: { lifeRefine: 10, skill: 'forging', exp: 7000 }, requiredLevel: 95, requiredRealmIndex: 48, requires: { xuanhuang: 4, yupo: 3 }, unlocked: false },
+                        daluo_armor: { name: '大罗法衣', desc: '玄黄精 ×5 + 仙金 ×4', duration: 245, output: { items: [{ id: 'daluoarmor', qty: 1 }], skill: 'forging', exp: 7200 }, requiredLevel: 96, requiredRealmIndex: 48, requires: { xuanhuang: 5, xianjin: 4 }, unlocked: false },
+                        daluo_pendant: { name: '大罗佩', desc: '玄黄精 ×3 + 灵晶 ×7', duration: 235, output: { items: [{ id: 'daluopendant', qty: 1 }], skill: 'forging', exp: 7400 }, requiredLevel: 97, requiredRealmIndex: 48, requires: { xuanhuang: 3, spiritcrystal: 7 }, unlocked: false },
+                        life_refine_daozu: { name: '祭炼青冥剑·道祖', desc: '玄黄精 ×6 + 玉魄 ×4｜每次添 2 口飞剑，这一档从 64 口祭到 72 口（满 72 口结成周天剑阵）', duration: 260, output: { lifeRefine: 11, skill: 'forging', exp: 8000 }, requiredLevel: 99, requiredRealmIndex: 50, requires: { xuanhuang: 6, yupo: 4 }, unlocked: false },
                     },
                     actions: {}
                 },
@@ -808,7 +810,12 @@
                         lotus: { name: '种植九叶莲', desc: '渡劫材料 需九叶莲种子', duration: 300, output: { items: [{ id: 'lotus', qty: 1 }], skill: 'farming', exp: 320 }, requiredLevel: 30, requires: { seed_lotus: 1 }, unlocked: false },
                         decompose_lotus: { name: '分解九叶莲', desc: '九叶莲 ×1 换回 九叶莲种子 ×2', duration: 360, output: { items: [{ id: 'seed_lotus', qty: 2 }], skill: 'farming', exp: 180 }, requiredLevel: 30, requires: { lotus: 1 }, unlocked: false },
                         daofruit: { name: '种植悟道果', desc: '化神材料 需悟道果种子（太虚幻境掉落）', duration: 480, output: { items: [{ id: 'daofruit', qty: 1 }], skill: 'farming', exp: 600 }, requiredLevel: 39, requires: { seed_daofruit: 1 }, unlocked: false },
-                        decompose_daofruit: { name: '分解悟道果', desc: '悟道果 ×1 换回 悟道果种子 ×2', duration: 560, output: { items: [{ id: 'seed_daofruit', qty: 2 }], skill: 'farming', exp: 320 }, requiredLevel: 39, requires: { daofruit: 1 }, unlocked: false }
+                        decompose_daofruit: { name: '分解悟道果', desc: '悟道果 ×1 换回 悟道果种子 ×2', duration: 560, output: { items: [{ id: 'seed_daofruit', qty: 2 }], skill: 'farming', exp: 320 }, requiredLevel: 39, requires: { daofruit: 1 }, unlocked: false },
+                        // v7.39 仙界灵植：仙界食物不再沿用化神期的悟道茶；种子来自对应仙域，也可在道果商城买
+                        xian_rice: { name: '种植仙灵稻', desc: '仙界食物材料，一次收 2 份 需仙灵稻种（太清仙域掉落 / 道果商城）', duration: 600, output: { items: [{ id: 'xian_rice', qty: 2 }], skill: 'farming', exp: 1500 }, requiredLevel: 82, requiredRealmIndex: 42, requires: { seed_xianrice: 1 }, unlocked: false },
+                        decompose_xian_rice: { name: '分解仙灵稻', desc: '仙灵稻 ×1 换回 仙灵稻种 ×2', duration: 690, output: { items: [{ id: 'seed_xianrice', qty: 2 }], skill: 'farming', exp: 800 }, requiredLevel: 82, requiredRealmIndex: 42, requires: { xian_rice: 1 }, unlocked: false },
+                        zaohua: { name: '种植造化果', desc: '仙界食物材料，一次收 2 份 需造化果种（玉清仙域掉落 / 道果商城）', duration: 720, output: { items: [{ id: 'zaohua', qty: 2 }], skill: 'farming', exp: 2200 }, requiredLevel: 90, requiredRealmIndex: 46, requires: { seed_zaohua: 1 }, unlocked: false },
+                        decompose_zaohua: { name: '分解造化果', desc: '造化果 ×1 换回 造化果种 ×2', duration: 830, output: { items: [{ id: 'seed_zaohua', qty: 2 }], skill: 'farming', exp: 1150 }, requiredLevel: 90, requiredRealmIndex: 46, requires: { zaohua: 1 }, unlocked: false }
                     },
                     actions: {}
                 },
@@ -828,10 +835,10 @@
                         daostone: { name: '采天道石', desc: '产出天道石（化虚丹与合体级装备的共用材料）', duration: 60, output: { items: [{ id: 'daostone', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false },
                         voidcrystal: { name: '采虚晶', desc: '产出虚晶（炼虚期材料，化虚 / 炼虚装备）', duration: 60, output: { items: [{ id: 'voidcrystal', qty: 1 }], skill: 'mining', exp: 800 }, requiredLevel: 50, unlocked: false },
                         taiyiessence: { name: '采鸿蒙精华', desc: '产出鸿蒙精华（大乘丹与大乘装备的共用材料）', duration: 75, output: { items: [{ id: 'taiyiessence', qty: 1 }], skill: 'mining', exp: 1300 }, requiredLevel: 70, unlocked: false },
-                        xianlingjing: { name: '采仙灵晶', desc: '产出仙灵晶（真仙装备与仙灵玉露的材料）', duration: 110, output: { items: [{ id: 'xianlingjing', qty: 1 }], skill: 'mining', exp: 1800 }, requiredLevel: 80, requiredRealmIndex: 42, unlocked: false },
-                        xianjin: { name: '采仙金', desc: '产出仙金（金仙装备、金髓仙浆、玉身转化的材料）', duration: 140, output: { items: [{ id: 'xianjin', qty: 1 }], skill: 'mining', exp: 2300 }, requiredLevel: 80, requiredRealmIndex: 44, unlocked: false },
-                        yupo: { name: '采玉魄', desc: '产出玉魄（太乙装备、玉魄琼脂、推演小世界的材料）', duration: 170, output: { items: [{ id: 'yupo', qty: 1 }], skill: 'mining', exp: 2800 }, requiredLevel: 80, requiredRealmIndex: 46, unlocked: false },
-                        xuanhuang: { name: '采玄黄精', desc: '产出玄黄精（大罗装备、玄黄玉液、凝结法则本源的材料）', duration: 200, output: { items: [{ id: 'xuanhuang', qty: 1 }], skill: 'mining', exp: 3400 }, requiredLevel: 80, requiredRealmIndex: 48, unlocked: false },
+                        xianlingjing: { name: '采仙灵晶', desc: '产出仙灵晶（真仙装备与仙灵玉露的材料）', duration: 110, output: { items: [{ id: 'xianlingjing', qty: 1 }], skill: 'mining', exp: 1800 }, requiredLevel: 82, requiredRealmIndex: 42, unlocked: false },
+                        xianjin: { name: '采仙金', desc: '产出仙金（金仙装备、金髓仙浆、玉身转化的材料）', duration: 140, output: { items: [{ id: 'xianjin', qty: 1 }], skill: 'mining', exp: 2300 }, requiredLevel: 86, requiredRealmIndex: 44, unlocked: false },
+                        yupo: { name: '采玉魄', desc: '产出玉魄（太乙装备、玉魄琼脂、推演小世界的材料）', duration: 170, output: { items: [{ id: 'yupo', qty: 1 }], skill: 'mining', exp: 2800 }, requiredLevel: 90, requiredRealmIndex: 46, unlocked: false },
+                        xuanhuang: { name: '采玄黄精', desc: '产出玄黄精（大罗装备、玄黄玉液、凝结法则本源的材料）', duration: 200, output: { items: [{ id: 'xuanhuang', qty: 1 }], skill: 'mining', exp: 3400 }, requiredLevel: 94, requiredRealmIndex: 48, unlocked: false },
                     },
                     actions: {}
                 },
@@ -966,6 +973,10 @@
                 chaosstone: { name: '混沌石', icon: '🌑', type: 'ore', sellPrice: 1200 },
                 daofruit: { name: '悟道果', icon: '🍇', type: 'material', sellPrice: 600 },
                 seed_daofruit: { name: '悟道果种子', icon: '🌰', type: 'seed', sellPrice: 300 },
+                xian_rice: { name: '仙灵稻', icon: '🌾', type: 'material', sellPrice: 2500 },
+                seed_xianrice: { name: '仙灵稻种', icon: '🌾', type: 'seed', sellPrice: 1500 },
+                zaohua: { name: '造化果', icon: '🍑', type: 'material', sellPrice: 5000 },
+                seed_zaohua: { name: '造化果种', icon: '🌰', type: 'seed', sellPrice: 3000 },
                 // 合体期新物品
                 daostone: { name: '天道石', icon: '🔶', type: 'ore', sellPrice: 2000 },
                 daoguo_seed: { name: '道果种子', icon: '🌰', type: 'seed', sellPrice: 500 },
@@ -1084,6 +1095,10 @@
                     { id: 'immortalore', name: '仙矿 ×3', icon: '✨', price: 30, currency: 'daoguo', bundle: 3, desc: '顶级材料', minRealmIndex: 34 },
                     { id: 'daofruit', name: '悟道果 ×2', icon: '🍇', price: 35, currency: 'daoguo', bundle: 2, desc: '炼丹 / 玉髓琼浆 / 道果技能材料', minRealmIndex: 34 },
                     { id: 'lotus', name: '九叶莲 ×3', icon: '🌸', price: 35, currency: 'daoguo', bundle: 3, desc: '炼丹材料', minRealmIndex: 34 },
+                    { id: 'seed_xianrice', name: '仙灵稻种 ×2', icon: '🌾', price: 60, currency: 'daoguo', bundle: 2, desc: '仙界灵植种子（灵田 Lv82 可种）', minRealmIndex: 42 },
+                    { id: 'xian_rice', name: '仙灵稻 ×2', icon: '🌾', price: 90, currency: 'daoguo', bundle: 2, desc: '仙灵玉露 / 金髓仙浆的材料（自己种更划算）', minRealmIndex: 42 },
+                    { id: 'seed_zaohua', name: '造化果种 ×2', icon: '🌰', price: 120, currency: 'daoguo', bundle: 2, desc: '仙界灵植种子（灵田 Lv90 可种）', minRealmIndex: 46 },
+                    { id: 'zaohua', name: '造化果 ×2', icon: '🍑', price: 180, currency: 'daoguo', bundle: 2, desc: '玉魄琼脂 / 玄黄玉液的材料（自己种更划算）', minRealmIndex: 46 },
                     { id: 'voidcrystal', name: '虚晶 ×2', icon: '💠', price: 45, currency: 'daoguo', bundle: 2, desc: '炼虚级矿石（化虚 / 炼虚装备材料）', minRealmIndex: 34 }
                 ],
                 arts: [
@@ -1266,6 +1281,8 @@
                 tea: svg(`${steam('#cfe8c8')}${bowl('#7fae6a', '#a58a55')}<path d="M15 15Q18 12 21 15Q18 17 15 15Z" fill="#4f8a4a"/>`),
                 lotus: svg(`<path d="M3 24Q10 30 16 27Q22 30 29 24Q22 25 16 23Q10 25 3 24Z" fill="#5f9a6a"/><path d="M16 5Q11 12 16 22Q21 12 16 5Z" fill="#f1b8c8"/><path d="M8 9Q6 17 16 22Q10 15 8 9ZM24 9Q26 17 16 22Q22 15 24 9Z" fill="#e58fa8"/><path d="M4 15Q6 21 16 22Q8 20 4 15ZM28 15Q26 21 16 22Q24 20 28 15Z" fill="#d97695"/><circle cx="16" cy="21" r="1.6" fill="#f3d36a"/>`),
                 daofruit: svg(`<path d="M16 9Q15 5 19 3" stroke="#6a5a3a"/>${leaf(16, 7, -30, 9, '#6aa060')}<g fill="#8b6bb0"><circle cx="11" cy="14" r="4"/><circle cx="21" cy="14" r="4"/><circle cx="16" cy="14" r="4"/><circle cx="13.5" cy="20" r="4"/><circle cx="19.5" cy="20" r="4"/><circle cx="16.5" cy="26" r="3.6"/></g><g fill="#fff" stroke="none" opacity=".7"><circle cx="10" cy="13" r="1"/><circle cx="15" cy="13" r="1"/><circle cx="20" cy="13" r="1"/></g>`),
+                xian_rice: svg(`<path d="M9 29Q10 18 7 6M16 29Q16 16 16 3M23 29Q22 18 25 6" stroke="#7a6a9a" stroke-width="1.4"/><g fill="#e8d8ff"><ellipse cx="7.5" cy="9" rx="2" ry="3.2"/><ellipse cx="6.4" cy="15" rx="2" ry="3.2"/><ellipse cx="16" cy="6.5" rx="2" ry="3.2"/><ellipse cx="16" cy="12.5" rx="2" ry="3.2"/><ellipse cx="24.5" cy="9" rx="2" ry="3.2"/><ellipse cx="25.6" cy="15" rx="2" ry="3.2"/></g>${sparkle(20, 22, 2.4, '#f4efff')}`),
+                zaohua: svg(`<path d="M16 8Q15 4 18 2" stroke="#6a5a3a"/>${leaf(17, 6, -20, 9, '#6aa060')}<path d="M16 8Q5 9 6 19Q7 29 16 29Q25 29 26 19Q27 9 16 8Z" fill="#f2b3a0"/><path d="M16 9Q13 18 16 28" stroke="#d4806a" stroke-width="1"/><path d="M10 14Q8 19 11 24" stroke="#fff0e8" stroke-width="1.2" opacity=".8"/>${sparkle(24, 25, 2.2, '#fff4d8')}`),
                 // —— 种子（布袋 + 徽记） ——
                 seed_millet: seedSack('#c9a45a', `<g fill="#f3e0a0" stroke="none"><ellipse cx="13" cy="19" rx="1.4" ry="2.2"/><ellipse cx="16.5" cy="17" rx="1.4" ry="2.2"/><ellipse cx="19.5" cy="20" rx="1.4" ry="2.2"/></g>`),
                 seed_cleangrass: seedSack('#7d9a62', leaf(16, 23, -60, 9, '#d6f0c0')),
@@ -1273,6 +1290,8 @@
                 seed_tea: seedSack('#6f9a7e', `${leaf(13, 22, -45, 7, '#d6f0c0')}${leaf(19, 22, -135, 7, '#d6f0c0')}`),
                 seed_lotus: seedSack('#c98a9a', `<path d="M16 15Q12 19 16 24Q20 19 16 15Z" fill="#fbe0e8"/>`),
                 seed_daofruit: seedSack('#7a6a9a', `<g fill="#d8c8f0" stroke="none"><circle cx="14" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><circle cx="16" cy="22" r="2"/></g>`),
+                seed_xianrice: seedSack('#8a7aaa', `<g fill="#e8d8ff" stroke="none"><ellipse cx="13" cy="19" rx="1.4" ry="2.2"/><ellipse cx="16.5" cy="17" rx="1.4" ry="2.2"/><ellipse cx="19.5" cy="20" rx="1.4" ry="2.2"/></g>`),
+                seed_zaohua: seedSack('#b0786a', `<path d="M16 15Q11 16 12 21Q13 25 16 25Q19 25 20 21Q21 16 16 15Z" fill="#f8c8b8"/>`),
                 danhuo_seed: seedSack('#a5563a', `<path d="M16 14Q21 19 18 24Q16 26 14 24Q11 19 16 14Z" fill="#ffb84a"/>`),
                 shenshi_seed: seedSack('#5b5a8a', `<path d="M10 20Q16 13 22 20Q16 27 10 20Z" fill="#dcd6f5"/><circle cx="16" cy="20" r="2.2" fill="#5b3f9a"/>`),
                 // —— 矿石 ——
@@ -2752,6 +2771,7 @@
         let gameState = {
             version: 1,  // 游戏数据版本，用于自动迁移
             workCurve: 2,  // 工作技能经验曲线版本（v6.63）；旧存档没有此字段，读档时按累计经验折算
+            workCap: 99,   // 生活技能上限版本（v7.39）；旧存档没有此字段，读档时补等级（migrateWorkCap99）
             realmLayoutVersion: 2,   // 练气 13 层的境界布局（v6.89）；新角色本来就是新布局，读档时不能再迁移
             player: {
                 name: '',
@@ -3458,7 +3478,7 @@
             { id: 'ACH_DACHENG',     glyph: '乘', name: '大乘',       desc: '突破到大乘初期',                         check: () => gameState.player.realmIndex >= 38 },
             { id: 'ACH_LAW_MASTER',  glyph: '法', name: '法则入门',   desc: `任一法则练到 ${LAW_MASTER_LEVEL} 级`,      check: () => LAW_IDS.some(id => getLawInfo(id).level >= LAW_MASTER_LEVEL) },
             { id: 'ACH_ALL_DUNGEONS', glyph: '境', name: '踏遍秘境',  get desc() { return `通关全部 ${NORMAL_DUNGEON_IDS.length} 个秘境`; },                       check: () => NORMAL_DUNGEON_IDS.every(isDungeonDone) },
-            { id: 'ACH_SKILL_80',    glyph: '宗', name: '一代宗师',   get desc() { return `任一生活技能达到 ${WORK_SKILL_MAX_LEVEL} 级（满级）`; }, check: () => anyWorkSkillAt(WORK_SKILL_MAX_LEVEL) },
+            { id: 'ACH_SKILL_80',    glyph: '宗', name: '一代宗师',   desc: '任一生活技能达到 80 级',                   check: () => anyWorkSkillAt(80) },
             { id: 'ACH_COINS_100M',  glyph: '富', name: '富甲一方',   desc: '同时持有 1 亿灵石',                        check: () => gameState.player.coins >= 1e8 },
             { id: 'ACH_FLY_TRIB',    glyph: '霄', name: '飞升天劫',   desc: '渡过飞升天劫',                             check: () => hasSurvivedTribulation(41) },
             { id: 'ACH_ZHENXIAN',    glyph: '仙', name: '真仙',       desc: '灵气尽化仙元，突破到真仙初期',             check: () => gameState.player.realmIndex >= XIAN_REALM },
@@ -3480,6 +3500,7 @@
             { id: 'ACH_DAOZU',       glyph: '祖', name: '道祖',       desc: '证道，成就道祖',                           check: () => gameState.player.realmIndex >= DAOZU_REALM },
             { id: 'ACH_DAO_HEART',   glyph: '心', name: '道心自守',   desc: '身为道祖而自降修为，不被天道吞噬',           check: () => !!gameState.player.daoHeart },
             { id: 'ACH_LIFE_SWORD_72', glyph: '阵', name: '周天剑阵',  desc: '七十二口青冥剑齐聚，结成周天剑阵',          check: () => getLifeSwords() >= LIFE_SWORD.zhoutian },
+            { id: 'ACH_SKILL_99',    glyph: '巅', name: '登峰造极',   get desc() { return `任一生活技能达到 ${WORK_SKILL_MAX_LEVEL} 级（满级）`; }, check: () => anyWorkSkillAt(WORK_SKILL_MAX_LEVEL) },
         ];
         function getAchievementStore() {
             if (!gameState.achievements || typeof gameState.achievements !== 'object') gameState.achievements = {};
@@ -5662,10 +5683,10 @@
             taiyiField:        [{ id: 'taiyiessence', p: 0.12, qty: 1 }, { id: 'chaosstone', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.02, qty: 1 }],
             lingjieAbyss:      [{ id: 'taiyiessence', p: 0.20, qty: [1, 2] }, { id: 'daofruit', p: 0.10, qty: 1 }, { id: 'nascentsoul_essence', p: 0.03, qty: 1 }],
             // 太乙精华概率比上一档更高：这是「开辟仙窍」的唯一材料，真仙境的战斗本身就是仙窍材料的主要来源
-            xianbattle:        [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'xianlingjing', p: 0.15, qty: 1 }, { id: 'daofruit', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.04, qty: 1 }],
-            jinxianbattle:     [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'xianjin', p: 0.15, qty: 1 }, { id: 'xianlingjing', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.05, qty: 1 }],
-            taiyibattle:       [{ id: 'taiyiessence', p: 0.32, qty: [1, 3] }, { id: 'yupo', p: 0.15, qty: 1 }, { id: 'xianjin', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.05, qty: 1 }],
-            daluobattle:       [{ id: 'taiyiessence', p: 0.34, qty: [1, 3] }, { id: 'xuanhuang', p: 0.15, qty: 1 }, { id: 'yupo', p: 0.12, qty: 1 }, { id: 'nascentsoul_essence', p: 0.06, qty: 1 }]
+            xianbattle:        [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'xianlingjing', p: 0.15, qty: 1 }, { id: 'daofruit', p: 0.12, qty: 1 }, { id: 'seed_xianrice', p: 0.04, qty: 1 }, { id: 'nascentsoul_essence', p: 0.04, qty: 1 }],
+            jinxianbattle:     [{ id: 'taiyiessence', p: 0.30, qty: [1, 3] }, { id: 'xianjin', p: 0.15, qty: 1 }, { id: 'xianlingjing', p: 0.12, qty: 1 }, { id: 'xian_rice', p: 0.08, qty: 1 }, { id: 'nascentsoul_essence', p: 0.05, qty: 1 }],
+            taiyibattle:       [{ id: 'taiyiessence', p: 0.32, qty: [1, 3] }, { id: 'yupo', p: 0.15, qty: 1 }, { id: 'xianjin', p: 0.12, qty: 1 }, { id: 'seed_zaohua', p: 0.04, qty: 1 }, { id: 'nascentsoul_essence', p: 0.05, qty: 1 }],
+            daluobattle:       [{ id: 'taiyiessence', p: 0.34, qty: [1, 3] }, { id: 'xuanhuang', p: 0.15, qty: 1 }, { id: 'yupo', p: 0.12, qty: 1 }, { id: 'zaohua', p: 0.08, qty: 1 }, { id: 'nascentsoul_essence', p: 0.06, qty: 1 }]
         };
 
         // 掉落数量文字（如 1–2 / 1）
@@ -6571,22 +6592,32 @@
             { id: 'alch_xuan',   skill: 'alchemy', level: 30, price: 40000,  icon: '🟣', name: '玄品丹炉', effects: { 'time:alchemy': -0.06, 'double:alchemy': 0.05 } },
             { id: 'alch_earth',  skill: 'alchemy', level: 40, price: 120000, icon: '🟤', name: '地品丹炉', effects: { 'save:alchemy': 0.08, 'exp:alchemy': 0.08 } },
             { id: 'alch_heaven', skill: 'alchemy', level: 50, price: 300000, icon: '🔥', name: '天品丹炉', effects: { 'double:alchemy': 0.08, 'time:alchemy': -0.06 } },
+            { id: 'alch_xian', skill: 'alchemy', level: 65, price: 3000000, icon: '🏺', name: '仙品丹炉', effects: { 'save:alchemy': 0.08, 'time:alchemy': -0.06 } },
+            { id: 'alch_hunyuan', skill: 'alchemy', level: 90, price: 150000000, icon: '☯️', name: '混元丹炉', effects: { 'double:alchemy': 0.10, 'exp:alchemy': 0.10 } },
             // 炼器
             { id: 'forge_anvil',   skill: 'forging', level: 10,  price: 3000,   icon: '⚒️', name: '精铁砧',   effects: { 'time:forging': -0.05 } },
             { id: 'forge_pool',    skill: 'forging', level: 20, price: 12000,  icon: '💧', name: '淬火池',   effects: { 'save:forging': 0.06 } },
             { id: 'forge_furnace', skill: 'forging', level: 30, price: 40000,  icon: '🏭', name: '灵纹炉',   effects: { gearPct: 0.03 } },
             { id: 'forge_god',     skill: 'forging', level: 40, price: 120000, icon: '🌋', name: '神火炉',   effects: { 'time:forging': -0.06, gearPct: 0.04 } },
             { id: 'forge_heaven',  skill: 'forging', level: 50, price: 300000, icon: '🏛️', name: '天工台',   effects: { 'save:forging': 0.08, gearPct: 0.05 } },
+            { id: 'forge_star', skill: 'forging', level: 65, price: 3000000, icon: '⭐', name: '星辰砧', effects: { 'time:forging': -0.06, gearPct: 0.04 } },
+            { id: 'forge_zaohua', skill: 'forging', level: 90, price: 150000000, icon: '🌋', name: '造化熔炉', effects: { 'save:forging': 0.08, gearPct: 0.06 } },
             // 灵田
             { id: 'farm_spring', skill: 'farming', level: 10,  price: 3000,   icon: '⛲', name: '灵泉',     effects: { 'time:farming': -0.05 } },
             { id: 'farm_array',  skill: 'farming', level: 20, price: 12000,  icon: '🌀', name: '聚灵阵',   effects: { 'double:farming': 0.06 } },
             { id: 'farm_house',  skill: 'farming', level: 30, price: 40000,  icon: '🏡', name: '温室',     effects: { 'exp:farming': 0.08, 'time:farming': -0.05 } },
             { id: 'farm_cave',   skill: 'farming', level: 40, price: 120000, icon: '⛰️', name: '洞天福地', effects: { 'double:farming': 0.08 } },
+            { id: 'farm_vein', skill: 'farming', level: 55, price: 1000000, icon: '🌱', name: '灵脉田垄', effects: { 'time:farming': -0.06, 'exp:farming': 0.08 } },
+            { id: 'farm_xian', skill: 'farming', level: 75, price: 15000000, icon: '🌸', name: '仙壤', effects: { 'double:farming': 0.08 } },
+            { id: 'farm_xiantian', skill: 'farming', level: 95, price: 300000000, icon: '🌳', name: '先天灵壤', effects: { 'double:farming': 0.10, 'time:farming': -0.06 } },
             // 采矿
             { id: 'mine_pick',  skill: 'mining', level: 10,  price: 3000,   icon: '⛏️', name: '精钢镐',   effects: { 'time:mining': -0.05 } },
             { id: 'mine_cart',  skill: 'mining', level: 20, price: 12000,  icon: '🛒', name: '矿车',     effects: { 'double:mining': 0.06 } },
             { id: 'mine_drill', skill: 'mining', level: 30, price: 40000,  icon: '🔩', name: '灵矿钻',   effects: { 'time:mining': -0.06, 'exp:mining': 0.08 } },
             { id: 'mine_core',  skill: 'mining', level: 40, price: 120000, icon: '💠', name: '地脉核心', effects: { 'double:mining': 0.08 } },
+            { id: 'mine_dragon', skill: 'mining', level: 55, price: 1000000, icon: '🧭', name: '寻龙盘', effects: { 'time:mining': -0.06, 'exp:mining': 0.08 } },
+            { id: 'mine_star', skill: 'mining', level: 75, price: 15000000, icon: '💫', name: '星核钻', effects: { 'double:mining': 0.08 } },
+            { id: 'mine_kaitian', skill: 'mining', level: 95, price: 300000000, icon: '⛏️', name: '开天镐', effects: { 'double:mining': 0.10, 'time:mining': -0.06 } },
             // 修炼
             { id: 'cult_mat',   skill: 'cultivation', level: 5,  price: 3000,   icon: '🧘', name: '聚灵蒲团', effects: { cultSpeed: 0.03 } },
             { id: 'cult_room',  skill: 'cultivation', level: 10, price: 12000,  icon: '🏯', name: '静修室',   effects: { cultSpeed: 0.03 } },
@@ -7001,7 +7032,9 @@
             { level: 45, time: -0.03, desc: '全部配方耗时 -3%' },
             { level: 60, main: 0.03, desc: '全部配方产出翻倍/节省材料 +3%' },
             { level: 70, time: -0.03, main: 0.03, desc: '耗时 -3%、翻倍/节省 +3%（炼虚期）' },
-            { level: 80, exp: 0.05, time: -0.03, main: 0.03, desc: '经验 +5%、耗时 -3%、翻倍/节省 +3%（大乘期）' }
+            { level: 80, exp: 0.05, time: -0.03, main: 0.03, desc: '经验 +5%、耗时 -3%、翻倍/节省 +3%（大乘期）' },
+            { level: 90, time: -0.03, main: 0.03, desc: '耗时 -3%、翻倍/节省 +3%（太乙期）' },
+            { level: 99, time: -0.05, main: 0.05, desc: '耗时 -5%、翻倍/节省 +5%（满级）' }
         ];
         function milestonesOf(skillName) { return WORK_SKILLS.includes(skillName) ? WORK_SKILL_MILESTONES : SKILL_MILESTONES; }
         function getSkillMilestones(skillName) {
@@ -7104,7 +7137,7 @@
         // 升到下一级所需经验：四个工作技能（炼丹 / 炼器 / 灵田 / 采矿）每 10 级对应一个大境界（Lv1–10 练气、11–20 筑基……51–60 合体），
         // 需 round(3.5 × level^2.05)，上限 Lv60；其余技能沿用 100 × level^1.8
         const WORK_SKILLS = ['alchemy', 'forging', 'farming', 'mining'];
-        const WORK_SKILL_MAX_LEVEL = 80;   // v6.69 起：大乘期把 71-80 也纳入（采太乙精华 / 大乘丹 / 大乘装备）
+        const WORK_SKILL_MAX_LEVEL = 99;   // v6.69 起大乘期 71-80；v7.39 起仙界 81-99（真仙 82–85 / 金仙 86–89 / 太乙 90–93 / 大罗 94–97 / 道祖 99）
         function skillExpNeeded(level, skillName = null) {
             if (WORK_SKILLS.includes(skillName)) return Math.round(3.5 * Math.pow(level, 2.05));
             return Math.round(100 * Math.pow(level, 1.8));
@@ -7112,12 +7145,12 @@
         // 「同样的经验投入 = 同样的效果」：新等级折算成旧曲线上累计经验相同的等级（可带小数），等级效果公式沿用旧公式
         const WORK_EQUIV_LEVEL = (() => {
             const oldCum = [0, 0];   // oldCum[L] = 升到 Lv.L 累计所需经验（旧曲线）
-            for (let l = 1; l < 80; l++) oldCum[l + 1] = oldCum[l] + Math.round(100 * Math.pow(l, 1.8));
+            for (let l = 1; l < WORK_SKILL_MAX_LEVEL; l++) oldCum[l + 1] = oldCum[l] + Math.round(100 * Math.pow(l, 1.8));
             const table = [1, 1];
             let cum = 0;
             for (let L = 1; L <= WORK_SKILL_MAX_LEVEL; L++) {
                 let o = 1;
-                while (o < 79 && oldCum[o + 1] <= cum) o++;
+                while (o < WORK_SKILL_MAX_LEVEL - 1 && oldCum[o + 1] <= cum) o++;
                 table[L] = o + (cum - oldCum[o]) / (oldCum[o + 1] - oldCum[o]);
                 cum += Math.round(3.5 * Math.pow(L, 2.05));
             }
@@ -11687,12 +11720,30 @@
             gameState.realmLayoutVersion = 2;
         }
 
+        // v7.39 生活技能上限 80 → 99，仙界配方从「80 级 + 境界」改为 82～99 级。老存档里卡在 80 级封顶（多余经验被清零）的技能，
+        // 补到当前境界已解锁配方所需的等级，免得已经在用的仙界配方突然做不了
+        function migrateWorkCap99() {
+            if ((gameState.workCap || 0) >= 99) return;
+            gameState.workCap = 99;
+            const P = gameState.player;
+            if (!P || !gameState.skills) return;
+            WORK_SKILLS.forEach(k => {
+                const sk = gameState.skills[k];
+                if (!sk || sk.level < 80) return;
+                const need = Math.max(0, ...Object.values(GAME_CONFIG.skills[k].recipes)
+                    .filter(r => r.requiredRealmIndex !== undefined && r.requiredRealmIndex <= P.realmIndex)
+                    .map(r => r.requiredLevel || 0));
+                if (need > sk.level) { sk.level = need; sk.exp = 0; }
+            });
+        }
+
         function migrateGameData() {
             // 版本迁移函数：自动更新旧数据以支持新配方
             if (!gameState.version) gameState.version = 0;
             invalidateLawTotals();   // 读档 / 导入后重新计算悟道法则加成
             migrateRealmLayout();
             migrateWorkSkillCurve();
+            migrateWorkCap99();
             gameState.workSpeedMultiplier = 1;   // 旧版把孤儿的 5% 存在这里且与灵玉脱钩；现在只由装备的灵玉提供（getWorkSpeedMultiplier）
             migrateEquipmentSlots();
             if (gameState.tutorialSeen === undefined) gameState.tutorialSeen = true;   // 已有存档的玩家不再自动弹出引导
