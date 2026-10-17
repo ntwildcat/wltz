@@ -2809,9 +2809,12 @@
             tutorialStep = Math.max(0, Math.min(TUTORIAL_STEPS.length - 1, step));
             const t = TUTORIAL_STEPS[tutorialStep];
             const last = tutorialStep === TUTORIAL_STEPS.length - 1;
+            const elder = typeof BattleArt !== 'undefined';
+            skinModal('tutorialModal', elder ? 'guide' : '');
+            const talk = `<div class="tutorial-title">${t.title}</div>
+                <div class="tutorial-body">${t.body}</div>`;
             document.getElementById('tutorialContent').innerHTML = `
-                <div class="tutorial-title">${t.title}</div>
-                <div class="tutorial-body">${t.body}</div>
+                ${elder ? `<div class="guide-wrap"><div class="guide-elder">${BattleArt.elder()}<div class="guide-name">引路人</div></div><div class="guide-bubble">${talk}</div></div>` : talk}
                 <div class="tutorial-dots">${TUTORIAL_STEPS.map((_, i) => `<i class="${i === tutorialStep ? 'on' : ''}"></i>`).join('')}</div>
                 <div class="tutorial-actions">
                     ${tutorialStep > 0 ? '<button class="btn" onclick="showTutorial(tutorialStep - 1)">上一步</button>' : '<button class="btn tutorial-skip" onclick="closeTutorial()">跳过</button>'}
@@ -3241,11 +3244,18 @@
             (REALM_UNLOCKS[r] = REALM_UNLOCKS[r] || []).unshift(`${d.icon} 本境界修为满后，须先渡「${d.name}」才能突破（突破弹窗里进入）：${d.desc}`);
         });
 
+        // v7.29 弹窗换皮：境界解锁 / 教程 / 试玩结束共用两个弹窗，按内容在 .modal-content 上写 data-skin（journal 札记 / guide 引路 / demo-end），CSS 据此换外观
+        function skinModal(modalId, skin) {
+            const box = document.querySelector('#' + modalId + ' .modal-content');
+            if (!box) return;
+            if (skin) box.dataset.skin = skin; else delete box.dataset.skin;
+        }
         function showRealmUnlockModal(realmIndex) {
             const unlocks = REALM_UNLOCKS[realmIndex];
             if (!unlocks || !unlocks.length) return;
+            skinModal('realmUnlockModal', 'journal');
             document.getElementById('realmUnlockContent').innerHTML = `
-                <div class="tutorial-title">✨ ${getRealmName(realmIndex)} ✨</div>
+                <div class="tutorial-title">${getRealmName(realmIndex)}</div>
                 <div class="tutorial-body">新解锁：<br/><br/>${unlocks.map(u => `• ${u}`).join('<br/>')}</div>
                 <div class="tutorial-actions">
                     <button class="btn" onclick="closeRealmUnlockModal()">知道了</button>
@@ -3265,8 +3275,9 @@
                     <div class="use-effect">${REALM_UNLOCKS[idx].join('<br/>')}</div></div>
                 </div>`;
             }).join('');
+            skinModal('realmUnlockModal', 'journal');
             document.getElementById('realmUnlockContent').innerHTML = `
-                <div class="tutorial-title">📜 境界解锁一览</div>
+                <div class="tutorial-title">境界解锁一览</div>
                 <div style="max-height:55vh;overflow-y:auto;margin:12px 0;">${rows}</div>
                 <div class="tutorial-actions">
                     <button class="btn" onclick="closeRealmUnlockModal()">关闭</button>
@@ -3284,8 +3295,13 @@
         function isDemoCapped(realmIndex = gameState.player.realmIndex) { return isDemoEdition() && realmIndex >= DEMO_REALM_CAP; }
         function showDemoEndModal() {
             const canOpenStore = !!(DESKTOP && DESKTOP.openStore);
-            document.getElementById('realmUnlockContent').innerHTML = `
-                <div class="tutorial-title">🌄 试玩到此为止</div>
+            skinModal('realmUnlockModal', 'demo-end');
+            const ahead = ['化神', '炼虚', '合体', '大乘', '真仙', '金仙', '太乙', '大罗', '道祖'];
+            const hero = typeof BattleArt === 'undefined' ? ''
+                : `<div class="demo-hero">${BattleArt.startHero(gameState.player.spiritRoot, { tier: 'immortal', title: '前路未完', sub: `化神而上　尚有${cnNum(ahead.length)}境` })}</div>
+                   <div class="demo-seals">${ahead.map(n => `<span>${n}</span>`).join('')}</div>`;
+            document.getElementById('realmUnlockContent').innerHTML = `${hero}
+                <div class="tutorial-title">试玩到此为止</div>
                 <div class="tutorial-body">试玩版的内容到<b>${getRealmName(DEMO_REALM_CAP)}</b>为止。<br/><br/>
                     完整版还有化神、炼虚、合体、大乘、真仙、金仙、太乙、大罗直到道祖的全部境界，以及天劫、悟道法则、道则、合道、元婴离体、仙穴与衰相等后期玩法。<br/><br/>
                     <b>存档与完整版通用</b>：购买完整版后打开游戏，选择同一个存档即可接着修炼，试玩期间达成的成就也会一并记入。</div>
@@ -3599,8 +3615,9 @@
                 const mark = state.skipped ? '⏭' : (i < state.index || state.done ? '✅' : (i === state.index ? '👉' : '⚪'));
                 return `<div class="quest-row${i === state.index && !state.done ? ' current' : ''}"><span>${mark} ${i + 1}. ${q.title}</span><small>${questRewardText(q.reward)}</small></div>`;
             }).join('');
+            skinModal('tutorialModal', 'journal');
             document.getElementById('tutorialContent').innerHTML = `
-                <div class="tutorial-title">📜 新手任务</div>
+                <div class="tutorial-title">新手任务</div>
                 <div class="tutorial-body quest-list">${rows}
                     <div class="quest-row final"><span>🎁 全部完成</span><small>${state.skipped ? '已跳过，没有奖励' : `${COIN_ICON} ${NEWBIE_FINAL_REWARD} 灵石 + 游戏目标介绍`}</small></div></div>
                 <div class="tutorial-actions"><button class="btn" onclick="closeTutorial()">关闭</button>${state.done ? '<button class="btn btn-secondary" onclick="showQuestGoal(false)">查看游戏目标</button>' : '<button class="btn btn-secondary quest-skip-btn" onclick="skipQuests()">我是老玩家，跳过任务</button>'}</div>`;
@@ -3612,8 +3629,9 @@
             const state = getQuestState();
             state.goalShown = true;
             const maxName = GAME_CONFIG.realms[GAME_CONFIG.realms.length - 1].name;
+            skinModal('tutorialModal', 'journal');
             document.getElementById('tutorialContent').innerHTML = `
-                <div class="tutorial-title">🎉 新手任务全部完成！</div>
+                <div class="tutorial-title">新手任务全部完成！</div>
                 <div class="tutorial-body">
                     ${justFinished ? `额外奖励 ${COIN_ICON} ${NEWBIE_FINAL_REWARD} 灵石已到账。<br/><br/>` : ''}
                     你已经把基础玩法都试过一遍了。接下来，这个游戏的目标是——<br/>
@@ -12240,31 +12258,15 @@
 
                 const isCurrentArt = gameState.player.currentArt === artKey;
                 const itemDiv = document.createElement('div');
-                itemDiv.style.cssText = `
-                    background: ${isCurrentArt ? 'color-mix(in srgb, var(--jade) 16%, var(--bg-l2))' : 'var(--bg-l2)'};
-                    border: 1px solid ${isCurrentArt ? 'var(--jade)' : 'var(--border-l3)'};
-                    border-radius: 4px;
-                    padding: 12px;
-                    margin-bottom: 10px;
-                    cursor: ${isCurrentArt ? 'default' : 'pointer'};
-                `;
-
-                const statusText = isCurrentArt ? '✓ 当前功法' : '点击切换';
-
+                // v7.29 每部功法是一卷展开的宣纸（同修炼页功法卡），正在修习的盖朱红「修习中」印
+                itemDiv.className = 'art-scroll' + (isCurrentArt ? ' current' : '');
+                const icon = art.icon && String(art.icon).startsWith('<svg') ? `<span class="art-icon">${art.icon}</span>` : '';
+                const effects = describeEffects(art.effects);
                 itemDiv.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 10px;">
-                        <div style="flex: 1;">
-                            <div style="font-weight: bold; color: var(--gold); font-size: 1em;">${art.icon || ''} ${art.name}</div>
-                            <div style="font-size: 0.85em; color: var(--text-l4); margin-top: 4px;">${art.description}</div>
-                            <div style="font-size: 0.8em; color: var(--text-l4); margin-top: 6px;">
-                                修炼速度倍率：<span style="color: var(--azure);">${art.speedMultiplier.toFixed(2)}x</span>
-                            </div>
-                            ${describeEffects(art.effects).length ? `<div style="font-size: 0.8em; color: var(--jade); margin-top: 4px;">特效：${describeEffects(art.effects).join(' · ')}</div>` : ''}
-                        </div>
-                        <div style="text-align: right; color: ${isCurrentArt ? 'var(--jade)' : 'var(--text-l4)'}; font-size: 0.9em;">
-                            ${statusText}
-                        </div>
-                    </div>
+                    <div class="as-head">${icon}<b class="as-name">${art.name}</b><span class="as-speed">修炼速度 ×${art.speedMultiplier.toFixed(2)}</span>
+                        <span class="${isCurrentArt ? 'as-seal' : 'as-hint'}">${isCurrentArt ? '修习中' : '点击切换'}</span></div>
+                    <div class="as-desc">${art.description}</div>
+                    ${effects.length ? `<div class="as-effects">特效：${effects.join(' · ')}</div>` : ''}
                 `;
 
                 if (!isCurrentArt) {
@@ -12285,8 +12287,54 @@
         }
 
         // P3优化：克制系统教程函数
+        // v7.29 灵根克制环：五行按「金→木→土→水→火→金」围成五边形，箭头指向被克的一方；雷冰在右边互克；风居中，不克也不被克。
+        // 关系全部从 COUNTER_SYSTEM.relations 生成，改表这里跟着变；你的灵根外面多一圈并标「你」
+        const ROOT_GLYPH = { metal: '金', wood: '木', water: '水', fire: '火', earth: '土', thunder: '雷', ice: '冰', wind: '风' };
+        function renderCounterRing() {
+            const box = document.getElementById('counterRing');
+            if (!box) return;
+            const rel = COUNTER_SYSTEM.relations, me = gameState.player.spiritRoot;
+            const color = k => typeof BattleArt !== 'undefined' ? BattleArt.colorOf(k) : 'var(--gold)';
+            const pos = {}, cx = 112, cy = 112, R = 80;
+            const cycle = [];
+            for (let k = 'metal'; k && !cycle.includes(k) && cycle.length < 5; k = rel[k].counters) cycle.push(k);
+            cycle.forEach((k, i) => { const a = -Math.PI / 2 + i * 2 * Math.PI / cycle.length; pos[k] = [cx + R * Math.cos(a), cy + R * Math.sin(a)]; });
+            const rest = Object.keys(rel).filter(k => !pos[k]);
+            const pair = rest.filter(k => rel[k].counters && rel[rel[k].counters].counters === k);
+            pair.forEach((k, i) => { pos[k] = [262, i ? 170 : 54]; });
+            rest.filter(k => !pos[k]).forEach(k => { pos[k] = [cx, cy]; });
+            const r = 19, drawn = new Set();
+            let arrows = '';
+            Object.entries(rel).forEach(([k, v]) => {
+                const t = v.counters;
+                if (!t || !pos[t] || drawn.has(t + k)) return;
+                drawn.add(k + t);
+                const mutual = rel[t].counters === k;
+                const [x1, y1] = pos[k], [x2, y2] = pos[t];
+                const d = Math.hypot(x2 - x1, y2 - y1), ux = (x2 - x1) / d, uy = (y2 - y1) / d;
+                const a = [x1 + ux * (r + 4), y1 + uy * (r + 4)], b = [x2 - ux * (r + 6), y2 - uy * (r + 6)];
+                const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+                const lx = mutual ? mx + 16 : mx + (mx - cx) * 0.22, ly = mutual ? my : my + (my - cy) * 0.22;
+                arrows += `<path d="M${a[0].toFixed(1)} ${a[1].toFixed(1)} L${b[0].toFixed(1)} ${b[1].toFixed(1)}" class="cr-arrow" marker-end="url(#crHead)"${mutual ? ' marker-start="url(#crTail)"' : ''}/>
+                    <text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" class="cr-ke">${mutual ? '互克' : '克'}</text>`;
+            });
+            const nodes = Object.keys(pos).map(k => {
+                const [x, y] = pos[k], c = color(k), mine = k === me;
+                return `<g class="cr-node${mine ? ' mine' : ''}" style="--c:${c}">
+                    ${mine ? `<circle cx="${x}" cy="${y}" r="${r + 6}" class="cr-mine"/>` : ''}
+                    <circle cx="${x}" cy="${y}" r="${r}" class="${rel[k].counters ? 'cr-disc' : 'cr-disc free'}"/>
+                    <text x="${x}" y="${y + 7}" class="cr-glyph">${ROOT_GLYPH[k] || k}</text>
+                    ${mine ? `<text x="${x + r + 4}" y="${y - r + 2}" class="cr-you">你</text>` : ''}
+                </g>`;
+            }).join('');
+            box.innerHTML = `<svg viewBox="0 0 300 224" role="img" aria-label="灵根克制关系图：金克木、木克土、土克水、水克火、火克金；雷冰互克；风不克也不被克">
+                <defs><marker id="crHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" class="cr-tip"/></marker>
+                <marker id="crTail" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M10 0 L0 5 L10 10 Z" class="cr-tip"/></marker></defs>
+                ${arrows}${nodes}</svg>`;
+        }
         function showCounterSystemModal() {
             fillRootEffectList();
+            renderCounterRing();
             document.getElementById('counterSystemModal').classList.add('show');
         }
 

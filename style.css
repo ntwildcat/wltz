@@ -2673,3 +2673,94 @@ body[data-panel="shop"] .nav-mini[data-nav="shop"]::before, body[data-panel="set
 /* 在背包 / 装备 / 商城 / 设置页时，侧栏上一个技能的墨痕淡下去，免得和下面的入口同时高亮 */
 body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"], [data-panel="settings"]) .sidebar .skill-item.active::before { opacity: 0.1; }
 body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"], [data-panel="settings"]) .sidebar .skill-item.active::after { opacity: 0.35; }
+
+/* ==========================================================================
+   v7.29 漫画风第二批（三）：修行札记 / 引路老者 / 试玩结束 / 功法卷轴列表 / 灵根克制环
+   ========================================================================== */
+/* 修行札记：境界解锁、解锁一览、新手任务列表——古籍页：宣纸、朱丝栏、双线朱框，右边书口竖写「修行札记」 */
+.modal-content[data-skin="journal"] { position: relative; isolation: isolate; --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; --patina: #3f7f6a; --cinnabar: #a8322a; --cinnabar-2: #a8322a; --border-l1: #7d4f22; --border-l2: #8a6420; color: #231f19; border: none; border-radius: 2px;
+    background: repeating-linear-gradient(90deg, rgba(168, 50, 42, 0) 0 30px, rgba(168, 50, 42, 0.13) 30px 31px), linear-gradient(180deg, #f4ead0, #e8d9b2);
+    box-shadow: inset 0 0 0 7px #f1e6c8, inset 0 0 0 9px rgba(168, 50, 42, 0.55), inset 0 0 0 11px #f1e6c8, inset 0 0 0 12px rgba(168, 50, 42, 0.4), inset 0 0 30px rgba(120, 90, 40, 0.3), 0 10px 30px rgba(0, 0, 0, 0.55); }
+.modal-content[data-skin="journal"] .tutorial-title::before { content: '修行札记'; display: block; margin-bottom: 2px; font-size: 0.42em; letter-spacing: 0.6em; color: #8a2a20; }
+.modal-content[data-skin="journal"] .tutorial-title { font-family: var(--font-brush); font-weight: normal; font-size: 1.9em; color: #1a140c; letter-spacing: 0.1em; }
+.modal-content[data-skin="journal"] .tutorial-title::after { content: ''; display: block; width: 46%; height: 7px; margin: 3px auto 0; background: #a8322a; opacity: 0.55; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'><path d='M2 8 Q30 1 70 5 Q120 9 160 3 Q185 1 198 6 L196 9 Q160 8 120 11 Q70 12 30 9 Q12 10 2 8 Z'/></svg>") center / 100% 100% no-repeat; }
+.modal-content[data-skin="journal"] .tutorial-body b { color: #7d4f22; }
+.modal-content[data-skin="journal"] .modal-close { color: #675f4e; }
+.modal-content[data-skin="journal"] .btn { font-family: var(--font-brush); font-size: 1.12em; }
+
+/* 侧栏「境界感悟」同样是一页札记 */
+.stat-panel.lore-journal { --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; --patina: #3f7f6a; --cinnabar: #a8322a; --cinnabar-2: #a8322a; --border-l1: #7d4f22; --border-l2: #8a6420; color: #231f19; border: none; background: repeating-linear-gradient(90deg, rgba(168, 50, 42, 0) 0 30px, rgba(168, 50, 42, 0.13) 30px 31px), linear-gradient(180deg, #f2e7cb, #e6d6ae);
+    box-shadow: inset 0 0 0 4px #f1e6c8, inset 0 0 0 5px rgba(168, 50, 42, 0.45), inset 0 0 18px rgba(120, 90, 40, 0.28), 0 2px 6px rgba(0, 0, 0, 0.35); }
+.stat-panel.lore-journal .stat-title { font-family: var(--font-brush); font-size: 1.3em; font-weight: normal; color: #1a140c; letter-spacing: 0.1em; border-bottom-color: rgba(168, 50, 42, 0.35); }
+.stat-panel.lore-journal #realmLoreBox { color: #4a4438 !important; }
+@media (max-width: 768px) { .realm-lore-mobile { --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; --patina: #3f7f6a; --cinnabar: #a8322a; --cinnabar-2: #a8322a; --border-l1: #7d4f22; --border-l2: #8a6420; color: #4a4438; background: repeating-linear-gradient(90deg, rgba(168, 50, 42, 0) 0 30px, rgba(168, 50, 42, 0.13) 30px 31px), linear-gradient(180deg, #f2e7cb, #e6d6ae); border: none; box-shadow: inset 0 0 0 1px rgba(168, 50, 42, 0.4), 0 2px 6px rgba(0, 0, 0, 0.35); }
+    .realm-lore-mobile > summary { font-family: var(--font-brush); font-weight: normal; font-size: 1.15em; color: #1a140c; } }
+
+/* 新手教程：左边引路老者，右边漫画对话气泡 */
+.modal-content[data-skin="guide"] { max-width: 620px; }
+.guide-wrap { display: grid; grid-template-columns: 132px 1fr; gap: 14px; align-items: end; }
+.guide-elder { position: relative; text-align: center; line-height: 0; }
+.guide-elder .bs-art { width: 132px; height: auto; overflow: visible; animation: bsBreathe 4.5s ease-in-out infinite; transform-origin: 50% 95%; }
+.guide-name { display: inline-block; margin-top: 4px; line-height: 1.2; font-size: 1.05em; padding: 3px 10px 2px; font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); }
+.guide-bubble { position: relative; --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; --patina: #3f7f6a; --cinnabar: #a8322a; --cinnabar-2: #a8322a; --border-l1: #7d4f22; --border-l2: #8a6420; color: #231f19; background: #fbf6e8; border: 2.5px solid #120e09; border-radius: 18px 18px 18px 4px; padding: 14px 18px; margin-bottom: 40px;
+    box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.45); }
+.guide-bubble::before { content: ''; position: absolute; left: -16px; bottom: 14px; width: 18px; height: 18px; background: #fbf6e8; border-left: 2.5px solid #120e09; border-bottom: 2.5px solid #120e09;
+    transform: skewY(-30deg); }
+.guide-bubble .tutorial-title { font-family: var(--font-brush); font-weight: normal; font-size: 1.6em; color: #1a140c; text-align: left; margin-bottom: 8px; }
+.guide-bubble .tutorial-body { min-height: 130px; color: #3a342a; }
+.guide-bubble .tutorial-body b { color: #8a2a20; }
+.modal-content[data-skin="guide"] .tutorial-dots i.on { background: #a8322a; }
+.modal-content[data-skin="guide"] .btn { font-family: var(--font-brush); font-size: 1.1em; }
+@media (max-width: 768px) {
+    .guide-wrap { grid-template-columns: 1fr; gap: 6px; }
+    .guide-elder { display: flex; align-items: flex-end; gap: 8px; }
+    .guide-elder .bs-art { width: 64px; }
+    .guide-bubble { margin-bottom: 0; border-radius: 4px 18px 18px 18px; }
+    .guide-bubble::before { left: 22px; top: -16px; bottom: auto; transform: skewX(-30deg); border-bottom: none; border-top: 2.5px solid #120e09; }
+}
+
+/* 试玩结束：仙界远景主视觉「前路未完」，下面一排还没走到的境界印（灰） */
+.modal-content[data-skin="demo-end"] { max-width: 560px; }
+.demo-hero { margin: -4px 0 12px; }
+.demo-hero .start-hero { margin: 0; }
+.demo-seals { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0 0 14px; }
+.demo-seals span { font-family: var(--font-brush); font-size: 1.05em; padding: 3px 7px 2px; border: 1.5px solid var(--text-l4); color: var(--text-l3); border-radius: 3px; opacity: 0.75; transform: rotate(-2deg); }
+.demo-seals span:nth-child(even) { transform: rotate(2deg); }
+.demo-seals span:last-child { font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); border-color: transparent; opacity: 1; }
+.modal-content[data-skin="demo-end"] .tutorial-title { font-family: var(--font-brush); font-weight: normal; font-size: 1.6em; }
+
+/* 功法切换：每部功法一卷宣纸，左右两根木轴，正在修习的盖朱红印 */
+.art-switch-modal .modal-title { font-family: var(--font-brush); font-size: 1.9em; letter-spacing: 0.15em; }
+#artSwitchList { padding: 6px 14px; }
+.art-scroll { position: relative; --text-l1: #231f19; --text-l2: #7d4f22; --text-l3: #4a4438; --text-l4: #675f4e; --gold: #8a6420; --azure: #3d6f8f; --jade: #3f7f6a; --color-hp: #3f7f6a; --color-warning: #9c5f18; --color-danger: #b33a2c; --violet: #6a4fa3; --bronze: #2f5566; --bronze-dim: #b9aa8a; --bg-l1: #efe6cc; --bg-l2: #f4ecd6; --bg-l3: #faf4e2; --bg-sunken: #ddd0b0; --border-l3: #c9b994; --border-l4: #ddd0b3; --patina: #3f7f6a; --cinnabar: #a8322a; --cinnabar-2: #a8322a; --border-l1: #7d4f22; --border-l2: #8a6420; color: #231f19; background: linear-gradient(180deg, #f3e9cf, #e7d8b4); border-radius: 2px; padding: 10px 14px; margin: 0 0 14px; cursor: pointer;
+    box-shadow: inset 0 0 16px rgba(120, 90, 40, 0.28), 0 3px 8px rgba(0, 0, 0, 0.35); transition: transform 0.15s; }
+.art-scroll::before, .art-scroll::after { content: ''; position: absolute; top: -5px; bottom: -5px; width: 9px; border-radius: 5px; background: linear-gradient(90deg, #3a2412, #7a4c26 45%, #3a2412); box-shadow: 0 0 0 1px #1a1008, inset 0 6px 0 -3px #c9a24a, inset 0 -6px 0 -3px #c9a24a; }
+.art-scroll::before { left: -9px; }
+.art-scroll::after { right: -9px; }
+.art-scroll:hover { transform: translateY(-2px); }
+.art-scroll.current { cursor: default; box-shadow: inset 0 0 16px rgba(120, 90, 40, 0.28), 0 0 0 2px #a8322a, 0 3px 8px rgba(0, 0, 0, 0.35); }
+.art-scroll.current:hover { transform: none; }
+.as-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+.as-head .art-icon { display: inline-flex; width: 28px; height: 28px; }
+.as-head .art-icon .ico { width: 28px; height: 28px; }
+.as-name { font-family: var(--font-brush); font-weight: normal; font-size: 1.45em; color: #1a140c; letter-spacing: 0.06em; }
+.as-speed { font-size: 0.8em; color: #fff3e6; background: #3d6f8f; padding: 1px 6px; border-radius: 2px; }
+.as-seal { margin-left: auto; font-size: 1em; padding: 3px 8px 2px; transform: rotate(-6deg); font-family: var(--font-brush); color: #fff2e4; background: #a8322a; border-radius: 3px; box-shadow: inset 0 0 0 2px rgba(255, 236, 214, 0.45), 2px 2px 0 rgba(0, 0, 0, 0.3); }
+.as-hint { margin-left: auto; font-size: 0.85em; color: #8a2a20; }
+.as-desc { font-size: 0.86em; color: #4a4438; margin-top: 5px; line-height: 1.6; }
+.as-effects { font-size: 0.82em; color: #3f7f6a; margin-top: 4px; }
+
+/* 灵根克制环 */
+.counter-modal .modal-title { font-family: var(--font-brush); font-size: 1.9em; letter-spacing: 0.15em; }
+.counter-ring { max-width: 340px; margin: 0 auto 14px; }
+.counter-ring svg { display: block; width: 100%; height: auto; overflow: visible; }
+.cr-arrow { stroke: var(--text-l3); stroke-width: 2; fill: none; opacity: 0.8; }
+.cr-tip { fill: var(--text-l3); }
+.cr-ke { font-family: var(--font-brush); font-size: 13px; fill: #c4483a; text-anchor: middle; }
+.cr-disc { fill: color-mix(in srgb, var(--c) 18%, #14110c); stroke: var(--c); stroke-width: 2.5; }
+.cr-disc.free { stroke-dasharray: 4 3; }
+.cr-glyph { font-family: var(--font-brush); font-size: 21px; fill: var(--c); text-anchor: middle; paint-order: stroke fill; stroke: #0e0c09; stroke-width: 2.5px; }
+.cr-mine { fill: none; stroke: var(--c); stroke-width: 1.5; opacity: 0.8; filter: drop-shadow(0 0 4px var(--c)); }
+.cr-you { font-family: var(--font-brush); font-size: 13px; fill: #fff2e4; paint-order: stroke fill; stroke: #a8322a; stroke-width: 5px; }
+
+@media (prefers-reduced-motion: reduce) { .guide-elder .bs-art { animation: none !important; } .art-scroll:hover { transform: none; } }
