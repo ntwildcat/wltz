@@ -6090,6 +6090,7 @@
                 ${s.board.length ? s.board.map(t => sectTaskCard(t, 'board')).join('') : '<div class="qiyu-empty">榜上的任务都接完了，等下一次补充。</div>'}
                 <div class="qiyu-note">任务榜每 4 小时把空位补满到 ${SECT_BOARD_SIZE} 个，离线也照常补。讨伐、清剿、游历、历练的进度在线离线都算，达成自动完成；供奉要手动上交。放弃的任务不回到榜上。</div>
                 ${sectHallsHtml()}
+                ${disciplesHtml()}
                 ${invasionHtml()}
                 ${sectShopHtml()}`;
         }
@@ -7614,10 +7615,19 @@
             const s = gameState.sect;
             if (!s || !s.halls) return 0;
             if (SECT_BATTLE_KEYS.has(key) && inTribulationFight()) return 0;
-            const sig = (s.hallsSig || '') + '|' + (s.xp || 0) + '|' + gameState.player.realmIndex + '|' + Object.keys(s.hallDown || {}).filter(hallIsDown).join(',');
+            const sig = (s.hallsSig || '') + '|' + (s.xp || 0) + '|' + gameState.player.realmIndex + '|' + Object.keys(s.hallDown || {}).filter(hallIsDown).join(',') + '|' + discipleSig();
             if (sectModCache.sig !== sig) {
                 const totals = {};
-                Object.keys(SECT_HALLS).forEach(h => { const f = sectHallForm(h); if (f) Object.entries(f.effects).forEach(([k, v]) => { totals[k] = (totals[k] || 0) + v; }); });
+                Object.keys(SECT_HALLS).forEach(h => {
+                    const f = sectHallForm(h);
+                    if (!f) return;
+                    const boost = 1 + hallDiscipleBonus(h);   // 弟子驻守只放大好处
+                    Object.entries(f.effects).forEach(([k, v]) => {
+                        const kind = k.split(':')[0];
+                        const good = (k === 'dmgTaken' || kind === 'time') ? v < 0 : v > 0;
+                        totals[k] = (totals[k] || 0) + v * (good ? boost : 1);
+                    });
+                });
                 sectModCache = { sig, totals };
             }
             return sectModCache.totals[key] || 0;
@@ -7710,7 +7720,7 @@
             const e = r.battle.currentEnemy;
             let text;
             if (r.won) {
-                const c = Math.round(INVADE_REWARD.contrib * mult), x = Math.round(INVADE_REWARD.xp * mult);
+                const c = Math.round(INVADE_REWARD.contrib * mult * (hasTancai() ? 1.2 : 1)), x = Math.round(INVADE_REWARD.xp * mult);   // 贪财弟子
                 s.contrib += c; s.xp += x;
                 const shard = Math.random() < INVADE_REWARD.shard ? qiyuAddShard('battle') : '';
                 text = `🏯 击退「${e.name}」！贡献 +${c}、宗门经验 +${x}${shard ? '\n🧩 ' + shard : ''}`;
@@ -7798,13 +7808,130 @@
                 ${['refill', 'reset'].map(id => `<div class="sect-task"><div class="sect-task-foot"><span><b>${SECT_SHOP[id].name}</b> · ${SECT_SHOP[id].cost} 贡献<br/><span class="sect-task-hint">${SECT_SHOP[id].desc}</span></span><span class="sect-task-btns"><button type="button" class="btn btn-small" onclick="buySectItem('${id}')">买</button></span></div></div>`).join('')}`;
         }
 
+        // ==================== 宗门弟子（v7.54） ====================
+        // 宗门 3 级起可以收弟子：候选每 8 小时刷新 3 名，花 150 贡献收一名；名额 3 级 1 名、5 级 2 名、7 级 3 名、9 级 4 名。
+        // 弟子派驻殿阁（藏经阁的秘术是开关式机制，不能驻守），放大该殿阁形制的「好处」（代价不变）：基础 +10%，每级 +2%；
+        // 驻守每满 6 小时升一级（现实时间，离线照算），最高 10 级。天赋：对口殿阁加成翻倍、勤勉 +10 个百分点、早慧升级快 50%、贪财外敌来犯胜利贡献 +20%。
+        // 例：攻阵「战斗伤害 +8%」由 10 级剑痴驻守（+28% × 2 = +56%）→ +12.5%，「受到的伤害 +5%」不变。
+        const DISCIPLE_FROM_LEVEL = 3, DISCIPLE_COST = 150, DISCIPLE_REFRESH_MS = 8 * 3600e3, DISCIPLE_LEVEL_MS = 6 * 3600e3, DISCIPLE_MAX_LEVEL = 10;
+        const DISCIPLE_BASE = 0.10, DISCIPLE_PER_LEVEL = 0.02;
+        const DISCIPLE_HOSTS = ['husan', 'danfang', 'qitang', 'lingtian', 'yanwu'];
+        const DISCIPLE_TALENTS = {
+            jianchi: { name: '剑痴', desc: '驻守护山大阵或演武场时，驻守加成翻倍', halls: ['husan', 'yanwu'] },
+            danchi:  { name: '丹痴', desc: '驻守丹房时，驻守加成翻倍', halls: ['danfang'] },
+            qichi:   { name: '器痴', desc: '驻守器堂时，驻守加成翻倍', halls: ['qitang'] },
+            nongchi: { name: '农痴', desc: '驻守灵田司时，驻守加成翻倍', halls: ['lingtian'] },
+            qinmian: { name: '勤勉', desc: '驻守加成 +10 个百分点（任何殿阁）' },
+            zaohui:  { name: '早慧', desc: '驻守升级快 50%（每 4 小时一级）' },
+            tancai:  { name: '贪财', desc: '有贪财弟子在宗门时，外敌来犯胜利的贡献 +20%（不叠加）' }
+        };
+        const DISCIPLE_SURNAMES = ['林', '陈', '苏', '叶', '顾', '沈', '白', '楚', '秦', '许', '江', '何', '宋', '唐', '温', '陆'];
+        const DISCIPLE_GIVEN = ['青', '远', '清', '若', '尘', '雪', '寒', '风', '星', '竹', '松', '月', '安', '宁', '逸', '墨', '衡', '婉', '瑶', '澜'];
+
+        function discipleCap() { const lv = sectLevelInfo().level; return lv < DISCIPLE_FROM_LEVEL ? 0 : Math.min(4, 1 + Math.floor((lv - DISCIPLE_FROM_LEVEL) / 2)); }
+        function makeDisciple() {
+            const pick = a => a[Math.floor(Math.random() * a.length)];
+            const keys = Object.keys(DISCIPLE_TALENTS);
+            const t1 = pick(keys), talents = [t1];
+            if (Math.random() < 0.3) { const rest = keys.filter(k => k !== t1); talents.push(pick(rest)); }
+            return { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: pick(DISCIPLE_SURNAMES) + pick(DISCIPLE_GIVEN) + (Math.random() < 0.5 ? pick(DISCIPLE_GIVEN) : ''), talents, exp: 0, hall: null, since: 0 };
+        }
+        function discipleExpMs(d, now = Date.now()) { return (d.exp || 0) + (d.hall ? Math.max(0, now - (d.since || now)) : 0); }
+        function discipleLevel(d) {
+            const per = d.talents.includes('zaohui') ? DISCIPLE_LEVEL_MS / 1.5 : DISCIPLE_LEVEL_MS;
+            return Math.min(DISCIPLE_MAX_LEVEL, 1 + Math.floor(discipleExpMs(d) / per));
+        }
+        function discipleBonus(d, hall) {
+            let b = DISCIPLE_BASE + DISCIPLE_PER_LEVEL * (discipleLevel(d) - 1);
+            if (d.talents.some(t => (DISCIPLE_TALENTS[t].halls || []).includes(hall))) b *= 2;
+            if (d.talents.includes('qinmian')) b += 0.10;
+            return b;
+        }
+        function hallDiscipleBonus(hall) {
+            const s = getSect();
+            if (!s || !s.disciples) return 0;
+            const d = s.disciples.find(x => x.hall === hall);
+            return d ? discipleBonus(d, hall) : 0;
+        }
+        function discipleSig() {
+            const s = getSect();
+            return s && s.disciples ? s.disciples.map(d => d.hall ? d.hall + discipleLevel(d) + d.talents.join('') : '').join(',') : '';
+        }
+        function hasTancai() { const s = getSect(); return !!(s && s.disciples && s.disciples.some(d => d.talents.includes('tancai'))); }
+        function tickRecruits(now = Date.now()) {
+            const s = getSect();
+            if (!s || discipleCap() <= 0) return false;
+            if (!s.recruits || !s.recruitAt || now >= s.recruitAt) {
+                s.recruits = [makeDisciple(), makeDisciple(), makeDisciple()];
+                s.recruitAt = now + DISCIPLE_REFRESH_MS;
+                return true;
+            }
+            return false;
+        }
+        function recruitDisciple(id) {
+            const s = getSect();
+            s.disciples = s.disciples || [];
+            if (s.disciples.length >= discipleCap()) { showNotification(`弟子名额已满（${discipleCap()} 名，宗门升级可增加）`, '#c98a3e'); return; }
+            if (s.contrib < DISCIPLE_COST) { showNotification(`贡献不够（收徒要 ${DISCIPLE_COST}）`, '#c98a3e'); return; }
+            const i = (s.recruits || []).findIndex(d => d.id === id);
+            if (i < 0) return;
+            s.contrib -= DISCIPLE_COST;
+            const d = s.recruits.splice(i, 1)[0];
+            s.disciples.push(d);
+            showNotification(`🧑‍🎓 ${d.name}拜入${s.name}（${d.talents.map(t => DISCIPLE_TALENTS[t].name).join('、')}）`, '#c2a25f', 'rare');
+            renderSectPanel(); saveGame();
+        }
+        function stationDisciple(id, hall) {
+            const s = getSect(), d = (s.disciples || []).find(x => x.id === id);
+            if (!d) return;
+            hall = DISCIPLE_HOSTS.includes(hall) ? hall : null;
+            const now = Date.now();
+            d.exp = discipleExpMs(d, now);   // 先把已驻守的时间结算进经验
+            if (hall) s.disciples.forEach(x => { if (x !== d && x.hall === hall) { x.exp = discipleExpMs(x, now); x.hall = null; x.since = 0; } });
+            d.hall = hall; d.since = hall ? now : 0;
+            calculateStats();
+            renderSectPanel(); saveGame();
+        }
+        async function dismissDisciple(id) {
+            const s = getSect(), d = (s.disciples || []).find(x => x.id === id);
+            if (!d) return;
+            if (!await uiConfirm(`遣散${d.name}？驻守积累的等级不会保留，收徒花的贡献不退。`, { title: '遣散弟子', danger: true })) return;
+            s.disciples = s.disciples.filter(x => x.id !== id);
+            calculateStats();
+            renderSectPanel(); saveGame();
+        }
+        function discipleTalentHtml(d) { return d.talents.map(t => `<span class="dis-talent" title="${DISCIPLE_TALENTS[t].desc}">${DISCIPLE_TALENTS[t].name}</span>`).join(''); }
+        function disciplesHtml() {
+            const s = getSect(), cap = discipleCap();
+            if (cap <= 0) return `<div class="qiyu-sub">弟子</div><div class="hall locked"><div class="hall-head">🧑‍🎓 弟子<span>宗门 ${DISCIPLE_FROM_LEVEL} 级开放</span></div></div>`;
+            tickRecruits();
+            const list = s.disciples || [];
+            const hallOpts = d => `<select onchange="stationDisciple('${d.id}', this.value)"><option value="">未派驻</option>${DISCIPLE_HOSTS.map(h => {
+                const ok = !!sectHallForm(h);
+                return `<option value="${h}"${d.hall === h ? ' selected' : ''}${ok ? '' : ' disabled'}>${SECT_HALLS[h].name}${ok ? `（+${Math.round(discipleBonus(d, h) * 100)}%）` : '（未开放或未定形制）'}</option>`;
+            }).join('')}</select>`;
+            const roster = list.length ? list.map(d => {
+                const lv = discipleLevel(d), per = d.talents.includes('zaohui') ? DISCIPLE_LEVEL_MS / 1.5 : DISCIPLE_LEVEL_MS;
+                const pct = lv >= DISCIPLE_MAX_LEVEL ? 100 : Math.round((discipleExpMs(d) % per) / per * 100);
+                const active = d.hall && sectHallForm(d.hall);
+                return `<div class="sect-task active"><div class="sect-task-title">${d.name} <small>Lv.${lv}</small> ${discipleTalentHtml(d)}</div>
+                    <div class="sect-task-bar"><i style="width:${pct}%"></i><span>${lv >= DISCIPLE_MAX_LEVEL ? '已满级' : d.hall ? '驻守中，' + fmtLeft(per - discipleExpMs(d) % per) + '后升级' : '未派驻，不会升级'}</span></div>
+                    <div class="sect-task-foot"><span>派驻：${hallOpts(d)}${d.hall && !active ? ' <span class="hall-bad">殿阁停用中</span>' : ''}</span><span class="sect-task-btns"><button type="button" class="btn btn-small btn-secondary" onclick="dismissDisciple('${d.id}')">遣散</button></span></div></div>`;
+            }).join('') : '<div class="qiyu-empty">还没有弟子。</div>';
+            const recruits = (s.recruits || []).map(d => `<div class="sect-task"><div class="sect-task-foot"><span><b>${d.name}</b> ${discipleTalentHtml(d)}<br/><span class="sect-task-hint">${d.talents.map(t => DISCIPLE_TALENTS[t].desc).join('；')}</span></span><span class="sect-task-btns"><button type="button" class="btn btn-small" onclick="recruitDisciple('${d.id}')"${list.length >= cap ? ' disabled' : ''}>收徒（${DISCIPLE_COST} 贡献）</button></span></div></div>`).join('');
+            return `<div class="qiyu-sub">弟子（${list.length}/${cap}）</div>${roster}
+                <div class="qiyu-sub">前来拜山的人 · ${fmtLeft(s.recruitAt - Date.now())}后换一批</div>${recruits || '<div class="qiyu-empty">这一批都收完了。</div>'}
+                <div class="qiyu-note">弟子派驻殿阁，放大该殿阁形制的好处（代价不变）：基础 +${Math.round(DISCIPLE_BASE * 100)}%，每级 +${Math.round(DISCIPLE_PER_LEVEL * 100)}%，对口天赋翻倍，勤勉再 +10 个百分点；驻守每满 6 小时升一级（离线照算），最高 ${DISCIPLE_MAX_LEVEL} 级。名额：宗门 3 / 5 / 7 / 9 级各 1 名。藏经阁的秘术不能驻守。</div>`;
+        }
+
         function sectHallsHtml() {
             const s = getSect(), lv = sectLevelInfo().level;
             return `<div class="qiyu-sub">殿阁</div>` + Object.entries(SECT_HALLS).map(([h, cfg]) => {
                 if (lv < cfg.level) return `<div class="hall locked"><div class="hall-head">${cfg.icon} ${cfg.name}<span>宗门 ${cfg.level} 级开放</span></div></div>`;
                 const cur = (s.halls || {})[h];
                 const left = cur ? ((s.hallSwitchAt || {})[h] || 0) + SECT_HALL_COOLDOWN_MS - Date.now() : 0;
-                const note = !cur ? '首次选择免费' : left > 0 ? `${fmtLeft(left)}后可再换` : `换形制 ${SECT_HALL_SWITCH_COST} 贡献`;
+                const dis = (s.disciples || []).find(d => d.hall === h);
+                const note = (!cur ? '首次选择免费' : left > 0 ? `${fmtLeft(left)}后可再换` : `换形制 ${SECT_HALL_SWITCH_COST} 贡献`) + (dis ? ` · ${dis.name}驻守，好处 +${Math.round(discipleBonus(dis, h) * 100)}%` : '');
                 const forms = Object.entries(cfg.forms).map(([id, f]) => `<button type="button" class="hall-form${cur === id ? ' on' : ''}" onclick="chooseSectHall('${h}', '${id}')"><b>${f.name}</b><span>${hallEffectText(f)}</span></button>`).join('');
                 return `<div class="hall"><div class="hall-head">${cfg.icon} ${cfg.name}<span>${note}</span></div><div class="hall-forms${h === 'yanwu' ? ' many' : ''}">${forms}</div></div>`;
             }).join('') + `<div class="qiyu-note">战斗伤害、受到的伤害、灵域专精这些战斗效果在渡劫类战斗（天劫、心魔、衰相、三尸、证道）里不生效。</div>`;
@@ -7824,9 +7951,10 @@
         // side：'self' = 作用在玩家身上的那一半，'foe' = 作用在敌人身上的那一半。只对敌时：自己只留正值，敌人只留负值
         function domainSideEffect(side, key) {
             let v = 0;
-            const spec = side === 'self' ? sectDomainSpec() : null;   // 宗门演武场：专精的灵域对自己那一半 +30%
+            const spec = side === 'self' ? sectDomainSpec() : null;   // 宗门演武场：专精的灵域对自己那一半 +30%（弟子驻守再放大）
+            const specMult = spec ? 1 + SECT_DOMAIN_SPEC * (1 + hallDiscipleBonus('yanwu')) : 1;
             getActiveDomains().forEach(d => {
-                const x = ((d.effects && d.effects[key]) || 0) * (spec && d === SPIRIT_DOMAINS[spec] ? 1 + SECT_DOMAIN_SPEC : 1);
+                const x = ((d.effects && d.effects[key]) || 0) * (spec && d === SPIRIT_DOMAINS[spec] ? specMult : 1);
                 if (!isDomainOneSided() || (side === 'self' ? x > 0 : x < 0)) v += x;
             });
             return v;
@@ -7835,8 +7963,9 @@
         function domainSideInterval(side) {
             let v = 0;
             const spec = side === 'self' ? sectDomainSpec() : null;
+            const specMult = spec ? 1 + SECT_DOMAIN_SPEC * (1 + hallDiscipleBonus('yanwu')) : 1;
             getActiveDomains().forEach(d => {
-                const x = (d.intervalAdd || 0) * (spec && d === SPIRIT_DOMAINS[spec] ? 1 + SECT_DOMAIN_SPEC : 1);
+                const x = (d.intervalAdd || 0) * (spec && d === SPIRIT_DOMAINS[spec] ? specMult : 1);
                 if (!isDomainOneSided() || (side === 'self' ? x < 0 : x > 0)) v += x;
             });
             return v;

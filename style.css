@@ -3061,3 +3061,6 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 /* v7.52 道途 */
 .dao-kind { margin-left: 6px; font-weight: normal; font-size: 0.8em; color: var(--text-l4); }
 .dao-sub { margin-top: 14px; }
+/* v7.54 弟子 */
+.dis-talent { display: inline-block; margin-left: 4px; padding: 0 5px; font-size: 0.75em; font-weight: normal; line-height: 1.6; border: 1px solid var(--bronze-dim); color: var(--text-l2); border-radius: 2px; }
+.sect-task-foot select { max-width: 100%; padding: 2px 4px; background: var(--bg-l1); color: var(--text-l1); border: 1px solid var(--border-l3); font: inherit; }
