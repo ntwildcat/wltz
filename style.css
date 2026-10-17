@@ -3064,3 +3064,12 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 /* v7.54 弟子 */
 .dis-talent { display: inline-block; margin-left: 4px; padding: 0 5px; font-size: 0.75em; font-weight: normal; line-height: 1.6; border: 1px solid var(--bronze-dim); color: var(--text-l2); border-radius: 2px; }
 .sect-task-foot select { max-width: 100%; padding: 2px 4px; background: var(--bg-l1); color: var(--text-l1); border: 1px solid var(--border-l3); font: inherit; }
+/* v7.56 结局 */
+.ending-modal { max-width: 520px; width: calc(100% - 32px); box-sizing: border-box; text-align: center; }
+.ending-title { font-family: var(--font-brush); font-size: 3em; letter-spacing: 0.2em; text-indent: 0.2em; color: var(--text-l1); line-height: 1.2; margin-top: 6px; }
+.ending-sub { margin: 8px 0 12px; font-size: 0.92em; color: var(--text-l3); line-height: 1.7; }
+.ending-seal { display: inline-block; font-family: var(--font-brush); font-size: 1.6em; color: #fff2e4; background: #a8322a; padding: 4px 12px 3px; border-radius: 4px; transform: rotate(-6deg); margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+.ending-stats { text-align: left; border-top: 1px dashed var(--border-l3); border-bottom: 1px dashed var(--border-l3); padding: 8px 0; }
+.ending-row { display: flex; justify-content: space-between; gap: 12px; padding: 4px 2px; font-size: 0.88em; color: var(--text-l3); }
+.ending-row b { color: var(--text-l1); font-weight: normal; text-align: right; }
+.ending-after { margin-top: 12px; text-align: left; font-size: 0.85em; color: var(--text-l3); line-height: 1.7; }
