@@ -1086,7 +1086,17 @@
                     { id: 'spiritore', name: '灵矿石', icon: '✨', price: 150, desc: '炼器材料', minRealmIndex: 14 },
                     { id: 'crystal', name: '玄晶', icon: '💎', price: 300, desc: '高级材料', minRealmIndex: 17 },
                     { id: 'spiritcrystal', name: '灵晶', icon: '🔹', price: 500, desc: '元婴级材料', minRealmIndex: 18 },
-                    { id: 'immortalore', name: '仙矿', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 22 }
+                    { id: 'immortalore', name: '仙矿', icon: '✨', price: 2000, desc: '顶级材料', minRealmIndex: 22 },
+                    // v7.43 后期矿石：每块约等于该境界最好战斗区域 10 场的灵石（和自己采一小时的量相当），给后期溢出的灵石一个去处；
+                    // 鸿蒙精华是开辟仙穴的材料，定价翻倍。仙界的推进靠修炼时长，买材料不会跳过门槛
+                    { id: 'chaosstone', name: '混沌石', icon: '🪨', price: 40000, desc: '化神装备材料', minRealmIndex: 26 },
+                    { id: 'voidcrystal', name: '虚晶', icon: '💠', price: 160000, desc: '炼虚装备 / 化虚材料', minRealmIndex: 30 },
+                    { id: 'daostone', name: '天道石', icon: '🪨', price: 640000, desc: '合体装备 / 合体丹材料', minRealmIndex: 34 },
+                    { id: 'taiyiessence', name: '鸿蒙精华', icon: '🌟', price: 5000000, desc: '大乘装备 / 开辟仙穴材料', minRealmIndex: 38 },
+                    { id: 'xianlingjing', name: '仙灵晶', icon: '💠', price: 10000000, desc: '真仙装备 / 仙界食物材料', minRealmIndex: 42 },
+                    { id: 'xianjin', name: '仙金', icon: '🪙', price: 20000000, desc: '金仙装备 / 玉身转化材料', minRealmIndex: 44 },
+                    { id: 'yupo', name: '玉魄', icon: '💎', price: 40000000, desc: '太乙装备 / 推演小世界材料', minRealmIndex: 46 },
+                    { id: 'xuanhuang', name: '玄黄精', icon: '🟤', price: 80000000, desc: '大罗装备 / 法则本源材料', minRealmIndex: 48 }
                 ],
                 // 丹火商城（结丹初期起）：用丹火买炼丹 / 战斗食物材料；食物是秘境的刚需
                 danhuo_shop: [
@@ -1118,7 +1128,17 @@
                     { id: 'xian_rice', name: '仙灵稻 ×2', icon: '🌾', price: 90, currency: 'daoguo', bundle: 2, desc: '仙灵玉露 / 金髓仙浆的材料（自己种更划算）', minRealmIndex: 42 },
                     { id: 'seed_zaohua', name: '造化果种 ×2', icon: '🌰', price: 120, currency: 'daoguo', bundle: 2, desc: '仙界灵植种子（灵田 Lv90 可种）', minRealmIndex: 46 },
                     { id: 'zaohua', name: '造化果 ×2', icon: '🍑', price: 180, currency: 'daoguo', bundle: 2, desc: '玉魄琼脂 / 玄黄玉液的材料（自己种更划算）', minRealmIndex: 46 },
-                    { id: 'voidcrystal', name: '虚晶 ×2', icon: '💠', price: 45, currency: 'daoguo', bundle: 2, desc: '炼虚级矿石（化虚 / 炼虚装备材料）', minRealmIndex: 34 }
+                    { id: 'voidcrystal', name: '虚晶 ×2', icon: '💠', price: 45, currency: 'daoguo', bundle: 2, desc: '炼虚级矿石（化虚 / 炼虚装备材料）', minRealmIndex: 34 },
+                    // v7.43 后期矿石与仙界食物：定价约为该境界战斗一小时道果收入能买 120～200 份（与自己采矿、炼丹的产量相当）
+                    { id: 'taiyiessence', name: '鸿蒙精华 ×2', icon: '🌟', price: 120, currency: 'daoguo', bundle: 2, desc: '大乘装备 / 开辟仙穴材料', minRealmIndex: 38 },
+                    { id: 'xianlingjing', name: '仙灵晶 ×1', icon: '💠', price: 200, currency: 'daoguo', bundle: 1, desc: '真仙装备 / 仙界食物材料', minRealmIndex: 42 },
+                    { id: 'xian_dew', name: '仙灵玉露 ×2', icon: '🍶', price: 150, currency: 'daoguo', bundle: 2, desc: '战斗食物（恢复 9500 生命）', minRealmIndex: 42 },
+                    { id: 'xianjin', name: '仙金 ×1', icon: '🪙', price: 250, currency: 'daoguo', bundle: 1, desc: '金仙装备 / 玉身转化材料', minRealmIndex: 44 },
+                    { id: 'jinsui_nectar', name: '金髓仙浆 ×2', icon: '🍶', price: 200, currency: 'daoguo', bundle: 2, desc: '战斗食物（恢复 13000 生命）', minRealmIndex: 44 },
+                    { id: 'yupo', name: '玉魄 ×1', icon: '💎', price: 400, currency: 'daoguo', bundle: 1, desc: '太乙装备 / 推演小世界材料', minRealmIndex: 46 },
+                    { id: 'yupo_jelly', name: '玉魄琼脂 ×2', icon: '🍮', price: 320, currency: 'daoguo', bundle: 2, desc: '战斗食物（恢复 18000 生命）', minRealmIndex: 46 },
+                    { id: 'xuanhuang', name: '玄黄精 ×1', icon: '🟤', price: 650, currency: 'daoguo', bundle: 1, desc: '大罗装备 / 法则本源材料', minRealmIndex: 48 },
+                    { id: 'xuanhuang_dew', name: '玄黄玉液 ×2', icon: '🍶', price: 500, currency: 'daoguo', bundle: 2, desc: '战斗食物（恢复 24000 生命）', minRealmIndex: 48 }
                 ],
                 arts: [
                     // v7.04 功法重新定价：原价只相当于同期一两分钟的打怪收入，买不买不构成选择。
