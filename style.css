@@ -3038,3 +3038,17 @@ body:is([data-panel="inventory"], [data-panel="equipment"], [data-panel="shop"],
 .sect-task-bar span { position: absolute; inset: 0; text-align: center; font-size: 0.75em; line-height: 16px; color: var(--text-l1); }
 .sect-task-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.8em; color: var(--text-l2); }
 .sect-task-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+/* v7.50 殿阁 */
+.hall { padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border-l4); background: var(--bg-l2); border-radius: 2px; }
+.hall.locked { opacity: 0.6; }
+.hall-head { display: flex; justify-content: space-between; gap: 8px; font-size: 0.95em; color: var(--text-l1); font-weight: bold; }
+.hall-head span { font-weight: normal; font-size: 0.8em; color: var(--text-l4); }
+.hall-forms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+.hall-forms.many { grid-template-columns: repeat(4, 1fr); }
+.hall-form { display: flex; flex-direction: column; gap: 3px; text-align: left; padding: 7px 8px; border: 1px solid var(--border-l4); border-radius: 2px; background: var(--bg-l3); color: var(--text-l3); cursor: pointer; font: inherit; font-size: 0.8em; line-height: 1.45; min-width: 0; }
+.hall-form b { color: var(--text-l1); font-size: 1.05em; }
+.hall-form:hover { border-color: var(--bronze-dim); }
+.hall-form.on { border-color: var(--cinnabar-2); box-shadow: inset 0 0 0 1px var(--cinnabar); }
+.hall-good { color: var(--jade); }
+.hall-bad { color: var(--cinnabar-2); }
+@media (max-width: 600px) { .hall-forms, .hall-forms.many { grid-template-columns: 1fr 1fr; } }

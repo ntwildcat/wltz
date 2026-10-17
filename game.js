@@ -4368,7 +4368,7 @@
         // 计算玩家对怪物的伤害
         // 战斗技能等级带来的伤害倍率（每级 +0.5%）
         function getBattleSkillDmgMult() {
-            return SKILL_LEVEL_EFFECTS.battle.formula((gameState.skills.battle || {}).level || 1);
+            return SKILL_LEVEL_EFFECTS.battle.formula((gameState.skills.battle || {}).level || 1) * (1 + getSectMod('battleDmg'));   // 宗门护山大阵（渡劫类战斗为 0）
         }
 
         // 秘境：玩家命中怪物的概率（含境界压制、灵根克制、灵根 / 功法命中特效）
@@ -4447,8 +4447,8 @@
                 const damageReduction = (playerDef / (monsterDmg + playerDef + 1)) * 0.75;
                 monsterDmg *= (1 - damageReduction);
 
-                // 怪物攻击也受境界压制
-                monsterDmg = Math.floor(monsterDmg * realmSuppression.dmgMod);
+                // 怪物攻击也受境界压制；宗门护山大阵（渡劫类战斗为 0）
+                monsterDmg = Math.floor(monsterDmg * realmSuppression.dmgMod * (1 + getSectMod('dmgTaken')));
 
                 // 克制修正
                 monsterDmg = Math.floor(monsterDmg * counterModifier.damage);
@@ -4595,8 +4595,9 @@
                 if (orificeLost) calculateStats();
             }
             let foodLost = 0;
+            const keepFood = !dungeon.isTribulation && sectSecretIs('hushi');   // 宗门藏经阁·护食诀
             gameState.player.inventory.forEach(item => {
-                if (GAME_CONFIG.items[item.id] && GAME_CONFIG.items[item.id].type === 'food') {
+                if (!keepFood && GAME_CONFIG.items[item.id] && GAME_CONFIG.items[item.id].type === 'food') {
                     const lose = Math.min(item.qty - 1, Math.floor(item.qty * foodLossRate));   // v7.47：向下取整，每种至少留 1 份
                     item.qty -= lose;
                     foodLost += lose;
@@ -5530,8 +5531,10 @@
                 const toEnemy = rollNormalAttack(playerStats, { ...enemy, def: enemyEff.def, spd: enemyEff.spd }, REALM_SUPPRESSION.calculate(gameState.player.realmIndex, areaRealm),
                     { hit: getMod('hit'), crit: BASE_CRIT.rate + getMod('crit'), critMult: BASE_CRIT.dmg + getMod('critDmg'),
                       dmgMult: (1 + getMasteryBonus('battle', battle.currentArea).dmg) * getBattleSkillDmgMult() * drawHeavenQi(),
+                      ...(sectSecretIs('xianshou') && !battle.firstHit ? { crit: 1 } : {}),
                       dodge: domainSideDodgeVoid('foe') ? 0 : domainSideEffect('foe', 'dodge') + (hasAffix(enemy, 'huanshen') ? AFFIX_TUNE.huanshenDodge : 0) });   // 水域：敌方那一半的闪避（只对敌时为 0）；幻身词缀，雷域下同样失效
                 if (toEnemy.hit) {
+                    battle.firstHit = true;
                     damageAreaEnemy(battle, enemy, toEnemy.dmg);
                     battle.log.push(`玩家${toEnemy.crit ? '暴击！' : ''}造成${toEnemy.dmg}点伤害`);
                     battle._lastPlayerAttack = { dmg: toEnemy.dmg, crit: toEnemy.crit };
@@ -5563,6 +5566,8 @@
                         { dodge: domainSideDodgeVoid('self') ? 0 : getMod('dodge'),
                           hit: domainSideEffect('foe', 'hit'), crit: domainSideEffect('foe', 'crit'), critMult: BASE_CRIT.dmg + domainSideEffect('foe', 'critDmg') });   // 金域：敌方也可能暴击，平时 crit=0 不会触发
                     if (toPlayer.hit) {
+                        const taken = getSectMod('dmgTaken');   // 宗门护山大阵
+                        if (taken) toPlayer.dmg = Math.max(1, Math.round(toPlayer.dmg * (1 + taken)));
                         battle.playerHP.current -= toPlayer.dmg;
                         battleStats(battle)[toPlayer.crit ? 'crit' : 'normal'] += toPlayer.dmg;
                         if (hasAffix(enemy, 'shixue')) {
@@ -5834,7 +5839,7 @@
             gameState.player.coins += coins;
             addSkillExp('battle', exp);
             addMasteryExp('battle', areaKey, 10);
-            const { got, lost } = rollAreaDrops(areaKey, reward);
+            const { got, lost } = rollAreaDrops(areaKey, reward * (enemyMult > 1 && sectSecretIs('souzhen') ? 1.5 : 1));   // 宗门藏经阁·搜珍诀
             const currency = rollAreaCurrency(areaKey, reward);
             trackQuest('battleWin');
             return { coins, exp, items: got, lost, danhuo: currency.danhuo, shenshi: currency.shenshi, daoguo: currency.daoguo };
@@ -5854,7 +5859,7 @@
         // 宗门是一条跟着境界走的并行成长线：宗门经验来自任务，等级同时受境界限制（SECT_LEVELS[].realm），不会一下子全开。
         // 任务榜：每 4 小时（现实时间）把空位补满到 3 个；同时只能接 1 个（宗门 5 级起 2 个）；花贡献可以把榜上的任务换一个。
         // 任务进度在线离线都算（离线托管的胜场也算），达成自动完成；供奉类要手动上交。
-        // 奖励：宗门经验 + 贡献，每升一级任务奖励 +15%。贡献目前用于换任务，殿阁 / 外敌来犯 / 宗门商店在后续版本加入。
+        // 奖励：宗门经验 + 贡献，每升一级任务奖励 +15%。贡献用于换任务、更换殿阁形制（v7.50）。
         const SECT_REALM = NASCENT_SAFE_REALM;   // 元婴初期
         const SECT_LEVELS = [
             { xp: 0, realm: 22 }, { xp: 250, realm: 23 }, { xp: 700, realm: 24 }, { xp: 1400, realm: 26 }, { xp: 2400, realm: 28 },
@@ -6079,7 +6084,8 @@
                 ${s.active.length ? s.active.map(t => sectTaskCard(t, 'active')).join('') : '<div class="qiyu-empty">还没有接任务，从下面的任务榜里挑一个。</div>'}
                 <div class="qiyu-sub">任务榜（${s.board.length}/${SECT_BOARD_SIZE}）· ${fmtLeft(s.nextRefreshAt - Date.now())}后补满</div>
                 ${s.board.length ? s.board.map(t => sectTaskCard(t, 'board')).join('') : '<div class="qiyu-empty">榜上的任务都接完了，等下一次补充。</div>'}
-                <div class="qiyu-note">任务榜每 4 小时把空位补满到 ${SECT_BOARD_SIZE} 个，离线也照常补。讨伐、清剿、游历、历练的进度在线离线都算，达成自动完成；供奉要手动上交。放弃的任务不回到榜上。</div>`;
+                <div class="qiyu-note">任务榜每 4 小时把空位补满到 ${SECT_BOARD_SIZE} 个，离线也照常补。讨伐、清剿、游历、历练的进度在线离线都算，达成自动完成；供奉要手动上交。放弃的任务不回到榜上。</div>
+                ${sectHallsHtml()}`;
         }
 
         // ==================== 敌人词缀、地气与精英（v7.47） ====================
@@ -7432,6 +7438,107 @@
         const DOMAIN_SHENSHI_COST = 15;   // 每次进入战斗激活一次：化神期神识产出约 0.3/秒，15 点约合半分钟产出，有真实成本但不至于用不起
         const MIN_ATTACK_INTERVAL = 0.3;   // 攻击间隔下限，防止冰域 / 装备叠加把间隔压到 0 或负数
 
+        // ==================== 宗门殿阁（v7.50） ====================
+        // 每座殿阁 3 种形制，同时只能用一种，每种都有好处也有代价（藏经阁、演武场是机制类三选一）。首次选择免费，之后切换花 50 贡献，
+        // 同一座殿阁切换后 1 小时内不能再切。战斗类效果在渡劫类战斗（天劫 / 心魔 / 三衰 / 三尸 / 证道）里不生效，不动它们的标定。
+        const SECT_HALLS = {
+            husan: { name: '护山大阵', icon: '⛩️', level: 1, forms: {
+                gong:  { name: '攻阵',   effects: { battleDmg: 0.08, dmgTaken: 0.05 } },
+                shou:  { name: '守阵',   effects: { dmgTaken: -0.10, battleReward: -0.05 } },
+                juling:{ name: '聚灵阵', effects: { cultSpeed: 0.06, battleDmg: -0.05 } } } },
+            danfang: { name: '丹房', icon: '⚗️', level: 2, forms: {
+                jihuo: { name: '急火', effects: { 'time:alchemy': -0.08, 'save:alchemy': -0.05 } },
+                wenhuo:{ name: '文火', effects: { 'save:alchemy': 0.08, 'time:alchemy': 0.05 } },
+                yaoshan:{ name: '药膳', effects: { foodPct: 0.10, 'exp:alchemy': -0.10 } } } },
+            qitang: { name: '器堂', icon: '🔨', level: 3, forms: {
+                jiduan:{ name: '急锻', effects: { 'time:forging': -0.08, 'save:forging': -0.05 } },
+                mangong:{ name: '慢工', effects: { 'save:forging': 0.08, 'time:forging': 0.05 } },
+                jinglian:{ name: '精炼', effects: { gearPct: 0.03, 'time:forging': 0.10 } } } },
+            lingtian: { name: '灵田司', icon: '🌾', level: 3, forms: {
+                guangzhong:{ name: '广种', effects: { 'double:farming': 0.06, 'time:mining': 0.05 } },
+                shenjue:{ name: '深掘', effects: { 'double:mining': 0.06, 'time:farming': 0.05 } },
+                qingeng:{ name: '勤耕', effects: { 'time:farming': -0.05, 'time:mining': -0.05, 'exp:farming': -0.10, 'exp:mining': -0.10 } } } },
+            cangjing: { name: '藏经阁', icon: '📚', level: 4, forms: {
+                hushi:  { name: '护食诀', effects: {}, text: '普通秘境战败不丢战斗食物' },
+                xianshou:{ name: '先手诀', effects: {}, text: '每场普通战斗的第一次命中必定暴击' },
+                souzhen:{ name: '搜珍诀', effects: {}, text: '击败带词缀的敌人时，物品掉落概率 ×1.5' } } },
+            yanwu: { name: '演武场', icon: '🥋', level: 6, forms: Object.fromEntries(Object.entries(SPIRIT_DOMAINS).map(([k, d]) => [k, { name: d.name + '专精', effects: {}, domain: k, text: `${d.name}对你那一半的效果 +30%（对敌那一半不变）` }])) }
+        };
+        const SECT_HALL_SWITCH_COST = 50, SECT_HALL_COOLDOWN_MS = 3600 * 1000, SECT_DOMAIN_SPEC = 0.30;
+        const SECT_BATTLE_KEYS = new Set(['battleDmg', 'dmgTaken']);
+        let sectModCache = { sig: '', totals: {} };
+
+        function inTribulationFight() {
+            const a = gameState.currentAction;
+            if (!a || !a.isDungeon) return false;
+            const d = GAME_CONFIG.dungeons[gameState.dungeons.currentDungeon];
+            return !!(d && d.isTribulation);
+        }
+        function sectHallForm(hall) {
+            const s = getSect();
+            if (!s || !s.halls || !s.halls[hall] || sectLevelInfo().level < SECT_HALLS[hall].level) return null;
+            return SECT_HALLS[hall].forms[s.halls[hall]] || null;
+        }
+        function getSectMod(key) {
+            const s = gameState.sect;
+            if (!s || !s.halls) return 0;
+            if (SECT_BATTLE_KEYS.has(key) && inTribulationFight()) return 0;
+            const sig = (s.hallsSig || '') + '|' + (s.xp || 0) + '|' + gameState.player.realmIndex;
+            if (sectModCache.sig !== sig) {
+                const totals = {};
+                Object.keys(SECT_HALLS).forEach(h => { const f = sectHallForm(h); if (f) Object.entries(f.effects).forEach(([k, v]) => { totals[k] = (totals[k] || 0) + v; }); });
+                sectModCache = { sig, totals };
+            }
+            return sectModCache.totals[key] || 0;
+        }
+        function sectSecretIs(id) { const f = sectHallForm('cangjing'); return !!(f && SECT_HALLS.cangjing.forms[id] === f); }
+        function sectDomainSpec() { if (inTribulationFight()) return null; const f = sectHallForm('yanwu'); return f ? f.domain : null; }
+        function hallEffectText(form) {
+            if (form.text) return form.text;
+            const kinds = { double: '翻倍概率', save: '节省材料概率', time: '耗时', out: '产出', exp: '经验' };
+            const fixed = { battleDmg: '战斗伤害', dmgTaken: '受到的伤害', battleReward: '战斗灵石与经验', cultSpeed: '修炼速度', foodPct: '战斗食物回复', gearPct: '装备属性' };
+            const sign = v => (v > 0 ? '+' : '') + Math.round(v * 100) + '%';
+            return Object.entries(form.effects).map(([k, v]) => {
+                const [kind, sk] = k.split(':');
+                const label = sk ? `${qiyuSkillName(sk)}${kinds[kind]}` : (fixed[k] || k);
+                const bad = (k === 'dmgTaken' || kind === 'time') ? v > 0 : v < 0;
+                return `<span class="${bad ? 'hall-bad' : 'hall-good'}">${label} ${sign(v)}</span>`;
+            }).join('、');
+        }
+        async function chooseSectHall(hall, formId) {
+            const s = getSect(), cfg = SECT_HALLS[hall];
+            if (!s || !cfg || !cfg.forms[formId] || sectLevelInfo().level < cfg.level) return;
+            s.halls = s.halls || {}; s.hallSwitchAt = s.hallSwitchAt || {};
+            if (s.halls[hall] === formId) return;
+            const first = !s.halls[hall];
+            if (!first) {
+                const left = (s.hallSwitchAt[hall] || 0) + SECT_HALL_COOLDOWN_MS - Date.now();
+                if (left > 0) { showNotification(`${cfg.name}刚换过形制，${fmtLeft(left)}后才能再换`, '#c98a3e'); return; }
+                if (s.contrib < SECT_HALL_SWITCH_COST) { showNotification(`贡献不够（换形制要 ${SECT_HALL_SWITCH_COST}）`, '#c98a3e'); return; }
+                if (!await uiConfirm(`把${cfg.name}换成「${cfg.forms[formId].name}」？花 ${SECT_HALL_SWITCH_COST} 贡献，1 小时内不能再换。`, { title: '更换形制' })) return;
+                if (s.contrib < SECT_HALL_SWITCH_COST) return;
+                s.contrib -= SECT_HALL_SWITCH_COST;
+            }
+            s.halls[hall] = formId;
+            s.hallsSig = JSON.stringify(s.halls);
+            s.hallSwitchAt[hall] = Date.now();
+            calculateStats();
+            showNotification(`${cfg.icon} ${cfg.name}：${first ? '定下' : '改为'}「${cfg.forms[formId].name}」`, '#c2a25f');
+            renderSectPanel(); updateUI(); saveGame();
+        }
+        function sectHallsHtml() {
+            const s = getSect(), lv = sectLevelInfo().level;
+            return `<div class="qiyu-sub">殿阁</div>` + Object.entries(SECT_HALLS).map(([h, cfg]) => {
+                if (lv < cfg.level) return `<div class="hall locked"><div class="hall-head">${cfg.icon} ${cfg.name}<span>宗门 ${cfg.level} 级开放</span></div></div>`;
+                const cur = (s.halls || {})[h];
+                const left = cur ? (s.hallSwitchAt[h] || 0) + SECT_HALL_COOLDOWN_MS - Date.now() : 0;
+                const note = !cur ? '首次选择免费' : left > 0 ? `${fmtLeft(left)}后可再换` : `换形制 ${SECT_HALL_SWITCH_COST} 贡献`;
+                const forms = Object.entries(cfg.forms).map(([id, f]) => `<button type="button" class="hall-form${cur === id ? ' on' : ''}" onclick="chooseSectHall('${h}', '${id}')"><b>${f.name}</b><span>${hallEffectText(f)}</span></button>`).join('');
+                return `<div class="hall"><div class="hall-head">${cfg.icon} ${cfg.name}<span>${note}</span></div><div class="hall-forms${h === 'yanwu' ? ' many' : ''}">${forms}</div></div>`;
+            }).join('') + `<div class="qiyu-note">战斗伤害、受到的伤害、灵域专精这些战斗效果在渡劫类战斗（天劫、心魔、衰相、三尸、证道）里不生效。</div>`;
+        }
+
+
         function isDomainUnlocked() { return gameState.player.realmIndex >= 26 && !isAssimilated() && !isLawRestrained(); }   // v6.89：原索引17 → +9；道祖同化 / 收敛时不能展开
         // 灵域的三个阶段（v7.23）：化神～真仙借天地之势布域，敌我同受；金仙以法则凝成自己的灵域，「只对敌」——
         // 自己只吃到灵域的好处、敌人只吃到坏处；太乙「叠域」，可以同时展开两个灵域（各自只对敌）
@@ -7445,8 +7552,9 @@
         // side：'self' = 作用在玩家身上的那一半，'foe' = 作用在敌人身上的那一半。只对敌时：自己只留正值，敌人只留负值
         function domainSideEffect(side, key) {
             let v = 0;
+            const spec = side === 'self' ? sectDomainSpec() : null;   // 宗门演武场：专精的灵域对自己那一半 +30%
             getActiveDomains().forEach(d => {
-                const x = (d.effects && d.effects[key]) || 0;
+                const x = ((d.effects && d.effects[key]) || 0) * (spec && d === SPIRIT_DOMAINS[spec] ? 1 + SECT_DOMAIN_SPEC : 1);
                 if (!isDomainOneSided() || (side === 'self' ? x > 0 : x < 0)) v += x;
             });
             return v;
@@ -7454,8 +7562,9 @@
         // 攻击间隔：加时间是坏处（只给敌人）、减时间是好处（只给自己）
         function domainSideInterval(side) {
             let v = 0;
+            const spec = side === 'self' ? sectDomainSpec() : null;
             getActiveDomains().forEach(d => {
-                const x = d.intervalAdd || 0;
+                const x = (d.intervalAdd || 0) * (spec && d === SPIRIT_DOMAINS[spec] ? 1 + SECT_DOMAIN_SPEC : 1);
                 if (!isDomainOneSided() || (side === 'self' ? x < 0 : x > 0)) v += x;
             });
             return v;
@@ -7952,6 +8061,7 @@
             total += getXianMod(key);   // 真仙：道体（每个亮着的仙窍生命 / 防御 +1%）与三衰
             total += getEndlessMod(key);   // 大乘以后的无上限修炼：器灵温养 / 神魂参悟 / 本源温养
             total += getQiyuMod(key);   // 奇遇的限时机缘与奇物
+            total += getSectMod(key);   // 宗门殿阁
             return total;
         }
 
